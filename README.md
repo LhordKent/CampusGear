@@ -2,6 +2,38 @@
 
 .NET 8 ASP.NET Core MVC application with Entity Framework Core 8, ASP.NET Core Identity, and Microsoft SQL Server. The original 70-frame Figma UI demo remains available under `/demo`.
 
+## Developer cheatsheet: start here
+
+New to the project? Read the [complete codebase cheatsheet](docs/CODEBASE_CHEATSHEET.md). It explains the folder structure, every controller's responsibilities, routes, database relationships, signup/email flows, reservation lifecycle, UI files, configuration, debugging, and common changes.
+
+| What you want to understand or change | Start with | What it controls |
+| --- | --- | --- |
+| Application startup and registered services | [Program.cs](CampusGear/CampusGear/Program.cs) | Database, Identity, email provider, sessions, permissions, middleware, and startup initialization |
+| Signup, login, email codes, password recovery | [AccountController.cs](CampusGear/CampusGear/Controllers/AccountController.cs) | Account forms, pending verification sessions, role redirects, and authentication |
+| Code generation and verification | [EmailChallengeService.cs](CampusGear/CampusGear/Services/EmailChallengeService.cs) | Code lifetime, resend cooldown, attempts, invalidation, and consumption |
+| Real email delivery and local settings | [SmtpEmailSender.cs](CampusGear/CampusGear/Services/SmtpEmailSender.cs), [DevelopmentConfiguration.cs](CampusGear/CampusGear/Services/DevelopmentConfiguration.cs) | SMTP sends and Development configuration loading |
+| Reservation rules and equipment loans | [ReservationService.cs](CampusGear/CampusGear/Services/Reservations/ReservationService.cs) | Availability, approval, cancellation, release, return, concurrency, and audit events |
+| Borrower screens | [BorrowerController.cs](CampusGear/CampusGear/Controllers/BorrowerController.cs), [Views/Borrower](CampusGear/CampusGear/Views/Borrower) | Booking form, own history, and calendar |
+| Custodian operations | [CustodianController.cs](CampusGear/CampusGear/Controllers/CustodianController.cs), [Views/Custodian](CampusGear/CampusGear/Views/Custodian) | Approval queue, releases, returns, details, and calendars |
+| Administrator management | [Controllers](CampusGear/CampusGear/Controllers) | Inventory, categories, accounts, borrower eligibility, maintenance, reservations, and audit log |
+| Database shape and first-run data | [ApplicationDbContext.cs](CampusGear/CampusGear/Data/ApplicationDbContext.cs), [DbInitializer.cs](CampusGear/CampusGear/Data/DbInitializer.cs) | Tables, relationships, constraints, migrations, roles, sample equipment, and initial administrator |
+| Shared screen layout and navigation | [Views/Shared](CampusGear/CampusGear/Views/Shared), [FigmaUi.cs](CampusGear/CampusGear/Models/FigmaUi.cs) | Account/workspace shells, shared partials, role navigation, and Figma assets |
+| Styles and browser interactions | [wwwroot/css](CampusGear/CampusGear/wwwroot/css), [wwwroot/js](CampusGear/CampusGear/wwwroot/js) | Responsive layouts, forms, navigation, and presentation |
+| Automated checks | [CampusGear.IntegrationTests](CampusGear/CampusGear.IntegrationTests), [scripts](scripts) | SQL lifecycle tests, email regressions, and local HTTP smoke checks |
+
+The web project is `CampusGear/CampusGear/`; the solution is `CampusGear/CampusGear.sln`. Live features use `Controllers` + `Views`; the saved Figma reference screens use `Pages/Screen.cshtml` + `Pages/Figma/Frames` under `/demo`. Editing a demo frame does not change the live reservation or account workflow.
+
+### README navigation
+
+- [Run locally](#run-locally)
+- [Gmail setup](#send-real-email-with-gmail-locally)
+- [First administrator](#create-the-first-administrator)
+- [Live workflows](#live-workflows)
+- [Database and deployment](#database-and-deployment-configuration)
+- [Figma reference](#figma-sources-and-ui-reference)
+- [Verification commands](#verification)
+- [Detailed code map and troubleshooting](docs/CODEBASE_CHEATSHEET.md)
+
 ## Run locally
 
 SQL Server Express is configured as `.\SQLEXPRESS` in `appsettings.Development.json`, using Windows authentication. The application creates/migrates only the `CampusGear` database in Development. A different instance can be configured with `ConnectionStrings__CampusGear`.
