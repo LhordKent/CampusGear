@@ -9,7 +9,7 @@
     var calendarAction = staffPath == "/admin" ? "AdminCalendar" : "Calendar";
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
-<main class="live-content">
+<main class="live-content" data-figma-source="@(staffPath == "/admin" ? "695:4296" : "695:2691")">
     <header class="live-heading"><p class="live-eyebrow">CUSTODIAN / SCHEDULE</p><h1>Availability calendar</h1><p>Inspect equipment bookings and maintenance status. All times are shown in Manila time (UTC+8).</p></header>
     <section class="live-panel">
         <form class="live-filters" method="get" action="@staffPath/calendar"><input type="hidden" name="year" value="@Model.Month.Year" /><input type="hidden" name="month" value="@Model.Month.Month" /><label for="CalendarItem">Equipment<select id="CalendarItem" name="equipmentItemId">@foreach (var item in Model.Items) { <option value="@item.Id" selected="@(Model.SelectedItem?.Id == item.Id)">@item.Name · @item.AssetCode@(item.MaintenanceHold ? " · Maintenance" : "")</option> }</select></label><button class="live-button" type="submit">View schedule</button></form>

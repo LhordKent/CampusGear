@@ -15,6 +15,7 @@ public sealed class DevelopmentController(IWebHostEnvironment environment, IServ
         if (!environment.IsDevelopment() || address is null || !IPAddress.IsLoopback(address)) return NotFound();
         Response.Headers.CacheControl = "no-store";
         var mailbox = services.GetService<DevelopmentEmailSender>();
-        return View(mailbox?.GetRecent() ?? Array.Empty<DevelopmentEmailMessage>());
+        if (mailbox is null) return NotFound();
+        return View(mailbox.GetRecent());
     }
 }

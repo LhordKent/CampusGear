@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>CampusGear-d27882c0-7d71-4d0d-97da-548b14740355</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,0 +1,6 @@
+@model CampusGear.Models.FigmaEditorFooter
+<div class="live-editor-summary">
+    @foreach (var value in Model.Values)
+    { <div><small>@value.Label</small><strong data-summary-for="@value.InputId">@value.Value</strong></div> }
+</div>
+<div class="live-editor-actions"><a class="live-button secondary" href="@Model.CancelUrl">CANCEL</a><button class="live-button" type="submit" form="@Model.FormId">SAVE CHANGES</button></div>

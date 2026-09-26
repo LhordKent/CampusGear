@@ -1,4 +1,5 @@
-param([string]$BaseUrl = 'http://127.0.0.1:5077', [switch]$KeepFixtures)
+param([string]$BaseUrl = 'http://127.0.0.1:5077', [switch]$KeepFixtures,
+    [string]$DatabaseConnectionString = 'Server=.\SQLEXPRESS;Database=CampusGear;Integrated Security=True;TrustServerCertificate=True')
 $ErrorActionPreference = 'Stop'
 $targetUri = [Uri]$BaseUrl
 if (!$targetUri.IsLoopback) { throw 'This smoke script is restricted to the local Development app.' }
@@ -8,7 +9,7 @@ $successful = $false
 $fixtureUsers = [System.Collections.Generic.List[string]]::new()
 $fixtureItems = [System.Collections.Generic.List[Guid]]::new()
 $fixtureCategories = [System.Collections.Generic.List[Guid]]::new()
-$connection = [System.Data.SqlClient.SqlConnection]::new('Server=.\SQLEXPRESS;Database=CampusGear;Integrated Security=True;TrustServerCertificate=True')
+$connection = [System.Data.SqlClient.SqlConnection]::new($DatabaseConnectionString)
 $connection.Open()
 function Sql([string]$text, [hashtable]$values = @{}) {
     $command = $connection.CreateCommand(); $command.CommandText = $text

@@ -68,14 +68,22 @@ builder.Services.AddScoped<EmailChallengeService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddHostedService<ReservationExpiryWorker>();
-if (builder.Environment.IsDevelopment())
+var emailProvider = builder.Configuration["Email:Provider"]
+    ?? (builder.Environment.IsDevelopment() ? "Development" : "Smtp");
+if (emailProvider.Equals("Development", StringComparison.OrdinalIgnoreCase))
 {
+    if (!builder.Environment.IsDevelopment())
+        throw new InvalidOperationException("The Development email provider is available only in Development.");
     builder.Services.AddSingleton<DevelopmentEmailSender>();
     builder.Services.AddSingleton<IEmailSender>(sp => sp.GetRequiredService<DevelopmentEmailSender>());
 }
-else
+else if (emailProvider.Equals("Smtp", StringComparison.OrdinalIgnoreCase))
 {
     builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+}
+else
+{
+    throw new InvalidOperationException("Email:Provider must be Development or Smtp.");
 }
 
 var app = builder.Build();
@@ -116,4 +124,5 @@ app.MapControllers();
 app.MapRazorPages();
 
 await DbInitializer.InitializeAsync(app.Services, app.Environment.IsDevelopment());
+if (args.Contains("--initialize-only", StringComparer.OrdinalIgnoreCase)) return;
 app.Run();

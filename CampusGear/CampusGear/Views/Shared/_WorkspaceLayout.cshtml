@@ -1,76 +1,80 @@
+@using CampusGear.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject Microsoft.AspNetCore.Identity.UserManager<CampusGear.Models.ApplicationUser> WorkspaceUsers
 @{
     var role = (string?)ViewData["WorkspaceRole"] ?? "Borrower";
     var slug = role == "Administrator" ? "admin" : role.ToLowerInvariant();
-    var currentPath = Context.Request.Path.Value ?? "";
-    string Active(string path) => currentPath.Equals(path, StringComparison.OrdinalIgnoreCase) ? "live-nav-active" : "";
+    var path = Context.Request.Path.Value ?? "";
+    var account = await WorkspaceUsers.GetUserAsync(User);
+    var name = account?.FullName ?? role;
+    var initial = name.Length > 0 ? name[..1].ToUpperInvariant() : "C";
+    var title = ViewData["Title"] as string ?? "Campus equipment workspace";
+    var dashboard = path.EndsWith("/dashboard", StringComparison.OrdinalIgnoreCase);
+    var verifiedLabel = role == "Administrator" ? "2FA VERIFIED" : role == "Custodian" ? "OPS READY" : "SYSTEM READY";
+    var avatar = role == "Borrower" ? "a698b.svg" : "2680a.svg";
+    var sidebarAvatar = role == "Administrator" ? "7ac1a.svg" : "6632a.svg";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] · CampusGear</title>
+    <meta name="theme-color" content="#071b2b" />
+    <title>@title · CampusGear</title>
     <link rel="stylesheet" href="~/css/live-workspace.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/css/figma-live.css" asp-append-version="true" />
 </head>
-<body>
+<body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaUi.Frame(path)">
+    <a class="live-skip" href="#workspace-content">Skip to content</a>
     <div class="live-shell">
+        <div class="live-atmosphere" aria-hidden="true" inert>
+            <img class="live-atmosphere-base" src="/figma/assets/@FigmaUi.Atmosphere(role)" alt="" />
+            <img class="live-atmosphere-detail" src="/figma/assets/@FigmaUi.Detail(role)" alt="" />
+        </div>
         <aside class="live-sidebar">
-            <a class="live-brand" href="/@slug/dashboard"><img src="~/figma/assets/b95f3.svg" alt="" /><span>Campus<strong>Gear</strong></span></a>
-            <div class="live-role">@role workspace</div>
+            @if (role != "Borrower") { <img class="live-sidebar-signature" src="/figma/assets/@FigmaUi.Signature(role)" alt="" aria-hidden="true" /> }
+            <a class="live-brand" href="/@slug/dashboard"><img src="/figma/assets/b95f3.svg" alt="" /><span>Campus<strong>Gear</strong></span></a>
+            <div class="live-role">@role.ToUpperInvariant() WORKSPACE</div>
             <details class="live-navigation" open>
-            <summary>Workspace menu</summary>
-            <nav aria-label="Workspace navigation">
-                <a class="@Active($"/{slug}/dashboard")" href="/@slug/dashboard">Dashboard</a>
-                @if (role == "Borrower")
-                {
-                    <a class="@Active("/borrower/reservation")" href="/borrower/reservation">Equipment Reservation</a>
-                    <a class="@Active("/borrower/history")" href="/borrower/history">Borrowing History</a>
-                    <a class="@Active("/borrower/calendar")" href="/borrower/calendar">Availability Calendar</a>
-                }
-                @if (role == "Custodian")
-                {
-                    <a class="@Active("/custodian/approvals")" href="/custodian/approvals">Approval Queue</a>
-                    <a class="@Active("/custodian/returns")" href="/custodian/returns">Releases &amp; Returns</a>
-                    <a class="@Active("/custodian/history")" href="/custodian/history">Borrowing Records</a>
-                    <a class="@Active("/custodian/calendar")" href="/custodian/calendar">Availability Calendar</a>
-                    <a href="/admin/maintenance">Maintenance</a>
-                }
-                @if (role == "Administrator")
-                {
-                    <a class="@Active("/admin/equipment")" href="/admin/equipment">Equipment Management</a>
-                    <a class="@Active("/admin/categories")" href="/admin/categories">Equipment Categories</a>
-                    <a class="@Active("/admin/reservations")" href="/admin/reservations">Reservations</a>
-                    <a class="@Active("/admin/users")" href="/admin/users">User Management</a>
-                    <a class="@Active("/admin/maintenance")" href="/admin/maintenance">Maintenance</a>
-                    <a class="@Active("/admin/approvals")" href="/admin/approvals">Approval Queue</a>
-                    <a class="@Active("/admin/returns")" href="/admin/returns">Releases &amp; Returns</a>
-                    <a class="@Active("/admin/calendar")" href="/admin/calendar">Availability Calendar</a>
-                    <a class="@Active("/admin/history")" href="/admin/history">Borrowing Records</a>
-                    <a class="@Active("/admin/audit")" href="/admin/audit">Audit History</a>
-                }
-                <a href="/demo/@slug/dashboard">Figma screen reference <span class="live-nav-note">Demo</span></a>
-            </nav>
+                <summary>Workspace menu</summary>
+                <nav aria-label="Workspace navigation">
+                    @foreach (var item in FigmaUi.Navigation(role))
+                    {
+                        var active = path.Equals(item.Path, StringComparison.OrdinalIgnoreCase) ||
+                            item.Path == "/admin/users" && path.StartsWith("/admin/users/", StringComparison.OrdinalIgnoreCase);
+                        <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)"><span class="live-nav-icon"><img src="/figma/assets/@item.Icon" alt="" /></span><span>@item.Label</span></a>
+                    }
+                    @if (role != "Borrower")
+                    {
+                        <details class="live-extra-navigation"><summary>More operations</summary>
+                            @if (role == "Administrator")
+                            { <a href="/admin/reservations">Reservation Management</a><a href="/admin/approvals">Approval &amp; Release</a><a href="/admin/returns">Return &amp; Condition Check</a> }
+                            else { <a href="/custodian/history">Borrowing History</a> }
+                            <a href="/admin/maintenance">Equipment Maintenance</a>
+                        </details>
+                    }
+                </nav>
             </details>
-            <form method="post" action="/auth/logout" class="live-logout">
-                @Html.AntiForgeryToken()
-                <button type="submit">Log out</button>
-            </form>
+            @if (role == "Borrower")
+            {
+                <div class="live-nav-ambient" aria-hidden="true"><p>CAMPUSGEAR / BORROWER</p><strong>SESSION ACTIVE</strong><span>EQUIPMENT ACCESS</span><div><img src="/figma/assets/f64d6.svg" alt="" /><img src="/figma/assets/6eb9d.svg" alt="" /><img src="/figma/assets/606cd.svg" alt="" /></div></div>
+            }
+            else
+            {
+                <div class="live-sidebar-profile"><span class="live-avatar"><img src="/figma/assets/@sidebarAvatar" alt="" /><b>@initial</b></span><div><strong>@name</strong><small>@role</small></div></div>
+            }
+            <form method="post" action="/auth/logout" class="live-logout">@Html.AntiForgeryToken()<button type="submit">Log out</button></form>
         </aside>
         <div class="live-main">
-            <header class="live-topbar"><span>@role workspace</span><span class="live-status">● SYSTEM READY</span></header>
-            @RenderBody()
+            <header class="live-topbar">
+                <div class="live-topbar-title"><strong>@title</strong><small>@(role == "Borrower" ? "Campus equipment workspace" : role == "Custodian" ? "Manage requests, releases, and returns." : "Manage equipment, users, reservations, and audit records.")</small></div>
+                <div class="live-topbar-account"><span class="live-status"><img src="/figma/assets/d3b6f.svg" alt="" />@verifiedLabel</span><span class="live-avatar"><img src="/figma/assets/@avatar" alt="" /><b>@initial</b></span><div><strong>@name</strong><small>@role</small></div></div>
+            </header>
+            <div id="workspace-content" tabindex="-1">@RenderBody()</div>
         </div>
     </div>
-    <script>
-        (() => {
-            const menu = document.querySelector('.live-navigation');
-            const mobile = window.matchMedia('(max-width: 1000px)');
-            const resize = () => { menu.open = !mobile.matches; };
-            resize();
-            mobile.addEventListener('change', resize);
-        })();
-    </script>
+    <script src="~/js/figma-live.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

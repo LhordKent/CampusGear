@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Net;
 using CampusGear.Data;
+using CampusGear.Filters;
 using CampusGear.Models;
 using CampusGear.Services;
 using Microsoft.Data.SqlClient;
@@ -15,6 +16,7 @@ namespace CampusGear.Controllers;
 
 [Route("auth")]
 [AutoValidateAntiforgeryToken]
+[TypeFilter(typeof(AccountAntiforgeryRecoveryFilter))]
 public sealed class AccountController : Controller
 {
     private const string PendingVerificationUserId = "CampusGear.PendingVerificationUserId";

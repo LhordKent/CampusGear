@@ -7,7 +7,7 @@
     var statuses = new[] { ("all", "All statuses"), ("pending", "Pending"), ("approved", "Approved"), ("borrowed", "Borrowed"), ("returned", "Returned"), ("late", "Late / overdue"), ("cancelled", "Cancelled") };
 }
 @* Figma sources: 695:562 history, 695:737 filtered, 695:1079 empty, 695:904 late monitoring. *@
-<link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" />
+@section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
 <main class="live-content borrower-page" data-figma-source="695:562">
     <header class="live-heading borrower-heading">
         <p class="live-eyebrow">BORROWER • WORKSPACE</p>

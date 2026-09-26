@@ -49,12 +49,14 @@ public static class DbInitializer
             EmailConfirmed = true,
             FullName = Environment.GetEnvironmentVariable("CAMPUSGEAR_BOOTSTRAP_ADMIN_NAME") ?? "CampusGear Administrator"
         };
+        await using var transaction = await db.Database.BeginTransactionAsync();
         var result = await users.CreateAsync(user, password);
         if (!result.Succeeded)
             throw new InvalidOperationException($"Could not create bootstrap administrator: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         result = await users.AddToRoleAsync(user, "Administrator");
         if (!result.Succeeded)
             throw new InvalidOperationException($"Could not assign administrator role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        await transaction.CommitAsync();
     }
 
     private static async Task<EquipmentCategory> GetOrCreateCategoryAsync(

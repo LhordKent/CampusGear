@@ -4,13 +4,16 @@
     Layout = "_WorkspaceLayout";
     ViewData["Title"] = "Equipment Management";
     ViewData["WorkspaceRole"] = "Administrator";
+    var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid;
 }
-<main class="live-content" data-figma-source="695:5691">
-    <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • INVENTORY</p><h1>Equipment Management</h1><p>Track individual items, their condition, and borrowing availability.</p></header>
+<main class="live-content" data-figma-source="@(editor ? Model.Input.Id is null ? "695:5882" : "695:6052" : "695:5691")">
+    <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • INVENTORY</p><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Item" : "Edit Equipment Item" : "Equipment Management")</h1><p>@(editor ? "Register equipment with its identifier, category, condition, and availability details." : "Track individual items, their condition, and borrowing availability.")</p></header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
+    @if (!editor) {
+    <section class="live-panel live-toolbar"><div><h2>EQUIPMENT MANAGEMENT</h2><p class="live-muted">Manage equipment details, categories, condition, and availability.</p></div><a class="live-button" href="/admin/equipment?form=add">Add Item</a></section>
     <section class="live-panel" aria-labelledby="inventory-title">
         <h2 id="inventory-title">Equipment inventory <span class="live-badge">@Model.Total items</span></h2>
-        <form method="get" class="live-filters"><label>Search name or asset code<input name="q" value="@Model.Query" /></label><button class="live-button" type="submit">Search</button><a class="live-button secondary" href="/admin/equipment">Reset / add new</a></form>
+        <details class="live-search" open="@(!string.IsNullOrEmpty(Model.Query))"><summary>Search inventory</summary><form method="get" class="live-filters"><label>Search name or asset code<input name="q" value="@Model.Query" /></label><button class="live-button" type="submit">Search</button><a class="live-button secondary" href="/admin/equipment">Reset</a></form></details>
         <div class="live-table-wrap"><table class="live-table"><thead><tr><th>Equipment</th><th>Category</th><th>Condition</th><th>Availability</th><th>Action</th></tr></thead><tbody>
             @foreach (var item in Model.Items)
             {
@@ -24,10 +27,15 @@
             @if (Model.Page < Model.Pages) { <a class="live-link" href="/admin/equipment?q=@Uri.EscapeDataString(Model.Query)&amp;page=@(Model.Page + 1)">Next</a> }
         </nav>
     </section>
-    <section class="live-panel" aria-labelledby="edit-title">
-        <h2 id="edit-title">@(Model.Input.Id is null ? "Add equipment" : "Edit equipment")</h2>
+    <div class="live-summary"><span>Inventory summary</span><strong>@Model.Total equipment items</strong><a class="live-link" href="/admin/categories">Manage categories →</a></div>
+    }
+    @if (editor)
+    {
+    <section class="live-panel live-editor-sheet" aria-labelledby="edit-title">
+
+        <h2 id="edit-title">ITEM INFORMATION</h2>
         <div asp-validation-summary="All"></div>
-        <form method="post" action="/admin/equipment/save" class="live-form">
+        <form id="equipment-editor-form" method="post" action="/admin/equipment/save" class="live-form live-form-three">
             @Html.AntiForgeryToken()
             <input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
             <label class="live-field">Asset code<input asp-for="Input.AssetCode" required maxlength="64" /></label>
@@ -39,8 +47,8 @@
             <label class="live-field wide">Description<textarea asp-for="Input.Description" maxlength="2000"></textarea></label>
             <label class="live-check wide"><input asp-for="Input.IsActive" /> Active inventory item</label>
             <p class="live-muted wide">Damaged or unserviceable items enter maintenance. Close their maintenance case after repair to restore availability. Equipment with an active loan cannot be edited.</p>
-            <div class="live-actions wide"><button class="live-button" type="submit">Save equipment</button><a class="live-button secondary" href="/admin/equipment">Clear form</a></div>
         </form>
     </section>
-    <section class="live-panel"><details><summary>Add a category</summary><form method="post" action="/admin/categories" class="live-filters">@Html.AntiForgeryToken()<label>Category name<input name="name" required maxlength="120" /></label><button class="live-button" type="submit">Add category</button></form></details></section>
+    <partial name="_EditorFooter" model='new FigmaEditorFooter("equipment-editor-form", "/admin/equipment", new FigmaEditorValue[] { new("IDENTIFIER", Model.Input.AssetCode ?? "New equipment", "Input_AssetCode"), new("CURRENT", Model.Input.IsActive ? "Active" : "Inactive"), new("IMPACT", Model.Input.Id is null ? "New inventory item" : "Update equipment record") })' />
+    }
 </main>

@@ -24,7 +24,8 @@ public sealed class AdminUsersController(
     private const int AuditPageSize = 25;
 
     [HttpGet("admin/borrowers")]
-    public IActionResult Borrowers() => Redirect("/admin/users?role=Borrower");
+    public Task<IActionResult> Borrowers(string? q, string? status, int page = 1,
+        CancellationToken cancellationToken = default) => Index(q, "Borrower", status, page, cancellationToken);
 
     [HttpGet("admin/users")]
     public async Task<IActionResult> Index(string? q, string? role, string? status,
@@ -65,7 +66,7 @@ public sealed class AdminUsersController(
             string.Join(", ", roleRows.Where(r => r.UserId == x.Id).Select(r => r.Name).Order()),
             x.IsActive, x.EmailConfirmed, x.BorrowerProfile?.StudentNumber,
             x.BorrowerProfile?.Department, x.BorrowerProfile?.IsEligible)).ToList();
-        return View(new AdminUsersPage(rows, q, role, status, page, pages, total,
+        return View("Index", new AdminUsersPage(rows, q, role, status, page, pages, total,
             TempData["AdminUsersFeedback"] as string));
     }
 

@@ -4,11 +4,16 @@
     Layout = "_WorkspaceLayout"; ViewData["Title"] = "Reservations"; ViewData["WorkspaceRole"] = "Administrator";
     var manila = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
     string Local(DateTime value) => TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(value, DateTimeKind.Utc), manila).ToString("MMM d, yyyy h:mm tt");
+    var editor = Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid;
 }
 <main class="live-content" data-figma-source="695:2931">
     <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • RESERVATIONS</p><h1>Equipment Reservations</h1><p>Make a request for an eligible borrower and track reservations.</p></header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
-    <section class="live-panel"><h2>New reservation</h2><div asp-validation-summary="All"></div>
+    @if (!editor) {
+    <section class="live-panel live-toolbar"><div><h2>RESERVATION MANAGEMENT</h2><p class="live-muted">Manage requests and review borrowing activity.</p></div><a class="live-button" href="/admin/reservations?form=add">Create reservation</a></section>
+    }
+    @if (editor) {
+    <section class="live-panel live-editor-sheet" aria-labelledby="reservation-editor-title"><h2 id="reservation-editor-title">New reservation</h2><div asp-validation-summary="All"></div>
         <form method="post" action="/admin/reservations" class="live-form">
             @Html.AntiForgeryToken()<input asp-for="Input.RequestId" type="hidden" />
             <label class="live-field">Borrower<select asp-for="Input.BorrowerUserId" required><option value="">Choose a borrower</option>@foreach (var borrower in Model.Borrowers) { <option value="@borrower.UserId">@borrower.FullName · @borrower.Email</option> }</select></label>
@@ -18,17 +23,20 @@
             <label class="live-field wide">Purpose<input asp-for="Input.Purpose" required maxlength="500" /></label>
             <label class="live-field wide">Notes<textarea asp-for="Input.Notes" maxlength="2000"></textarea></label>
             <p class="live-muted wide">The slot is held for up to 24 hours or until its start. The request needs approval before release.</p>
-            <div class="live-actions wide"><button class="live-button" type="submit">Submit reservation</button><a class="live-button secondary" href="/admin/calendar">Check availability</a></div>
+            <div class="live-actions wide"><a class="live-button secondary" href="/admin/reservations" data-editor-cancel>Cancel</a><button class="live-button" type="submit">Submit reservation</button></div>
         </form>
     </section>
+    }
+    @if (!editor) {
     <section class="live-panel"><h2>Recent requests</h2><div class="live-table-wrap"><table class="live-table"><thead><tr><th>Borrower</th><th>Equipment</th><th>Manila time</th><th>Status</th><th>Actions</th></tr></thead><tbody>
         @foreach (var reservation in Model.Recent)
         {
-            <tr><td>@reservation.BorrowerProfile.User.FullName</td><td>@reservation.EquipmentItem.Name<small>@reservation.EquipmentItem.AssetCode</small></td><td>@Local(reservation.StartAtUtc)<small>to @Local(reservation.EndAtUtc)</small></td><td>@reservation.Status</td><td><a class="live-link" href="/custodian/reservations/@reservation.Id">Details</a>
+            <tr><td>@reservation.BorrowerProfile.User.FullName</td><td>@reservation.EquipmentItem.Name<small>@reservation.EquipmentItem.AssetCode</small></td><td>@Local(reservation.StartAtUtc)<small>to @Local(reservation.EndAtUtc)</small></td><td><span class="live-badge">@reservation.Status</span></td><td><a class="live-button secondary" href="/custodian/reservations/@reservation.Id">Details</a>
                 @if (reservation.Status is ReservationStatus.Pending or ReservationStatus.Approved)
                 { <form method="post" action="/admin/reservations/@reservation.Id/cancel">@Html.AntiForgeryToken()<button class="live-button secondary" type="submit">Cancel</button></form> }
             </td></tr>
         }
         @if (Model.Recent.Count == 0) { <tr><td colspan="5">No reservations yet.</td></tr> }
     </tbody></table></div><div class="live-actions"><a class="live-link" href="/admin/history">View all borrowing records →</a></div></section>
+    }
 </main>

@@ -1,28 +1,31 @@
 @model AdminUsersPage
 @{
     Layout = "_WorkspaceLayout";
-    ViewData["Title"] = "User & Role Management";
+    var borrowers = Context.Request.Path == "/admin/borrowers";
+    var basePath = borrowers ? "/admin/borrowers" : "/admin/users";
+    ViewData["Title"] = borrowers ? "Borrower Profiles" : "User & Role Management";
     ViewData["WorkspaceRole"] = "Administrator";
     var roles = new[] { "Borrower", "Custodian", "Administrator" };
 }
-<main class="live-content" data-figma-source="695:7067">
+<main class="live-content" data-figma-source="@(borrowers ? "695:6398" : "695:7067")">
     <header class="live-heading">
         <p class="live-eyebrow">ADMINISTRATOR • WORKSPACE</p>
-        <h1>User &amp; Role Management</h1>
-        <p>Manage user accounts and role access while keeping permissions aligned with campus responsibilities.</p>
+        <h1>@(borrowers ? "Borrower Profiles" : "User & Role Management")</h1>
+        <p>@(borrowers ? "Manage borrower information, departments, and borrowing access." : "Manage user accounts and role access while keeping permissions aligned with campus responsibilities.")</p>
     </header>
     @if (Model.Feedback is not null)
     {
         <div class="live-feedback" role="status">@Model.Feedback</div>
     }
+    <section class="live-panel live-toolbar"><div><h2>@(borrowers ? "BORROWER PROFILE MANAGEMENT" : "USER & ROLE MANAGEMENT")</h2><p class="live-muted">@Model.Total registered account@(Model.Total == 1 ? "" : "s")</p></div><a class="live-button secondary" href="/admin/users?status=unverified">Review unverified accounts</a></section>
     <section class="live-panel" aria-labelledby="accounts-title">
-        <h2 id="accounts-title">USER &amp; ROLE MANAGEMENT</h2>
+        <h2 id="accounts-title">@(borrowers ? "Borrower records" : "Account records")</h2>
         <p class="live-muted">Borrowers create and verify their own accounts. Staff must sign up and verify their email before an administrator assigns Custodian or Administrator access.</p>
-        <form class="live-filters" method="get" action="/admin/users" aria-label="Find user accounts">
+        <form class="live-filters" method="get" action="@basePath" aria-label="Find user accounts">
             <label for="q">Search name, email, student number, or department<input id="q" name="q" value="@Model.Query" maxlength="120" type="search" /></label>
-            <label for="role">Role<select id="role" name="role"><option value="all" selected="@(Model.Role == "all")">All roles</option>
+            @if (!borrowers) { <label for="role">Role<select id="role" name="role"><option value="all" selected="@(Model.Role == "all")">All roles</option>
                 @foreach (var role in roles) { <option value="@role" selected="@(Model.Role == role)">@role</option> }
-            </select></label>
+            </select></label> }
             <label for="status">Account status<select id="status" name="status">
                 <option value="all" selected="@(Model.Status == "all")">All accounts</option>
                 <option value="active" selected="@(Model.Status == "active")">Active</option>
@@ -30,7 +33,7 @@
                 <option value="unverified" selected="@(Model.Status == "unverified")">Email not verified</option>
             </select></label>
             <button class="live-button" type="submit">Search</button>
-            <a class="live-button secondary" href="/admin/users">Clear</a>
+            <a class="live-button secondary" href="@basePath">Clear</a>
         </form>
         <p class="live-muted">@Model.Total matching account@(Model.Total == 1 ? "" : "s")</p>
         @if (Model.Rows.Count == 0)
@@ -41,14 +44,14 @@
         {
             <div class="live-table-wrap" tabindex="0" aria-label="User accounts table">
                 <table class="live-table">
-                    <thead><tr><th scope="col">USER</th><th scope="col">ID / EMAIL</th><th scope="col">ROLE</th><th scope="col">STATUS</th><th scope="col">ACTION</th></tr></thead>
+                    <thead><tr><th scope="col">@(borrowers ? "BORROWER" : "USER")</th><th scope="col">ID / EMAIL</th><th scope="col">@(borrowers ? "DEPARTMENT" : "ROLE")</th><th scope="col">STATUS</th><th scope="col">ACTION</th></tr></thead>
                     <tbody>
                     @foreach (var row in Model.Rows)
                     {
                         <tr>
                             <td><strong>@row.FullName</strong><small>@(row.Department ?? "No department recorded")</small></td>
                             <td>@row.Email<small>@(row.StudentNumber ?? "No student number")</small></td>
-                            <td><span class="live-badge">@(row.Role.Length > 0 ? row.Role : "No role")</span></td>
+                            <td>@if (borrowers) { @(row.Department ?? "Not recorded") } else { <span class="live-badge">@(row.Role.Length > 0 ? row.Role : "No role")</span> }</td>
                             <td><span class="live-badge">@(row.IsActive ? "Active" : "Inactive")</span><small>@(row.EmailConfirmed ? "Email verified" : "Email not verified")</small>
                                 @if (row.IsEligible is false) { <small>Borrowing access paused</small> }
                             </td>
@@ -60,10 +63,10 @@
             </div>
             <nav class="live-pager" aria-label="User account pages">
                 @if (Model.Page > 1)
-                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/users", new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page - 1 })">Previous</a> }
+                { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page - 1 })">Previous</a> }
                 <span>Page @Model.Page of @Model.PageCount</span>
                 @if (Model.Page < Model.PageCount)
-                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/users", new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page + 1 })">Next</a> }
+                { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page + 1 })">Next</a> }
             </nav>
         }
     </section>

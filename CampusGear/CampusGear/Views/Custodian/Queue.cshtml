@@ -6,10 +6,11 @@
     var returns = Model.ActionName is "Returns" or "AdminReturns";
     var staffPath = ViewData["WorkspaceRole"] as string == "Administrator" ? "/admin" : "/custodian";
     var basePath = staffPath + (returns ? "/returns" : history ? "/history" : "/approvals");
+    var source = history ? "695:4595" : returns ? staffPath == "/admin" ? "695:3957" : "695:2032" : staffPath == "/admin" ? "695:3278" : "695:1499";
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
-<main class="live-content">
-    <header class="live-heading"><p class="live-eyebrow">CUSTODIAN / EQUIPMENT WORKFLOW</p><h1>@Model.Title</h1><p>@Model.Intro</p></header>
+<main class="live-content" data-figma-source="@source">
+    <header class="live-heading"><p class="live-eyebrow">@(staffPath == "/admin" ? "ADMINISTRATOR" : "CUSTODIAN") • EQUIPMENT WORKFLOW</p><h1>@(history ? "Borrowing History Report" : returns ? "Return & Condition Check" : "Approval & Release")</h1><p>@Model.Intro</p></header>
     <div class="live-metrics custodian-metrics">
         <a class="live-metric" href="@staffPath/approvals"><strong>@Model.PendingCount</strong><span>Pending requests</span></a>
         <a class="live-metric" href="@staffPath/returns?queue=release"><strong>@Model.ApprovedCount</strong><span>Approved for release</span></a>
