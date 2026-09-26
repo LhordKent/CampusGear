@@ -1,0 +1,8 @@
+@{
+    var current = (string?)ViewData["BorrowerPage"];
+}
+<nav class="borrower-tabs" aria-label="Borrower pages">
+    <a href="/borrower/reservation" class="@(current == "reservation" ? "is-current" : null)" aria-current="@(current == "reservation" ? "page" : null)">Equipment Reservation</a>
+    <a href="/borrower/history" class="@(current == "history" ? "is-current" : null)" aria-current="@(current == "history" ? "page" : null)">Borrowing History</a>
+    <a href="/borrower/calendar" class="@(current == "calendar" ? "is-current" : null)" aria-current="@(current == "calendar" ? "page" : null)">Availability Calendar</a>
+</nav>

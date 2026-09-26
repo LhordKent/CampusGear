@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="620" height="760" viewBox="0 0 620 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Borrower &#226;&#128;&#162; Enhanced Ambient Detail">
+<circle id="Borrower &#226;&#128;&#162; Reservation Orbit" cx="380" cy="250" r="209" stroke="#2C8C8A" stroke-opacity="0.2" stroke-width="2"/>
+<circle id="Borrower &#226;&#128;&#162; Calendar Orbit" cx="390" cy="250" r="139.5" stroke="#C77833" stroke-opacity="0.18"/>
+<line id="Borrower &#226;&#128;&#162; Equipment Trace" x1="70" y1="539.5" x2="300" y2="539.5" stroke="#2C8C8A"/>
+<line id="Borrower &#226;&#128;&#162; Equipment Trace_2" x1="125" y1="573.5" x2="355" y2="573.5" stroke="#2C8C8A"/>
+<line id="Borrower &#226;&#128;&#162; Equipment Trace_3" x1="180" y1="607.5" x2="410" y2="607.5" stroke="#2C8C8A"/>
+<line id="Borrower &#226;&#128;&#162; Equipment Trace_4" x1="235" y1="641.5" x2="465" y2="641.5" stroke="#2C8C8A"/>
+<line id="Borrower &#226;&#128;&#162; Equipment Trace_5" x1="290" y1="675.5" x2="520" y2="675.5" stroke="#2C8C8A"/>
+<circle id="Borrower &#226;&#128;&#162; Status Node" cx="524" cy="474" r="4" fill="#2C8C8A" fill-opacity="0.55"/>
+<circle id="Borrower &#226;&#128;&#162; Status Node_2" cx="552" cy="508" r="4" fill="#C77833" fill-opacity="0.55"/>
+<circle id="Borrower &#226;&#128;&#162; Status Node_3" cx="580" cy="542" r="4" fill="#2C8C8A" fill-opacity="0.55"/>
+</g>
+</svg>

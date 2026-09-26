@@ -1,0 +1,51 @@
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Sign in";
+    ViewData["FigmaFrame"] = "15_3";
+    ViewData["StatusMessage"] = "CAMPUS AUTHENTICATION  •  READY FOR ACCOUNT VERIFICATION";
+}
+<section class="auth-card" aria-labelledby="account-title">
+    <header>
+        <div class="auth-card-top">
+            <div>
+                <p class="auth-eyebrow">Campus access</p>
+                <h1 id="account-title">Account sign in</h1>
+            </div>
+            <span class="auth-badge">Campus access / sign in</span>
+        </div>
+        <p class="auth-description">Enter your campus credentials. Your role is resolved automatically after authentication.</p>
+    </header>
+    <hr class="auth-divider" />
+    @await Html.PartialAsync("_AccountFeedback")
+    <form class="auth-form" action="/auth/login" method="post">
+        @Html.AntiForgeryToken()
+        <label class="auth-field" for="Email">
+            <span class="auth-field-label">Campus email</span>
+            <span class="auth-input-wrap">
+                <img class="auth-input-icon" src="/figma/assets/afa76.svg" alt="" />
+                <input class="auth-input has-icon" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="name@campus.edu" autocomplete="username" required />
+            </span>
+            @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
+        </label>
+        <label class="auth-field" for="Password">
+            <span class="auth-field-label">Password</span>
+            <span class="auth-input-wrap">
+                <img class="auth-input-icon" src="/figma/assets/5e774.svg" alt="" />
+                <input class="auth-input has-icon" id="Password" name="Password" type="password" placeholder="Enter your password" autocomplete="current-password" required />
+            </span>
+            @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
+        </label>
+        <button class="auth-action" type="submit">SIGN IN</button>
+    </form>
+    <div class="auth-actions">
+        <a class="auth-link" href="/auth/password-reset-request">Forgot password?</a>
+        <a class="auth-secondary" href="/auth/signup">CREATE A NEW ACCOUNT</a>
+    </div>
+    <div class="auth-spacer"></div>
+    <div class="auth-panel">
+        <img src="/figma/assets/bb17f.svg" alt="" />
+        <div><strong>Account security</strong><span>Credentials are checked before role-based workspace access.</span></div>
+    </div>
+    <div class="auth-spacer"></div>
+    @await Html.PartialAsync("_AccountStatus")
+</section>

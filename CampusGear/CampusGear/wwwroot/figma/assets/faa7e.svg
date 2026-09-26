@@ -1,0 +1,24 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Custodian &#226;&#128;&#162; Open Operations Atmosphere" opacity="0.92">
+<g id="Vector">
+<path d="M250 210H1360ZM250 250H1360ZM250 290H1360ZM250 730H1360Z" fill="black"/>
+<path d="M250 210H1360M250 250H1360M250 290H1360M250 730H1360" stroke="#8AA6B8" stroke-opacity="0.04"/>
+</g>
+<g id="Vector_2">
+<path d="M880 120V820ZM960 120V820ZM1040 120V820ZM1120 120V820ZM1200 120V820ZM1280 120V820Z" fill="black"/>
+<path d="M880 120V820M960 120V820M1040 120V820M1120 120V820M1200 120V820M1280 120V820" stroke="#8AA6B8" stroke-opacity="0.03"/>
+</g>
+<path id="Vector_3" d="M820 160C980 80 1210 120 1390 310" stroke="#2C8C8A" stroke-opacity="0.3" stroke-width="1.5"/>
+<path id="Vector_4" d="M760 720C980 560 1190 600 1400 760" stroke="#2C8C8A" stroke-opacity="0.2"/>
+<g id="Vector_5">
+<path d="M1060 180L1340 460ZM1120 140L1380 400Z" fill="black"/>
+<path d="M1060 180L1340 460M1120 140L1380 400" stroke="#C77833"/>
+</g>
+<path id="Vector_6" d="M1180 320C1218.66 320 1250 288.66 1250 250C1250 211.34 1218.66 180 1180 180C1141.34 180 1110 211.34 1110 250C1110 288.66 1141.34 320 1180 320Z" stroke="#2C8C8A" stroke-opacity="0.22"/>
+<path id="Vector_7" d="M1180 254C1182.21 254 1184 252.209 1184 250C1184 247.791 1182.21 246 1180 246C1177.79 246 1176 247.791 1176 250C1176 252.209 1177.79 254 1180 254Z" fill="#2C8C8A" fill-opacity="0.55"/>
+<g id="Vector_8">
+<path d="M1110 250H1250ZM1180 180V320Z" fill="black"/>
+<path d="M1110 250H1250M1180 180V320" stroke="#2C8C8A" stroke-opacity="0.13"/>
+</g>
+</g>
+</svg>

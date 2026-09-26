@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="560" height="760" viewBox="0 0 560 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Custodian &#226;&#128;&#162; Enhanced Ambient Detail">
+<circle id="Custodian &#226;&#128;&#162; Workflow Node" cx="77" cy="250" r="7" fill="#2C8C8A" fill-opacity="0.6"/>
+<circle id="Custodian &#226;&#128;&#162; Workflow Node_2" cx="197" cy="250" r="7" fill="#2C8C8A" fill-opacity="0.6"/>
+<circle id="Custodian &#226;&#128;&#162; Workflow Node_3" cx="317" cy="250" r="7" fill="#C77833" fill-opacity="0.6"/>
+<circle id="Custodian &#226;&#128;&#162; Workflow Node_4" cx="437" cy="250" r="7" fill="#2C8C8A" fill-opacity="0.6"/>
+<line id="Custodian &#226;&#128;&#162; Equipment Trace" x1="110" y1="389.5" x2="280" y2="389.5" stroke="#2C8C8A"/>
+<line id="Custodian &#226;&#128;&#162; Equipment Trace_2" x1="180" y1="444.5" x2="350" y2="444.5" stroke="#2C8C8A"/>
+<line id="Custodian &#226;&#128;&#162; Equipment Trace_3" x1="250" y1="499.5" x2="420" y2="499.5" stroke="#2C8C8A"/>
+<line id="Custodian &#226;&#128;&#162; Equipment Trace_4" x1="320" y1="554.5" x2="490" y2="554.5" stroke="#2C8C8A"/>
+<circle id="Custodian &#226;&#128;&#162; Operations Orbit" cx="340" cy="590" r="149.5" stroke="#C77833" stroke-opacity="0.14"/>
+</g>
+</svg>

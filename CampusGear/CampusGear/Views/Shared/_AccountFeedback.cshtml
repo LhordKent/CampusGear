@@ -1,0 +1,18 @@
+@{
+    var errorMessage = ViewData["ErrorMessage"] as string;
+    var noticeMessage = ViewData["NoticeMessage"] as string;
+}
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="auth-error" role="alert">@errorMessage</div>
+}
+@if (ViewData.ModelState.ErrorCount > 0)
+{
+    <div class="auth-validation" role="alert">
+        @Html.ValidationSummary(false)
+    </div>
+}
+@if (!string.IsNullOrWhiteSpace(noticeMessage))
+{
+    <div class="auth-panel" role="status"><span>@noticeMessage</span></div>
+}

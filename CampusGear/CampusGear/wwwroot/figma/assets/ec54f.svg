@@ -1,0 +1,44 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="AUTH &#226;&#128;&#162; NON-GENERIC ATMOSPHERE" clip-path="url(#clip0_0_46)">
+<g id="Vector" opacity="0.48">
+</g>
+<path id="Vector_2" d="M1260 370C1398.07 370 1510 258.071 1510 120C1510 -18.0712 1398.07 -130 1260 -130C1121.93 -130 1010 -18.0712 1010 120C1010 258.071 1121.93 370 1260 370Z" fill="url(#paint0_radial_0_46)"/>
+<path id="Vector_3" opacity="0.32" d="M1260 270C1342.84 270 1410 202.843 1410 120C1410 37.1573 1342.84 -30 1260 -30C1177.16 -30 1110 37.1573 1110 120C1110 202.843 1177.16 270 1260 270Z" stroke="#C77833"/>
+<path id="Vector_4" opacity="0.42" d="M1260 225C1317.99 225 1365 177.99 1365 120C1365 62.0101 1317.99 15 1260 15C1202.01 15 1155 62.0101 1155 120C1155 177.99 1202.01 225 1260 225Z" stroke="#2C8C8A" stroke-width="1.5"/>
+<path id="Vector_5" opacity="0.3" d="M1260 180C1293.14 180 1320 153.137 1320 120C1320 86.8629 1293.14 60 1260 60C1226.86 60 1200 86.8629 1200 120C1200 153.137 1226.86 180 1260 180Z" stroke="#2C8C8A"/>
+<g id="Vector_6" opacity="0.26">
+<path d="M1040 900L1390 550Z" fill="black"/>
+<path d="M1040 900L1390 550" stroke="#C77833" stroke-width="2"/>
+</g>
+<g id="Vector_7" opacity="0.3">
+<path d="M1120 900L1440 580Z" fill="black"/>
+<path d="M1120 900L1440 580" stroke="#2C8C8A"/>
+</g>
+<g id="Vector_8" opacity="0.3">
+<path d="M0 770H430Z" fill="black"/>
+<path d="M0 770H430" stroke="#2C8C8A" stroke-width="2"/>
+</g>
+<g id="Vector_9" opacity="0.48">
+<path d="M48 770H210Z" fill="black"/>
+<path d="M48 770H210" stroke="#C77833" stroke-width="3"/>
+</g>
+<path id="Vector_10" opacity="0.7" d="M78 777C81.866 777 85 773.866 85 770C85 766.134 81.866 763 78 763C74.134 763 71 766.134 71 770C71 773.866 74.134 777 78 777Z" fill="#2C8C8A"/>
+<g id="Vector_11" opacity="0.18">
+<path d="M520 0V900Z" fill="black"/>
+<path d="M520 0V900" stroke="#2C8C8A"/>
+</g>
+<g id="Vector_12" opacity="0.14">
+<path d="M532 0V900Z" fill="black"/>
+<path d="M532 0V900" stroke="#C77833"/>
+</g>
+</g>
+<defs>
+<radialGradient id="paint0_radial_0_46" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1260 120) scale(250)">
+<stop stop-color="#2E9AA8" stop-opacity="0.18"/>
+<stop offset="1" stop-color="#2E9AA8" stop-opacity="0"/>
+</radialGradient>
+<clipPath id="clip0_0_46">
+<rect width="1440" height="900" fill="white"/>
+</clipPath>
+</defs>
+</svg>

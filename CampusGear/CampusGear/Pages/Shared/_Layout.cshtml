@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071b2b" />
+    <title>@ViewData["Title"] · CampusGear</title>
+    <link rel="stylesheet" href="~/css/figma-generated.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/figma-app.css" asp-append-version="true" />
+</head>
+<body>
+    @RenderBody()
+    <script src="~/js/figma-demo.js" asp-append-version="true" defer></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,157 @@
+@model ReservationPageViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Equipment Reservation";
+    ViewData["WorkspaceRole"] = "Borrower";
+    ViewData["BorrowerPage"] = "reservation";
+    var selected = Model.Selected;
+}
+@* Figma sources: 695:2 reservation, 695:154 conflict, 695:280 submitted, 695:409 submitting. *@
+<link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" />
+<main class="live-content borrower-page" data-figma-source="695:2">
+    <header class="live-heading borrower-heading">
+        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
+        <h1><img src="~/figma/assets/5fc0e.svg" alt="" />Equipment Reservation</h1>
+        <p>Reserve available equipment and submit a borrowing request for approval.</p>
+    </header>
+    <partial name="_BorrowerTabs" />
+
+    @if (Model.Submitted is { } submitted)
+    {
+        <section class="borrower-feedback borrower-success" role="status" data-figma-source="695:280">
+            <p class="borrower-eyebrow">REQUEST RECORDED</p>
+            <h2>Reservation request submitted</h2>
+            <p>Your request is saved. Staff will review it before the equipment can be released.</p>
+            <dl class="borrower-summary">
+                <div><dt>EQUIPMENT</dt><dd>@submitted.EquipmentName <span>@submitted.AssetCode</span></dd></div>
+                <div><dt>MANILA TIME</dt><dd>@submitted.StartManila<br />to @submitted.EndManila</dd></div>
+                <div><dt>STATUS</dt><dd><span class="borrower-badge">@submitted.Status</span></dd></div>
+                @if (submitted.HoldExpiresManila is not null)
+                {
+                    <div><dt>PENDING HOLD ENDS</dt><dd>@submitted.HoldExpiresManila</dd></div>
+                }
+            </dl>
+            <div class="borrower-actions">
+                <a class="borrower-button" href="/borrower/history">View borrowing history</a>
+                <a class="borrower-button borrower-button-secondary" href="/borrower/reservation">Create another request</a>
+            </div>
+        </section>
+    }
+    else
+    {
+        @if (Model.Feedback is not null)
+        {
+            <section class="borrower-feedback borrower-error" role="alert" data-figma-source="@(Model.IsConflict ? "695:154" : "695:2")">
+                <h2>@(Model.IsConflict ? "Reservation conflict" : "Request could not be submitted")</h2>
+                <p>@Model.Feedback</p>
+                @if (Model.IsConflict)
+                {
+                    <a href="/borrower/calendar?equipmentItemId=@Model.Input.EquipmentItemId">Review the availability calendar →</a>
+                }
+            </section>
+        }
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="borrower-validation" role="alert">@Html.ValidationSummary(false)</div>
+        }
+        @if (!Model.IsEligible)
+        {
+            <section class="borrower-feedback borrower-error" role="alert">
+                <h2>Borrowing access is paused</h2><p>Contact an administrator before making another reservation.</p>
+            </section>
+        }
+        @if (Model.Items.Count == 0)
+        {
+            <section class="borrower-empty">
+                <h2>No equipment is available for reservation</h2>
+                <p>Active equipment will appear here when it is ready to borrow.</p>
+                <a class="borrower-button borrower-button-secondary" href="/borrower/calendar">View availability calendar</a>
+            </section>
+        }
+        else
+        {
+            <form method="post" action="/borrower/reservation" id="reservation-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="RequestId" value="@Model.Input.RequestId" />
+                <div class="borrower-reservation-grid">
+                    <section class="borrower-card borrower-equipment" aria-labelledby="equipment-title">
+                        <p class="borrower-eyebrow">SELECTED EQUIPMENT</p>
+                        <h2 id="equipment-title">@(selected?.Name ?? "Choose equipment")</h2>
+                        <label class="borrower-field" for="EquipmentItemId">
+                            <span>Equipment item</span>
+                            <select id="EquipmentItemId" name="EquipmentItemId" required>
+                                <option value="">Choose an item</option>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <option value="@item.Id" selected="@(item.Id == Model.Input.EquipmentItemId)"
+                                            data-name="@item.Name" data-code="@item.AssetCode" data-category="@item.Category"
+                                            data-condition="@item.Condition" data-location="@(item.Location ?? "Not specified")">@item.Name · @item.AssetCode</option>
+                                }
+                            </select>
+                            @Html.ValidationMessage("EquipmentItemId", null, new { @class = "borrower-field-error" })
+                        </label>
+                        <p class="borrower-muted" id="selected-code">@selected?.AssetCode · @selected?.Category</p>
+                        <span class="borrower-badge">TIME SLOT CHECKED ON SUBMIT</span>
+                        <dl class="borrower-equipment-details">
+                            <div><dt>CONDITION</dt><dd id="selected-condition">@selected?.Condition</dd></div>
+                            <div><dt>LOCATION</dt><dd id="selected-location">@(selected?.Location ?? "Not specified")</dd></div>
+                        </dl>
+                        <p class="borrower-muted">Each asset code represents one physical equipment item.</p>
+                    </section>
+                    <section class="borrower-card" aria-labelledby="request-title">
+                        <h2 id="request-title">REQUEST DETAILS</h2>
+                        <p class="borrower-muted">All dates and times use Manila time (UTC+8).</p>
+                        <div class="borrower-field-grid">
+                            <label class="borrower-field" for="StartLocal">
+                                <span>Start date and time</span>
+                                <input id="StartLocal" name="StartLocal" type="datetime-local" value="@Model.Input.StartLocal" required />
+                                @Html.ValidationMessage("StartLocal", null, new { @class = "borrower-field-error" })
+                            </label>
+                            <label class="borrower-field" for="EndLocal">
+                                <span>End date and time</span>
+                                <input id="EndLocal" name="EndLocal" type="datetime-local" value="@Model.Input.EndLocal" required />
+                                @Html.ValidationMessage("EndLocal", null, new { @class = "borrower-field-error" })
+                            </label>
+                        </div>
+                        <label class="borrower-field" for="Purpose">
+                            <span>Purpose</span>
+                            <input id="Purpose" name="Purpose" value="@Model.Input.Purpose" maxlength="500" placeholder="e.g. Class presentation" required />
+                            @Html.ValidationMessage("Purpose", null, new { @class = "borrower-field-error" })
+                        </label>
+                        <label class="borrower-field" for="Notes">
+                            <span>Note <span class="borrower-optional">Optional</span></span>
+                            <textarea id="Notes" name="Notes" maxlength="2000" rows="4" placeholder="Additional details for the custodian">@Model.Input.Notes</textarea>
+                            @Html.ValidationMessage("Notes", null, new { @class = "borrower-field-error" })
+                        </label>
+                    </section>
+                </div>
+                <section class="borrower-hold-note">
+                    <strong>REQUEST SUMMARY</strong>
+                    <p>A pending request holds the slot for up to 24 hours or until its start time. Approval keeps the booking; rejection, cancellation, or expiry releases the slot.</p>
+                </section>
+                <div class="borrower-actions borrower-actions-end">
+                    <a class="borrower-button borrower-button-secondary" href="/borrower/calendar">Check calendar</a>
+                    <button class="borrower-button" type="submit" disabled="@(!Model.IsEligible)">SUBMIT RESERVATION</button>
+                </div>
+            </form>
+        }
+    }
+    <p class="borrower-workflow">CAMPUSGEAR / BORROWER <span>RESERVE → APPROVE → RELEASE → RETURN</span></p>
+</main>
+<script>
+(() => {
+    const select = document.getElementById('EquipmentItemId');
+    if (select) select.addEventListener('change', () => {
+        const option = select.selectedOptions[0];
+        document.getElementById('equipment-title').textContent = option.dataset.name || 'Choose equipment';
+        document.getElementById('selected-code').textContent = option.dataset.code ? `${option.dataset.code} · ${option.dataset.category}` : '';
+        document.getElementById('selected-condition').textContent = option.dataset.condition || '—';
+        document.getElementById('selected-location').textContent = option.dataset.location || '—';
+    });
+    document.getElementById('reservation-form')?.addEventListener('submit', event => {
+        const button = event.currentTarget.querySelector('button[type="submit"]');
+        button.disabled = true;
+        button.textContent = 'SUBMITTING RESERVATION…';
+    });
+})();
+</script>

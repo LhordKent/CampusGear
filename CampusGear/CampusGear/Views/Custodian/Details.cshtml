@@ -1,0 +1,56 @@
+@model CustodianDetailViewModel
+@using CampusGear.Models
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Reservation details";
+    var record = Model.Record;
+    var loan = record.Loan;
+    var route = $"/custodian/reservations/{record.Id}";
+    var staffPath = ViewData["WorkspaceRole"] as string == "Administrator" ? "/admin" : "/custodian";
+}
+@section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
+<main class="live-content">
+    <header class="live-heading"><p class="live-eyebrow">CUSTODIAN / APPROVAL · RELEASE · RETURN</p><h1>Reservation details</h1><p>@record.EquipmentItem.Name · @record.EquipmentItem.AssetCode</p><span class="live-badge">@Model.Status</span></header>
+    <nav class="live-actions" aria-label="Workflow navigation"><a class="live-button secondary" href="@staffPath/approvals">Approvals</a><a class="live-button secondary" href="@staffPath/returns">Release and return desk</a><a class="live-button secondary" href="@staffPath/history">History</a></nav>
+    @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status">@Model.Feedback</div> }
+    @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert">@Model.Error</div> }
+    @if (!string.IsNullOrWhiteSpace(Model.AvailabilityNote)) { <div class="live-feedback" role="status">@Model.AvailabilityNote</div> }
+    <div class="live-grid">
+        <section class="live-panel"><h2>Borrower and request</h2><dl class="live-details">
+            <dt>Borrower</dt><dd>@record.BorrowerProfile.User.FullName</dd><dt>Email</dt><dd>@record.BorrowerProfile.User.Email</dd><dt>Contact number</dt><dd>@(record.BorrowerProfile.ContactNumber ?? "—")</dd>
+            <dt>Booking start</dt><dd>@CustodianTime.Format(record.StartAtUtc)</dd><dt>Due / booking end</dt><dd>@CustodianTime.Format(record.EndAtUtc)</dd><dt>Purpose</dt><dd class="custodian-preserve">@record.Purpose</dd><dt>Borrower notes</dt><dd class="custodian-preserve">@(record.Notes ?? "—")</dd>
+            @if (record.HoldExpiresAtUtc is { } expiry) { <dt>Pending hold expires</dt><dd>@CustodianTime.Format(expiry)</dd> }
+            <dt>Submitted</dt><dd>@CustodianTime.Format(record.CreatedAtUtc)</dd>
+            @if (record.DecidedAtUtc is { } decided) { <dt>Decision recorded</dt><dd>@CustodianTime.Format(decided) by @(record.DecidedByUser?.FullName ?? "staff")</dd> }
+            @if (record.DecisionReason is { } reason) { <dt>Decision reason</dt><dd class="custodian-preserve">@reason</dd> }
+        </dl><p class="live-muted">All times are shown in Manila time (UTC+8).</p></section>
+        <section class="live-panel"><h2>Equipment</h2><dl class="live-details"><dt>Item</dt><dd>@record.EquipmentItem.Name</dd><dt>Asset code</dt><dd>@record.EquipmentItem.AssetCode</dd><dt>Category</dt><dd>@record.EquipmentItem.Category.Name</dd><dt>Location</dt><dd>@(record.EquipmentItem.Location ?? "—")</dd><dt>Current condition</dt><dd>@record.EquipmentItem.Condition</dd><dt>Maintenance hold</dt><dd>@(record.EquipmentItem.IsMaintenanceHold ? "Yes" : "No")</dd></dl>
+            @if (loan is not null)
+            {
+                <h3>Loan record</h3><dl class="live-details"><dt>Released</dt><dd>@CustodianTime.Format(loan.ReleasedAtUtc) by @loan.ReleasedByUser.FullName</dd><dt>Release condition</dt><dd>@loan.ConditionAtRelease</dd><dt>Release notes</dt><dd class="custodian-preserve">@(loan.ReleaseNotes ?? "—")</dd><dt>Due</dt><dd>@CustodianTime.Format(loan.DueAtUtc)</dd>
+                    @if (loan.ReturnedAtUtc is { } returned)
+                    { <dt>Returned</dt><dd>@CustodianTime.Format(returned) by @(loan.ReceivedByUser?.FullName ?? "staff")</dd><dt>Return condition</dt><dd>@loan.ConditionAtReturn</dd><dt>Timeliness</dt><dd>@(returned > loan.DueAtUtc ? "Returned late" : "Returned on time")</dd><dt>Return notes</dt><dd class="custodian-preserve">@(loan.ReturnNotes ?? "—")</dd> }
+                </dl>
+            }
+        </section>
+    </div>
+    @if (Model.CanApprove || Model.CanReject)
+    {
+        <section class="live-panel"><h2>Request decision</h2><p class="live-muted">Approval checks availability again. Rejecting a request releases its hold.</p><div class="live-grid">
+            <form method="post" action="@route/approve">@Html.AntiForgeryToken()<p>Approve this equipment and booking time for the borrower.</p><button class="live-button" type="submit" disabled="@(!Model.CanApprove)">Approve request</button></form>
+            <form class="live-form" method="post" action="@route/reject">@Html.AntiForgeryToken()<label class="live-field wide" for="Reason"><span>Rejection reason</span><textarea id="Reason" name="Reason" maxlength="1000" required placeholder="Explain why this request cannot proceed"></textarea></label><div class="wide"><button class="live-button danger" type="submit">Reject request</button></div></form>
+        </div></section>
+    }
+    @if (record.Status == ReservationStatus.Approved)
+    {
+        <section class="live-panel"><h2>Record equipment release</h2><p class="live-muted">Inspect the item and record its condition when handing it to the borrower. Release is available only during the approved booking time.</p>
+            <form class="live-form" method="post" action="@route/release">@Html.AntiForgeryToken()<label class="live-field" for="ReleaseCondition"><span>Condition at release</span><select id="ReleaseCondition" name="Condition" required disabled="@(!Model.CanRelease)">@foreach (var condition in new[] { EquipmentCondition.Excellent, EquipmentCondition.Good, EquipmentCondition.Fair }) { <option value="@condition" selected="@(record.EquipmentItem.Condition == condition)">@condition</option> }</select></label><label class="live-field wide" for="ReleaseNotes"><span>Release notes (optional)</span><textarea id="ReleaseNotes" name="Notes" maxlength="2000" disabled="@(!Model.CanRelease)"></textarea></label><div class="wide"><button class="live-button" type="submit" disabled="@(!Model.CanRelease)">Record release</button></div></form>
+        </section>
+    }
+    @if (Model.CanReturn)
+    {
+        <section class="live-panel"><h2>Return and condition check</h2><p class="live-muted">Record the inspected condition. A damaged or unserviceable return automatically places the item on a maintenance hold. Late return is recorded independently of condition.</p>
+            <form class="live-form" method="post" action="@route/return">@Html.AntiForgeryToken()<label class="live-field" for="ReturnCondition"><span>Condition at return</span><select id="ReturnCondition" name="Condition" required>@foreach (var condition in Enum.GetValues<EquipmentCondition>()) { <option value="@condition" selected="@(condition == EquipmentCondition.Good)">@condition</option> }</select></label><label class="live-field wide" for="ReturnNotes"><span>Return notes (optional)</span><textarea id="ReturnNotes" name="Notes" maxlength="2000" placeholder="Record inspection findings or damage"></textarea></label><div class="wide"><button class="live-button" type="submit">Record return</button></div></form>
+        </section>
+    }
+</main>

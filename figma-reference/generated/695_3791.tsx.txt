@@ -1,0 +1,250 @@
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/db27b90c-6cba-420b-9b77-a86faafd51d4";
+const imgAdministratorOpenGovernanceAtmosphere = `${assetPathPrefix}/e0141.svg`;
+const imgAdministratorEnhancedAmbientDetail = `${assetPathPrefix}/7a4b9.svg`;
+const imgLeftPanelAdminGovernanceSignature = `${assetPathPrefix}/44f3c.svg`;
+const imgDashboardShellCircle = `${assetPathPrefix}/a698b.svg`;
+const imgDashboardShellCircle1 = `${assetPathPrefix}/7ac1a.svg`;
+const imgDashboardShellCircle2 = `${assetPathPrefix}/d3b6f.svg`;
+const imgDashboardShellCircle3 = `${assetPathPrefix}/2680a.svg`;
+const imgBrandLogoCgSupplied = `${assetPathPrefix}/b95f3.svg`;
+const imgGroup = `${assetPathPrefix}/edd56.svg`;
+const imgGroup1 = `${assetPathPrefix}/7e0b6.svg`;
+const imgGroup2 = `${assetPathPrefix}/9177b.svg`;
+const imgGroup3 = `${assetPathPrefix}/a40a1.svg`;
+const imgGroup4 = `${assetPathPrefix}/be9c1.svg`;
+const imgGroup5 = `${assetPathPrefix}/e1db6.svg`;
+const imgGroup6 = `${assetPathPrefix}/9f767.svg`;
+const imgGroup7 = `${assetPathPrefix}/bc2d0.svg`;
+
+export default function Component08DAdministratorReleaseRecorded() {
+  return (
+    <div className="bg-[#071b2b] relative size-full" data-node-id="695:3791" data-name="08D — Administrator Release Recorded">
+      <div className="absolute h-[900px] left-0 top-0 w-[1440px]" data-node-id="1507:157" data-name="Administrator • Open Governance Atmosphere">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAdministratorOpenGovernanceAtmosphere} />
+      </div>
+      <div className="absolute h-[760px] left-[720px] top-[90px] w-[560px]" data-node-id="1599:203" data-name="Administrator • Enhanced Ambient Detail">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAdministratorEnhancedAmbientDetail} />
+      </div>
+      <div className="absolute bg-[rgba(12,32,48,0.94)] border border-[rgba(44,140,138,0.84)] border-solid h-[92px] left-[246px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[88px] w-[1100px]" data-node-id="1411:29" data-name="DESIGN • PAGE HEADER SURFACE" />
+      <a className="absolute bg-[#071b2b] block border border-[#c77833] border-solid cursor-pointer h-[40px] left-[14px] rounded-[10px] top-[806px] w-[202px]" data-node-id="695:3905" data-name="Logout Button" />
+      <div className="absolute h-[900px] left-0 top-0 w-[228px]" data-node-id="1677:100" data-name="LEFT PANEL • ADMIN GOVERNANCE SIGNATURE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgLeftPanelAdminGovernanceSignature} />
+      </div>
+      <div className="absolute bg-[rgba(8,27,41,0.88)] h-[900px] left-0 top-0 w-[228px]" data-node-id="1266:5441" data-name="DASHBOARD SHELL • Sidebar" />
+      <div className="absolute bg-[rgba(8,27,41,0.94)] border border-[#1a4a6b] border-solid h-[44px] left-[14px] rounded-[10px] top-[124px] w-[200px]" data-node-id="1535:141" data-name="CANONICAL NAV • Dashboard" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[176px] w-[200px]" data-node-id="1535:142" data-name="CANONICAL NAV • Equipment Categories" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[228px] w-[200px]" data-node-id="1535:143" data-name="CANONICAL NAV • Equipment Items" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[280px] w-[200px]" data-node-id="1535:144" data-name="CANONICAL NAV • Borrower Profiles" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[332px] w-[200px]" data-node-id="1535:145" data-name="CANONICAL NAV • User & Role Management" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[384px] w-[200px]" data-node-id="1535:146" data-name="CANONICAL NAV • Borrowing History" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[436px] w-[200px]" data-node-id="1535:147" data-name="CANONICAL NAV • Availability Calendar" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[488px] w-[200px]" data-node-id="1535:148" data-name="CANONICAL NAV • System Audit Log" />
+      <div className="absolute bg-[#0b2233] h-[72px] left-[228px] top-0 w-[1212px]" data-node-id="1266:5442" data-name="DASHBOARD SHELL • Topbar" />
+      <div className="absolute bg-[#21455c] h-px left-[228px] rounded-[1px] top-[71px] w-[1212px]" data-node-id="1266:5443" data-name="DASHBOARD SHELL • Topbar Divider" />
+      <div className="absolute left-[28px] size-[36px] top-[22px]" data-node-id="1266:5444" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle} />
+      </div>
+      <div className="absolute bg-[#2c8c8a] h-[3px] left-[39px] rounded-[1px] top-[33px] w-[14px]" data-node-id="1266:5445" data-name="DASHBOARD SHELL • Divider" />
+      <div className="absolute bg-[#2c8c8a] h-[3px] left-[39px] rounded-[1px] top-[40px] w-[10px]" data-node-id="1266:5446" data-name="DASHBOARD SHELL • Divider" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2c8c8a] border-solid h-[34px] left-[22px] rounded-[9px] top-[86px] w-[184px]" data-node-id="1266:5449" data-name="DASHBOARD SHELL • Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[14px] justify-center leading-[0] left-[28px] not-italic text-[#f4f8fb] text-[10.5px] top-[98px] w-[170px]" data-node-id="1266:5450">
+        <p className="leading-[normal]">ADMINISTRATOR WORKSPACE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[146px] w-[148px]" data-node-id="1266:5452">
+        <p className="leading-[normal]">Dashboard</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[198px] w-[148px]" data-node-id="1266:5453">
+        <p className="leading-[normal]">Equipment Categories</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[250px] w-[148px]" data-node-id="1266:5454">
+        <p className="leading-[normal]">Equipment Items</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[302px] w-[148px]" data-node-id="1266:5455">
+        <p className="leading-[normal]">Borrower Profiles</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[354px] w-[148px]" data-node-id="1266:5456">
+        <p className="leading-[normal]">{`User & Role Management`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[406px] w-[148px]" data-node-id="1266:5457">
+        <p className="leading-[normal]">Borrowing History</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[458px] w-[148px]" data-node-id="1266:5459">
+        <p className="leading-[normal]">Availability Calendar</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic opacity-84 text-[#99b0bf] text-[11.5px] top-[510px] w-[148px]" data-node-id="1266:5461">
+        <p className="leading-[normal]">System Audit Log</p>
+      </div>
+      <div className="absolute bg-[#071b2b] border border-[#1a4a6b] border-solid h-[96px] left-[22px] rounded-[14px] top-[720px] w-[184px]" data-node-id="1266:5462" data-name="DASHBOARD SHELL • Shape" />
+      <div className="absolute left-[36px] size-[38px] top-[738px]" data-node-id="1266:5463" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle1} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[55px] not-italic text-[#f4f8fb] text-[11.5px] text-center top-[757px] w-[38px]" data-node-id="1266:5464">
+        <p className="leading-[normal]">A</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[84px] not-italic text-[#f4f8fb] text-[11.5px] top-[746px] w-[106px]" data-node-id="1266:5465">
+        <p className="leading-[normal]">Alex Rivera</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[84px] not-italic text-[#99b0bf] text-[10.5px] top-[761px] w-[110px]" data-node-id="1266:5466">
+        <p className="leading-[normal]">System Administrator</p>
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[14px] justify-center leading-[0] left-[114px] not-italic text-[#c77833] text-[11px] text-center top-[826px] w-[184px]" data-node-id="1266:5467">
+        <p className="leading-[normal]">Log out</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[14px] top-[27.5px] w-[300px]" data-node-id="1266:5468">
+        <p className="leading-[normal]">{`Approval & Release`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[258px] not-italic text-[#99b0bf] text-[10.5px] top-[47px] w-[330px]" data-node-id="1266:5469">
+        <p className="leading-[normal]">Review approval decisions and release records.</p>
+      </div>
+      <div className="absolute bg-[#2c8c8a] border-0 border-[#1a4a6b] border-solid h-[34px] left-[1024px] rounded-[17px] top-[18px] w-[132px]" data-node-id="1266:5470" data-name="DASHBOARD SHELL • Shape" />
+      <div className="absolute left-[1040px] size-[8px] top-[31px]" data-node-id="1266:5471" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle2} />
+      </div>
+      <div className="absolute left-[1180px] size-[36px] top-[18px]" data-node-id="1266:5473" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle3} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1198px] not-italic text-[#f4f8fb] text-[11.5px] text-center top-[36px] w-[36px]" data-node-id="1266:5474">
+        <p className="leading-[normal]">A</p>
+      </div>
+      <div className="absolute bg-[#0c2230] border border-[#2c8c8a] border-solid content-stretch flex flex-col gap-[8px] h-[257px] items-start left-[270px] overflow-clip px-[20px] py-[16px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[220px] w-[1080px]" data-node-id="1283:349" data-name="RESULT • Approval">
+        <div className="bg-[#17382f] border border-[#2c8c8a] border-solid h-[34px] overflow-clip relative rounded-[15px] shrink-0 w-[210px]" data-node-id="1283:350" data-name="STATUS • RELEASED">
+          <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[11px] not-italic text-[#2c8c8a] text-[9px] top-[7px] w-[210px]" data-node-id="1283:351">
+            RELEASED
+          </p>
+        </div>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[#f4f8fb] text-[22px] w-[800px]" data-node-id="1283:352">
+          Release Recorded
+        </p>
+        <div className="[word-break:break-word] content-stretch flex gap-[14px] h-[58px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 w-[1040px]" data-node-id="1283:353" data-name="Frame">
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[320px]" data-node-id="1283:354" data-name="FIELD • BORROWER">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[292px]" data-node-id="1283:355">
+              BORROWER
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[292px]" data-node-id="1283:356">
+              Maria Santos
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[330px]" data-node-id="1283:357" data-name="FIELD • EQUIPMENT">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[302px]" data-node-id="1283:358">
+              EQUIPMENT
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[302px]" data-node-id="1283:359">
+              Laptop Dell 5420 • EQ-001
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[300px]" data-node-id="1283:360" data-name="FIELD • REQUEST">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[272px]" data-node-id="1283:361">
+              REQUEST
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[272px]" data-node-id="1283:362">
+              Sep 8 • 10:00–12:00
+            </p>
+          </div>
+        </div>
+        <div className="[word-break:break-word] content-stretch flex gap-[14px] h-[58px] items-start leading-[normal] not-italic overflow-clip relative shrink-0 w-[1040px]" data-node-id="1283:363" data-name="Frame">
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[320px]" data-node-id="1283:364" data-name="FIELD • DECISION">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[292px]" data-node-id="1283:365">
+              DECISION
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[292px]" data-node-id="1283:366">
+              RELEASED
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[330px]" data-node-id="1283:367" data-name="FIELD • ACTOR">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[302px]" data-node-id="1283:368">
+              ACTOR
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[302px]" data-node-id="1283:369">
+              Administrator
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[300px]" data-node-id="1283:370" data-name="FIELD • RECORD">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[272px]" data-node-id="1283:371">
+              RECORD
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[272px]" data-node-id="1283:372">
+              RES-2026-014
+            </p>
+          </div>
+        </div>
+        <p className="[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[#99b0bf] text-[12px] w-[1040px]" data-node-id="1283:373">
+          Status changed to Borrowed. Return obligation is now active.
+        </p>
+      </div>
+      <a className="absolute bg-[rgba(8,27,41,0)] block border border-[rgba(44,140,138,0)] border-solid cursor-pointer h-[42px] left-[1060px] rounded-[12px] top-[800px] w-[250px]" data-node-id="1283:375" data-name="VISIBLE BACK BUTTON" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[12px] top-[109.5px] w-[500px]" data-node-id="1539:74">
+        <p className="leading-[normal]">ADMINISTRATOR • WORKSPACE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[24px] top-[136px] w-[800px]" data-node-id="1539:75">
+        <p className="leading-[34px]">Release Recorded</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[14px] top-[163.5px] w-[900px]" data-node-id="1539:76">
+        <p className="leading-[normal]">The release is recorded and the borrowing obligation is now active.</p>
+      </div>
+      <div className="absolute h-[36.548px] left-[24px] top-[19.73px] w-[44px]" data-node-id="1649:193" data-name="Brand Logo • CG • Supplied">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgBrandLogoCgSupplied} />
+      </div>
+      <p className="[word-break:break-word] absolute font-['Sora:SemiBold'] font-semibold leading-[0] left-[78px] text-[#edf2fa] text-[0px] top-[27px] tracking-[0.216px] whitespace-nowrap" data-node-id="1653:32">
+        <span className="font-['Oxanium:Medium'] font-medium leading-[normal] text-[18px]">Campus</span>
+        <span className="font-['Oxanium:Bold'] font-bold leading-[normal] text-[#c77833] text-[18px]">Gear</span>
+      </p>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[136px]" data-node-id="1679:435" data-name="NAV ICON • CONSISTENT • Dashboard">
+        <div className="absolute inset-[19%_16%_21.5%_16%]" data-node-id="1679:436" data-name="Group">
+          <div className="absolute inset-[-7.98%_-6.99%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[188px]" data-node-id="1679:440" data-name="NAV ICON • CONSISTENT • Equipment Categories">
+        <div className="absolute inset-[24%_14%]" data-node-id="1679:441" data-name="Group">
+          <div className="absolute inset-[-9.13%_-6.6%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup1} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[240px]" data-node-id="1679:444" data-name="NAV ICON • CONSISTENT • Equipment Items">
+        <div className="absolute bottom-[32%] left-1/4 right-1/4 top-[12%]" data-node-id="1679:445" data-name="Group">
+          <div className="absolute inset-[-8.48%_-9.5%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup2} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#102a3c] left-[28px] overflow-clip size-[20px] top-[292px]" data-node-id="1679:450" data-name="NAV ICON • CONSISTENT • Borrower Profiles">
+        <div className="absolute inset-[21%_21.5%_17.5%_21.5%]" data-node-id="1679:451" data-name="Group">
+          <div className="absolute inset-[-7.72%_-8.34%_-7.73%_-8.34%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup3} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[344px]" data-node-id="1679:454" data-name="NAV ICON • CONSISTENT • User & Role Management">
+        <div className="absolute inset-[23%_23.5%_20%_18.5%]" data-node-id="1679:455" data-name="Group">
+          <div className="absolute inset-[-8.33%_-8.19%_-8.34%_-8.19%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup4} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#102a3c] left-[28px] overflow-clip size-[20px] top-[396px]" data-node-id="1679:459" data-name="NAV ICON • CONSISTENT • Borrowing History">
+        <div className="absolute inset-[16.5%]" data-node-id="1679:460" data-name="Group">
+          <div className="absolute inset-[-7.09%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup5} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[448px]" data-node-id="1679:463" data-name="NAV ICON • CONSISTENT • Availability Calendar">
+        <div className="absolute inset-[14%_15%_17.5%_15%]" data-node-id="1679:464" data-name="Group">
+          <div className="absolute inset-[-6.93%_-6.79%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup6} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[500px]" data-node-id="1679:468" data-name="NAV ICON • CONSISTENT • System Audit Log">
+        <div className="absolute bottom-[14.5%] left-1/4 right-1/4 top-[14.5%]" data-node-id="1679:469" data-name="Group">
+          <div className="absolute inset-[-6.69%_-9.5%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup7} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] h-[28px] left-[12px] opacity-95 rounded-[2px] top-[132px] w-[3px]" data-node-id="1826:9" data-name="PERSISTENT ACTIVE INDICATOR" />
+    </div>
+  );
+}

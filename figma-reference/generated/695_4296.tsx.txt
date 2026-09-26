@@ -1,0 +1,559 @@
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/f2c12163-082c-4938-9b12-768fe0f44810";
+const imgAdministratorOpenGovernanceAtmosphere = `${assetPathPrefix}/e0141.svg`;
+const imgAdministratorEnhancedAmbientDetail = `${assetPathPrefix}/7a4b9.svg`;
+const imgLeftPanelAdminGovernanceSignature = `${assetPathPrefix}/44f3c.svg`;
+const imgDashboardShellCircle = `${assetPathPrefix}/a698b.svg`;
+const imgDashboardShellCircle1 = `${assetPathPrefix}/7ac1a.svg`;
+const imgDashboardShellCircle2 = `${assetPathPrefix}/d3b6f.svg`;
+const imgDashboardShellCircle3 = `${assetPathPrefix}/2680a.svg`;
+const imgBrandLogoCgSupplied = `${assetPathPrefix}/b95f3.svg`;
+const imgGroup = `${assetPathPrefix}/edd56.svg`;
+const imgGroup1 = `${assetPathPrefix}/7e0b6.svg`;
+const imgGroup2 = `${assetPathPrefix}/9177b.svg`;
+const imgGroup3 = `${assetPathPrefix}/a40a1.svg`;
+const imgGroup4 = `${assetPathPrefix}/be9c1.svg`;
+const imgGroup5 = `${assetPathPrefix}/e1db6.svg`;
+const imgGroup6 = `${assetPathPrefix}/9f767.svg`;
+const imgGroup7 = `${assetPathPrefix}/bc2d0.svg`;
+
+export default function Component11BAdministratorAvailabilityCalendar() {
+  return (
+    <div className="bg-[#071b2b] relative size-full" data-node-id="695:4296" data-name="11B — Administrator Availability Calendar">
+      <div className="absolute h-[900px] left-0 top-0 w-[1440px]" data-node-id="1507:184" data-name="Administrator • Open Governance Atmosphere">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAdministratorOpenGovernanceAtmosphere} />
+      </div>
+      <div className="absolute h-[760px] left-[720px] top-[90px] w-[560px]" data-node-id="1599:242" data-name="Administrator • Enhanced Ambient Detail">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAdministratorEnhancedAmbientDetail} />
+      </div>
+      <div className="absolute bg-[rgba(12,32,48,0.94)] border border-[rgba(44,140,138,0.84)] border-solid h-[92px] left-[246px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[88px] w-[1100px]" data-node-id="1411:32" data-name="DESIGN • PAGE HEADER SURFACE" />
+      <a className="absolute bg-[#071b2b] block border border-[#c77833] border-solid cursor-pointer h-[40px] left-[14px] rounded-[10px] top-[806px] w-[202px]" data-node-id="695:4543" data-name="Logout Button" />
+      <div className="absolute bg-[#0e2537] h-[28px] left-[12px] rounded-[2px] top-[444px] w-[3px]" data-node-id="1259:2945" data-name="PERSISTENT ACTIVE INDICATOR" />
+      <div className="absolute h-[900px] left-0 top-0 w-[228px]" data-node-id="1677:118" data-name="LEFT PANEL • ADMIN GOVERNANCE SIGNATURE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgLeftPanelAdminGovernanceSignature} />
+      </div>
+      <div className="absolute bg-[rgba(8,27,41,0.88)] h-[900px] left-0 top-0 w-[228px]" data-node-id="1266:5750" data-name="DASHBOARD SHELL • Sidebar" />
+      <div className="absolute bg-[rgba(8,27,41,0.94)] border border-[#1a4a6b] border-solid h-[44px] left-[14px] rounded-[10px] top-[124px] w-[200px]" data-node-id="1535:165" data-name="CANONICAL NAV • Dashboard" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[176px] w-[200px]" data-node-id="1535:166" data-name="CANONICAL NAV • Equipment Categories" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[228px] w-[200px]" data-node-id="1535:167" data-name="CANONICAL NAV • Equipment Items" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[280px] w-[200px]" data-node-id="1535:168" data-name="CANONICAL NAV • Borrower Profiles" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[332px] w-[200px]" data-node-id="1535:169" data-name="CANONICAL NAV • User & Role Management" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[384px] w-[200px]" data-node-id="1535:170" data-name="CANONICAL NAV • Borrowing History" />
+      <div className="absolute bg-[rgba(44,140,138,0.96)] border border-[#1a4a6b] border-solid h-[44px] left-[14px] rounded-[10px] top-[436px] w-[200px]" data-node-id="1535:171" data-name="CANONICAL NAV • Availability Calendar" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[488px] w-[200px]" data-node-id="1535:172" data-name="CANONICAL NAV • System Audit Log" />
+      <div className="absolute bg-[#0b2233] h-[72px] left-[228px] top-0 w-[1212px]" data-node-id="1266:5751" data-name="DASHBOARD SHELL • Topbar" />
+      <div className="absolute bg-[#21455c] h-px left-[228px] rounded-[1px] top-[71px] w-[1212px]" data-node-id="1266:5752" data-name="DASHBOARD SHELL • Topbar Divider" />
+      <div className="absolute left-[28px] size-[36px] top-[22px]" data-node-id="1266:5753" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle} />
+      </div>
+      <div className="absolute bg-[#2c8c8a] h-[3px] left-[39px] rounded-[1px] top-[33px] w-[14px]" data-node-id="1266:5754" data-name="DASHBOARD SHELL • Divider" />
+      <div className="absolute bg-[#2c8c8a] h-[3px] left-[39px] rounded-[1px] top-[40px] w-[10px]" data-node-id="1266:5755" data-name="DASHBOARD SHELL • Divider" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2c8c8a] border-solid h-[34px] left-[22px] rounded-[9px] top-[86px] w-[184px]" data-node-id="1266:5758" data-name="DASHBOARD SHELL • Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[14px] justify-center leading-[0] left-[28px] not-italic text-[#f4f8fb] text-[10.5px] top-[98px] w-[170px]" data-node-id="1266:5759">
+        <p className="leading-[normal]">ADMINISTRATOR WORKSPACE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[146px] w-[148px]" data-node-id="1266:5761">
+        <p className="leading-[normal]">Dashboard</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[198px] w-[148px]" data-node-id="1266:5762">
+        <p className="leading-[normal]">Equipment Categories</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[250px] w-[148px]" data-node-id="1266:5763">
+        <p className="leading-[normal]">Equipment Items</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[302px] w-[148px]" data-node-id="1266:5764">
+        <p className="leading-[normal]">Borrower Profiles</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[354px] w-[148px]" data-node-id="1266:5765">
+        <p className="leading-[normal]">{`User & Role Management`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[406px] w-[148px]" data-node-id="1266:5766">
+        <p className="leading-[normal]">Borrowing History</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[11.5px] text-white top-[458px] w-[148px]" data-node-id="1266:5768">
+        <p className="leading-[normal]">Availability Calendar</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic opacity-84 text-[#99b0bf] text-[11.5px] top-[510px] w-[148px]" data-node-id="1266:5770">
+        <p className="leading-[normal]">System Audit Log</p>
+      </div>
+      <div className="absolute bg-[#071b2b] border border-[#1a4a6b] border-solid h-[96px] left-[22px] rounded-[14px] top-[720px] w-[184px]" data-node-id="1266:5771" data-name="DASHBOARD SHELL • Shape" />
+      <div className="absolute left-[36px] size-[38px] top-[738px]" data-node-id="1266:5772" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle1} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[55px] not-italic text-[#f4f8fb] text-[11.5px] text-center top-[757px] w-[38px]" data-node-id="1266:5773">
+        <p className="leading-[normal]">A</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[84px] not-italic text-[#f4f8fb] text-[11.5px] top-[746px] w-[106px]" data-node-id="1266:5774">
+        <p className="leading-[normal]">Alex Rivera</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[84px] not-italic text-[#99b0bf] text-[10.5px] top-[761px] w-[110px]" data-node-id="1266:5775">
+        <p className="leading-[normal]">System Administrator</p>
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[14px] justify-center leading-[0] left-[114px] not-italic text-[#c77833] text-[11px] text-center top-[826px] w-[184px]" data-node-id="1266:5776">
+        <p className="leading-[normal]">Log out</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[14px] top-[27.5px] w-[300px]" data-node-id="1266:5777">
+        <p className="leading-[normal]">Availability Calendar</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[258px] not-italic text-[#99b0bf] text-[10.5px] top-[47px] w-[330px]" data-node-id="1266:5778">
+        <p className="leading-[normal]">Review equipment availability across scheduled slots.</p>
+      </div>
+      <div className="absolute bg-[#2c8c8a] border-0 border-[#1a4a6b] border-solid h-[34px] left-[1024px] rounded-[17px] top-[18px] w-[132px]" data-node-id="1266:5779" data-name="DASHBOARD SHELL • Shape" />
+      <div className="absolute left-[1040px] size-[8px] top-[31px]" data-node-id="1266:5780" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle2} />
+      </div>
+      <div className="absolute left-[1180px] size-[36px] top-[18px]" data-node-id="1266:5782" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle3} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1198px] not-italic text-[#f4f8fb] text-[11.5px] text-center top-[36px] w-[36px]" data-node-id="1266:5783">
+        <p className="leading-[normal]">A</p>
+      </div>
+      <div className="[word-break:break-word] absolute bg-[#0c2230] border border-[#2c8c8a] border-solid h-[86px] leading-[normal] left-[270px] not-italic overflow-clip rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[205px] w-[1080px]" data-node-id="1283:1248" data-name="CALENDAR HEADER">
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[17px] text-[#f4f8fb] text-[20px] top-[9px] w-[300px]" data-node-id="1283:1249">
+          SEPTEMBER 2026
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[17px] text-[#a8b8c5] text-[10px] top-[44px] w-[360px]" data-node-id="1283:1250">
+          30 scheduled status points
+        </p>
+        <div className="absolute bg-[rgba(44,140,138,0.72)] border border-[#1a4a6b] border-solid h-[58px] left-[469px] overflow-clip rounded-[10px] top-[13px] w-[135px]" data-node-id="1283:1251" data-name="STAT AVAILABLE">
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[9px] text-[#99b0bf] text-[8px] top-[7px] w-[115px]" data-node-id="1283:1252">
+            AVAILABLE
+          </p>
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[9px] text-[#f4f8fb] text-[17px] top-[26px] w-[115px]" data-node-id="1283:1253">
+            24
+          </p>
+          <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1254">
+            ​
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.72)] h-[58px] left-[617px] overflow-clip rounded-[10px] top-[13px] w-[135px]" data-node-id="1283:1255" data-name="STAT RESERVED">
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[10px] text-[#99b0bf] text-[8px] top-[8px] w-[115px]" data-node-id="1283:1256">
+            RESERVED
+          </p>
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[10px] text-[#f4f8fb] text-[17px] top-[27px] w-[115px]" data-node-id="1283:1257">
+            12
+          </p>
+          <p className="absolute font-['Inter:Regular'] font-normal left-0 text-[#f4f8fb] text-[1px] top-px w-[200px]" data-node-id="1283:1258">
+            ​
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.72)] border border-[#1a4a6b] border-solid h-[58px] left-[765px] overflow-clip rounded-[10px] top-[13px] w-[135px]" data-node-id="1283:1259" data-name="STAT BORROWED">
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[9px] text-[#99b0bf] text-[8px] top-[7px] w-[115px]" data-node-id="1283:1260">
+            BORROWED
+          </p>
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[9px] text-[#f4f8fb] text-[17px] top-[26px] w-[115px]" data-node-id="1283:1261">
+            5
+          </p>
+          <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1262">
+            ​
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.72)] border border-[#1a4a6b] border-solid h-[58px] left-[913px] overflow-clip rounded-[10px] top-[13px] w-[135px]" data-node-id="1283:1263" data-name="STAT MAINTENANCE">
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[9px] text-[#99b0bf] text-[8px] top-[7px] w-[115px]" data-node-id="1283:1264">
+            MAINTENANCE
+          </p>
+          <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[9px] text-[#f4f8fb] text-[17px] top-[26px] w-[115px]" data-node-id="1283:1265">
+            2
+          </p>
+          <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1266">
+            ​
+          </p>
+        </div>
+      </div>
+      <div className="[word-break:break-word] absolute bg-[#0c2230] border border-[#2c8c8a] border-solid h-[385px] leading-[normal] left-[270px] not-italic overflow-clip rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[305px] w-[1080px]" data-node-id="1283:1267" data-name="CALENDAR GRID">
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[29px] text-[#99b0bf] text-[9px] top-[7px] w-[90px]" data-node-id="1283:1268">
+          MON
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1269">
+          ​
+        </p>
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[177px] text-[#99b0bf] text-[9px] top-[7px] w-[90px]" data-node-id="1283:1270">
+          TUE
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1271">
+          ​
+        </p>
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[325px] text-[#99b0bf] text-[9px] top-[7px] w-[90px]" data-node-id="1283:1272">
+          WED
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1273">
+          ​
+        </p>
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[473px] text-[#e8f2f7] text-[9px] top-[7px] w-[90px]" data-node-id="1283:1274">
+          THU
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1275">
+          ​
+        </p>
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[621px] text-[#e8f2f7] text-[9px] top-[7px] w-[90px]" data-node-id="1283:1276">
+          FRI
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1277">
+          ​
+        </p>
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[769px] text-[#99b0bf] text-[9px] top-[7px] w-[90px]" data-node-id="1283:1278">
+          SAT
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1279">
+          ​
+        </p>
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[917px] text-[#99b0bf] text-[9px] top-[7px] w-[90px]" data-node-id="1283:1280">
+          SUN
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1281">
+          ​
+        </p>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[157px] opacity-98 overflow-clip rounded-[8px] top-[33px] w-[132px]" data-node-id="1283:1282" data-name="DAY 1">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1283">
+            1
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1284">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[297px] opacity-98 overflow-clip rounded-[8px] top-[33px] w-[132px]" data-node-id="1283:1285" data-name="DAY 2">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1286">
+            2
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1287">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[437px] opacity-98 overflow-clip rounded-[8px] top-[33px] w-[132px]" data-node-id="1283:1288" data-name="DAY 3">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1289">
+            3
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1290">
+            BORROWED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[577px] opacity-98 overflow-clip rounded-[8px] top-[33px] w-[132px]" data-node-id="1283:1291" data-name="DAY 4">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1292">
+            4
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1293">
+            MAINTENANCE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[717px] opacity-98 overflow-clip rounded-[8px] top-[33px] w-[132px]" data-node-id="1283:1294" data-name="DAY 5">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1295">
+            5
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1296">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[857px] opacity-98 overflow-clip rounded-[8px] top-[33px] w-[132px]" data-node-id="1283:1297" data-name="DAY 6">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1298">
+            6
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1299">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[17px] opacity-98 overflow-clip rounded-[8px] top-[33px] w-[132px]" data-node-id="1283:1300" data-name="DAY 7">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1301">
+            7
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1302">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[157px] opacity-98 overflow-clip rounded-[8px] top-[95px] w-[132px]" data-node-id="1283:1303" data-name="DAY 8">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1304">
+            8
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1305">
+            BORROWED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[297px] opacity-98 overflow-clip rounded-[8px] top-[95px] w-[132px]" data-node-id="1283:1306" data-name="DAY 9">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1307">
+            9
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1308">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[437px] opacity-98 overflow-clip rounded-[8px] top-[95px] w-[132px]" data-node-id="1283:1309" data-name="DAY 10">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1310">
+            10
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1311">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[577px] opacity-98 overflow-clip rounded-[8px] top-[95px] w-[132px]" data-node-id="1283:1312" data-name="DAY 11">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1313">
+            11
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1314">
+            MAINTENANCE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[717px] opacity-98 overflow-clip rounded-[8px] top-[95px] w-[132px]" data-node-id="1283:1315" data-name="DAY 12">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1316">
+            12
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1317">
+            BORROWED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[857px] opacity-98 overflow-clip rounded-[8px] top-[95px] w-[132px]" data-node-id="1283:1318" data-name="DAY 13">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1319">
+            13
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1320">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[17px] opacity-98 overflow-clip rounded-[8px] top-[95px] w-[132px]" data-node-id="1283:1321" data-name="DAY 14">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1322">
+            14
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1323">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[157px] opacity-98 overflow-clip rounded-[8px] top-[157px] w-[132px]" data-node-id="1283:1324" data-name="DAY 15">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1325">
+            15
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1326">
+            BORROWED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[297px] opacity-98 overflow-clip rounded-[8px] top-[157px] w-[132px]" data-node-id="1283:1327" data-name="DAY 16">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1328">
+            16
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1329">
+            MAINTENANCE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border-2 border-[#2c8c8a] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[437px] opacity-98 overflow-clip rounded-[8px] top-[157px] w-[132px]" data-node-id="1283:1330" data-name="DAY 17">
+          <p className="absolute left-[8px] text-[#f4f8fb] text-[15px] top-[6px] w-[30px]" data-node-id="1283:1331">
+            17
+          </p>
+          <p className="absolute left-[8px] text-[#d5e0e7] text-[8px] top-[29px] w-[105px]" data-node-id="1283:1332">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[577px] opacity-98 overflow-clip rounded-[8px] top-[157px] w-[132px]" data-node-id="1283:1333" data-name="DAY 18">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1334">
+            18
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1335">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[717px] opacity-98 overflow-clip rounded-[8px] top-[157px] w-[132px]" data-node-id="1283:1336" data-name="DAY 19">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1337">
+            19
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1338">
+            BORROWED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[857px] opacity-98 overflow-clip rounded-[8px] top-[157px] w-[132px]" data-node-id="1283:1339" data-name="DAY 20">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1340">
+            20
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1341">
+            MAINTENANCE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[17px] opacity-98 overflow-clip rounded-[8px] top-[157px] w-[132px]" data-node-id="1283:1342" data-name="DAY 21">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1343">
+            21
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1344">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[157px] opacity-98 overflow-clip rounded-[8px] top-[219px] w-[132px]" data-node-id="1283:1345" data-name="DAY 22">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1346">
+            22
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1347">
+            MAINTENANCE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[297px] opacity-98 overflow-clip rounded-[8px] top-[219px] w-[132px]" data-node-id="1283:1348" data-name="DAY 23">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1349">
+            23
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1350">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[437px] opacity-98 overflow-clip rounded-[8px] top-[219px] w-[132px]" data-node-id="1283:1351" data-name="DAY 24">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1352">
+            24
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1353">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[577px] opacity-98 overflow-clip rounded-[8px] top-[219px] w-[132px]" data-node-id="1283:1354" data-name="DAY 25">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1355">
+            25
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1356">
+            BORROWED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[717px] opacity-98 overflow-clip rounded-[8px] top-[219px] w-[132px]" data-node-id="1283:1357" data-name="DAY 26">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1358">
+            26
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1359">
+            MAINTENANCE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[857px] opacity-98 overflow-clip rounded-[8px] top-[219px] w-[132px]" data-node-id="1283:1360" data-name="DAY 27">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1361">
+            27
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1362">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[17px] opacity-98 overflow-clip rounded-[8px] top-[219px] w-[132px]" data-node-id="1283:1363" data-name="DAY 28">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1364">
+            28
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1365">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[157px] opacity-98 overflow-clip rounded-[8px] top-[281px] w-[132px]" data-node-id="1283:1366" data-name="DAY 29">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1367">
+            29
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1368">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] border border-[#1a4a6b] border-solid font-['Inter:Semi_Bold'] font-semibold h-[54px] left-[297px] opacity-98 overflow-clip rounded-[8px] top-[281px] w-[132px]" data-node-id="1283:1369" data-name="DAY 30">
+          <p className="absolute left-[9px] text-[#f4f8fb] text-[15px] top-[7px] w-[30px]" data-node-id="1283:1370">
+            30
+          </p>
+          <p className="absolute left-[9px] text-[#d5e0e7] text-[8px] top-[30px] w-[105px]" data-node-id="1283:1371">
+            AVAILABLE
+          </p>
+        </div>
+      </div>
+      <div className="absolute bg-[#0c2230] border border-[#2c8c8a] border-solid h-[78px] left-[270px] overflow-clip rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[705px] w-[620px]" data-node-id="1283:1372" data-name="STATUS LEGEND">
+        <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[15px] not-italic text-[#a8b8c5] text-[9px] top-[11px] w-[70px]" data-node-id="1283:1373">
+          STATUS
+        </p>
+        <div className="absolute bg-[rgba(44,140,138,0.8)] h-[30px] left-[94px] overflow-clip rounded-[15px] top-[12px] w-[115px]" data-node-id="1283:1374" data-name="Available">
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[57.5px] not-italic text-[#d5e0e7] text-[8px] text-center top-[6px] w-[115px]" data-node-id="1283:1375">
+            AVAILABLE
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] h-[30px] left-[219px] overflow-clip rounded-[15px] top-[12px] w-[115px]" data-node-id="1283:1376" data-name="Reserved">
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[57.5px] not-italic text-[#d5e0e7] text-[8px] text-center top-[6px] w-[115px]" data-node-id="1283:1377">
+            RESERVED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(7,27,43,0.8)] h-[30px] left-[344px] overflow-clip rounded-[15px] top-[12px] w-[115px]" data-node-id="1283:1378" data-name="Borrowed">
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[57.5px] not-italic text-[#d5e0e7] text-[8px] text-center top-[6px] w-[115px]" data-node-id="1283:1379">
+            BORROWED
+          </p>
+        </div>
+        <div className="absolute bg-[rgba(199,120,51,0.8)] h-[30px] left-[469px] overflow-clip rounded-[15px] top-[12px] w-[115px]" data-node-id="1283:1380" data-name="Maintenance">
+          <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[57.5px] not-italic text-[#d5e0e7] text-[8px] text-center top-[6px] w-[115px]" data-node-id="1283:1381">
+            MAINTENANCE
+          </p>
+        </div>
+      </div>
+      <div className="[word-break:break-word] absolute bg-[#0c2230] border border-[#2c8c8a] border-solid h-[78px] leading-[normal] left-[905px] not-italic overflow-clip rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[705px] w-[445px]" data-node-id="1283:1382" data-name="SELECTED DATE">
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[15px] text-[#99b0bf] text-[8px] top-[8px] w-[90px]" data-node-id="1283:1383">
+          SELECTED
+        </p>
+        <p className="absolute font-['Inter:Semi_Bold'] font-semibold left-[15px] text-[#f4f8fb] text-[12px] top-[26px] w-[300px]" data-node-id="1283:1384">
+          SEP 10 • 10:00 AM–12:00 PM
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[15px] text-[#a8b8c5] text-[10px] top-[49px] w-[395px]" data-node-id="1283:1385">
+          Shows reservation, borrowing, and maintenance status.
+        </p>
+        <p className="absolute font-['Inter:Regular'] font-normal left-[-1px] text-[#f4f8fb] text-[1px] top-0 w-[200px]" data-node-id="1283:1386">
+          ​
+        </p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[12px] top-[109.5px] w-[500px]" data-node-id="1539:83">
+        <p className="leading-[normal]">ADMINISTRATOR • WORKSPACE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[24px] top-[136px] w-[800px]" data-node-id="1539:84">
+        <p className="leading-[34px]">Availability Calendar</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[14px] top-[163.5px] w-[900px]" data-node-id="1539:85">
+        <p className="leading-[normal]">Read equipment availability, scheduled reservations, and maintenance status by date.</p>
+      </div>
+      <div className="absolute h-[36.548px] left-[24px] top-[19.73px] w-[44px]" data-node-id="1649:214" data-name="Brand Logo • CG • Supplied">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgBrandLogoCgSupplied} />
+      </div>
+      <p className="[word-break:break-word] absolute font-['Sora:SemiBold'] font-semibold leading-[0] left-[78px] text-[#edf2fa] text-[0px] top-[27px] tracking-[0.216px] whitespace-nowrap" data-node-id="1653:35">
+        <span className="font-['Oxanium:Medium'] font-medium leading-[normal] text-[18px]">Campus</span>
+        <span className="font-['Oxanium:Bold'] font-bold leading-[normal] text-[#c77833] text-[18px]">Gear</span>
+      </p>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[136px]" data-node-id="1679:546" data-name="NAV ICON • CONSISTENT • Dashboard">
+        <div className="absolute inset-[19%_16%_21.5%_16%]" data-node-id="1679:547" data-name="Group">
+          <div className="absolute inset-[-7.98%_-6.99%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[188px]" data-node-id="1679:551" data-name="NAV ICON • CONSISTENT • Equipment Categories">
+        <div className="absolute inset-[24%_14%]" data-node-id="1679:552" data-name="Group">
+          <div className="absolute inset-[-9.13%_-6.6%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup1} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[240px]" data-node-id="1679:555" data-name="NAV ICON • CONSISTENT • Equipment Items">
+        <div className="absolute bottom-[32%] left-1/4 right-1/4 top-[12%]" data-node-id="1679:556" data-name="Group">
+          <div className="absolute inset-[-8.48%_-9.5%_-8.47%_-9.5%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup2} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#102a3c] left-[28px] overflow-clip size-[20px] top-[292px]" data-node-id="1679:561" data-name="NAV ICON • CONSISTENT • Borrower Profiles">
+        <div className="absolute inset-[21%_21.5%_17.5%_21.5%]" data-node-id="1679:562" data-name="Group">
+          <div className="absolute inset-[-7.72%_-8.34%_-7.73%_-8.34%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup3} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[344px]" data-node-id="1679:565" data-name="NAV ICON • CONSISTENT • User & Role Management">
+        <div className="absolute inset-[23%_23.5%_20%_18.5%]" data-node-id="1679:566" data-name="Group">
+          <div className="absolute inset-[-8.33%_-8.19%_-8.34%_-8.19%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup4} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#102a3c] left-[28px] overflow-clip size-[20px] top-[396px]" data-node-id="1679:570" data-name="NAV ICON • CONSISTENT • Borrowing History">
+        <div className="absolute inset-[16.5%]" data-node-id="1679:571" data-name="Group">
+          <div className="absolute inset-[-7.09%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup5} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[448px]" data-node-id="1679:574" data-name="NAV ICON • CONSISTENT • Availability Calendar">
+        <div className="absolute inset-[14%_15%_17.5%_15%]" data-node-id="1679:575" data-name="Group">
+          <div className="absolute inset-[-6.93%_-6.79%_-6.94%_-6.79%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup6} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[500px]" data-node-id="1679:579" data-name="NAV ICON • CONSISTENT • System Audit Log">
+        <div className="absolute bottom-[14.5%] left-1/4 right-1/4 top-[14.5%]" data-node-id="1679:580" data-name="Group">
+          <div className="absolute inset-[-6.69%_-9.5%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup7} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

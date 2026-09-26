@@ -1,0 +1,88 @@
+@model HistoryPageViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Borrowing History";
+    ViewData["WorkspaceRole"] = "Borrower";
+    ViewData["BorrowerPage"] = "history";
+    var statuses = new[] { ("all", "All statuses"), ("pending", "Pending"), ("approved", "Approved"), ("borrowed", "Borrowed"), ("returned", "Returned"), ("late", "Late / overdue"), ("cancelled", "Cancelled") };
+}
+@* Figma sources: 695:562 history, 695:737 filtered, 695:1079 empty, 695:904 late monitoring. *@
+<link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" />
+<main class="live-content borrower-page" data-figma-source="695:562">
+    <header class="live-heading borrower-heading">
+        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
+        <h1><img src="~/figma/assets/e1db6.svg" alt="" />Borrowing History Report</h1>
+        <p>Review your reservation records, borrowing activity, and return status.</p>
+    </header>
+    <partial name="_BorrowerTabs" />
+    @if (Model.Feedback is not null)
+    {
+        <section class="borrower-feedback borrower-success" role="status"><p>@Model.Feedback</p></section>
+    }
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="borrower-validation" role="alert">@Html.ValidationSummary(false)</div>
+    }
+    <form method="get" action="/borrower/history" class="borrower-card borrower-filter" aria-label="Filter borrowing history">
+        <label class="borrower-field" for="from"><span>From date</span><input id="from" name="from" type="date" value="@Model.From" /></label>
+        <label class="borrower-field" for="to"><span>To date</span><input id="to" name="to" type="date" value="@Model.To" /></label>
+        <label class="borrower-field" for="status"><span>Status</span><select id="status" name="status">
+            @foreach (var (value, label) in statuses)
+            {
+                <option value="@value" selected="@(Model.Status == value)">@label</option>
+            }
+        </select></label>
+        <div class="borrower-filter-actions"><button class="borrower-button" type="submit">APPLY FILTER</button><a href="/borrower/history">Clear</a></div>
+    </form>
+    <section class="borrower-card borrower-history" aria-labelledby="history-title">
+        <div class="borrower-section-heading"><h2 id="history-title">BORROWING RECORDS</h2><span class="borrower-muted">@Model.Total record@(Model.Total == 1 ? "" : "s") · Manila time</span></div>
+        @if (Model.Rows.Count == 0)
+        {
+            <div class="borrower-empty" data-figma-source="695:1079">
+                <h3>No matching records</h3><p>Your requests will appear here after you submit a reservation.</p>
+                <a class="borrower-button" href="/borrower/reservation">Reserve equipment</a>
+            </div>
+        }
+        else
+        {
+            <div class="borrower-table-scroll" tabindex="0" aria-label="Borrowing history table">
+                <table class="borrower-table">
+                    <thead><tr><th scope="col">Equipment</th><th scope="col">Reservation time</th><th scope="col">Status</th><th scope="col">Return / condition</th><th scope="col">Action</th></tr></thead>
+                    <tbody>
+                        @foreach (var row in Model.Rows)
+                        {
+                            <tr>
+                                <td><strong>@row.EquipmentName</strong><span class="borrower-muted">@row.AssetCode</span><span class="borrower-purpose">@row.Purpose</span></td>
+                                <td>@row.StartManila<span class="borrower-muted">to @row.EndManila</span></td>
+                                <td><span class="borrower-badge status-@row.Status.ToLowerInvariant().Replace(" ", "-")">@row.Status</span></td>
+                                <td>@(row.ReturnedManila ?? "—")<span class="borrower-muted">@(row.ReturnCondition ?? "")</span></td>
+                                <td>
+                                    @if (row.CanCancel)
+                                    {
+                                        <form method="post" action="/borrower/reservation/@row.Id/cancel">
+                                            @Html.AntiForgeryToken()
+                                            <button class="borrower-button borrower-button-danger" type="submit">Cancel request</button>
+                                        </form>
+                                    }
+                                    else { <span class="borrower-muted">—</span> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <nav class="borrower-pagination" aria-label="History pages">
+                @if (Model.Page > 1)
+                {
+                    <a class="borrower-button borrower-button-secondary" href="@ScreenUrls.Query("/borrower/history", new { status = Model.Status, from = Model.From, to = Model.To, page = Model.Page - 1 })">← Previous</a>
+                }
+                <span>Page @Model.Page of @Model.PageCount</span>
+                @if (Model.Page < Model.PageCount)
+                {
+                    <a class="borrower-button borrower-button-secondary" href="@ScreenUrls.Query("/borrower/history", new { status = Model.Status, from = Model.From, to = Model.To, page = Model.Page + 1 })">Next →</a>
+                }
+            </nav>
+        }
+    </section>
+    <p class="borrower-workflow">CAMPUSGEAR / BORROWER <span>HISTORY / REQUEST + RETURN STATUS</span></p>
+</main>

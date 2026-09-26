@@ -1,0 +1,56 @@
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Create account";
+    ViewData["FigmaFrame"] = "524_2";
+    ViewData["StatusMessage"] = "SECURE REGISTRATION  •  EMAIL VERIFICATION REQUIRED";
+}
+<section class="auth-card auth-signup" aria-labelledby="account-title">
+    <header>
+        <div class="auth-card-top">
+            <div>
+                <p class="auth-eyebrow">New account</p>
+                <h1 id="account-title">Create your campus account</h1>
+            </div>
+            <span class="auth-badge">Borrower access</span>
+        </div>
+        <p class="auth-description">Register your borrower account with your details. Verify your email address before access is activated.</p>
+    </header>
+    <hr class="auth-divider" />
+    @await Html.PartialAsync("_AccountFeedback")
+    <form class="auth-form" action="/auth/signup" method="post">
+        @Html.AntiForgeryToken()
+        <label class="auth-field" for="FullName">
+            <span class="auth-field-label">Full name</span>
+            <input class="auth-input" id="FullName" name="FullName" type="text" value="@(ViewData["FullName"] as string)" placeholder="Jordan Lee" autocomplete="name" maxlength="150" required />
+            @Html.ValidationMessage("FullName", null, new { @class = "auth-field-error" })
+        </label>
+        <label class="auth-field" for="Email">
+            <span class="auth-field-label">Email address</span>
+            <input class="auth-input" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="jordan@example.com" autocomplete="email" required />
+            @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
+        </label>
+        <label class="auth-field" for="MobileNumber">
+            <span class="auth-field-label">Mobile number</span>
+            <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" value="@(ViewData["MobileNumber"] as string)" placeholder="09XX XXX XXXX" autocomplete="tel" required />
+            @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
+        </label>
+        <label class="auth-field" for="Password">
+            <span class="auth-field-label">Password</span>
+            <input class="auth-input" id="Password" name="Password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required />
+            @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
+        </label>
+        <label class="auth-field" for="ConfirmPassword">
+            <span class="auth-field-label">Confirm password</span>
+            <input class="auth-input" id="ConfirmPassword" name="ConfirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password" minlength="8" required />
+            @Html.ValidationMessage("ConfirmPassword", null, new { @class = "auth-field-error" })
+        </label>
+        <div class="auth-panel">
+            <img src="/figma/assets/bb17f.svg" alt="" />
+            <div><strong>Borrower access</strong><span>Self-registration creates Borrower access. Other roles require administrator assignment.</span></div>
+        </div>
+        <button class="auth-action" type="submit">SEND VERIFICATION CODE</button>
+    </form>
+    <div class="auth-actions"><a class="auth-link" href="/auth/login">Already have an account? Return to sign in</a></div>
+    <div class="auth-spacer"></div>
+    @await Html.PartialAsync("_AccountStatus")
+</section>

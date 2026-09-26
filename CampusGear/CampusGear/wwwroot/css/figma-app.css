@@ -1,0 +1,84 @@
+@font-face { font-family: 'Inter:Regular'; src: url('/figma/fonts/inter-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Inter:Medium'; src: url('/figma/fonts/inter-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Inter:Semi Bold'; src: url('/figma/fonts/inter-latin-600-normal.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Inter:Bold'; src: url('/figma/fonts/inter-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Oxanium:Medium'; src: url('/figma/fonts/oxanium-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Oxanium:Bold'; src: url('/figma/fonts/oxanium-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Sora:SemiBold'; src: url('/figma/fonts/sora-latin-600-normal.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Space Grotesk:Regular'; src: url('/figma/fonts/space-grotesk-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Space Grotesk:Medium'; src: url('/figma/fonts/space-grotesk-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Space Grotesk:Bold'; src: url('/figma/fonts/space-grotesk-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+
+:root { color-scheme: dark; --campus-bg: #071b2b; --campus-card: #0c2030; --campus-border: #1a4a6b; --campus-teal: #2c8c8a; --campus-amber: #c77833; --campus-ink: #f4f8fb; }
+html, body { min-height: 100%; margin: 0; background: var(--campus-bg); }
+body { overflow-x: hidden; font-family: 'Inter:Regular', Arial, sans-serif; color: var(--campus-ink); }
+.figma-page { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: var(--campus-bg); overflow: hidden; }
+.figma-stage-viewport { width: 1440px; height: 900px; flex: 0 0 auto; position: relative; overflow: visible; }
+.figma-stage { width: 1440px; height: 900px; transform-origin: top left; position: relative; }
+.figma-stage > [data-node-id] { width: 1440px; height: 900px; }
+.figma-stage a[href], .figma-stage [role='button'] { cursor: pointer; }
+.figma-stage a:focus-visible, .figma-stage [role='button']:focus-visible, .figma-mobile :focus-visible { outline: 3px solid #f2ae62; outline-offset: 3px; }
+.figma-stage [data-name^='AUTH • ROLE ACCESS CARD'] { z-index: 20; cursor: pointer; transition: box-shadow .16s ease, transform .16s ease; }
+.figma-stage [data-name^='AUTH • ROLE ACCESS CARD'][aria-pressed='true'] { box-shadow: 0 0 0 2px #f2ae62, 0 8px 18px #0006; }
+.figma-lock-icon { position: absolute; left: 23px; top: 19px; width: 24px; height: 24px; }
+.figma-mobile { display: none; }
+
+@media (max-width: 999px) {
+  .figma-page { display: block; min-height: 100vh; overflow: visible; }
+  .figma-stage-viewport { position: absolute; left: -2000px; top: 0; visibility: hidden; pointer-events: none; width: 1440px; height: 900px; }
+  .figma-mobile { display: block; min-height: 100vh; }
+  .mobile-shell { min-height: 100vh; max-width: 760px; margin: 0 auto; padding: 0 22px 52px; background: radial-gradient(circle at 92% 8%, #1a425270, transparent 33%), var(--campus-bg); }
+  .mobile-header { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--campus-border); }
+  .mobile-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--campus-ink); font: 700 20px 'Oxanium:Bold', sans-serif; }
+  .mobile-brand img { width: 38px; height: 38px; object-fit: contain; }
+  .mobile-role { max-width: 160px; text-align: right; text-transform: uppercase; letter-spacing: .1em; color: #83c5c4; font: 600 10px 'Inter:Semi Bold', sans-serif; }
+  .mobile-menu { margin-top: 14px; border: 1px solid var(--campus-border); border-radius: 12px; background: #0e2638; }
+  .mobile-menu summary { padding: 13px 17px; cursor: pointer; color: var(--campus-ink); font: 600 13px 'Inter:Semi Bold', sans-serif; }
+  .mobile-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; padding: 0 12px 13px; }
+  .mobile-nav a { min-height: 40px; display: flex; align-items: center; padding: 8px 11px; border: 1px solid #1a4a6b; border-radius: 8px; color: #d5e0e7; text-decoration: none; font: 500 11px 'Inter:Medium', sans-serif; }
+  .mobile-nav a.active { background: var(--campus-teal); color: white; }
+  .mobile-hero { padding: 30px 0 20px; }
+  .mobile-eyebrow { margin-bottom: 9px; text-transform: uppercase; letter-spacing: .12em; color: #62aaa9; font: 600 11px 'Inter:Semi Bold', sans-serif; }
+  .mobile-hero h1 { margin: 0; color: var(--campus-ink); font: 700 clamp(28px, 5vw, 38px)/1.15 'Oxanium:Bold', sans-serif; }
+  .mobile-role-cards { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 20px; }
+  .mobile-role-card { min-height: 78px; display: flex; flex-direction: column; gap: 6px; text-align: left; padding: 12px; border: 1px solid var(--campus-border); border-left: 3px solid var(--campus-amber); border-radius: 11px; color: var(--campus-ink); background: #0e2638; cursor: pointer; }
+  .mobile-role-card[aria-pressed='true'] { outline: 2px solid #f2ae62; outline-offset: 1px; }
+  .mobile-role-card strong { font: 600 13px 'Inter:Semi Bold', sans-serif; }
+  .mobile-role-card small { color: #a8b8c5; font: 400 11px 'Inter:Regular', sans-serif; }
+  .mobile-login-form, .mobile-content { padding: 20px; border: 1px solid var(--campus-border); border-radius: 16px; background: rgba(12,32,48,.96); box-shadow: 0 10px 24px -8px #0006; }
+  .mobile-error { margin: 0 0 16px; padding: 12px; border: 1px solid var(--campus-amber); border-radius: 8px; color: #f2ae62; font: 500 12px 'Inter:Medium',sans-serif; }
+  .mobile-metrics { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
+  .mobile-metric { min-height: 112px; display: flex; flex-direction: column; gap: 4px; padding: 15px; border: 1px solid var(--campus-teal); border-radius: 13px; background: #0c2030; }
+  .mobile-metric strong { color: #f4f8fb; font: 700 24px 'Inter:Bold',sans-serif; }
+  .mobile-metric span { color: #d5e0e7; font: 400 11px/1.35 'Inter:Regular',sans-serif; }
+  .mobile-field { display: block; margin-bottom: 17px; }
+  .mobile-field span { display: block; margin-bottom: 8px; color: #b8cbd6; font: 600 11px 'Inter:Semi Bold', sans-serif; }
+  .mobile-field input { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid #2c8c8a99; border-radius: 9px; color: var(--campus-ink); background: #091825; font: 500 15px 'Inter:Medium', sans-serif; }
+  .mobile-field input::placeholder { color: #c3d0d7; opacity: 1; }
+  .mobile-primary, .mobile-secondary { min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 10px 18px; border-radius: 11px; text-align: center; text-decoration: none; font: 600 13px 'Inter:Semi Bold', sans-serif; }
+  .mobile-primary { background: var(--campus-teal); color: white; }
+  .mobile-secondary { border: 1px solid var(--campus-amber); color: #65b3b1; background: #0c2030; }
+  .mobile-text-link { display: inline-block; margin: 13px 0 18px; color: #d5e0e7; text-decoration: underline; font: 500 12px 'Inter:Medium', sans-serif; }
+  .mobile-content { display: grid; gap: 11px; }
+  .mobile-side-content { margin-top: 15px; }
+  .mobile-section-title { margin: 6px 0 0; color: #f4f8fb; font: 700 19px/1.25 'Inter:Bold', sans-serif; }
+  .mobile-data-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 14px; padding: 10px 0; border-bottom: 1px solid #1a4a6b80; }
+  .mobile-data-row:last-child { border-bottom: 0; }
+  .mobile-data-label { color: #83c5c4; font: 600 12px/1.45 'Inter:Semi Bold', sans-serif; letter-spacing: .02em; }
+  .mobile-data-text { color: #e8f2f7; font: 400 13px/1.55 'Inter:Regular', sans-serif; }
+  .mobile-actions { display: grid; gap: 10px; margin-top: 17px; }
+  .mobile-states { margin-top: 26px; padding: 14px 17px; border: 1px solid var(--campus-border); border-radius: 11px; background: #0e2638; }
+  .mobile-states summary { cursor: pointer; font: 500 12px 'Inter:Medium', sans-serif; color: #a8b8c5; }
+  .mobile-states a { display: block; padding: 11px 0; border-top: 1px solid #1a4a6b80; color: #d5e0e7; font: 500 12px 'Inter:Medium', sans-serif; text-transform: capitalize; }
+  .mobile-states a:first-of-type { margin-top: 12px; }
+  .mobile-states a.active { color: #70c7c5; }
+}
+
+@media (max-width: 520px) {
+  .mobile-shell { padding: 0 16px 36px; }
+  .mobile-nav { grid-template-columns: 1fr; }
+  .mobile-role-cards { grid-template-columns: 1fr; }
+  .mobile-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .mobile-role-card { min-height: 60px; }
+  .mobile-login-form, .mobile-content { padding: 16px; }
+}

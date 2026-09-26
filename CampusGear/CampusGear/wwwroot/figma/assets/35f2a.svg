@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="228" height="900" viewBox="0 0 228 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="LEFT PANEL &#226;&#128;&#162; CUSTODIAN SIGNATURE" clip-path="url(#clip0_0_57)">
+<circle id="Custodian &#226;&#128;&#162; Bronze Orbit" cx="5" cy="765" r="155" fill="#C77833" fill-opacity="0.12"/>
+<circle id="Custodian &#226;&#128;&#162; Teal Core" cx="203" cy="785" r="85" fill="#2C8C8A" fill-opacity="0.13"/>
+<rect id="Custodian &#226;&#128;&#162; Bronze Facet" x="150" y="100" width="88" height="180" transform="rotate(-28 150 100)" fill="#C77833" fill-opacity="0.07"/>
+<circle id="Custodian &#226;&#128;&#162; Signal Ring" cx="174" cy="476" r="45" stroke="#2C8C8A" stroke-opacity="0.34" stroke-width="2"/>
+<circle id="Custodian &#226;&#128;&#162; Signal Node" cx="178" cy="476" r="4" fill="#C77833" fill-opacity="0.8"/>
+</g>
+<defs>
+<clipPath id="clip0_0_57">
+<rect width="228" height="900" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,0 +1,32 @@
+@{
+    Layout = "_AccountLayout";
+    var signup = string.Equals(ViewData["SuccessKind"] as string, "signup", StringComparison.OrdinalIgnoreCase);
+    ViewData["Title"] = signup ? "Account created" : "Password updated";
+    ViewData["FigmaFrame"] = signup ? "524_106" : "917_11";
+    ViewData["StatusMessage"] = signup ? "SECURE REGISTRATION COMPLETE  •  BORROWER ACCESS ACTIVATED" : "ACCOUNT RECOVERY COMPLETE  •  PASSWORD UPDATED";
+}
+<section class="auth-card compact" aria-labelledby="account-title">
+    <header>
+        <p class="auth-eyebrow">@(signup ? "Account verified" : "Recovery complete")</p>
+        <h1 id="account-title">@(signup ? "Your account is ready" : "You're back in.")</h1>
+        <p class="auth-description">@(signup ? "Your email address has been verified and your Borrower account is ready." : "Your campus password has been updated successfully. Your existing role and permissions remain unchanged.")</p>
+    </header>
+    <hr class="auth-divider" />
+    <div class="auth-success-mark" aria-hidden="true">✓</div>
+    <div class="auth-summary">
+        <strong>@(signup ? "Borrower access activated" : "Password updated")</strong>
+        <p>@(signup ? "You can now use the Borrower workspace to reserve equipment." : "Your new password is active for your next sign-in.")</p>
+    </div>
+    <div class="auth-actions">
+        @if (signup)
+        {
+            <a class="auth-action" href="/borrower/dashboard">CONTINUE TO BORROWER WORKSPACE</a>
+        }
+        else
+        {
+            <a class="auth-action" href="/auth/login">RETURN TO SIGN IN</a>
+        }
+    </div>
+    <div class="auth-spacer"></div>
+    @await Html.PartialAsync("_AccountStatus")
+</section>

@@ -1,0 +1,10 @@
+@using CampusGear.Services
+@model IReadOnlyList<DevelopmentEmailMessage>
+@{ Layout = null; }
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Development email · CampusGear</title><link rel="stylesheet" href="/css/live-workspace.css" /></head>
+<body><main class="live-content">
+    <header class="live-heading"><p class="live-eyebrow">LOCAL DEVELOPMENT</p><h1>Email inbox</h1><p>Verification emails for this running development instance appear here. Refresh after requesting a code. Messages disappear when the app restarts.</p><div class="live-actions"><a class="live-button" href="/development/email">Refresh inbox</a><a class="live-button secondary" href="/auth/login">Sign in</a></div></header>
+    @if (Model.Count == 0) { <p class="live-empty">No emails yet. Create an account or request a verification code.</p> }
+    @foreach (var message in Model)
+    { <article class="live-panel"><h2>@message.Subject</h2><p class="live-muted">To @message.ToEmail · @message.SentAtUtc.ToString("u")</p><p style="white-space:pre-wrap;overflow-wrap:anywhere">@message.Body</p></article> }
+</main></body></html>

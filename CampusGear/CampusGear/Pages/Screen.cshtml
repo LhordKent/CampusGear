@@ -1,0 +1,13 @@
+@page "/demo/{workspace}/{screen}"
+@model CampusGear.Pages.ScreenModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+<main class="figma-page" data-route="@Model.Route" data-state="@Model.State" data-figma-node-id="@Model.NodeId">
+    <div class="figma-stage-viewport">
+        <div class="figma-stage">
+            @await Html.PartialAsync($"~/Pages/Figma/Frames/{Model.ViewName}")
+        </div>
+    </div>
+    <div class="figma-mobile" aria-label="CampusGear mobile view"></div>
+</main>

@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="560" height="760" viewBox="0 0 560 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Administrator &#226;&#128;&#162; Enhanced Ambient Detail">
+<circle id="Administrator &#226;&#128;&#162; Governance Ring" cx="340" cy="210" r="179" stroke="#2C8C8A" stroke-opacity="0.18" stroke-width="2"/>
+<circle id="Administrator &#226;&#128;&#162; Security Ring" cx="340" cy="210" r="114.5" stroke="#C77833" stroke-opacity="0.16"/>
+<line id="Administrator &#226;&#128;&#162; Audit Trace" x1="60" y1="469.5" x2="360" y2="469.5" stroke="#2C8C8A"/>
+<line id="Administrator &#226;&#128;&#162; Audit Trace_2" x1="60" y1="511.5" x2="360" y2="511.5" stroke="#2C8C8A"/>
+<line id="Administrator &#226;&#128;&#162; Audit Trace_3" x1="60" y1="553.5" x2="360" y2="553.5" stroke="#2C8C8A"/>
+<line id="Administrator &#226;&#128;&#162; Audit Trace_4" x1="60" y1="595.5" x2="360" y2="595.5" stroke="#2C8C8A"/>
+<line id="Administrator &#226;&#128;&#162; Audit Trace_5" x1="60" y1="637.5" x2="360" y2="637.5" stroke="#2C8C8A"/>
+<circle id="Administrator &#226;&#128;&#162; Audit Node" cx="63.5" cy="469.5" r="3.5" fill="#2C8C8A" fill-opacity="0.55"/>
+<circle id="Administrator &#226;&#128;&#162; Audit Node_2" cx="155.5" cy="511.5" r="3.5" fill="#2C8C8A" fill-opacity="0.55"/>
+<circle id="Administrator &#226;&#128;&#162; Audit Node_3" cx="247.5" cy="469.5" r="3.5" fill="#2C8C8A" fill-opacity="0.55"/>
+<circle id="Administrator &#226;&#128;&#162; Audit Node_4" cx="339.5" cy="511.5" r="3.5" fill="#C77833" fill-opacity="0.55"/>
+<circle id="Administrator &#226;&#128;&#162; Audit Node_5" cx="431.5" cy="469.5" r="3.5" fill="#2C8C8A" fill-opacity="0.55"/>
+</g>
+</svg>

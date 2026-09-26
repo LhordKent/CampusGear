@@ -1,0 +1,76 @@
+@{
+    var role = (string?)ViewData["WorkspaceRole"] ?? "Borrower";
+    var slug = role == "Administrator" ? "admin" : role.ToLowerInvariant();
+    var currentPath = Context.Request.Path.Value ?? "";
+    string Active(string path) => currentPath.Equals(path, StringComparison.OrdinalIgnoreCase) ? "live-nav-active" : "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · CampusGear</title>
+    <link rel="stylesheet" href="~/css/live-workspace.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="live-shell">
+        <aside class="live-sidebar">
+            <a class="live-brand" href="/@slug/dashboard"><img src="~/figma/assets/b95f3.svg" alt="" /><span>Campus<strong>Gear</strong></span></a>
+            <div class="live-role">@role workspace</div>
+            <details class="live-navigation" open>
+            <summary>Workspace menu</summary>
+            <nav aria-label="Workspace navigation">
+                <a class="@Active($"/{slug}/dashboard")" href="/@slug/dashboard">Dashboard</a>
+                @if (role == "Borrower")
+                {
+                    <a class="@Active("/borrower/reservation")" href="/borrower/reservation">Equipment Reservation</a>
+                    <a class="@Active("/borrower/history")" href="/borrower/history">Borrowing History</a>
+                    <a class="@Active("/borrower/calendar")" href="/borrower/calendar">Availability Calendar</a>
+                }
+                @if (role == "Custodian")
+                {
+                    <a class="@Active("/custodian/approvals")" href="/custodian/approvals">Approval Queue</a>
+                    <a class="@Active("/custodian/returns")" href="/custodian/returns">Releases &amp; Returns</a>
+                    <a class="@Active("/custodian/history")" href="/custodian/history">Borrowing Records</a>
+                    <a class="@Active("/custodian/calendar")" href="/custodian/calendar">Availability Calendar</a>
+                    <a href="/admin/maintenance">Maintenance</a>
+                }
+                @if (role == "Administrator")
+                {
+                    <a class="@Active("/admin/equipment")" href="/admin/equipment">Equipment Management</a>
+                    <a class="@Active("/admin/categories")" href="/admin/categories">Equipment Categories</a>
+                    <a class="@Active("/admin/reservations")" href="/admin/reservations">Reservations</a>
+                    <a class="@Active("/admin/users")" href="/admin/users">User Management</a>
+                    <a class="@Active("/admin/maintenance")" href="/admin/maintenance">Maintenance</a>
+                    <a class="@Active("/admin/approvals")" href="/admin/approvals">Approval Queue</a>
+                    <a class="@Active("/admin/returns")" href="/admin/returns">Releases &amp; Returns</a>
+                    <a class="@Active("/admin/calendar")" href="/admin/calendar">Availability Calendar</a>
+                    <a class="@Active("/admin/history")" href="/admin/history">Borrowing Records</a>
+                    <a class="@Active("/admin/audit")" href="/admin/audit">Audit History</a>
+                }
+                <a href="/demo/@slug/dashboard">Figma screen reference <span class="live-nav-note">Demo</span></a>
+            </nav>
+            </details>
+            <form method="post" action="/auth/logout" class="live-logout">
+                @Html.AntiForgeryToken()
+                <button type="submit">Log out</button>
+            </form>
+        </aside>
+        <div class="live-main">
+            <header class="live-topbar"><span>@role workspace</span><span class="live-status">● SYSTEM READY</span></header>
+            @RenderBody()
+        </div>
+    </div>
+    <script>
+        (() => {
+            const menu = document.querySelector('.live-navigation');
+            const mobile = window.matchMedia('(max-width: 1000px)');
+            const resize = () => { menu.open = !mobile.matches; };
+            resize();
+            mobile.addEventListener('change', resize);
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,36 @@
+@model CustodianCalendarViewModel
+@using System.Globalization
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Availability calendar";
+    var previous = Model.Month.AddMonths(-1);
+    var next = Model.Month.AddMonths(1);
+    var staffPath = ViewData["WorkspaceRole"] as string == "Administrator" ? "/admin" : "/custodian";
+    var calendarAction = staffPath == "/admin" ? "AdminCalendar" : "Calendar";
+}
+@section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
+<main class="live-content">
+    <header class="live-heading"><p class="live-eyebrow">CUSTODIAN / SCHEDULE</p><h1>Availability calendar</h1><p>Inspect equipment bookings and maintenance status. All times are shown in Manila time (UTC+8).</p></header>
+    <section class="live-panel">
+        <form class="live-filters" method="get" action="@staffPath/calendar"><input type="hidden" name="year" value="@Model.Month.Year" /><input type="hidden" name="month" value="@Model.Month.Month" /><label for="CalendarItem">Equipment<select id="CalendarItem" name="equipmentItemId">@foreach (var item in Model.Items) { <option value="@item.Id" selected="@(Model.SelectedItem?.Id == item.Id)">@item.Name · @item.AssetCode@(item.MaintenanceHold ? " · Maintenance" : "")</option> }</select></label><button class="live-button" type="submit">View schedule</button></form>
+        @if (Model.SelectedItem is null)
+        { <div class="live-empty">No active equipment is available to display.</div> }
+        else
+        {
+            <nav class="custodian-calendar-nav" aria-label="Calendar months"><a class="live-button secondary" href="@ScreenUrls.Query(staffPath + "/calendar", new { year = previous.Year, month = previous.Month, equipmentItemId = Model.SelectedItem.Id })" aria-label="Previous month">←</a><h2>@Model.Month.ToString("MMMM yyyy", CultureInfo.InvariantCulture)</h2><a class="live-button secondary" href="@ScreenUrls.Query(staffPath + "/calendar", new { year = next.Year, month = next.Month, equipmentItemId = Model.SelectedItem.Id })" aria-label="Next month">→</a></nav>
+            @if (Model.SelectedItem.MaintenanceHold) { <div class="live-feedback" role="status">@Model.SelectedItem.Name is on a maintenance hold.</div> }
+            <div class="custodian-calendar" aria-label="Equipment availability days">
+                @foreach (var weekday in new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" }) { <div class="custodian-weekday">@weekday</div> }
+                @foreach (var day in Model.Days)
+                {
+                    <a class="custodian-calendar-day @(!day.CurrentMonth ? "outside" : "") @(day.Selected ? "selected" : "") @(day.Today ? "today" : "") @(day.Status == "Maintenance" ? "maintenance" : day.BookingCount > 0 ? "reserved" : "available")" href="@ScreenUrls.Query(staffPath + "/calendar", new { year = Model.Month.Year, month = Model.Month.Month, equipmentItemId = Model.SelectedItem.Id, day = day.Date.ToString("yyyy-MM-dd") })" aria-current="@(day.Selected ? "date" : null)" aria-label="@day.Date.ToString("MMMM d, yyyy") — @day.Status — @day.BookingCount booking@(day.BookingCount == 1 ? "" : "s")"><strong>@day.Date.Day</strong><span class="custodian-day-state">@day.Status</span>@if (day.BookingCount > 0) { <small>@day.BookingCount booking@(day.BookingCount == 1 ? "" : "s")</small> }</a>
+                }
+            </div>
+            <div class="custodian-calendar-legend"><span><i class="available"></i> Available</span><span><i class="reserved"></i> Reserved / borrowed</span><span><i class="maintenance"></i> Maintenance</span></div>
+        }
+    </section>
+    <section class="live-panel"><h2>@Model.SelectedDay.ToString("dddd, MMMM d, yyyy", CultureInfo.InvariantCulture)</h2>
+        @if (Model.Slots.Count == 0) { <p class="live-empty">No reservations overlap this day for the selected equipment.</p> }
+        else { <div class="custodian-slots">@foreach (var slot in Model.Slots) { <article><div><strong>@slot.BorrowerName</strong><p>@slot.StartManila<br />Until @slot.EndManila</p><span class="live-badge">@slot.Status</span></div><a class="live-button secondary" href="/custodian/reservations/@slot.Id">View details</a></article> }</div> }
+    </section>
+</main>

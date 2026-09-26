@@ -1,0 +1,74 @@
+@model CustodianListViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = Model.Title;
+    var history = Model.Queue == "history";
+    var returns = Model.ActionName is "Returns" or "AdminReturns";
+    var staffPath = ViewData["WorkspaceRole"] as string == "Administrator" ? "/admin" : "/custodian";
+    var basePath = staffPath + (returns ? "/returns" : history ? "/history" : "/approvals");
+}
+@section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
+<main class="live-content">
+    <header class="live-heading"><p class="live-eyebrow">CUSTODIAN / EQUIPMENT WORKFLOW</p><h1>@Model.Title</h1><p>@Model.Intro</p></header>
+    <div class="live-metrics custodian-metrics">
+        <a class="live-metric" href="@staffPath/approvals"><strong>@Model.PendingCount</strong><span>Pending requests</span></a>
+        <a class="live-metric" href="@staffPath/returns?queue=release"><strong>@Model.ApprovedCount</strong><span>Approved for release</span></a>
+        <a class="live-metric" href="@staffPath/returns"><strong>@Model.ActiveCount</strong><span>Active loans</span></a>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status">@Model.Feedback</div> }
+    @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert">@Model.Error</div> }
+    <section class="live-panel" aria-labelledby="queue-title">
+        <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? Model.Queue == "release" ? "Approved release queue" : "Active loans awaiting return" : history ? "Reservation and loan records" : "Request queue")</h2><span class="live-muted">@Model.Total record@(Model.Total == 1 ? "" : "s") · Manila time (UTC+8)</span></div>
+        @if (returns)
+        {
+            <nav class="custodian-tabs" aria-label="Desk queues">
+                <a class="@(Model.Queue == "active" ? "selected" : "")" href="@staffPath/returns" aria-current="@(Model.Queue == "active" ? "page" : null)">Active loans</a>
+                <a class="@(Model.Queue == "release" ? "selected" : "")" href="@staffPath/returns?queue=release" aria-current="@(Model.Queue == "release" ? "page" : null)">Approved release queue</a>
+            </nav>
+        }
+        <form class="live-filters" method="get" action="@basePath">
+            @if (returns) { <input type="hidden" name="queue" value="@Model.Queue" /> }
+            <label for="queue-search">Search borrower or equipment<input id="queue-search" name="q" type="search" value="@Model.Search" maxlength="100" placeholder="Name, email, or asset code" /></label>
+            @if (!returns)
+            {
+                <label for="queue-status">Status<select id="queue-status" name="status">
+                    @if (history)
+                    {
+                        @foreach (var status in new[] { "all", "pending", "approved", "borrowed", "returned", "rejected", "cancelled", "expired", "late" })
+                        { <option value="@status" selected="@(Model.Status == status)">@(char.ToUpperInvariant(status[0]) + status[1..])</option> }
+                    }
+                    else
+                    {
+                        @foreach (var status in new[] { "pending", "approved", "all" })
+                        { <option value="@status" selected="@(Model.Status == status)">@(status == "all" ? "Pending and approved" : char.ToUpperInvariant(status[0]) + status[1..])</option> }
+                    }
+                </select></label>
+            }
+            <label for="queue-from">Booking from<input id="queue-from" name="from" type="date" value="@Model.From" /></label>
+            <label for="queue-to">Booking through<input id="queue-to" name="to" type="date" value="@Model.To" /></label>
+            <button class="live-button" type="submit">Apply filters</button><a class="live-button secondary" href="@basePath">Reset</a>
+        </form>
+        @if (Model.Rows.Count == 0)
+        {
+            <div class="live-empty"><h3>No matching records</h3><p>Try another search or date range. New requests and active loans will appear here as they are recorded.</p></div>
+        }
+        else
+        {
+            <div class="live-table-wrap" tabindex="0" role="region" aria-label="Reservation records; scroll horizontally on small screens">
+                <table class="live-table custodian-table"><caption class="custodian-sr-only">@Model.Title records</caption><thead><tr><th scope="col">Borrower</th><th scope="col">Equipment</th><th scope="col">Booking time</th><th scope="col">Status</th>@if (history) { <th scope="col">Return</th> }<th scope="col">Action</th></tr></thead>
+                    <tbody>@foreach (var row in Model.Rows)
+                    {
+                        <tr><td><strong>@row.BorrowerName</strong><small>@row.BorrowerEmail</small></td><td>@row.EquipmentName<small>@row.AssetCode</small></td><td>@row.StartManila<small>Until @row.EndManila</small></td><td><span class="live-badge custodian-status @(row.Status is "Overdue" or "Returned late" ? "late" : "")">@row.Status</span></td>
+                            @if (history) { <td>@(row.ReturnCondition ?? "—")<small>@row.ReturnedManila</small></td> }
+                            <td><a class="live-button secondary" href="/custodian/reservations/@row.Id">@(returns ? Model.Queue == "release" ? "Release details" : "Record return" : "Review details")</a></td></tr>
+                    }</tbody>
+                </table>
+            </div>
+        }
+        <nav class="live-pager" aria-label="Record pages">
+            @if (Model.Page > 1) { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Search, status = Model.Status, from = Model.From, to = Model.To, queue = Model.Queue, page = Model.Page - 1 })">Previous</a> }
+            <span>Page @Model.Page of @Model.PageCount</span>
+            @if (Model.Page < Model.PageCount) { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Search, status = Model.Status, from = Model.From, to = Model.To, queue = Model.Queue, page = Model.Page + 1 })">Next</a> }
+        </nav>
+    </section>
+</main>

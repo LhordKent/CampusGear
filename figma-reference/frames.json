@@ -1,0 +1,356 @@
+{
+  "fileKey": "Lm8g0wbEaJBwsHZNGK16RV",
+  "sourceUrl": "https://www.figma.com/design/Lm8g0wbEaJBwsHZNGK16RV/Campus-Equipment-Borrowing-System-%25E2%2580%2594-UI-UX?node-id=15-2",
+  "frames": [
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "15:3",
+      "name": "01A — Login — Shared Account Entry"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "691:10",
+      "name": "01C — Login — BORROWER — Resolved Role State"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "691:124",
+      "name": "01D — Login — CUSTODIAN — Resolved Role State"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "691:238",
+      "name": "01E — Login — ADMINISTRATOR — Resolved Role State"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "704:2",
+      "name": "01F — Login — BORROWER — Invalid Credentials"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "704:82",
+      "name": "01G — Login — CUSTODIAN — Invalid Credentials"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "704:162",
+      "name": "01H — Login — ADMINISTRATOR — Invalid Credentials"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "691:358",
+      "name": "01I — Administrator Two-Factor Verification"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "691:402",
+      "name": "01J — Administrator 2FA — Verification Failed"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "136:20",
+      "name": "02A — Access Denied — Unauthorized Role"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "15:20",
+      "name": "03A — Password Reset Request"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "15:30",
+      "name": "03B — Password Reset — Verification Code"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "405:2",
+      "name": "03C — Password Reset — Verification Failed"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "822:14",
+      "name": "03D — Password Reset — Set New Password"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "917:11",
+      "name": "03E — Password Reset — Success"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "524:2",
+      "name": "13A — User Sign Up"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "524:44",
+      "name": "13B — Phone Verification"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "524:75",
+      "name": "13C — Sign Up — Verification Failed"
+    },
+    {
+      "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+      "id": "524:106",
+      "name": "13D — Account Created"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "689:2",
+      "name": "02B — Borrower Dashboard"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:2",
+      "name": "07 — Equipment Reservation"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:154",
+      "name": "07A — Equipment Reservation — Conflict State"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:280",
+      "name": "07B — Equipment Reservation — Request Submitted"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:409",
+      "name": "07C — Equipment Reservation — Submitting"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:562",
+      "name": "10A — Borrowing History Report"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:737",
+      "name": "10A — Borrowing History — Filtered Results"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:1079",
+      "name": "10C — Borrowing History — No Matching Records"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:1234",
+      "name": "11A — Availability Calendar"
+    },
+    {
+      "section": "02 • BORROWER WORKSPACE",
+      "id": "695:904",
+      "name": "10B — Borrowing History — Late Return Monitoring"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "690:8",
+      "name": "02C — Custodian Dashboard"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:1499",
+      "name": "08 — Approval and Release"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:1642",
+      "name": "08A — Approval Confirmed"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:1772",
+      "name": "08B — Request Rejected"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:1902",
+      "name": "08C — Release Recorded"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:2032",
+      "name": "09 — Return and Condition Check"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:2173",
+      "name": "09A — Return Recorded — Good / Available"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:2298",
+      "name": "09B — Return Recorded — Damaged / Maintenance"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:2423",
+      "name": "09C — Late Return Identified"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:2548",
+      "name": "09D — Return and Condition Check — Recording"
+    },
+    {
+      "section": "03 • CUSTODIAN WORKSPACE",
+      "id": "695:2691",
+      "name": "11B — Availability Calendar — Custodian"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "690:212",
+      "name": "02D — Administrator Dashboard"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:2931",
+      "name": "07A — Administrator Reservation Management"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:3118",
+      "name": "07B — Administrator Reservation — Record Created"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:3278",
+      "name": "08A — Administrator Approval and Release"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:3459",
+      "name": "08B — Administrator Approval Confirmed"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:3625",
+      "name": "08C — Administrator Request Rejected"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:3791",
+      "name": "08D — Administrator Release Recorded"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:3957",
+      "name": "09A — Administrator Return and Condition Check"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:4135",
+      "name": "09B — Administrator Return Recorded"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:4296",
+      "name": "11B — Administrator Availability Calendar"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:4991",
+      "name": "04 — Equipment Categories Management"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:5184",
+      "name": "04B — Add Equipment Category"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:5347",
+      "name": "04C — Edit Equipment Category"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:5515",
+      "name": "04D — Category Validation &amp; Success States"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:5691",
+      "name": "05 — Equipment Item Management"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:5882",
+      "name": "05A — Add Equipment Item"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:6052",
+      "name": "05B — Edit Equipment Item"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:6224",
+      "name": "05C — Item Validation and Success States"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:6398",
+      "name": "06 — Borrower Profile Management"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:6589",
+      "name": "06A — Add Borrower Profile"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:6754",
+      "name": "06B — Edit Borrower Profile"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:6918",
+      "name": "06C — Borrower Profile Validation &amp; Success States"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:7067",
+      "name": "12 — User and Role Management"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:7268",
+      "name": "12A — Create User Account"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:7445",
+      "name": "12B — Edit Account and Role"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:7622",
+      "name": "12C — Account Deactivated"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:7778",
+      "name": "12D — Role-Based Access State"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "945:195",
+      "name": "14 — System Audit Log"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:4595",
+      "name": "10B — Borrowing History — Administrator"
+    },
+    {
+      "section": "04 • ADMINISTRATOR WORKSPACE",
+      "id": "695:4793",
+      "name": "10C — Borrowing History — Administrator — Filtered Results"
+    }
+  ]
+}

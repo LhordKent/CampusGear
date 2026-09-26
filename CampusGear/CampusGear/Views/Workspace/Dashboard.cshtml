@@ -1,0 +1,41 @@
+@model WorkspaceDashboardViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = $"{Model.Role} Dashboard";
+    ViewData["WorkspaceRole"] = Model.Role;
+    var slug = Model.Role == "Administrator" ? "admin" : Model.Role.ToLowerInvariant();
+    var sourceNode = Model.Role switch { "Administrator" => "690:212", "Custodian" => "690:8", _ => "689:2" };
+}
+<main class="live-content" data-figma-source="@sourceNode">
+    <div class="live-heading">
+        <p class="live-eyebrow">@Model.Role.ToUpperInvariant() • OPERATIONS</p>
+        <h1>Your equipment workspace</h1>
+        <p>Welcome, @Model.FullName. Track reservations, borrowing activity, and equipment availability.</p>
+    </div>
+    <section class="live-metrics" aria-label="Workspace summary">
+        @foreach (var metric in Model.Metrics)
+        {
+            <article class="live-metric"><strong>@metric.Value</strong><span>@metric.Label</span></article>
+        }
+    </section>
+    <section class="live-info">
+        <p class="live-eyebrow">EQUIPMENT OPERATIONS</p>
+        <h2>Continue your work</h2>
+        @if (Model.Role == "Borrower")
+        {
+            <p>Choose equipment and a borrowing period, or check the progress of your requests.</p>
+            <div class="live-actions"><a class="live-button" href="/borrower/reservation">Reserve equipment</a><a class="live-button secondary" href="/borrower/history">My requests</a></div>
+        }
+        else if (Model.Role == "Custodian")
+        {
+            <p>Review requests, release approved equipment, and record returned items.</p>
+            <div class="live-actions"><a class="live-button" href="/custodian/approvals">Review requests</a><a class="live-button secondary" href="/custodian/returns">Releases &amp; returns</a></div>
+        }
+        else
+        {
+            <p>Manage equipment, maintain borrower access, and review activity.</p>
+            <div class="live-actions"><a class="live-button" href="/admin/equipment">Manage equipment</a><a class="live-button secondary" href="/admin/users">Manage users</a></div>
+        }
+        <p><a href="/demo/@slug/dashboard">View the Figma screen reference →</a></p>
+    </section>
+</main>

@@ -1,0 +1,20 @@
+@model CategoriesPageModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Equipment Categories"; ViewData["WorkspaceRole"] = "Administrator"; }
+<main class="live-content" data-figma-source="695:4991">
+    <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • INVENTORY</p><h1>Equipment Categories</h1><p>Organize equipment for inventory and reservations.</p></header>
+    @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
+    <section class="live-panel"><h2>Categories</h2><div class="live-table-wrap"><table class="live-table"><thead><tr><th>Name</th><th>Description</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>
+        @foreach (var category in Model.Categories)
+        { <tr><td>@category.Name</td><td>@category.Description</td><td>@category.Items</td><td>@(category.IsActive ? "Active" : "Inactive")</td><td><a class="live-link" href="/admin/categories?id=@category.Id">Edit</a></td></tr> }
+    </tbody></table></div></section>
+    <section class="live-panel"><h2>@(Model.Input.Id is null ? "Add category" : "Edit category")</h2><div asp-validation-summary="All"></div>
+        <form method="post" action="/admin/categories/save" class="live-form">
+            @Html.AntiForgeryToken()<input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
+            <label class="live-field wide">Category name<input asp-for="Input.Name" required maxlength="120" /></label>
+            <label class="live-field wide">Description<textarea asp-for="Input.Description" maxlength="1000"></textarea></label>
+            <label class="live-check wide"><input asp-for="Input.IsActive" /> Active category</label>
+            <p class="live-muted wide">A category with active equipment must stay active. Historical equipment records are retained.</p>
+            <div class="live-actions wide"><button class="live-button" type="submit">Save category</button><a class="live-button secondary" href="/admin/categories">Clear form</a></div>
+        </form>
+    </section>
+</main>

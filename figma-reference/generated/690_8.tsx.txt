@@ -1,0 +1,316 @@
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/4b24ae94-864d-44b5-9ba6-922b0366ec1f";
+const imgCustodianOpenOperationsAtmosphere = `${assetPathPrefix}/faa7e.svg`;
+const imgCustodianEnhancedAmbientDetail = `${assetPathPrefix}/da63d.svg`;
+const imgLeftPanelCustodianSignature = `${assetPathPrefix}/35f2a.svg`;
+const imgCircle = `${assetPathPrefix}/a698b.svg`;
+const imgCircle1 = `${assetPathPrefix}/6632a.svg`;
+const imgCircle2 = `${assetPathPrefix}/d3b6f.svg`;
+const imgCircle3 = `${assetPathPrefix}/2680a.svg`;
+const imgCircle4 = `${assetPathPrefix}/fdad8.svg`;
+const imgCircle5 = `${assetPathPrefix}/6728b.svg`;
+const imgCircle6 = `${assetPathPrefix}/b71a4.svg`;
+const imgGroup = `${assetPathPrefix}/edd56.svg`;
+const imgGroup1 = `${assetPathPrefix}/e7a8d.svg`;
+const imgGroup2 = `${assetPathPrefix}/9970e.svg`;
+const imgGroup3 = `${assetPathPrefix}/9f767.svg`;
+const imgBrandLogoCgSupplied = `${assetPathPrefix}/b95f3.svg`;
+
+export default function Component02CCustodianDashboard() {
+  return (
+    <div className="bg-[#071b2b] relative size-full" data-node-id="690:8" data-name="02C — Custodian Dashboard">
+      <div className="absolute h-[900px] left-0 top-0 w-[1440px]" data-node-id="1507:4" data-name="Custodian • Open Operations Atmosphere">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCustodianOpenOperationsAtmosphere} />
+      </div>
+      <div className="absolute h-[760px] left-[720px] top-[90px] w-[560px]" data-node-id="1599:4" data-name="Custodian • Enhanced Ambient Detail">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCustodianEnhancedAmbientDetail} />
+      </div>
+      <div className="absolute bg-[rgba(12,32,48,0.93)] border border-[rgba(44,140,138,0.82)] border-solid h-[92px] left-[246px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[88px] w-[1100px]" data-node-id="1411:12" data-name="DESIGN • PAGE HEADER SURFACE" />
+      <a className="absolute bg-[#2c8c8a] block cursor-pointer h-[30px] left-[842px] rounded-[10px] shadow-[0px_4px_10px_0px_rgba(59,130,246,0.28)] top-[462px] w-[88px]" data-node-id="690:94" data-name="Rectangle" />
+      <a className="absolute bg-[#071b2b] block border border-[#c77833] border-solid cursor-pointer h-[40px] left-[14px] rounded-[10px] top-[806px] w-[202px]" data-node-id="690:102" data-name="Logout Button" />
+      <div className="absolute h-[900px] left-0 top-0 w-[228px]" data-node-id="1677:4" data-name="LEFT PANEL • CUSTODIAN SIGNATURE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgLeftPanelCustodianSignature} />
+      </div>
+      <div className="absolute bg-[rgba(8,27,41,0.88)] h-[900px] left-0 top-0 w-[228px]" data-node-id="1198:7" data-name="DASHBOARD SHELL • Sidebar" />
+      <div className="absolute bg-[rgba(44,140,138,0.96)] border border-[#1a4a6b] border-solid h-[44px] left-[14px] rounded-[10px] top-[124px] w-[200px]" data-node-id="1329:636" data-name="CANONICAL NAV • Dashboard" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[176px] w-[200px]" data-node-id="1329:637" data-name="CANONICAL NAV • Approval & Release" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[228px] w-[200px]" data-node-id="1329:639" data-name="CANONICAL NAV • Return & Condition Check" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[280px] w-[200px]" data-node-id="1329:641" data-name="CANONICAL NAV • Availability Calendar" />
+      <div className="absolute bg-[#0b2233] h-[72px] left-[228px] top-0 w-[1212px]" data-node-id="1198:8" data-name="DASHBOARD SHELL • Topbar" />
+      <div className="absolute bg-[#21455c] h-px left-[228px] rounded-[1px] top-[71px] w-[1212px]" data-node-id="1198:9" data-name="DASHBOARD SHELL • Topbar Divider" />
+      <div className="absolute left-[28px] size-[36px] top-[22px]" data-node-id="1198:10" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle} />
+      </div>
+      <div className="absolute bg-[#2c8c8a] border border-[#2c8c8a] border-solid h-[28px] left-[18px] rounded-[9px] top-[82px] w-[194px]" data-node-id="1198:15" data-name="Role Badge" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[11px] justify-center leading-[0] left-[28px] not-italic text-[#f4f8fb] text-[9px] top-[97.5px] w-[170px]" data-node-id="1198:16">
+        <p className="leading-[normal]">CUSTODIAN WORKSPACE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[14px] justify-center leading-[0] left-[58px] not-italic text-[11.5px] text-white top-[146px] w-[148px]" data-node-id="1198:19">
+        <p className="leading-[normal]">Dashboard</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[14px] justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[198px] w-[148px]" data-node-id="1198:20">
+        <p className="leading-[normal]">{`Approval & Release`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[14px] justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[250px] w-[148px]" data-node-id="1198:21">
+        <p className="leading-[normal]">{`Return & Condition Check`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[14px] justify-center leading-[0] left-[58px] not-italic text-[#99b0bf] text-[11.5px] top-[302px] w-[148px]" data-node-id="1198:22">
+        <p className="leading-[normal]">Availability Calendar</p>
+      </div>
+      <div className="absolute bg-[#091c2b] border border-[#1a4a6b] border-solid h-[96px] left-[22px] rounded-[14px] top-[720px] w-[184px]" data-node-id="1198:23" data-name="Shape" />
+      <div className="absolute left-[36px] size-[38px] top-[738px]" data-node-id="1198:24" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle1} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[55px] not-italic size-[38px] text-[#f4f8fb] text-[13px] text-center top-[757px]" data-node-id="1198:25">
+        <p className="leading-[normal]">J</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[84px] not-italic text-[#f4f8fb] text-[11px] top-[745px] w-[108px]" data-node-id="1198:26">
+        <p className="leading-[normal]">John Reyes</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[84px] not-italic text-[#99b0bf] text-[9px] top-[761.5px] w-[108px]" data-node-id="1198:27">
+        <p className="leading-[normal]">Custodian • Faculty</p>
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[13px] justify-center leading-[0] left-[114px] not-italic text-[#c77833] text-[10.5px] text-center top-[826.5px] w-[184px]" data-node-id="1198:28">
+        <p className="leading-[normal]">Log out</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[20px] justify-center leading-[0] left-[258px] not-italic text-[#f4f8fb] text-[14px] top-[27px] w-[300px]" data-node-id="1198:29">
+        <p className="leading-[normal]">Custodian Dashboard</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[258px] not-italic text-[#99b0bf] text-[9px] top-[46px] w-[330px]" data-node-id="1198:30">
+        <p className="leading-[normal]">Manage requests, releases, and returns.</p>
+      </div>
+      <div className="absolute bg-[#091c2b] border-0 border-[#1a4a6b] border-solid h-[34px] left-[1030px] rounded-[14px] top-[18px] w-[126px]" data-node-id="1198:31" data-name="Shape" />
+      <div className="absolute left-[1046px] size-[8px] top-[31px]" data-node-id="1198:32" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle2} />
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[34px] justify-center leading-[0] left-[1060px] not-italic text-[#f4f8fb] text-[8px] top-[35px] w-[88px]" data-node-id="1198:33">
+        <p className="leading-[normal]">OPS READY</p>
+      </div>
+      <div className="absolute left-[1180px] size-[36px] top-[18px]" data-node-id="1198:34" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle3} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1198px] not-italic size-[36px] text-[#f4f8fb] text-[12px] text-center top-[36px]" data-node-id="1198:35">
+        <p className="leading-[normal]">J</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[1228px] not-italic text-[#f4f8fb] text-[11px] top-[24px] w-[150px]" data-node-id="1198:36">
+        <p className="leading-[normal]">John Reyes</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[1228px] not-italic text-[#99b0bf] text-[9px] top-[41px] w-[150px]" data-node-id="1198:37">
+        <p className="leading-[normal]">Custodian • Faculty</p>
+      </div>
+      <div className="absolute bg-[#091c2b] border-0 border-[#2c8c8a] border-solid h-[50px] left-[1112px] rounded-[14px] top-[113px] w-[254px]" data-node-id="1198:41" data-name="Shape" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[50px] justify-center leading-[0] left-[1239px] not-italic text-[#f5f7fa] text-[12px] text-center top-[138px] w-[254px]" data-node-id="1198:42">
+        <p className="leading-[normal]">Open approval queue</p>
+      </div>
+      <div className="absolute bg-[#0c2030] border border-[#2c8c8a] border-solid h-[112px] left-[258px] rounded-[16px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[198px] w-[248px]" data-node-id="1198:43" data-name="Pending Requests" />
+      <div className="absolute bg-[rgba(44,140,138,0.22)] border-0 border-[rgba(44,140,138,0.7)] border-solid left-[274px] rounded-[14px] size-[38px] top-[215px]" data-node-id="1198:44" data-name="Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[34px] justify-center leading-[0] left-[326px] not-italic text-[#e8f2f7] text-[28px] top-[229px] w-[160px]" data-node-id="1198:45">
+        <p className="leading-[normal]">7</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[326px] not-italic text-[#f4f8fb] text-[13px] top-[259px] w-[164px]" data-node-id="1198:46">
+        <p className="leading-[normal]">Pending Requests</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[326px] not-italic text-[#e8f2f7] text-[13px] top-[280px] w-[164px]" data-node-id="1198:47">
+        <p className="leading-[normal]">Awaiting decision</p>
+      </div>
+      <div className="absolute bg-[#1aa199] h-[2px] left-[274px] rounded-[1px] top-[298px] w-[216px]" data-node-id="1198:48" data-name="Pending Requests accent" />
+      <div className="absolute bg-[#0c2030] border border-[#2c8c8a] border-solid h-[112px] left-[526px] rounded-[16px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[198px] w-[248px]" data-node-id="1198:49" data-name="Currently Borrowed" />
+      <div className="absolute bg-[rgba(44,140,138,0.22)] border-0 border-[rgba(44,140,138,0.7)] border-solid left-[542px] rounded-[14px] size-[38px] top-[215px]" data-node-id="1198:50" data-name="Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[34px] justify-center leading-[0] left-[594px] not-italic text-[#e8f2f7] text-[28px] top-[229px] w-[160px]" data-node-id="1198:51">
+        <p className="leading-[normal]">12</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[594px] not-italic text-[#f4f8fb] text-[13px] top-[259px] w-[164px]" data-node-id="1198:52">
+        <p className="leading-[normal]">Currently Borrowed</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[594px] not-italic text-[#e8f2f7] text-[13px] top-[280px] w-[164px]" data-node-id="1198:53">
+        <p className="leading-[normal]">In circulation</p>
+      </div>
+      <div className="absolute bg-[#1aa199] h-[2px] left-[542px] rounded-[1px] top-[298px] w-[216px]" data-node-id="1198:54" data-name="Currently Borrowed accent" />
+      <div className="absolute bg-[#0c2030] border border-[#2c8c8a] border-solid h-[112px] left-[794px] rounded-[16px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[198px] w-[248px]" data-node-id="1198:55" data-name="Needs Repair" />
+      <div className="absolute bg-[rgba(44,140,138,0.22)] border-0 border-[rgba(44,140,138,0.7)] border-solid left-[810px] rounded-[14px] size-[38px] top-[215px]" data-node-id="1198:56" data-name="Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[34px] justify-center leading-[0] left-[862px] not-italic text-[#e8f2f7] text-[28px] top-[229px] w-[160px]" data-node-id="1198:57">
+        <p className="leading-[normal]">2</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[862px] not-italic text-[#f4f8fb] text-[13px] top-[259px] w-[164px]" data-node-id="1198:58">
+        <p className="leading-[normal]">Needs Repair</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[862px] not-italic text-[#e8f2f7] text-[13px] top-[280px] w-[164px]" data-node-id="1198:59">
+        <p className="leading-[normal]">Condition follow-up</p>
+      </div>
+      <div className="absolute bg-[#c77833] h-[2px] left-[810px] rounded-[1px] top-[298px] w-[216px]" data-node-id="1198:60" data-name="Needs Repair accent" />
+      <a className="absolute bg-[#0c2030] block border border-[#2c8c8a] border-solid cursor-pointer h-[112px] left-[1062px] rounded-[16px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[198px] w-[248px]" data-node-id="1198:61" data-name="Overdue Returns" />
+      <div className="absolute bg-[rgba(44,140,138,0.22)] border-0 border-[rgba(44,140,138,0.7)] border-solid left-[1078px] rounded-[14px] size-[38px] top-[215px]" data-node-id="1198:62" data-name="Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[34px] justify-center leading-[0] left-[1130px] not-italic text-[28px] text-white top-[229px] w-[160px]" data-node-id="1198:63">
+        <p className="leading-[normal]">1</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[1130px] not-italic text-[#f4f8fb] text-[13px] top-[259px] w-[164px]" data-node-id="1198:64">
+        <p className="leading-[normal]">Overdue Returns</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[1130px] not-italic text-[13px] text-white top-[280px] w-[164px]" data-node-id="1198:65">
+        <p className="leading-[normal]">Monitor timing</p>
+      </div>
+      <div className="absolute bg-[#c77833] h-[2px] left-[1078px] rounded-[10px] top-[298px] w-[216px]" data-node-id="1198:66" data-name="Overdue Returns accent" />
+      <div className="absolute bg-[#0c2030] border border-[#2c8c8a] border-solid h-[370px] left-[258px] rounded-[16px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[332px] w-[720px]" data-node-id="1198:67" data-name="Queue Panel" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[24px] justify-center leading-[0] left-[282px] not-italic text-[#e8f2f7] text-[18px] top-[365px] w-[450px]" data-node-id="1198:68">
+        <p className="leading-[normal]">Requests awaiting release</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[16px] justify-center leading-[0] left-[282px] not-italic text-[#e8f2f7] text-[13px] top-[389px] w-[520px]" data-node-id="1198:69">
+        <p className="leading-[normal]">Review requests before release.</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[14px] justify-center leading-[0] left-[282px] not-italic text-[#e8f2f7] text-[13px] top-[423px] w-[150px]" data-node-id="1198:70">
+        <p className="leading-[normal]">BORROWER</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[14px] justify-center leading-[0] left-[442px] not-italic text-[#e8f2f7] text-[13px] top-[423px] w-[200px]" data-node-id="1198:71">
+        <p className="leading-[normal]">EQUIPMENT</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[14px] justify-center leading-[0] left-[680px] not-italic text-[#e8f2f7] text-[18px] top-[423px] w-[130px]" data-node-id="1198:72">
+        <p className="leading-[normal]">REQUESTED</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[14px] justify-center leading-[0] left-[842px] not-italic text-[#e8f2f7] text-[13px] top-[423px] w-[90px]" data-node-id="1198:73">
+        <p className="leading-[normal]">ACTION</p>
+      </div>
+      <div className="absolute bg-[#2c8c8a] h-px left-[282px] rounded-[1px] top-[439px] w-[648px]" data-node-id="1198:74" data-name="Divider" />
+      <div className="absolute bg-[#091c2b] border-0 border-[#2c8c8a] border-solid h-[56px] left-[282px] rounded-[14px] shadow-[0px_3px_12px_0px_rgba(0,0,0,0.08)] top-[454px] w-[648px]" data-node-id="1198:75" data-name="Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[300px] not-italic text-[#e8f2f7] text-[13px] top-[472px] w-[130px]" data-node-id="1198:76">
+        <p className="leading-[normal]">Maria Santos</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Medium'] font-medium h-[18px] justify-center leading-[0] left-[442px] not-italic text-[#e8f2f7] text-[13px] top-[472px] w-[210px]" data-node-id="1198:77">
+        <p className="leading-[normal]">Laptop Dell 5420</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[18px] justify-center leading-[0] left-[680px] not-italic text-[#e8f2f7] text-[13px] top-[472px] w-[130px]" data-node-id="1198:78">
+        <p className="leading-[normal]">Sep 8 • 10:00 AM</p>
+      </div>
+      <div className="absolute bg-[#091c2b] h-[30px] left-[842px] rounded-[14px] top-[462px] w-[88px]" data-node-id="1198:79" data-name="Shape" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[30px] justify-center leading-[0] left-[886px] not-italic text-[#e8f2f7] text-[13px] text-center top-[477px] w-[88px]" data-node-id="1198:80">
+        <p className="leading-[normal]">Review</p>
+      </div>
+      <div className="absolute bg-[#091c2b] border-0 border-[#2c8c8a] border-solid h-[56px] left-[282px] rounded-[14px] shadow-[0px_3px_12px_0px_rgba(0,0,0,0.08)] top-[522px] w-[648px]" data-node-id="1198:81" data-name="Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[300px] not-italic text-[#e8f2f7] text-[13px] top-[540px] w-[130px]" data-node-id="1198:82">
+        <p className="leading-[normal]">Carlo Reyes</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Medium'] font-medium h-[18px] justify-center leading-[0] left-[442px] not-italic text-[#e8f2f7] text-[13px] top-[540px] w-[210px]" data-node-id="1198:83">
+        <p className="leading-[normal]">Epson X500 Projector</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[18px] justify-center leading-[0] left-[680px] not-italic text-[#e8f2f7] text-[13px] top-[540px] w-[130px]" data-node-id="1198:84">
+        <p className="leading-[normal]">Sep 14 • 2:30 PM</p>
+      </div>
+      <div className="absolute bg-[#091c2b] h-[30px] left-[842px] rounded-[14px] top-[530px] w-[88px]" data-node-id="1198:85" data-name="Shape" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[30px] justify-center leading-[0] left-[886px] not-italic text-[#e8f2f7] text-[13px] text-center top-[545px] w-[88px]" data-node-id="1198:86">
+        <p className="leading-[normal]">Review</p>
+      </div>
+      <div className="absolute bg-[#091c2b] border-0 border-[#2c8c8a] border-solid h-[56px] left-[282px] rounded-[14px] shadow-[0px_3px_12px_0px_rgba(0,0,0,0.08)] top-[590px] w-[648px]" data-node-id="1198:87" data-name="Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[18px] justify-center leading-[0] left-[300px] not-italic text-[#e8f2f7] text-[13px] top-[608px] w-[130px]" data-node-id="1198:88">
+        <p className="leading-[normal]">Ana Dela Cruz</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Medium'] font-medium h-[18px] justify-center leading-[0] left-[442px] not-italic text-[#e8f2f7] text-[13px] top-[608px] w-[210px]" data-node-id="1198:89">
+        <p className="leading-[normal]">Canon EOS 90D</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[18px] justify-center leading-[0] left-[680px] not-italic text-[#e8f2f7] text-[13px] top-[608px] w-[130px]" data-node-id="1198:90">
+        <p className="leading-[normal]">Sep 14 • 5:00 PM</p>
+      </div>
+      <div className="absolute bg-[#091c2b] h-[30px] left-[842px] rounded-[14px] top-[598px] w-[88px]" data-node-id="1198:91" data-name="Shape" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[30px] justify-center leading-[0] left-[886px] not-italic text-[#e8f2f7] text-[13px] text-center top-[613px] w-[88px]" data-node-id="1198:92">
+        <p className="leading-[normal]">Review</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[20px] justify-center leading-[0] left-[282px] not-italic text-[#e8f2f7] text-[18px] top-[670px] w-[600px]" data-node-id="1198:93">
+        <p className="leading-[normal]">Approve before release. Record condition on return.</p>
+      </div>
+      <div className="absolute left-[1024px] size-[30px] top-[426px]" data-node-id="1198:97" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle4} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1039px] not-italic size-[30px] text-[#e8f2f7] text-[13px] text-center top-[441px]" data-node-id="1198:98">
+        <p className="leading-[normal]">01</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[30px] justify-center leading-[0] left-[1070px] not-italic text-[#e8f2f7] text-[13px] top-[441px] w-[150px]" data-node-id="1198:99">
+        <p className="leading-[normal]">Review</p>
+      </div>
+      <div className="absolute bg-[#a8b8c5] h-[22px] left-[1038px] rounded-[1px] top-[456px] w-[2px]" data-node-id="1198:101" data-name="Divider" />
+      <div className="absolute left-[1024px] size-[30px] top-[480px]" data-node-id="1198:102" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle5} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1039px] not-italic size-[30px] text-[#e8f2f7] text-[13px] text-center top-[495px]" data-node-id="1198:103">
+        <p className="leading-[normal]">02</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[30px] justify-center leading-[0] left-[1070px] not-italic text-[#e8f2f7] text-[18px] top-[495px] w-[150px]" data-node-id="1198:104">
+        <p className="leading-[normal]">Release</p>
+      </div>
+      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[30px] justify-center leading-[0] left-[1334px] not-italic text-[#e8f2f7] text-[13px] text-right top-[495px] w-[100px]" data-node-id="1198:105">
+        <p className="leading-[normal]">READY</p>
+      </div>
+      <div className="absolute bg-[#a8b8c5] h-[22px] left-[1038px] rounded-[1px] top-[510px] w-[2px]" data-node-id="1198:106" data-name="Divider" />
+      <div className="absolute left-[1024px] size-[30px] top-[534px]" data-node-id="1198:107" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle4} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1039px] not-italic size-[30px] text-[#e8f2f7] text-[13px] text-center top-[549px]" data-node-id="1198:108">
+        <p className="leading-[normal]">03</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[30px] justify-center leading-[0] left-[1070px] not-italic text-[#e8f2f7] text-[18px] top-[549px] w-[150px]" data-node-id="1198:109">
+        <p className="leading-[normal]">Return</p>
+      </div>
+      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[30px] justify-center leading-[0] left-[1334px] not-italic text-[#e8f2f7] text-[13px] text-right top-[549px] w-[100px]" data-node-id="1198:110">
+        <p className="leading-[normal]">MONITOR</p>
+      </div>
+      <div className="absolute bg-[#a8b8c5] h-[22px] left-[1038px] rounded-[1px] top-[564px] w-[2px]" data-node-id="1198:111" data-name="Divider" />
+      <div className="absolute left-[1024px] size-[30px] top-[588px]" data-node-id="1198:112" data-name="Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle6} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1039px] not-italic size-[30px] text-[#e8f2f7] text-[13px] text-center top-[603px]" data-node-id="1198:113">
+        <p className="leading-[normal]">04</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[30px] justify-center leading-[0] left-[1070px] not-italic text-[#e8f2f7] text-[18px] top-[603px] w-[150px]" data-node-id="1198:114">
+        <p className="leading-[normal]">Condition</p>
+      </div>
+      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[30px] justify-center leading-[0] left-[1334px] not-italic text-[#e8f2f7] text-[13px] text-right top-[603px] w-[100px]" data-node-id="1198:115">
+        <p className="leading-[normal]">NEXT</p>
+      </div>
+      <div className="absolute bg-[#2c8c8a] h-px left-[1024px] rounded-[1px] top-[648px] w-[314px]" data-node-id="1198:116" data-name="Divider" />
+      <div className="absolute bg-[#091c2b] h-[78px] left-[820px] rounded-[14px] top-[738px] w-[150px]" data-node-id="1198:123" data-name="Shape" />
+      <div className="absolute bg-[#091c2b] h-[78px] left-[982px] rounded-[14px] top-[738px] w-[150px]" data-node-id="1198:127" data-name="Shape" />
+      <div className="absolute bg-[#091c2b] h-[78px] left-[1144px] rounded-[14px] top-[738px] w-[198px]" data-node-id="1198:131" data-name="Shape" />
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[136px]" data-node-id="1210:22" data-name="Nav Icon • Dashboard">
+        <div className="absolute inset-[19%_16%_21.5%_16%]" data-node-id="1210:23" data-name="Group">
+          <div className="absolute inset-[-7.98%_-6.99%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[188px]" data-node-id="1210:27" data-name="Nav Icon • Approval & Release">
+        <div className="absolute inset-[16%]" data-node-id="1210:28" data-name="Group">
+          <div className="absolute inset-[-6.99%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup1} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[240px]" data-node-id="1210:31" data-name="Nav Icon • Return & Condition Check">
+        <div className="absolute inset-[15.39%_17.81%_21.61%_18.5%]" data-node-id="1210:32" data-name="Group">
+          <div className="absolute inset-[-7.54%_-7.46%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup2} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[292px]" data-node-id="1210:36" data-name="Nav Icon • Availability Calendar">
+        <div className="absolute inset-[14%_15%_17.5%_15%]" data-node-id="1210:37" data-name="Group">
+          <div className="absolute inset-[-6.93%_-6.79%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup3} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute h-[36.548px] left-[24px] top-[19.73px] w-[44px]" data-node-id="1649:74" data-name="Brand Logo • CG • Supplied">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgBrandLogoCgSupplied} />
+      </div>
+      <p className="[word-break:break-word] absolute font-['Sora:SemiBold'] font-semibold leading-[0] left-[78px] text-[#edf2fa] text-[0px] top-[27px] tracking-[0.216px] whitespace-nowrap" data-node-id="1653:15">
+        <span className="font-['Oxanium:Medium'] font-medium leading-[normal] text-[18px]">Campus</span>
+        <span className="font-['Oxanium:Bold'] font-bold leading-[normal] text-[#c77833] text-[18px]">Gear</span>
+      </p>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[16px] justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[13px] top-[106px] w-[500px]" data-node-id="1751:4">
+        <p className="leading-[normal]">CUSTODIAN • OVERVIEW</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[38px] justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[24px] top-[138px] w-[760px]" data-node-id="1751:5">
+        <p className="leading-[34px]">Manage requests, releases, and returns.</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[18px] justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[14px] top-[162px] w-[780px]" data-node-id="1751:6">
+        <p className="leading-[normal]">Review approvals, release equipment, and track returned conditions.</p>
+      </div>
+      <div className="absolute bg-[#0e2537] h-[28px] left-[12px] opacity-95 rounded-[2px] top-[132px] w-[3px]" data-node-id="1815:4" data-name="NAV ACTIVE INDICATOR" />
+    </div>
+  );
+}

@@ -1,0 +1,31 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Borrower &#226;&#128;&#162; Open Ambient System" opacity="0.9">
+<path id="Vector" d="M850 80C1110 100 1320 250 1390 500" stroke="#2C8C8A" stroke-opacity="0.32" stroke-width="1.5"/>
+<path id="Vector_2" d="M970 40C1210 180 1310 390 1330 650" stroke="#C77833"/>
+<path id="Vector_3" d="M790 760C930 630 1110 600 1400 690" stroke="#2C8C8A" stroke-opacity="0.18"/>
+<g id="Vector_4">
+<path d="M260 210H1360ZM260 250H1360ZM260 290H1360Z" fill="black"/>
+<path d="M260 210H1360M260 250H1360M260 290H1360" stroke="#8AA6B8" stroke-opacity="0.045"/>
+</g>
+<g id="Vector_5">
+<path d="M900 120V820ZM980 120V820ZM1060 120V820ZM1140 120V820ZM1220 120V820ZM1300 120V820Z" fill="black"/>
+<path d="M900 120V820M980 120V820M1060 120V820M1140 120V820M1220 120V820M1300 120V820" stroke="#8AA6B8" stroke-opacity="0.035"/>
+</g>
+<path id="Vector_6" d="M1235 248C1278.08 248 1313 213.078 1313 170C1313 126.922 1278.08 92 1235 92C1191.92 92 1157 126.922 1157 170C1157 213.078 1191.92 248 1235 248Z" stroke="url(#paint0_linear_0_64)" stroke-width="1.5"/>
+<path id="Vector_7" d="M1235 176C1238.31 176 1241 173.314 1241 170C1241 166.686 1238.31 164 1235 164C1231.69 164 1229 166.686 1229 170C1229 173.314 1231.69 176 1235 176Z" fill="#C77833"/>
+<g id="Vector_8">
+<path d="M1110 170H1360Z" fill="black"/>
+<path d="M1110 170H1360" stroke="#C77833"/>
+</g>
+<g id="Vector_9">
+<path d="M1235 45V295Z" fill="black"/>
+<path d="M1235 45V295" stroke="#2C8C8A" stroke-opacity="0.12"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_64" x1="1157" y1="92" x2="1313" y2="248" gradientUnits="userSpaceOnUse">
+<stop stop-color="#1A7F83" stop-opacity="0.24"/>
+<stop offset="1" stop-color="#B98A52" stop-opacity="0.08"/>
+</linearGradient>
+</defs>
+</svg>

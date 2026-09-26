@@ -1,0 +1,19 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1050" height="58" viewBox="0 0 1050 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="BORROWER &#226;&#128;&#162; OPEN WORKFLOW TRACE" clip-path="url(#clip0_0_15)">
+<path id="Vector" opacity="0.72" d="M0 29H180L204 10H470L494 40H760L784 22H1050" stroke="#C77833" stroke-width="1.2"/>
+<path id="Vector_2" opacity="0.34" d="M0 44H1050" stroke="#2C8C8A"/>
+<path id="Vector_3" d="M204 14C206.209 14 208 12.2091 208 10C208 7.79086 206.209 6 204 6C201.791 6 200 7.79086 200 10C200 12.2091 201.791 14 204 14Z" fill="#2C8C8A"/>
+<path id="Vector_4" d="M494 44C496.209 44 498 42.2091 498 40C498 37.7909 496.209 36 494 36C491.791 36 490 37.7909 490 40C490 42.2091 491.791 44 494 44Z" fill="#C77833"/>
+<path id="Vector_5" d="M784 26C786.209 26 788 24.2091 788 22C788 19.7909 786.209 18 784 18C781.791 18 780 19.7909 780 22C780 24.2091 781.791 26 784 26Z" fill="#2C8C8A"/>
+<path id="Vector_6" d="M1050 33C1052.21 33 1054 31.2091 1054 29C1054 26.7909 1052.21 25 1050 25C1047.79 25 1046 26.7909 1046 29C1046 31.2091 1047.79 33 1050 33Z" fill="#C77833"/>
+<g id="Vector_7" opacity="0.28">
+<path d="M204 4V16ZM494 34V46ZM784 16V28Z" fill="black"/>
+<path d="M204 4V16M494 34V46M784 16V28" stroke="#EDF2F7" stroke-width="0.8"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_15">
+<rect width="1050" height="58" fill="white"/>
+</clipPath>
+</defs>
+</svg>

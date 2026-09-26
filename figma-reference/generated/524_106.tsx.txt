@@ -1,0 +1,361 @@
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/2eb07b4f-f526-4322-895a-13e995194886";
+const imgAuthConsistentAuthGeometry = `${assetPathPrefix}/159a4.svg`;
+const imgAuthSignupVerificationAtmosphereComplete = `${assetPathPrefix}/85674.svg`;
+const imgVector = `${assetPathPrefix}/371b6.svg`;
+const imgVector1 = `${assetPathPrefix}/a8cbc.svg`;
+const imgVector2 = `${assetPathPrefix}/c7c0b.svg`;
+const imgVector3 = `${assetPathPrefix}/ff46e.svg`;
+const imgVector4 = `${assetPathPrefix}/ba137.svg`;
+const imgVector5 = `${assetPathPrefix}/48e73.svg`;
+const imgVector6 = `${assetPathPrefix}/3dff2.svg`;
+const imgVector7 = `${assetPathPrefix}/6ef97.svg`;
+const imgVector8 = `${assetPathPrefix}/e2137.svg`;
+const imgVector9 = `${assetPathPrefix}/36b46.svg`;
+const imgVector10 = `${assetPathPrefix}/69664.svg`;
+const imgStatusVerified = `${assetPathPrefix}/67cfe.svg`;
+const imgAuthNewLeftVisualStage = `${assetPathPrefix}/f93d1.svg`;
+const imgVector11 = `${assetPathPrefix}/4dfa7.svg`;
+const imgVector12 = `${assetPathPrefix}/a1475.svg`;
+const imgVector13 = `${assetPathPrefix}/a2440.svg`;
+const imgVector14 = `${assetPathPrefix}/e5572.svg`;
+const imgVector15 = `${assetPathPrefix}/8f9fd.svg`;
+const imgVector16 = `${assetPathPrefix}/06691.svg`;
+const imgVector17 = `${assetPathPrefix}/04590.svg`;
+const imgVector18 = `${assetPathPrefix}/c3ea3.svg`;
+const imgVector19 = `${assetPathPrefix}/03121.svg`;
+const imgVector20 = `${assetPathPrefix}/09da1.svg`;
+const imgVector21 = `${assetPathPrefix}/55c3a.svg`;
+const imgVector22 = `${assetPathPrefix}/74b60.svg`;
+const imgVector23 = `${assetPathPrefix}/1353e.svg`;
+const imgVector24 = `${assetPathPrefix}/729ee.svg`;
+const imgVector25 = `${assetPathPrefix}/f364b.svg`;
+const imgVector26 = `${assetPathPrefix}/36e5c.svg`;
+const imgVector27 = `${assetPathPrefix}/a85d7.svg`;
+const imgVector28 = `${assetPathPrefix}/d5823.svg`;
+const imgVector29 = `${assetPathPrefix}/e8011.svg`;
+const imgVector30 = `${assetPathPrefix}/0986c.svg`;
+const imgVector31 = `${assetPathPrefix}/68b4c.svg`;
+const imgAuthBrandMarkUserSuppliedCg = `${assetPathPrefix}/7ef91.svg`;
+const imgVector32 = `${assetPathPrefix}/55223.svg`;
+const imgVector33 = `${assetPathPrefix}/31ed0.svg`;
+const imgVector34 = `${assetPathPrefix}/47b74.svg`;
+const imgVector35 = `${assetPathPrefix}/aef72.svg`;
+const imgVector36 = `${assetPathPrefix}/6da99.svg`;
+const imgVector37 = `${assetPathPrefix}/942c1.svg`;
+const imgVector38 = `${assetPathPrefix}/7a56f.svg`;
+const imgVector39 = `${assetPathPrefix}/91c72.svg`;
+const imgVector40 = `${assetPathPrefix}/b8029.svg`;
+
+export default function Component13DAccountCreated() {
+  return (
+    <div className="bg-[#071b2b] relative size-full" data-node-id="524:106" data-name="13D — Account Created">
+      <div className="absolute h-[540px] left-0 top-0 w-[420px]" data-node-id="1586:156" data-name="AUTH • CONSISTENT AUTH GEOMETRY">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthConsistentAuthGeometry} />
+      </div>
+      <div className="absolute h-[900px] left-0 overflow-clip top-0 w-[1440px]" data-node-id="1579:96" data-name="AUTH • SIGNUP VERIFICATION ATMOSPHERE • COMPLETE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthSignupVerificationAtmosphereComplete} />
+        <div className="absolute inset-[-14.44%_-4.86%_58.89%_70.14%]" data-node-id="1579:98" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector} />
+        </div>
+        <div className="absolute inset-[-3.33%_2.08%_70%_77.08%]" data-node-id="1579:99" data-name="Vector">
+          <div className="absolute inset-[-0.17%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector1} />
+          </div>
+        </div>
+        <div className="absolute bottom-3/4 left-[80.21%] right-[5.21%] top-[1.67%]" data-node-id="1579:100" data-name="Vector">
+          <div className="absolute inset-[-0.36%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector2} />
+          </div>
+        </div>
+        <div className="absolute inset-[6.67%_8.33%_80%_83.33%]" data-node-id="1579:101" data-name="Vector">
+          <div className="absolute inset-[-0.42%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector3} />
+          </div>
+        </div>
+        <div className="absolute inset-[61.11%_3.47%_0_72.22%]" data-node-id="1579:102" data-name="Vector">
+          <div className="absolute inset-[-0.2%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector4} />
+          </div>
+        </div>
+        <div className="absolute inset-[64.44%_0_0_77.78%]" data-node-id="1579:103" data-name="Vector">
+          <div className="absolute inset-[-0.11%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector5} />
+          </div>
+        </div>
+        <div className="absolute inset-[85.56%_70.14%_14.44%_0]" data-node-id="1579:104" data-name="Vector">
+          <div className="absolute inset-[-1px_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector6} />
+          </div>
+        </div>
+        <div className="absolute inset-[85.56%_85.42%_14.44%_3.33%]" data-node-id="1579:105" data-name="Vector">
+          <div className="absolute inset-[-1.5px_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector7} />
+          </div>
+        </div>
+        <div className="absolute inset-[84.78%_94.1%_13.67%_4.93%]" data-node-id="1579:106" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector8} />
+        </div>
+        <div className="absolute inset-[0_63.89%_0_36.11%]" data-node-id="1579:107" data-name="Vector">
+          <div className="absolute inset-[0_-0.5px]">
+            <img alt="" className="block max-w-none size-full" src={imgVector9} />
+          </div>
+        </div>
+        <div className="absolute inset-[0_63.06%_0_36.94%]" data-node-id="1579:108" data-name="Vector">
+          <div className="absolute inset-[0_-0.5px]">
+            <img alt="" className="block max-w-none size-full" src={imgVector10} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0c2233] border border-[#2c8c8a] border-solid h-[784px] left-[560px] overflow-clip rounded-[20px] top-[58px] w-[808px]" data-node-id="1454:2" data-name="AUTH • ACCOUNT CREATED CARD">
+        <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[39px] not-italic text-[30px] text-white top-[91px] w-[650px]" data-node-id="1454:5">
+          Your account is ready
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[39px] not-italic text-[#adbfcc] text-[14px] top-[139px] w-[650px]" data-node-id="1454:6">
+          Your campus identity has been verified and your Borrower account is ready for sign-in.
+        </p>
+        <div className="absolute bg-[rgba(12,32,48,0.94)] border border-[rgba(28,59,79,0.82)] border-solid h-[108px] left-[39px] rounded-[18px] top-[201px] w-[728px]" data-node-id="1454:7" data-name="AUTH • ACCOUNT READY STATUS" />
+        <div className="absolute left-[57px] size-[52px] top-[223px]" data-node-id="1454:8" data-name="STATUS • VERIFIED">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgStatusVerified} />
+        </div>
+        <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[83px] not-italic text-[#081b2b] text-[20px] text-center top-[237px] w-[54px]" data-node-id="1614:5">
+          ✓
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[129px] not-italic text-[#2c8c8a] text-[12px] top-[217px] w-[500px]" data-node-id="1454:10">
+          ACCOUNT VERIFIED
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[129px] not-italic text-[13px] text-white top-[243px] w-[560px]" data-node-id="1454:11">
+          Borrower access is activated. Your credentials can now be used from the shared sign-in screen.
+        </p>
+        <div className="absolute bg-[#071b2b] border border-[#2c8c8a] border-solid h-[112px] left-[39px] rounded-[12px] top-[333px] w-[728px]" data-node-id="1454:12" data-name="AUTH • NEXT STEP" />
+        <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[57px] not-italic text-[#c77833] text-[11px] top-[347px] w-[250px]" data-node-id="1454:13">
+          WHAT HAPPENS NEXT
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[57px] not-italic text-[15px] text-white top-[371px] w-[300px]" data-node-id="1454:14">
+          Return to Sign In
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[57px] not-italic text-[#adbfcc] text-[12px] top-[399px] w-[650px]" data-node-id="1454:15">
+          Use your campus email and password to enter the system and access Borrower features.
+        </p>
+        <a className="absolute bg-[#2c8c8a] block border border-[rgba(44,140,138,0.55)] border-solid cursor-pointer h-[54px] left-[39px] rounded-[12px] top-[481px] w-[728px]" data-node-id="1454:16" data-name="ACTION • BACK TO LOGIN" />
+        <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[normal] left-[calc(50%-55px)] not-italic text-[12px] text-white top-[500px] w-[110px]" data-node-id="1454:17">
+          BACK TO SIGN IN
+        </p>
+        <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[39px] not-italic text-[#adbfcc] text-[11px] top-[569px] w-[728px] whitespace-pre-wrap" data-node-id="1454:18">{`SECURE REGISTRATION COMPLETE  •  Borrower access is activated`}</p>
+        <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[39px] not-italic text-[#adbfcc] text-[12px] top-[613px] w-[728px] whitespace-pre-wrap" data-node-id="1454:19">{`Campus identity  →  verification  →  Borrower access`}</p>
+        <div className="absolute h-[48px] left-[39px] overflow-clip top-[27px] w-[728px]" data-node-id="1813:26" data-name="AUTH • 3-STEP INDICATOR">
+          <div className="absolute bg-[#c77833] h-[4px] left-0 top-0 w-[228px]" data-node-id="1813:27" data-name="INDICATOR • ACCOUNT" />
+          <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[14px] leading-[normal] left-0 not-italic text-[#c77833] text-[10px] top-[12px] w-[28px]" data-node-id="1813:28">
+            01
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[normal] left-[34px] not-italic text-[10px] text-[rgba(237,242,247,0.65)] top-[11px] w-[180px]" data-node-id="1813:29">
+            ACCOUNT
+          </p>
+          <div className="absolute bg-[#c77833] h-[4px] left-[244px] top-0 w-[228px]" data-node-id="1813:30" data-name="INDICATOR • CODE" />
+          <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[14px] leading-[normal] left-[244px] not-italic text-[#c77833] text-[10px] top-[12px] w-[28px]" data-node-id="1813:31">
+            02
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[normal] left-[278px] not-italic text-[10px] text-[rgba(237,242,247,0.65)] top-[11px] w-[180px]" data-node-id="1813:32">
+            CODE
+          </p>
+          <div className="absolute bg-[#2c8c8a] h-[4px] left-[488px] top-0 w-[228px]" data-node-id="1813:33" data-name="INDICATOR • READY" />
+          <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[14px] leading-[normal] left-[488px] not-italic text-[#c77833] text-[10px] top-[12px] w-[28px]" data-node-id="1813:34">
+            03
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[normal] left-[522px] not-italic text-[#edf2f7] text-[10px] top-[11px] w-[180px]" data-node-id="1813:35">
+            READY
+          </p>
+          <p className="-translate-x-full [word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[14px] leading-[normal] left-[728px] not-italic text-[#2c8c8a] text-[9px] text-right top-[32px] w-[228px]" data-node-id="1813:36">
+            03 / ACCOUNT READY
+          </p>
+        </div>
+      </div>
+      <div className="absolute h-[900px] left-0 overflow-clip top-0 w-[520px]" data-node-id="1623:701" data-name="AUTH • NEW LEFT • VISUAL STAGE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthNewLeftVisualStage} />
+        <div className="absolute inset-[62.48%_0_19.51%_0]" data-node-id="1623:703" data-name="Vector">
+          <div className="absolute inset-[-0.62%_-0.15%_-0.62%_-0.12%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector11} />
+          </div>
+        </div>
+        <div className="absolute inset-[70.28%_0_11.77%_0]" data-node-id="1623:704" data-name="Vector">
+          <div className="absolute inset-[-0.46%_-0.1%_-0.46%_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector12} />
+          </div>
+        </div>
+        <div className="absolute inset-[31.11%_-15.38%_26.67%_42.31%]" data-node-id="1623:705" data-name="Vector">
+          <div className="absolute inset-[-0.2%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector13} />
+          </div>
+        </div>
+        <div className="absolute inset-[36.11%_-6.73%_31.67%_50.96%]" data-node-id="1623:706" data-name="Vector">
+          <div className="absolute inset-[-0.17%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector14} />
+          </div>
+        </div>
+        <div className="absolute inset-[42%_3.46%_37.56%_61.15%]" data-node-id="1623:707" data-name="Vector">
+          <div className="absolute inset-[-0.27%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector15} />
+          </div>
+        </div>
+        <div className="absolute inset-[50.22%_17.69%_45.78%_75.38%]" data-node-id="1623:708" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector16} />
+        </div>
+        <div className="absolute inset-[46.67%_9.62%_31.11%_23.08%]" data-node-id="1623:709" data-name="Vector">
+          <div className="absolute inset-[-0.44%_-0.16%_-0.47%_-0.44%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector17} />
+          </div>
+        </div>
+        <div className="absolute inset-[46.11%_75.96%_52.78%_22.12%]" data-node-id="1623:710" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector18} />
+        </div>
+        <div className="absolute inset-[51.67%_20.19%_47.22%_77.88%]" data-node-id="1623:711" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector19} />
+        </div>
+        <div className="absolute inset-[68.33%_43.27%_30.56%_54.81%]" data-node-id="1623:712" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector18} />
+        </div>
+        <div className="absolute inset-[67.33%_8.85%_31.78%_89.62%]" data-node-id="1623:713" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector20} />
+        </div>
+        <div className="absolute inset-[63.33%_63.85%_28.22%_13.46%]" data-node-id="1623:714" data-name="Vector">
+          <div className="absolute inset-[-0.66%_-0.42%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector21} />
+          </div>
+        </div>
+        <div className="absolute inset-[64.89%_66.92%_29.78%_16.54%]" data-node-id="1623:715" data-name="Vector">
+          <div className="absolute inset-[-1.04%_-0.58%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector22} />
+          </div>
+        </div>
+        <div className="absolute inset-[71.78%_70.58%_28.22%_20.19%]" data-node-id="1623:716" data-name="Vector">
+          <div className="absolute inset-[-1px_-2.08%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector23} />
+          </div>
+        </div>
+        <div className="absolute inset-[72.22%_30.77%_17.56%_40.38%]" data-node-id="1623:717" data-name="Vector">
+          <div className="absolute inset-[-0.54%_-0.33%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector24} />
+          </div>
+        </div>
+        <div className="absolute inset-[74%_33.85%_20.44%_43.46%]" data-node-id="1623:718" data-name="Vector">
+          <div className="absolute inset-[-1%_-0.42%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector25} />
+          </div>
+        </div>
+        <div className="absolute inset-[81.22%_36.92%_18.78%_46.54%]" data-node-id="1623:719" data-name="Vector">
+          <div className="absolute inset-[-1.5px_-1.74%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector26} />
+          </div>
+        </div>
+        <div className="absolute inset-[72.22%_11.15%_17.78%_71.15%]" data-node-id="1623:720" data-name="Vector">
+          <div className="absolute inset-[-0.56%_-0.54%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector27} />
+          </div>
+        </div>
+        <div className="absolute inset-[74.11%_16.54%_21.89%_76.54%]" data-node-id="1623:721" data-name="Vector">
+          <div className="absolute inset-[-6.94%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector28} />
+          </div>
+        </div>
+        <div className="absolute inset-[75.33%_18.65%_23.11%_78.65%]" data-node-id="1623:722" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector29} />
+        </div>
+        <div className="absolute inset-[91.11%_10%_8.89%_10%]" data-node-id="1623:723" data-name="Vector">
+          <div className="absolute inset-[-0.5px_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector30} />
+          </div>
+        </div>
+        <div className="absolute inset-[91.78%_57.69%_8.22%_10%]" data-node-id="1623:724" data-name="Vector">
+          <div className="absolute inset-[-0.5px_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector31} />
+          </div>
+        </div>
+        <div className="absolute h-[103px] left-[48px] top-[38px] w-[124px]" data-node-id="1627:130" data-name="AUTH • BRAND MARK • USER SUPPLIED CG">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthBrandMarkUserSuppliedCg} />
+        </div>
+      </div>
+      <div className="absolute h-[610px] left-[52px] overflow-clip top-[150px] w-[420px]" data-node-id="1709:76" data-name="SIGNUP • LEFT • ACCESS CONSTELLATION">
+        <p className="[word-break:break-word] absolute font-['Space_Grotesk:Bold'] font-bold inset-[2.62%_56.43%_95.25%_4.76%] leading-[normal] text-[#c77833] text-[10px] whitespace-nowrap" data-node-id="1709:77">
+          CAMPUSGEAR / ACCESS SEQUENCE
+        </p>
+        <p className="[word-break:break-word] absolute font-['Oxanium:Bold'] font-bold inset-[5.57%_40.71%_89.51%_4.76%] leading-[normal] text-[#edf2f7] text-[24px] whitespace-nowrap" data-node-id="1709:78">
+          BORROWER ACCESS
+        </p>
+        <p className="[word-break:break-word] absolute font-['Space_Grotesk:Regular'] font-normal inset-[11.31%_61.43%_86.39%_4.76%] leading-[normal] text-[#aab7c4] text-[11px] whitespace-nowrap" data-node-id="1709:79">
+          Verified account activated
+        </p>
+        <div className="absolute inset-[32.62%_22.38%_29.34%_22.38%]" data-node-id="1709:80" data-name="Vector">
+          <div className="absolute inset-[-0.22%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector32} />
+          </div>
+        </div>
+        <div className="absolute inset-[38.2%_30.48%_34.92%_30.48%]" data-node-id="1709:81" data-name="Vector">
+          <div className="absolute inset-[-0.3%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector33} />
+          </div>
+        </div>
+        <div className="absolute inset-[43.77%_38.57%_40.49%_38.57%]" data-node-id="1709:82" data-name="Vector">
+          <div className="absolute inset-[-1.04%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector34} />
+          </div>
+        </div>
+        <div className="absolute inset-[46.07%_41.9%_42.79%_41.9%]" data-node-id="1709:83" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector35} />
+        </div>
+        <p className="[word-break:break-word] absolute font-['Oxanium:Bold'] font-bold inset-[47.7%_47.5%_48.52%_47.5%] leading-[normal] text-[#edf2f7] text-[18px] text-center whitespace-nowrap" data-node-id="1709:84">
+          03
+        </p>
+        <p className="[word-break:break-word] absolute font-['Space_Grotesk:Bold'] font-bold inset-[52.3%_46.67%_45.9%_46.67%] leading-[normal] text-[#c77833] text-[9px] text-center whitespace-nowrap" data-node-id="1709:85">
+          READY
+        </p>
+        <div className="absolute inset-[26.39%_71.19%_64.1%_15%]" data-node-id="1709:86" data-name="Vector">
+          <div className="absolute inset-[-1.72%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector36} />
+          </div>
+        </div>
+        <p className="[word-break:break-word] absolute font-['Oxanium:Bold'] font-bold inset-[28.85%_76.55%_68.85%_20.36%] leading-[normal] text-[#edf2f7] text-[11px] text-center whitespace-nowrap" data-node-id="1709:87">
+          01
+        </p>
+        <p className="[word-break:break-word] absolute font-['Space_Grotesk:Bold'] font-bold inset-[32.13%_74.05%_66.23%_17.86%] leading-[normal] text-[#edf2f7] text-[8px] text-center whitespace-nowrap" data-node-id="1709:88">
+          IDENTITY
+        </p>
+        <div className="absolute inset-[26.39%_15%_64.1%_71.19%]" data-node-id="1709:89" data-name="Vector">
+          <div className="absolute inset-[-1.72%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector37} />
+          </div>
+        </div>
+        <p className="[word-break:break-word] absolute font-['Oxanium:Bold'] font-bold inset-[28.85%_20.36%_68.85%_76.55%] leading-[normal] text-[#edf2f7] text-[11px] text-center whitespace-nowrap" data-node-id="1709:90">
+          02
+        </p>
+        <p className="[word-break:break-word] absolute bottom-[66.23%] font-['Space_Grotesk:Bold'] font-bold leading-[normal] left-3/4 right-[18.81%] text-[#edf2f7] text-[8px] text-center top-[32.13%] whitespace-nowrap" data-node-id="1709:91">
+          VERIFY
+        </p>
+        <div className="absolute inset-[70.33%_43.1%_20.16%_43.1%]" data-node-id="1709:92" data-name="Vector">
+          <div className="absolute inset-[-1.72%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector36} />
+          </div>
+        </div>
+        <p className="[word-break:break-word] absolute font-['Oxanium:Bold'] font-bold inset-[72.79%_48.45%_24.92%_48.45%] leading-[normal] text-[#edf2f7] text-[11px] text-center whitespace-nowrap" data-node-id="1709:93">
+          03
+        </p>
+        <p className="[word-break:break-word] absolute font-['Space_Grotesk:Bold'] font-bold inset-[76.07%_46.43%_22.3%_46.43%] leading-[normal] text-[#edf2f7] text-[8px] text-center whitespace-nowrap" data-node-id="1709:94">
+          ACCESS
+        </p>
+        <div className="absolute inset-[33.93%_57.14%_52.79%_27.38%]" data-node-id="1709:95" data-name="Vector">
+          <div className="absolute inset-[-0.53%_-1.01%_-0.45%_-0.95%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector38} />
+          </div>
+        </div>
+        <div className="absolute inset-[33.93%_27.38%_52.79%_57.14%]" data-node-id="1709:96" data-name="Vector">
+          <div className="absolute inset-[-0.53%_-0.95%_-0.45%_-1.01%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector39} />
+          </div>
+        </div>
+        <div className="absolute bottom-[29.84%] left-1/2 right-1/2 top-[59.51%]" data-node-id="1709:97" data-name="Vector">
+          <div className="absolute inset-[0_-0.75px]">
+            <img alt="" className="block max-w-none size-full" src={imgVector40} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

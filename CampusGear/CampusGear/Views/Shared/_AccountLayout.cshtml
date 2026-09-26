@@ -1,0 +1,42 @@
+@{
+    var frame = ViewData["FigmaFrame"] as string ?? "15_3";
+    var title = ViewData["Title"] as string ?? "Account access";
+    var sourceFrame = await Html.PartialAsync($"~/Pages/Figma/Frames/_{frame}.cshtml");
+    using var sourceBuffer = new System.IO.StringWriter();
+    sourceFrame.WriteTo(sourceBuffer, System.Text.Encodings.Web.HtmlEncoder.Default);
+    // The approved backend uses email verification while the original Figma signup uses mobile verification.
+    var sourceMarkup = sourceBuffer.ToString()
+        .Replace("MOBILE TRUST", "EMAIL TRUST", StringComparison.Ordinal)
+        .Replace("mobile verification", "email verification", StringComparison.Ordinal)
+        .Replace("registered mobile number", "registered email address", StringComparison.Ordinal)
+        .Replace("REGISTERED MOBILE", "REGISTERED EMAIL", StringComparison.Ordinal);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071b2b" />
+    <title>@title · CampusGear</title>
+    <link rel="stylesheet" href="/css/figma-generated.css" />
+    <link rel="stylesheet" href="/css/figma-app.css" />
+    @await Html.PartialAsync("_AccountStyles")
+</head>
+<body class="auth-page">
+    <div class="auth-shell">
+        <aside class="auth-aside" aria-hidden="true" inert>
+            <div class="auth-figma-frame">
+                @Html.Raw(sourceMarkup)
+            </div>
+        </aside>
+        <main class="auth-main" id="main-content">
+            <div class="auth-mobile-brand">
+                <img src="/figma/assets/7ef91.svg" alt="" />
+                <span>CampusGear</span>
+            </div>
+            @RenderBody()
+        </main>
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

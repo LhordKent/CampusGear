@@ -1,0 +1,73 @@
+@model AdminUserEditPage
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Edit Account & Role";
+    ViewData["WorkspaceRole"] = "Administrator";
+    var roles = new[] { "Borrower", "Custodian", "Administrator" };
+}
+<main class="live-content" data-figma-source="695:7445">
+    <header class="live-heading">
+        <p class="live-eyebrow">ADMINISTRATOR • WORKSPACE</p>
+        <h1>Edit Account &amp; Role</h1>
+        <p>Update account details or role assignments while preserving the user's existing activity record.</p>
+    </header>
+    <section class="live-panel" aria-labelledby="account-information">
+        <h2 id="account-information">ACCOUNT INFORMATION</h2>
+        @Html.ValidationSummary(false)
+        <dl class="live-details">
+            <dt>Email</dt><dd>@Model.Email <span class="live-badge">@(Model.EmailConfirmed ? "Verified" : "Not verified")</span></dd>
+            <dt>Current role</dt><dd>@Model.CurrentRole</dd>
+            <dt>Contact</dt><dd>@(Model.ContactNumber ?? "Not recorded")</dd>
+        </dl>
+        @if (Model.IsSelf)
+        { <p class="live-feedback" role="note">Your own account must stay active with Administrator access.</p> }
+        @if (!Model.EmailConfirmed)
+        { <p class="live-feedback" role="note">This user must verify their email before staff access can be assigned.</p> }
+        <form class="live-form" method="post" action="/admin/users/@Model.Id/edit">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ConcurrencyStamp" value="@Model.Input.ConcurrencyStamp" />
+            <input type="hidden" name="ProfileRowVersion" value="@Model.Input.ProfileRowVersion" />
+            <label class="live-field" for="FullName"><span>NAME</span>
+                <input id="FullName" name="FullName" value="@Model.Input.FullName" required maxlength="160" autocomplete="name" />
+                @Html.ValidationMessage("FullName")
+            </label>
+            <label class="live-field" for="Role"><span>ROLE</span>
+                <select id="Role" name="Role" disabled="@Model.IsSelf">
+                    @foreach (var role in roles)
+                    { <option value="@role" selected="@(Model.Input.Role == role)" disabled="@(!Model.EmailConfirmed && role != "Borrower")">@role</option> }
+                </select>
+                @if (Model.IsSelf) { <input type="hidden" name="Role" value="Administrator" /> }
+                @Html.ValidationMessage("Role")
+            </label>
+            <div class="live-field wide">
+                <span>STATUS</span>
+                <label class="live-check" for="IsActive"><input id="IsActive" name="IsActive" type="checkbox" value="true" checked="@Model.Input.IsActive" disabled="@Model.IsSelf" />Account is active</label>
+                <input type="hidden" name="IsActive" value="@(Model.IsSelf ? "true" : "false")" />
+                <p class="live-muted">Deactivation signs the user out and blocks new access. Their reservations and history stay intact.</p>
+            </div>
+            <div class="wide">
+                <h2>Borrower profile</h2>
+                <p class="live-muted">@(Model.HasBorrowerProfile ? "The existing borrower profile is retained when roles change." : "Profile details are created when Borrower is selected. Leave these fields empty when assigning a staff role.")</p>
+            </div>
+            <label class="live-field" for="StudentNumber"><span>STUDENT / BORROWER NUMBER</span>
+                <input id="StudentNumber" name="StudentNumber" value="@Model.Input.StudentNumber" maxlength="64" />
+                @Html.ValidationMessage("StudentNumber")
+            </label>
+            <label class="live-field" for="Department"><span>DEPARTMENT</span>
+                <input id="Department" name="Department" value="@Model.Input.Department" maxlength="160" />
+                @Html.ValidationMessage("Department")
+            </label>
+            <div class="live-field wide">
+                <span>BORROWING ACCESS</span>
+                <label class="live-check" for="IsEligible"><input id="IsEligible" name="IsEligible" type="checkbox" value="true" checked="@Model.Input.IsEligible" />Eligible to reserve equipment</label>
+                <input type="hidden" name="IsEligible" value="false" />
+            </div>
+            <label class="live-field wide" for="EligibilityNotes"><span>ELIGIBILITY NOTES</span>
+                <textarea id="EligibilityNotes" name="EligibilityNotes" maxlength="1000">@Model.Input.EligibilityNotes</textarea>
+                @Html.ValidationMessage("EligibilityNotes")
+            </label>
+            <p class="live-muted wide">Elevated roles are controlled by Administrator access. Each account has one primary role; role and status changes require the user to sign in again.</p>
+            <div class="live-actions wide"><a class="live-button secondary" href="/admin/users">CANCEL</a><button class="live-button" type="submit">SAVE CHANGES</button></div>
+        </form>
+    </section>
+</main>

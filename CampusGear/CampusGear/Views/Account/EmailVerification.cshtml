@@ -1,0 +1,33 @@
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Verify your email";
+    ViewData["FigmaFrame"] = ViewData["ErrorMessage"] is string || ViewData.ModelState.ErrorCount > 0 ? "524_75" : "524_44";
+    ViewData["StatusMessage"] = "CAMPUS IDENTITY  •  EMAIL CODE REQUIRED";
+}
+<section class="auth-card compact" aria-labelledby="account-title">
+    <header>
+        <div class="auth-card-top">
+            <div><p class="auth-eyebrow">Secure registration / step 2</p><h1 id="account-title">Verify your account</h1></div>
+            <span class="auth-badge">Email verification</span>
+        </div>
+        <p class="auth-description">Enter the one-time code sent to your registered email address. This confirms the account belongs to you before Borrower access is activated.</p>
+    </header>
+    <hr class="auth-divider" />
+    @await Html.PartialAsync("_AccountFeedback")
+    <div class="auth-summary"><strong>Code sent to your registered email</strong><p>@(ViewData["MaskedEmail"] as string ?? "Check your inbox for the newest message") &nbsp;•&nbsp; Valid for 10 minutes</p></div>
+    <form class="auth-form" action="/auth/email-verification" method="post">
+        @Html.AntiForgeryToken()
+        <label class="auth-field" for="Code"><span class="auth-field-label">6-digit verification code</span>
+            <input class="auth-input auth-code" id="Code" name="Code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="••••••" required />
+            @Html.ValidationMessage("Code", null, new { @class = "auth-field-error" })
+        </label>
+        <div class="auth-panel"><img src="/figma/assets/bb17f.svg" alt="" /><div><strong>Security check</strong><span>Never share this code. If you did not request this account, return to sign in.</span></div></div>
+        <button class="auth-action" type="submit">VERIFY ACCOUNT</button>
+    </form>
+    <div class="auth-actions">
+        <form class="auth-inline-form" action="/auth/resend-email-verification" method="post">@Html.AntiForgeryToken()<button type="submit">Resend code</button></form>
+        <a class="auth-link" href="/auth/login">Back to sign in</a>
+    </div>
+    <div class="auth-spacer"></div>
+    @await Html.PartialAsync("_AccountStatus")
+</section>

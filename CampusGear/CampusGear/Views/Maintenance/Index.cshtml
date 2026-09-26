@@ -1,0 +1,51 @@
+@using CampusGear.Models
+@model MaintenancePageModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Equipment Maintenance";
+    var manila = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
+    string Local(DateTime value) => TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(value, DateTimeKind.Utc), manila).ToString("MMM d, yyyy h:mm tt");
+}
+<main class="live-content">
+    <header class="live-heading"><p class="live-eyebrow">EQUIPMENT OPERATIONS</p><h1>Equipment Maintenance</h1><p>Record repairs and restore items to borrowing availability.</p></header>
+    @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
+    <section class="live-panel">
+        <h2>Maintenance cases</h2>
+        <div class="live-actions"><a class="live-button @(Model.Status == "open" ? "" : "secondary")" href="/admin/maintenance">Open cases</a><a class="live-button @(Model.Status == "closed" ? "" : "secondary")" href="/admin/maintenance?status=closed">Closed cases</a></div>
+        @if (Model.Cases.Count == 0) { <p class="live-empty">No @Model.Status maintenance cases.</p> }
+        @foreach (var item in Model.Cases)
+        {
+            <article class="live-panel">
+                <h2>@item.EquipmentItem.Name <span class="live-badge">@item.Status</span></h2>
+                <p class="live-muted">@item.EquipmentItem.AssetCode · Opened @Local(item.OpenedAtUtc) (Manila)</p>
+                <p>@item.Description</p>
+                @if (item.Status == MaintenanceStatus.Closed)
+                { <p>Resolution: @item.Resolution</p><p class="live-muted">Closed @(item.ClosedAtUtc is { } closed ? Local(closed) : "")</p> }
+                else
+                {
+                    <form method="post" action="/admin/maintenance/@item.Id/update" class="live-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(item.RowVersion)" />
+                        <label class="live-field">Status<select name="Status">@foreach (var status in Enum.GetValues<MaintenanceStatus>()) { <option value="@status" selected="@(status == item.Status)">@status</option> }</select></label>
+                        <label class="live-field">Condition after repair<select name="Condition">@foreach (var condition in new[] { EquipmentCondition.Excellent, EquipmentCondition.Good, EquipmentCondition.Fair }) { <option value="@condition" selected="@(condition == EquipmentCondition.Good)">@condition</option> }</select></label>
+                        <label class="live-field wide">Repair notes<textarea name="Resolution" maxlength="2000">@item.Resolution</textarea></label>
+                        <div class="live-actions wide"><button class="live-button" type="submit">Save maintenance</button></div>
+                    </form>
+                }
+            </article>
+        }
+        <nav class="live-pager" aria-label="Maintenance pages">
+            @if (Model.Page > 1) { <a class="live-link" href="/admin/maintenance?status=@Model.Status&amp;page=@(Model.Page - 1)">Previous</a> }
+            <span>Page @Model.Page of @Model.Pages</span>
+            @if (Model.Page < Model.Pages) { <a class="live-link" href="/admin/maintenance?status=@Model.Status&amp;page=@(Model.Page + 1)">Next</a> }
+        </nav>
+    </section>
+    <section class="live-panel"><h2>Open a maintenance case</h2><p class="live-muted">An open case blocks new reservations and release. Record an active loan's return first.</p>
+        <form method="post" action="/admin/maintenance/open" class="live-form">
+            @Html.AntiForgeryToken()
+            <label class="live-field wide">Equipment<select name="equipmentItemId" required><option value="">Choose equipment</option>@foreach (var item in Model.Items) { <option value="@item.Id">@item.Name · @item.AssetCode</option> }</select></label>
+            <label class="live-field wide">Issue description<textarea name="description" required maxlength="2000"></textarea></label>
+            <div class="live-actions wide"><button class="live-button" type="submit">Place in maintenance</button></div>
+        </form>
+    </section>
+</main>

@@ -1,0 +1,294 @@
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/69aca1f2-fcab-401a-98b0-b4401ee2b001";
+const imgStatusDot = `${assetPathPrefix}/fd079.svg`;
+const imgChevron = `${assetPathPrefix}/6274a.svg`;
+
+type RoleBadgeProps = {
+  className?: string;
+  label?: string;
+  role?: "Borrower" | "Custodian" | "Administrator";
+};
+
+function RoleBadge({ className, label = "BORROWER", role = "Borrower" }: RoleBadgeProps) {
+  const isAdministrator = role === "Administrator";
+  const isCustodian = role === "Custodian";
+  return (
+    <div className={className || `border border-solid content-stretch flex flex-col items-start px-[16px] py-[14px] relative rounded-[12px] w-[180px] ${isAdministrator ? "bg-[#102a43] border-[rgba(211,155,44,0.85)]" : isCustodian ? "bg-[#c77833] border-[rgba(211,155,44,0.85)]" : "bg-[#2c8c8a] border-[rgba(39,116,174,0.85)]"}`} id={isAdministrator ? "node-1021_146" : isCustodian ? "node-1021_144" : "node-1021_142"}>
+      <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold h-[20px] leading-[16px] not-italic relative shrink-0 text-[#2c8c8a] text-[12px] tracking-[0.2px] w-[148px]" data-node-id="1021:143">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+type FilterControlProps = {
+  className?: string;
+  label?: string;
+  state?: "Default" | "Focus" | "Disabled";
+  value?: string;
+};
+
+function FilterControl({ className, label = "STATUS", state = "Default", value = "All statuses" }: FilterControlProps) {
+  return (
+    <div className={className || "bg-[#102a43] border border-[#2774ae] border-solid content-stretch flex flex-col gap-[6px] items-start px-[16px] py-[14px] relative rounded-[12px] w-[280px]"} id={state === "Disabled" ? "node-1021_138" : state === "Focus" ? "node-1021_135" : "node-1021_132"}>
+      <p className="font-['Inter:Semi_Bold'] font-semibold h-[20px] leading-[14px] relative shrink-0 text-[#2c8c8a] text-[11px] tracking-[0.3px] w-[248px]" data-node-id="1021:133">
+        {label}
+      </p>
+      <p className="font-['Inter:Regular'] font-normal leading-[20px] relative shrink-0 text-[#a8b8c5] text-[14px] w-[248px]" data-node-id="1021:134">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+type EmptyStateProps = {
+  className?: string;
+  action?: string;
+  message?: string;
+  title?: string;
+  type?: "No Results" | "No Data";
+};
+
+function EmptyState({ className, action = "CLEAR FILTERS", message = "Try adjusting your filters or search criteria.", title = "No matching records", type = "No Results" }: EmptyStateProps) {
+  return (
+    <div className={className || "bg-[#102a43] border border-[#2774ae] border-solid content-stretch flex flex-col gap-[6px] items-start px-[16px] py-[14px] relative rounded-[12px] w-[560px]"} id={type === "No Data" ? "node-1021_127" : "node-1021_123"}>
+      <p className="font-['Inter:Bold'] font-bold h-[20px] leading-[26px] relative shrink-0 text-[#f4f8fb] text-[22px] w-[528px]" data-node-id="1021:124">
+        {title}
+      </p>
+      <p className="font-['Inter:Regular'] font-normal leading-[20px] relative shrink-0 text-[#a8b8c5] text-[14px] w-[528px]" data-node-id="1021:125">
+        {message}
+      </p>
+      <p className="font-['Inter:Medium'] font-medium h-[20px] leading-[16px] relative shrink-0 text-[#a8b8c5] text-[12px] tracking-[0.2px] w-[528px]" data-node-id="1021:126">
+        {action}
+      </p>
+    </div>
+  );
+}
+
+type ConfirmationAlertProps = {
+  className?: string;
+  action?: string;
+  message?: string;
+  state?: "Success" | "Warning" | "Error";
+  title?: string;
+};
+
+function ConfirmationAlert({ className, action = "Continue", message = "The system recorded the change successfully.", state = "Success", title = "Action completed" }: ConfirmationAlertProps) {
+  const isError = state === "Error";
+  return (
+    <div className={className || `border border-solid content-stretch flex flex-col gap-[6px] items-start px-[18px] py-[16px] relative w-[640px] ${isError ? "bg-[#c77833] border-[#b84b55]" : "bg-[#102a43] border-[#2774ae]"}`} id={isError ? "node-1016_80" : state === "Warning" ? "node-1016_76" : "node-1016_72"}>
+      <p className="font-['Inter:Bold'] font-bold h-[24px] leading-[26px] relative shrink-0 text-[#f4f8fb] text-[22px] w-[600px]" data-node-id="1016:73">
+        {title}
+      </p>
+      <p className="font-['Inter:Regular'] font-normal h-[40px] leading-[20px] relative shrink-0 text-[#a8b8c5] text-[14px] w-[600px]" data-node-id="1016:74">
+        {message}
+      </p>
+      <p className="font-['Inter:Medium'] font-medium h-[18px] leading-[16px] relative shrink-0 text-[#a8b8c5] text-[12px] tracking-[0.2px] w-[120px]" data-node-id="1016:75">
+        {action}
+      </p>
+    </div>
+  );
+}
+
+type TableRowProps = {
+  className?: string;
+  action?: string;
+  primary?: string;
+  secondary?: string;
+  state?: "Default" | "Selected" | "Disabled";
+  status?: string;
+};
+
+function TableRow({ className, action = "View", primary = "Dell 5420", secondary = "EQ-001", state = "Default", status = "AVAILABLE" }: TableRowProps) {
+  const isSelected = state === "Selected";
+  return (
+    <div className={className || `bg-[#102a43] border-[#2774ae] border-solid content-stretch flex h-[56px] items-center px-[16px] relative rounded-[var(--campus-radius-8,8px)] ${isSelected ? "border" : "border-0"}`} id={state === "Disabled" ? "node-1016_66" : isSelected ? "node-1016_61" : "node-1016_56"}>
+      <p className="font-['Inter:Regular'] font-normal leading-[20px] relative shrink-0 text-[14px] w-[220px]" data-node-id="1016:57">
+        {primary}
+      </p>
+      <p className="font-['Inter:Regular'] font-normal leading-[20px] relative shrink-0 text-[14px] w-[150px]" data-node-id="1016:58">
+        {secondary}
+      </p>
+      <p className="font-['Inter:Medium'] font-medium h-[20px] leading-[16px] relative shrink-0 text-[12px] tracking-[0.2px] w-[160px]" data-node-id="1016:59">
+        {status}
+      </p>
+      <p className="font-['Inter:Regular'] font-normal leading-[20px] relative shrink-0 text-[14px] w-[100px]" data-node-id="1016:60">
+        {action}
+      </p>
+    </div>
+  );
+}
+
+type MetricCardProps = {
+  className?: string;
+  label?: string;
+  meta?: string;
+  state?: "Neutral" | "Positive" | "Attention";
+  value?: string;
+};
+
+function MetricCard({ className, label = "Metric Label", meta = "Current system count", state = "Neutral", value = "24" }: MetricCardProps) {
+  return (
+    <div className={className || "bg-[#102a43] border border-[#2774ae] border-solid content-stretch flex flex-col gap-[8px] items-start px-[16px] py-[14px] relative rounded-[var(--campus-radius-12,12px)] w-[300px]"} id={state === "Attention" ? "node-1016_51" : state === "Positive" ? "node-1016_47" : "node-1016_43"}>
+      <p className="h-[16px] leading-[14px] relative shrink-0 text-[#2c8c8a] text-[11px] tracking-[0.3px] w-[260px]" data-node-id="1016:44">
+        {label}
+      </p>
+      <p className="leading-[40px] relative shrink-0 text-[#a8b8c5] text-[32px] tracking-[-0.4px] w-[260px]" data-node-id="1016:45">
+        {value}
+      </p>
+      <p className="leading-[18px] relative shrink-0 text-[#2c8c8a] text-[12px] w-[260px]" data-node-id="1016:46">
+        {meta}
+      </p>
+    </div>
+  );
+}
+
+type NavigationItemProps = {
+  className?: string;
+  label?: string;
+  role?: "Borrower" | "Custodian" | "Administrator";
+  state?: "Default" | "Active";
+};
+
+function NavigationItem({ className, label = "Navigation", role = "Borrower", state = "Default" }: NavigationItemProps) {
+  const isAdministratorAndActive = role === "Administrator" && state === "Active";
+  const isAdministratorAndDefault = role === "Administrator" && state === "Default";
+  const isBorrowerAndActive = role === "Borrower" && state === "Active";
+  const isCustodianAndActive = role === "Custodian" && state === "Active";
+  const isCustodianAndDefault = role === "Custodian" && state === "Default";
+  return (
+    <div className={className || `border border-solid content-stretch flex gap-[12px] h-[42px] items-center px-[12px] relative rounded-[var(--campus-radius-12,12px)] ${state === "Active" && ["Custodian", "Administrator"].includes(role) ? "bg-[#c77833] border-[rgba(211,155,44,0.85)]" : state === "Default" && ["Custodian", "Administrator"].includes(role) ? "bg-[#102a43] border-[rgba(211,155,44,0.85)]" : isBorrowerAndActive ? "bg-[#2c8c8a] border-[rgba(39,116,174,0.85)]" : "bg-[#102a43] border-[rgba(39,116,174,0.85)]"}`} id={isAdministratorAndActive ? "node-1016_39" : isAdministratorAndDefault ? "node-1016_36" : isCustodianAndActive ? "node-1016_33" : isCustodianAndDefault ? "node-1016_30" : isBorrowerAndActive ? "node-1016_27" : "node-1016_24"}>
+      <div className="relative shrink-0 size-[22px]" id={isAdministratorAndActive ? "node-1016_40" : isAdministratorAndDefault ? "node-1016_37" : isCustodianAndActive ? "node-1016_34" : isCustodianAndDefault ? "node-1016_31" : isBorrowerAndActive ? "node-1016_28" : "node-1016_25"} data-name="Icon Slot" />
+      <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[20px] not-italic relative shrink-0 text-[#2c8c8a] text-[10px] w-[140px]" data-node-id="1016:26">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+type StatusPillProps = {
+  className?: string;
+  label?: string;
+  status?: "Available" | "Reserved" | "Borrowed" | "Maintenance" | "Returned" | "Late" | "Inactive";
+};
+
+function StatusPill({ className, label = "AVAILABLE", status = "Available" }: StatusPillProps) {
+  const isBorrowed = status === "Borrowed";
+  const isInactive = status === "Inactive";
+  const isLate = status === "Late";
+  const isMaintenance = status === "Maintenance";
+  const isReserved = status === "Reserved";
+  const isReturned = status === "Returned";
+  return (
+    <div className={className || `border border-solid content-stretch flex gap-[7px] h-[28px] items-center justify-center px-[10px] relative rounded-[var(--campus-radius-full,9999px)] ${["Maintenance", "Late"].includes(status) ? "bg-[#c77833] border-[#d39b2c]" : isBorrowed ? "bg-[#102a43] border-[#2774ae]" : "bg-[#2c8c8a] border-[#2774ae]"}`} id={isInactive ? "node-1016_20" : isLate ? "node-1016_17" : isReturned ? "node-1016_14" : isMaintenance ? "node-1016_11" : isBorrowed ? "node-1016_8" : isReserved ? "node-1016_5" : "node-1016_2"}>
+      <div className="relative shrink-0 size-[7px]" id={isInactive ? "node-1016_21" : isLate ? "node-1016_18" : isReturned ? "node-1016_15" : isMaintenance ? "node-1016_12" : isBorrowed ? "node-1016_9" : isReserved ? "node-1016_6" : "node-1016_3"} data-name="Status Dot">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgStatusDot} />
+      </div>
+      <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[14px] not-italic relative shrink-0 text-[#2c8c8a] text-[11px] tracking-[0.3px] w-[90px]" data-node-id="1016:4">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+type SelectProps = {
+  className?: string;
+  label?: string;
+  state?: "Default" | "Focus" | "Error" | "Disabled";
+  value?: string;
+};
+
+function Select({ className, label = "Selection", state = "Default", value = "Choose an option" }: SelectProps) {
+  const isDisabled = state === "Disabled";
+  const isError = state === "Error";
+  const isFocus = state === "Focus";
+  return (
+    <div className={className || "content-stretch flex flex-col gap-[6px] h-[var(--campus-control-height-md,44px)] items-start relative rounded-[var(--campus-radius-12,12px)] w-[420px]"} id={isDisabled ? "node-1015_17" : isError ? "node-1015_12" : isFocus ? "node-1015_7" : "node-1015_2"}>
+      <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[16px] not-italic relative shrink-0 text-[#2c8c8a] text-[12px] tracking-[0.2px] w-[420px]" data-node-id="1015:3">
+        {label}
+      </p>
+      <div className={`bg-[#102a43] border-[#2774ae] border-solid content-stretch flex h-[48px] items-center justify-between overflow-clip px-[14px] relative rounded-[var(--campus-radius-12,12px)] shrink-0 ${isFocus ? "border-2" : "border"}`} id={isDisabled ? "node-1015_19" : isError ? "node-1015_14" : isFocus ? "node-1015_9" : "node-1015_4"} data-name="Select Surface">
+        <p className="[word-break:break-word] font-['Inter:Regular'] font-normal leading-[20px] not-italic relative shrink-0 text-[#a8b8c5] text-[14px] w-[340px]" data-node-id="1015:5">
+          {value}
+        </p>
+        <div className="flex items-center justify-center relative shrink-0" id={isDisabled ? "node-1015_21" : isError ? "node-1015_16" : isFocus ? "node-1015_11" : "node-1015_6"}>
+          <div className="flex-none rotate-180">
+            <div className="h-[6px] relative w-[10px]" data-name="Chevron">
+              <div className="absolute bottom-1/4 left-[6.7%] right-[6.7%] top-0">
+                <img alt="" className="block max-w-none size-full" src={imgChevron} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type FormFieldProps = {
+  className?: string;
+  helper?: string;
+  label?: string;
+  state?: "Default" | "Focus" | "Error" | "Disabled";
+  value?: string;
+};
+
+function FormField({ className, helper = "Supporting guidance", label = "Field label", state = "Default", value = "Enter a value" }: FormFieldProps) {
+  const isDisabled = state === "Disabled";
+  const isError = state === "Error";
+  const isFocus = state === "Focus";
+  return (
+    <div className={className || "content-stretch flex flex-col gap-[6px] items-start relative rounded-[var(--campus-radius-12,12px)] w-[420px]"} id={isDisabled ? "node-1014_51" : isError ? "node-1014_46" : isFocus ? "node-1014_41" : "node-1014_36"}>
+      <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[16px] not-italic relative shrink-0 text-[#2c8c8a] text-[12px] tracking-[0.2px] w-[420px]" data-node-id="1014:37">
+        {label}
+      </p>
+      <div className={`bg-[#102a43] border-[#2774ae] border-solid content-stretch flex h-[44px] items-center overflow-clip px-[14px] relative rounded-[var(--campus-radius-12,12px)] shrink-0 ${isFocus ? "border-2" : "border"}`} id={isDisabled ? "node-1014_53" : isError ? "node-1014_48" : isFocus ? "node-1014_43" : "node-1014_38"} data-name="Input Surface">
+        <p className="[word-break:break-word] font-['Inter:Regular'] font-normal leading-[20px] not-italic relative shrink-0 text-[#a8b8c5] text-[14px] w-[380px]" data-node-id="1014:39">
+          {value}
+        </p>
+      </div>
+      <p className="[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[#a8b8c5] text-[12px] w-[420px]" data-node-id="1014:40">
+        {helper}
+      </p>
+    </div>
+  );
+}
+
+type ButtonProps = {
+  className?: string;
+  label?: string;
+  size?: "Small" | "Medium";
+  state?: "Default" | "Disabled";
+  style?: "Primary" | "Secondary" | "Tertiary" | "Danger";
+};
+
+function Button({ className, label = "Continue", size = "Small", state = "Default", style = "Primary" }: ButtonProps) {
+  const isDangerAndMediumAndDefault = style === "Danger" && size === "Medium" && state === "Default";
+  const isDangerAndMediumAndDisabled = style === "Danger" && size === "Medium" && state === "Disabled";
+  const isDangerAndSmallAndDefault = style === "Danger" && size === "Small" && state === "Default";
+  const isDangerAndSmallAndDisabled = style === "Danger" && size === "Small" && state === "Disabled";
+  const isPrimaryAndMediumAndDefault = style === "Primary" && size === "Medium" && state === "Default";
+  const isSecondaryAndMediumAndDefault = style === "Secondary" && size === "Medium" && state === "Default";
+  const isSecondaryAndSmallAndDefault = style === "Secondary" && size === "Small" && state === "Default";
+  const isTertiaryAndMediumAndDefault = style === "Tertiary" && size === "Medium" && state === "Default";
+  const isTertiaryAndMediumAndDisabled = style === "Tertiary" && size === "Medium" && state === "Disabled";
+  const isTertiaryAndSmallAndDefault = style === "Tertiary" && size === "Small" && state === "Default";
+  const isTertiaryAndSmallAndDisabled = style === "Tertiary" && size === "Small" && state === "Disabled";
+  return (
+    <div className={className || `content-stretch flex items-center justify-center relative rounded-[var(--campus-radius-12,12px)] ${isDangerAndMediumAndDisabled ? "bg-[#c77833] border border-[#b84b55] border-solid h-[var(--campus-control-height-md,44px)] opacity-50 px-[16px]" : isDangerAndMediumAndDefault ? "bg-[#c77833] border border-[#b84b55] border-solid h-[var(--campus-control-height-md,44px)] px-[16px]" : isDangerAndSmallAndDisabled ? "bg-[#c77833] border border-[#b84b55] border-solid h-[var(--campus-control-height-sm,36px)] opacity-50 px-[12px]" : isDangerAndSmallAndDefault ? "bg-[#c77833] border border-[#b84b55] border-solid h-[var(--campus-control-height-sm,36px)] px-[12px]" : isTertiaryAndMediumAndDisabled ? "h-[var(--campus-control-height-md,44px)] opacity-55 px-[16px]" : isTertiaryAndMediumAndDefault ? "h-[var(--campus-control-height-md,44px)] px-[16px]" : isTertiaryAndSmallAndDisabled ? "h-[var(--campus-control-height-sm,36px)] opacity-55 px-[12px]" : isTertiaryAndSmallAndDefault ? "h-[var(--campus-control-height-sm,36px)] px-[12px]" : isSecondaryAndMediumAndDefault ? "bg-[#102a43] border border-[#2774ae] border-solid h-[var(--campus-control-height-md,44px)] px-[16px]" : isSecondaryAndSmallAndDefault ? "bg-[#102a43] border border-[#2774ae] border-solid h-[var(--campus-control-height-sm,36px)] px-[12px]" : size === "Medium" && state === "Disabled" && ["Primary", "Secondary"].includes(style) ? "bg-[#102a43] border border-[#2774ae] border-solid h-[var(--campus-control-height-md,44px)] opacity-65 px-[16px]" : isPrimaryAndMediumAndDefault ? "bg-[#2c8c8a] border border-[#2774ae] border-solid h-[var(--campus-control-height-md,44px)] px-[16px]" : size === "Small" && state === "Disabled" && ["Primary", "Secondary"].includes(style) ? "bg-[#102a43] border border-[#2774ae] border-solid h-[var(--campus-control-height-sm,36px)] opacity-65 px-[12px]" : "bg-[#2c8c8a] border border-[#2774ae] border-solid h-[var(--campus-control-height-sm,36px)] px-[12px]"}`} id={isDangerAndMediumAndDisabled ? "node-1014_33" : isDangerAndMediumAndDefault ? "node-1014_31" : isDangerAndSmallAndDisabled ? "node-1014_29" : isDangerAndSmallAndDefault ? "node-1014_27" : isTertiaryAndMediumAndDisabled ? "node-1014_25" : isTertiaryAndMediumAndDefault ? "node-1014_23" : isTertiaryAndSmallAndDisabled ? "node-1014_21" : isTertiaryAndSmallAndDefault ? "node-1014_19" : style === "Secondary" && size === "Medium" && state === "Disabled" ? "node-1014_17" : isSecondaryAndMediumAndDefault ? "node-1014_15" : style === "Secondary" && size === "Small" && state === "Disabled" ? "node-1014_13" : isSecondaryAndSmallAndDefault ? "node-1014_11" : style === "Primary" && size === "Medium" && state === "Disabled" ? "node-1014_9" : isPrimaryAndMediumAndDefault ? "node-1014_7" : style === "Primary" && size === "Small" && state === "Disabled" ? "node-1014_5" : "node-1014_3"}>
+      {size === "Small" && (
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[16px] not-italic relative shrink-0 text-[#2c8c8a] text-[12px] text-center tracking-[0.2px] w-[100px]" data-node-id="1014:4">
+          {label}
+        </p>
+      )}
+      {size === "Medium" && (
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] not-italic relative shrink-0 text-[#2c8c8a] text-[12px] text-center tracking-[0.2px] w-[100px]" data-node-id="1014:8">
+          {label}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default function Component00AComponentLibraryCoreControls() {
+  return <div className="bg-[#12304a] relative size-full" data-node-id="1014:2" data-name="00A — Component Library / Core Controls" />;
+}

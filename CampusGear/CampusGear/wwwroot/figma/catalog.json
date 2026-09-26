@@ -1,0 +1,632 @@
+[
+  {
+    "id": "15:3",
+    "title": "01A — Login — Shared Account Entry",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/login",
+    "state": "default",
+    "url": "/demo/auth/login",
+    "viewName": "_15_3.cshtml"
+  },
+  {
+    "id": "691:10",
+    "title": "01C — Login — BORROWER — Resolved Role State",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/login",
+    "state": "borrower",
+    "url": "/demo/auth/login?state=borrower",
+    "viewName": "_691_10.cshtml"
+  },
+  {
+    "id": "691:124",
+    "title": "01D — Login — CUSTODIAN — Resolved Role State",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/login",
+    "state": "custodian",
+    "url": "/demo/auth/login?state=custodian",
+    "viewName": "_691_124.cshtml"
+  },
+  {
+    "id": "691:238",
+    "title": "01E — Login — ADMINISTRATOR — Resolved Role State",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/login",
+    "state": "administrator",
+    "url": "/demo/auth/login?state=administrator",
+    "viewName": "_691_238.cshtml"
+  },
+  {
+    "id": "704:2",
+    "title": "01F — Login — BORROWER — Invalid Credentials",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/login",
+    "state": "invalid-borrower",
+    "url": "/demo/auth/login?state=invalid-borrower",
+    "viewName": "_704_2.cshtml"
+  },
+  {
+    "id": "704:82",
+    "title": "01G — Login — CUSTODIAN — Invalid Credentials",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/login",
+    "state": "invalid-custodian",
+    "url": "/demo/auth/login?state=invalid-custodian",
+    "viewName": "_704_82.cshtml"
+  },
+  {
+    "id": "704:162",
+    "title": "01H — Login — ADMINISTRATOR — Invalid Credentials",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/login",
+    "state": "invalid-administrator",
+    "url": "/demo/auth/login?state=invalid-administrator",
+    "viewName": "_704_162.cshtml"
+  },
+  {
+    "id": "691:358",
+    "title": "01I — Administrator Two-Factor Verification",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/two-factor",
+    "state": "default",
+    "url": "/demo/auth/two-factor",
+    "viewName": "_691_358.cshtml"
+  },
+  {
+    "id": "691:402",
+    "title": "01J — Administrator 2FA — Verification Failed",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/two-factor",
+    "state": "failed",
+    "url": "/demo/auth/two-factor?state=failed",
+    "viewName": "_691_402.cshtml"
+  },
+  {
+    "id": "136:20",
+    "title": "02A — Access Denied — Unauthorized Role",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/access-denied",
+    "state": "default",
+    "url": "/demo/auth/access-denied",
+    "viewName": "_136_20.cshtml"
+  },
+  {
+    "id": "15:20",
+    "title": "03A — Password Reset Request",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/password-reset-request",
+    "state": "default",
+    "url": "/demo/auth/password-reset-request",
+    "viewName": "_15_20.cshtml"
+  },
+  {
+    "id": "15:30",
+    "title": "03B — Password Reset — Verification Code",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/password-reset-code",
+    "state": "default",
+    "url": "/demo/auth/password-reset-code",
+    "viewName": "_15_30.cshtml"
+  },
+  {
+    "id": "405:2",
+    "title": "03C — Password Reset — Verification Failed",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/password-reset-code",
+    "state": "failed",
+    "url": "/demo/auth/password-reset-code?state=failed",
+    "viewName": "_405_2.cshtml"
+  },
+  {
+    "id": "822:14",
+    "title": "03D — Password Reset — Set New Password",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/password-reset-new",
+    "state": "default",
+    "url": "/demo/auth/password-reset-new",
+    "viewName": "_822_14.cshtml"
+  },
+  {
+    "id": "917:11",
+    "title": "03E — Password Reset — Success",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/password-reset-success",
+    "state": "default",
+    "url": "/demo/auth/password-reset-success",
+    "viewName": "_917_11.cshtml"
+  },
+  {
+    "id": "524:2",
+    "title": "13A — User Sign Up",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/signup",
+    "state": "default",
+    "url": "/demo/auth/signup",
+    "viewName": "_524_2.cshtml"
+  },
+  {
+    "id": "524:44",
+    "title": "13B — Phone Verification",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/phone-verification",
+    "state": "default",
+    "url": "/demo/auth/phone-verification",
+    "viewName": "_524_44.cshtml"
+  },
+  {
+    "id": "524:75",
+    "title": "13C — Sign Up — Verification Failed",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/phone-verification",
+    "state": "failed",
+    "url": "/demo/auth/phone-verification?state=failed",
+    "viewName": "_524_75.cshtml"
+  },
+  {
+    "id": "524:106",
+    "title": "13D — Account Created",
+    "section": "01 • AUTHENTICATION &amp; ACCOUNT RECOVERY",
+    "route": "auth/account-created",
+    "state": "default",
+    "url": "/demo/auth/account-created",
+    "viewName": "_524_106.cshtml"
+  },
+  {
+    "id": "689:2",
+    "title": "02B — Borrower Dashboard",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/dashboard",
+    "state": "default",
+    "url": "/demo/borrower/dashboard",
+    "viewName": "_689_2.cshtml"
+  },
+  {
+    "id": "695:2",
+    "title": "07 — Equipment Reservation",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/reservation",
+    "state": "default",
+    "url": "/demo/borrower/reservation",
+    "viewName": "_695_2.cshtml"
+  },
+  {
+    "id": "695:154",
+    "title": "07A — Equipment Reservation — Conflict State",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/reservation",
+    "state": "conflict",
+    "url": "/demo/borrower/reservation?state=conflict",
+    "viewName": "_695_154.cshtml"
+  },
+  {
+    "id": "695:280",
+    "title": "07B — Equipment Reservation — Request Submitted",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/reservation",
+    "state": "submitted",
+    "url": "/demo/borrower/reservation?state=submitted",
+    "viewName": "_695_280.cshtml"
+  },
+  {
+    "id": "695:409",
+    "title": "07C — Equipment Reservation — Submitting",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/reservation",
+    "state": "submitting",
+    "url": "/demo/borrower/reservation?state=submitting",
+    "viewName": "_695_409.cshtml"
+  },
+  {
+    "id": "695:562",
+    "title": "10A — Borrowing History Report",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/history",
+    "state": "default",
+    "url": "/demo/borrower/history",
+    "viewName": "_695_562.cshtml"
+  },
+  {
+    "id": "695:737",
+    "title": "10A — Borrowing History — Filtered Results",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/history",
+    "state": "filtered",
+    "url": "/demo/borrower/history?state=filtered",
+    "viewName": "_695_737.cshtml"
+  },
+  {
+    "id": "695:1079",
+    "title": "10C — Borrowing History — No Matching Records",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/history",
+    "state": "empty",
+    "url": "/demo/borrower/history?state=empty",
+    "viewName": "_695_1079.cshtml"
+  },
+  {
+    "id": "695:904",
+    "title": "10B — Borrowing History — Late Return Monitoring",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/history",
+    "state": "late",
+    "url": "/demo/borrower/history?state=late",
+    "viewName": "_695_904.cshtml"
+  },
+  {
+    "id": "695:1234",
+    "title": "11A — Availability Calendar",
+    "section": "02 • BORROWER WORKSPACE",
+    "route": "borrower/calendar",
+    "state": "default",
+    "url": "/demo/borrower/calendar",
+    "viewName": "_695_1234.cshtml"
+  },
+  {
+    "id": "690:8",
+    "title": "02C — Custodian Dashboard",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/dashboard",
+    "state": "default",
+    "url": "/demo/custodian/dashboard",
+    "viewName": "_690_8.cshtml"
+  },
+  {
+    "id": "695:1499",
+    "title": "08 — Approval and Release",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/approvals",
+    "state": "default",
+    "url": "/demo/custodian/approvals",
+    "viewName": "_695_1499.cshtml"
+  },
+  {
+    "id": "695:1642",
+    "title": "08A — Approval Confirmed",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/approvals",
+    "state": "approved",
+    "url": "/demo/custodian/approvals?state=approved",
+    "viewName": "_695_1642.cshtml"
+  },
+  {
+    "id": "695:1772",
+    "title": "08B — Request Rejected",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/approvals",
+    "state": "rejected",
+    "url": "/demo/custodian/approvals?state=rejected",
+    "viewName": "_695_1772.cshtml"
+  },
+  {
+    "id": "695:1902",
+    "title": "08C — Release Recorded",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/approvals",
+    "state": "released",
+    "url": "/demo/custodian/approvals?state=released",
+    "viewName": "_695_1902.cshtml"
+  },
+  {
+    "id": "695:2032",
+    "title": "09 — Return and Condition Check",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/returns",
+    "state": "default",
+    "url": "/demo/custodian/returns",
+    "viewName": "_695_2032.cshtml"
+  },
+  {
+    "id": "695:2173",
+    "title": "09A — Return Recorded — Good / Available",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/returns",
+    "state": "good",
+    "url": "/demo/custodian/returns?state=good",
+    "viewName": "_695_2173.cshtml"
+  },
+  {
+    "id": "695:2298",
+    "title": "09B — Return Recorded — Damaged / Maintenance",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/returns",
+    "state": "damaged",
+    "url": "/demo/custodian/returns?state=damaged",
+    "viewName": "_695_2298.cshtml"
+  },
+  {
+    "id": "695:2423",
+    "title": "09C — Late Return Identified",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/returns",
+    "state": "late",
+    "url": "/demo/custodian/returns?state=late",
+    "viewName": "_695_2423.cshtml"
+  },
+  {
+    "id": "695:2548",
+    "title": "09D — Return and Condition Check — Recording",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/returns",
+    "state": "recording",
+    "url": "/demo/custodian/returns?state=recording",
+    "viewName": "_695_2548.cshtml"
+  },
+  {
+    "id": "695:2691",
+    "title": "11B — Availability Calendar — Custodian",
+    "section": "03 • CUSTODIAN WORKSPACE",
+    "route": "custodian/calendar",
+    "state": "default",
+    "url": "/demo/custodian/calendar",
+    "viewName": "_695_2691.cshtml"
+  },
+  {
+    "id": "690:212",
+    "title": "02D — Administrator Dashboard",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/dashboard",
+    "state": "default",
+    "url": "/demo/admin/dashboard",
+    "viewName": "_690_212.cshtml"
+  },
+  {
+    "id": "695:2931",
+    "title": "07A — Administrator Reservation Management",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/reservations",
+    "state": "default",
+    "url": "/demo/admin/reservations",
+    "viewName": "_695_2931.cshtml"
+  },
+  {
+    "id": "695:3118",
+    "title": "07B — Administrator Reservation — Record Created",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/reservations",
+    "state": "created",
+    "url": "/demo/admin/reservations?state=created",
+    "viewName": "_695_3118.cshtml"
+  },
+  {
+    "id": "695:3278",
+    "title": "08A — Administrator Approval and Release",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/approvals",
+    "state": "default",
+    "url": "/demo/admin/approvals",
+    "viewName": "_695_3278.cshtml"
+  },
+  {
+    "id": "695:3459",
+    "title": "08B — Administrator Approval Confirmed",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/approvals",
+    "state": "approved",
+    "url": "/demo/admin/approvals?state=approved",
+    "viewName": "_695_3459.cshtml"
+  },
+  {
+    "id": "695:3625",
+    "title": "08C — Administrator Request Rejected",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/approvals",
+    "state": "rejected",
+    "url": "/demo/admin/approvals?state=rejected",
+    "viewName": "_695_3625.cshtml"
+  },
+  {
+    "id": "695:3791",
+    "title": "08D — Administrator Release Recorded",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/approvals",
+    "state": "released",
+    "url": "/demo/admin/approvals?state=released",
+    "viewName": "_695_3791.cshtml"
+  },
+  {
+    "id": "695:3957",
+    "title": "09A — Administrator Return and Condition Check",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/returns",
+    "state": "default",
+    "url": "/demo/admin/returns",
+    "viewName": "_695_3957.cshtml"
+  },
+  {
+    "id": "695:4135",
+    "title": "09B — Administrator Return Recorded",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/returns",
+    "state": "recorded",
+    "url": "/demo/admin/returns?state=recorded",
+    "viewName": "_695_4135.cshtml"
+  },
+  {
+    "id": "695:4296",
+    "title": "11B — Administrator Availability Calendar",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/calendar",
+    "state": "default",
+    "url": "/demo/admin/calendar",
+    "viewName": "_695_4296.cshtml"
+  },
+  {
+    "id": "695:4991",
+    "title": "04 — Equipment Categories Management",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/categories",
+    "state": "default",
+    "url": "/demo/admin/categories",
+    "viewName": "_695_4991.cshtml"
+  },
+  {
+    "id": "695:5184",
+    "title": "04B — Add Equipment Category",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/categories",
+    "state": "add",
+    "url": "/demo/admin/categories?state=add",
+    "viewName": "_695_5184.cshtml"
+  },
+  {
+    "id": "695:5347",
+    "title": "04C — Edit Equipment Category",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/categories",
+    "state": "edit",
+    "url": "/demo/admin/categories?state=edit",
+    "viewName": "_695_5347.cshtml"
+  },
+  {
+    "id": "695:5515",
+    "title": "04D — Category Validation &amp; Success States",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/categories",
+    "state": "validation",
+    "url": "/demo/admin/categories?state=validation",
+    "viewName": "_695_5515.cshtml"
+  },
+  {
+    "id": "695:5691",
+    "title": "05 — Equipment Item Management",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/equipment",
+    "state": "default",
+    "url": "/demo/admin/equipment",
+    "viewName": "_695_5691.cshtml"
+  },
+  {
+    "id": "695:5882",
+    "title": "05A — Add Equipment Item",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/equipment",
+    "state": "add",
+    "url": "/demo/admin/equipment?state=add",
+    "viewName": "_695_5882.cshtml"
+  },
+  {
+    "id": "695:6052",
+    "title": "05B — Edit Equipment Item",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/equipment",
+    "state": "edit",
+    "url": "/demo/admin/equipment?state=edit",
+    "viewName": "_695_6052.cshtml"
+  },
+  {
+    "id": "695:6224",
+    "title": "05C — Item Validation and Success States",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/equipment",
+    "state": "validation",
+    "url": "/demo/admin/equipment?state=validation",
+    "viewName": "_695_6224.cshtml"
+  },
+  {
+    "id": "695:6398",
+    "title": "06 — Borrower Profile Management",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/borrowers",
+    "state": "default",
+    "url": "/demo/admin/borrowers",
+    "viewName": "_695_6398.cshtml"
+  },
+  {
+    "id": "695:6589",
+    "title": "06A — Add Borrower Profile",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/borrowers",
+    "state": "add",
+    "url": "/demo/admin/borrowers?state=add",
+    "viewName": "_695_6589.cshtml"
+  },
+  {
+    "id": "695:6754",
+    "title": "06B — Edit Borrower Profile",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/borrowers",
+    "state": "edit",
+    "url": "/demo/admin/borrowers?state=edit",
+    "viewName": "_695_6754.cshtml"
+  },
+  {
+    "id": "695:6918",
+    "title": "06C — Borrower Profile Validation &amp; Success States",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/borrowers",
+    "state": "validation",
+    "url": "/demo/admin/borrowers?state=validation",
+    "viewName": "_695_6918.cshtml"
+  },
+  {
+    "id": "695:7067",
+    "title": "12 — User and Role Management",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/users",
+    "state": "default",
+    "url": "/demo/admin/users",
+    "viewName": "_695_7067.cshtml"
+  },
+  {
+    "id": "695:7268",
+    "title": "12A — Create User Account",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/users",
+    "state": "add",
+    "url": "/demo/admin/users?state=add",
+    "viewName": "_695_7268.cshtml"
+  },
+  {
+    "id": "695:7445",
+    "title": "12B — Edit Account and Role",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/users",
+    "state": "edit",
+    "url": "/demo/admin/users?state=edit",
+    "viewName": "_695_7445.cshtml"
+  },
+  {
+    "id": "695:7622",
+    "title": "12C — Account Deactivated",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/users",
+    "state": "deactivated",
+    "url": "/demo/admin/users?state=deactivated",
+    "viewName": "_695_7622.cshtml"
+  },
+  {
+    "id": "695:7778",
+    "title": "12D — Role-Based Access State",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/users",
+    "state": "access",
+    "url": "/demo/admin/users?state=access",
+    "viewName": "_695_7778.cshtml"
+  },
+  {
+    "id": "945:195",
+    "title": "14 — System Audit Log",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/audit",
+    "state": "default",
+    "url": "/demo/admin/audit",
+    "viewName": "_945_195.cshtml"
+  },
+  {
+    "id": "695:4595",
+    "title": "10B — Borrowing History — Administrator",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/history",
+    "state": "default",
+    "url": "/demo/admin/history",
+    "viewName": "_695_4595.cshtml"
+  },
+  {
+    "id": "695:4793",
+    "title": "10C — Borrowing History — Administrator — Filtered Results",
+    "section": "04 • ADMINISTRATOR WORKSPACE",
+    "route": "admin/history",
+    "state": "filtered",
+    "url": "/demo/admin/history?state=filtered",
+    "viewName": "_695_4793.cshtml"
+  }
+]

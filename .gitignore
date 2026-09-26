@@ -1,0 +1,38 @@
+# .NET and Visual Studio output
+**/bin/
+**/obj/
+**/.vs/
+**/TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.coverage
+*.coveragexml
+
+# Local configuration, credentials, and database files
+.env
+.env.*
+!.env.example
+secrets.json
+appsettings.local.json
+appsettings.*.local.json
+*.pfx
+*.p12
+*.key
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+
+# Runtime and development tooling output
+*.log
+node_modules/
+coverage/
+/scripts/live-smoke-results.json
+
+# Operating system files
+Thumbs.db
+.DS_Store

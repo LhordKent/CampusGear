@@ -1,0 +1,96 @@
+@model CalendarPageViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Availability Calendar";
+    ViewData["WorkspaceRole"] = "Borrower";
+    ViewData["BorrowerPage"] = "calendar";
+    var itemId = Model.SelectedItem?.Id;
+    var weekdays = new[] { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
+}
+@* Figma source: 695:1234 availability calendar. The grid reflects persisted equipment reservations. *@
+<link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" />
+<main class="live-content borrower-page" data-figma-source="695:1234">
+    <header class="live-heading borrower-heading">
+        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
+        <h1><img src="~/figma/assets/1f786.svg" alt="" />Availability Calendar</h1>
+        <p>Check equipment availability by date and review scheduled reservations and maintenance status.</p>
+    </header>
+    <partial name="_BorrowerTabs" />
+    @if (Model.Items.Count == 0)
+    {
+        <section class="borrower-empty"><h2>No active equipment</h2><p>Equipment availability will appear here when items are added.</p></section>
+    }
+    else
+    {
+        <section class="borrower-card borrower-calendar" aria-labelledby="calendar-title">
+            <div class="borrower-calendar-toolbar">
+                <form method="get" action="/borrower/calendar" class="borrower-calendar-picker">
+                    <input type="hidden" name="year" value="@Model.Year" /><input type="hidden" name="month" value="@Model.Month" />
+                    <label class="borrower-field" for="equipmentItemId"><span>Equipment item</span><select id="equipmentItemId" name="equipmentItemId">
+                        @foreach (var item in Model.Items)
+                        {
+                            <option value="@item.Id" selected="@(item.Id == itemId)">@item.Name · @item.AssetCode</option>
+                        }
+                    </select></label>
+                    <button class="borrower-button borrower-button-secondary" type="submit">View availability</button>
+                </form>
+                <nav class="borrower-month-nav" aria-label="Calendar month">
+                    <a href="@ScreenUrls.Query("/borrower/calendar", new { year = Model.PreviousMonth.Year, month = Model.PreviousMonth.Month, equipmentItemId = itemId })" aria-label="Previous month">←</a>
+                    <h2 id="calendar-title">@Model.MonthTitle</h2>
+                    <a href="@ScreenUrls.Query("/borrower/calendar", new { year = Model.NextMonth.Year, month = Model.NextMonth.Month, equipmentItemId = itemId })" aria-label="Next month">→</a>
+                </nav>
+            </div>
+            <div class="borrower-calendar-grid" role="group" aria-label="@Model.MonthTitle equipment availability">
+                @foreach (var weekday in weekdays)
+                {
+                    <div class="borrower-weekday">@weekday</div>
+                }
+                @foreach (var day in Model.Days)
+                {
+                    <a class="borrower-day day-@day.Status.ToLowerInvariant() @(day.IsCurrentMonth ? "" : "day-other-month") @(day.IsSelected ? "day-selected" : "") @(day.IsToday ? "day-today" : "")"
+                       href="@ScreenUrls.Query("/borrower/calendar", new { year = Model.Year, month = Model.Month, equipmentItemId = itemId, day = day.Date.ToString("yyyy-MM-dd") })"
+                       aria-label="@day.Date.ToString("dddd, MMMM d, yyyy"), @day.Status, @day.BookingCount scheduled slots"
+                       aria-current="@(day.IsSelected ? "date" : null)">
+                        <time datetime="@day.Date.ToString("yyyy-MM-dd")">@day.Date.Day</time>
+                        <span class="borrower-day-status">@day.Status.ToUpperInvariant()</span>
+                        @if (day.BookingCount > 0) { <span class="borrower-day-count">@day.BookingCount slot@(day.BookingCount == 1 ? "" : "s")</span> }
+                    </a>
+                }
+            </div>
+        </section>
+        <div class="borrower-calendar-bottom">
+            <section class="borrower-card borrower-calendar-legend" aria-label="Calendar status legend">
+                <h2>STATUS</h2>
+                <span class="borrower-badge status-available">Available</span><span class="borrower-badge status-reserved">Reserved</span><span class="borrower-badge status-borrowed">Borrowed</span><span class="borrower-badge status-maintenance">Maintenance</span>
+                <p class="borrower-muted">A day can contain several time slots. Exact availability is checked when you submit your requested start and end time.</p>
+            </section>
+            <section class="borrower-card borrower-selected-day" aria-labelledby="selected-date-title">
+                <p class="borrower-eyebrow">SELECTED DATE · MANILA TIME</p>
+                <h2 id="selected-date-title">@Model.SelectedDate.ToString("MMM d, yyyy")</h2>
+                <p>@Model.SelectedItem?.Name <span class="borrower-muted">@Model.SelectedItem?.AssetCode</span></p>
+                @if (Model.SelectedItem?.IsMaintenanceHold == true)
+                {
+                    <p class="borrower-maintenance-message">This item is under maintenance and cannot be reserved.</p>
+                }
+                else
+                {
+                    @if (Model.SelectedSlots.Count == 0)
+                    {
+                        <p class="borrower-muted">No scheduled reservations on this date.</p>
+                    }
+                    else
+                    {
+                        <ul class="borrower-slot-list">
+                            @foreach (var slot in Model.SelectedSlots)
+                            {
+                                <li><span>@slot.StartManila – @slot.EndManila</span><span class="borrower-badge status-@slot.Status.ToLowerInvariant()">@slot.Status</span></li>
+                            }
+                        </ul>
+                    }
+                    <a class="borrower-button" href="/borrower/reservation?equipmentItemId=@itemId">Reserve this equipment</a>
+                }
+            </section>
+        </div>
+    }
+    <p class="borrower-workflow">CAMPUSGEAR / BORROWER <span>AVAILABILITY / DATE + STATUS</span></p>
+</main>

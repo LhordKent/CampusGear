@@ -1,0 +1,435 @@
+export default function Component00DesignSystemFoundation() {
+  return (
+    <div className="bg-[#12304a] relative size-full" data-node-id="1012:359" data-name="00 — Design System / Foundation">
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[180px] left-[-1px] rounded-[14px] top-0 w-[1440px]" data-node-id="1012:360" data-name="Foundation Header" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[16px] left-[55px] not-italic text-[#2c8c8a] text-[12px] top-[34px] tracking-[0.2px] w-[700px]" data-node-id="1012:361">
+        CAMPUS EQUIPMENT • PRODUCT FOUNDATION
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[48px] leading-[40px] left-[55px] not-italic text-[#f4f8fb] text-[32px] top-[56px] tracking-[-0.4px] w-[700px]" data-node-id="1012:362">
+        Design System
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[22px] leading-[20px] left-[55px] not-italic text-[#f4f8fb] text-[22px] top-[108px] w-[720px]" data-node-id="1012:363">
+        Shared visual rules, interaction contracts, and reusable UI patterns for the existing 13-function campus borrowing product.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[30px] left-[929px] rounded-[15px] top-[44px] w-[104px]" data-node-id="1012:364" data-name="Meta Chip 0" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[14px] left-[937px] not-italic text-[#2c8c8a] text-[11px] top-[51px] tracking-[0.3px] w-[88px]" data-node-id="1012:365">
+        13 FUNCTIONS
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[30px] left-[1041px] rounded-[15px] top-[44px] w-[104px]" data-node-id="1012:366" data-name="Meta Chip 1" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[14px] left-[1049px] not-italic text-[#2c8c8a] text-[11px] top-[51px] tracking-[0.3px] w-[88px]" data-node-id="1012:367">
+        3 ROLES
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[30px] left-[1153px] rounded-[15px] top-[44px] w-[104px]" data-node-id="1012:368" data-name="Meta Chip 2" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[14px] left-[1161px] not-italic text-[#2c8c8a] text-[11px] top-[51px] tracking-[0.3px] w-[88px]" data-node-id="1012:369">
+        DARK THEME
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[30px] left-[1265px] rounded-[15px] top-[44px] w-[104px]" data-node-id="1012:370" data-name="Meta Chip 3" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[14px] left-[1273px] not-italic text-[#2c8c8a] text-[11px] top-[51px] tracking-[0.3px] w-[88px]" data-node-id="1012:371">
+        71 SCREENS
+      </p>
+      <div className="absolute bg-[#12304a] border border-[#2774ae] border-solid h-[520px] left-[39px] rounded-[14px] top-[220px] w-[1360px]" data-node-id="1012:372" data-name="FOUNDATIONS • COLOR Surface" />
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[26px] left-[71px] not-italic text-[#f4f8fb] text-[22px] top-[244px] w-[980px]" data-node-id="1012:373">
+        FOUNDATIONS • COLOR
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[19px] leading-[18px] left-[71px] not-italic text-[#a8b8c5] text-[12px] top-[273px] w-[1120px]" data-node-id="1012:374">
+        Three-color product palette: Deep Navy #071B2B, Deep Teal #2C8C8A, and Warm Bronze #C77833. Light neutral #EDF2F7 supports readability without adding another brand accent.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-px left-[71px] top-[308px] w-[1260px]" data-node-id="1012:375" data-name="FOUNDATIONS • COLOR Divider" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[88px] left-[71px] rounded-[12px] top-[320px] w-[286px]" data-node-id="1012:376" data-name="Color Swatch Canvas" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[86px] rounded-[10px] top-[336px] w-[46px]" data-node-id="1012:377" data-name="Color Sample Canvas" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[146px] not-italic text-[#a8b8c5] text-[14px] top-[338px] w-[190px]" data-node-id="1012:378">
+        Canvas
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[145px] not-italic text-[#a8b8c5] text-[12px] top-[364px] w-[190px]" data-node-id="1012:379">
+        surface/canvas • #DDE5E9
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[376px] rounded-[12px] top-[320px] w-[286px]" data-node-id="1012:380" data-name="Color Swatch Surface" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[56px] left-[390px] rounded-[10px] top-[336px] w-[46px]" data-node-id="1012:381" data-name="Color Sample Surface" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[450px] not-italic text-[#a8b8c5] text-[14px] top-[338px] w-[190px]" data-node-id="1012:382">
+        Surface
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[450px] not-italic text-[#a8b8c5] text-[12px] top-[364px] w-[190px]" data-node-id="1012:383">
+        surface/default
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[681px] rounded-[12px] top-[320px] w-[286px]" data-node-id="1012:384" data-name="Color Swatch Raised" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[56px] left-[695px] rounded-[10px] top-[336px] w-[46px]" data-node-id="1012:385" data-name="Color Sample Raised" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[755px] not-italic text-[#a8b8c5] text-[14px] top-[338px] w-[190px]" data-node-id="1012:386">
+        Raised
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[755px] not-italic text-[#a8b8c5] text-[12px] top-[364px] w-[190px]" data-node-id="1012:387">
+        surface/raised
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[986px] rounded-[12px] top-[320px] w-[286px]" data-node-id="1012:388" data-name="Color Swatch Text Primary" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[1000px] rounded-[10px] top-[336px] w-[46px]" data-node-id="1012:389" data-name="Color Sample Text Primary" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[1060px] not-italic text-[#a8b8c5] text-[14px] top-[338px] w-[190px]" data-node-id="1012:390">
+        Text Primary
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[1060px] not-italic text-[#a8b8c5] text-[12px] top-[364px] w-[190px]" data-node-id="1012:391">
+        text/primary
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[71px] rounded-[12px] top-[438px] w-[286px]" data-node-id="1012:392" data-name="Color Swatch Text Secondary" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[56px] left-[86px] rounded-[10px] top-[454px] w-[46px]" data-node-id="1012:393" data-name="Color Sample Text Secondary" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[145px] not-italic text-[#a8b8c5] text-[14px] top-[456px] w-[190px]" data-node-id="1012:394">
+        Text Secondary
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[145px] not-italic text-[#a8b8c5] text-[12px] top-[482px] w-[190px]" data-node-id="1012:395">
+        text/secondary
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[376px] rounded-[12px] top-[438px] w-[286px]" data-node-id="1012:396" data-name="Color Swatch Action" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[390px] rounded-[10px] top-[454px] w-[46px]" data-node-id="1012:397" data-name="Color Sample Action" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[450px] not-italic text-[#a8b8c5] text-[14px] top-[456px] w-[190px]" data-node-id="1012:398">
+        Action
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[450px] not-italic text-[#a8b8c5] text-[12px] top-[482px] w-[190px]" data-node-id="1012:399">
+        action/primary
+      </p>
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[88px] left-[681px] rounded-[12px] top-[438px] w-[286px]" data-node-id="1012:400" data-name="Color Swatch Success" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[695px] rounded-[10px] top-[454px] w-[46px]" data-node-id="1012:401" data-name="Color Sample Success" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[755px] not-italic text-[#a8b8c5] text-[14px] top-[456px] w-[190px]" data-node-id="1012:402">
+        Success
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[755px] not-italic text-[#a8b8c5] text-[12px] top-[482px] w-[190px]" data-node-id="1012:403">
+        status/success
+      </p>
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid h-[88px] left-[986px] rounded-[12px] top-[438px] w-[286px]" data-node-id="1012:404" data-name="Color Swatch Warning" />
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid h-[56px] left-[1000px] rounded-[10px] top-[454px] w-[46px]" data-node-id="1012:405" data-name="Color Sample Warning" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[1060px] not-italic text-[#a8b8c5] text-[14px] top-[456px] w-[190px]" data-node-id="1012:406">
+        Warning
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[1060px] not-italic text-[#a8b8c5] text-[12px] top-[482px] w-[190px]" data-node-id="1012:407">
+        status/warning
+      </p>
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid h-[88px] left-[71px] rounded-[12px] top-[556px] w-[286px]" data-node-id="1012:408" data-name="Color Swatch Danger" />
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid h-[56px] left-[86px] rounded-[10px] top-[572px] w-[46px]" data-node-id="1012:409" data-name="Color Sample Danger" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[146px] not-italic text-[#a8b8c5] text-[14px] top-[574px] w-[190px]" data-node-id="1012:410">
+        Danger
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[145px] not-italic text-[#a8b8c5] text-[12px] top-[600px] w-[190px]" data-node-id="1012:411">
+        status/danger
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[376px] rounded-[12px] top-[556px] w-[286px]" data-node-id="1012:412" data-name="Color Swatch Borrower" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[390px] rounded-[10px] top-[572px] w-[46px]" data-node-id="1012:413" data-name="Color Sample Borrower" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[450px] not-italic text-[#a8b8c5] text-[14px] top-[574px] w-[190px]" data-node-id="1012:414">
+        Borrower
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[450px] not-italic text-[#a8b8c5] text-[12px] top-[600px] w-[190px]" data-node-id="1012:415">
+        role/borrower
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[681px] rounded-[12px] top-[556px] w-[286px]" data-node-id="1012:416" data-name="Color Swatch Custodian" />
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid h-[56px] left-[695px] rounded-[10px] top-[572px] w-[46px]" data-node-id="1012:417" data-name="Color Sample Custodian" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[755px] not-italic text-[#a8b8c5] text-[14px] top-[574px] w-[190px]" data-node-id="1012:418">
+        Custodian
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[755px] not-italic text-[#a8b8c5] text-[12px] top-[600px] w-[190px]" data-node-id="1012:419">
+        role/custodian
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[88px] left-[986px] rounded-[12px] top-[556px] w-[286px]" data-node-id="1012:420" data-name="Color Swatch Administrator" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[56px] left-[1000px] rounded-[10px] top-[572px] w-[46px]" data-node-id="1012:421" data-name="Color Sample Administrator" />
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[1060px] not-italic text-[#a8b8c5] text-[14px] top-[574px] w-[190px]" data-node-id="1012:422">
+        Administrator
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[1060px] not-italic text-[#a8b8c5] text-[12px] top-[600px] w-[190px]" data-node-id="1012:423">
+        role/administrator
+      </p>
+      <div className="absolute bg-[#12304a] border border-[#2774ae] border-solid h-[450px] left-[39px] rounded-[14px] top-[760px] w-[1360px]" data-node-id="1012:424" data-name="FOUNDATIONS • TYPOGRAPHY Surface" />
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[26px] left-[71px] not-italic text-[#f4f8fb] text-[22px] top-[784px] w-[980px]" data-node-id="1012:425">
+        FOUNDATIONS • TYPOGRAPHY
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[19px] leading-[18px] left-[71px] not-italic text-[#a8b8c5] text-[12px] top-[813px] w-[1120px]" data-node-id="1012:426">
+        Inter remains the product typeface. The scale below should replace ad-hoc text sizing.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-px left-[71px] top-[848px] w-[1260px]" data-node-id="1012:427" data-name="FOUNDATIONS • TYPOGRAPHY Divider" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[40px] left-[83px] not-italic text-[#a8b8c5] text-[32px] top-[860px] tracking-[-0.4px] w-[520px] whitespace-pre-wrap" data-node-id="1012:428">{`Display  •  32 / 40`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[20px] leading-[18px] left-[719px] not-italic text-[#a8b8c5] text-[12px] top-[863px] w-[420px]" data-node-id="1012:429">
+        Primary hierarchy
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[32px] left-[83px] not-italic text-[#f4f8fb] text-[24px] top-[908px] w-[520px] whitespace-pre-wrap" data-node-id="1012:430">{`Heading  •  24 / 32`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[20px] leading-[18px] left-[719px] not-italic text-[#f4f8fb] text-[22px] top-[911px] w-[420px]" data-node-id="1012:431">
+        Primary hierarchy
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[26px] left-[84px] not-italic text-[#2c8c8a] text-[10px] top-[956px] w-[520px] whitespace-pre-wrap" data-node-id="1012:432">{`Section  •  18 / 26`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[20px] leading-[18px] left-[719px] not-italic text-[#f4f8fb] text-[22px] top-[959px] w-[420px]" data-node-id="1012:433">
+        Section titles
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[26px] leading-[20px] left-[84px] not-italic text-[#a8b8c5] text-[14px] top-[1004px] w-[520px] whitespace-pre-wrap" data-node-id="1012:434">{`Body  •  14 / 20`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[20px] leading-[18px] left-[719px] not-italic text-[#a8b8c5] text-[12px] top-[1007px] w-[420px]" data-node-id="1012:435">
+        Reading content
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[26px] leading-[18px] left-[84px] not-italic text-[#a8b8c5] text-[12px] top-[1052px] w-[520px] whitespace-pre-wrap" data-node-id="1012:436">{`Body Small  •  12 / 18`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[20px] leading-[18px] left-[719px] not-italic text-[#a8b8c5] text-[12px] top-[1055px] w-[420px]" data-node-id="1012:437">
+        Supporting content
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[26px] leading-[16px] left-[84px] not-italic text-[#2c8c8a] text-[12px] top-[1100px] tracking-[0.2px] w-[520px] whitespace-pre-wrap" data-node-id="1012:438">{`Label  •  12 / 16`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[20px] leading-[18px] left-[719px] not-italic text-[#2c8c8a] text-[12px] top-[1103px] w-[420px]" data-node-id="1012:439">
+        Controls / metadata
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[26px] leading-[14px] left-[84px] not-italic text-[#2c8c8a] text-[11px] top-[1148px] tracking-[0.3px] w-[520px] whitespace-pre-wrap" data-node-id="1012:440">{`Label Small  •  11 / 14`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[20px] leading-[18px] left-[719px] not-italic text-[#2c8c8a] text-[12px] top-[1151px] w-[420px]" data-node-id="1012:441">
+        Dense UI metadata
+      </p>
+      <div className="absolute bg-[#12304a] border border-[#2774ae] border-solid h-[430px] left-[39px] rounded-[14px] top-[1240px] w-[1360px]" data-node-id="1012:442" data-name="FOUNDATIONS • LAYOUT Surface" />
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[26px] left-[71px] not-italic text-[#f4f8fb] text-[22px] top-[1264px] w-[980px]" data-node-id="1012:443">
+        FOUNDATIONS • LAYOUT
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[19px] leading-[18px] left-[71px] not-italic text-[#a8b8c5] text-[12px] top-[1293px] w-[1120px]" data-node-id="1012:444">
+        Use an 8-point rhythm by default. Keep radii and control heights limited to predictable values.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-px left-[71px] top-[1328px] w-[1260px]" data-node-id="1012:445" data-name="FOUNDATIONS • LAYOUT Divider" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[84px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:446">
+        4
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[84px] rounded-[6px] top-[1370px] w-[8px]" data-node-id="1012:447" data-name="Spacing Bar 4" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[237px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:448">
+        8
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[237px] rounded-[6px] top-[1370px] w-[16px]" data-node-id="1012:449" data-name="Spacing Bar 8" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[391px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:450">
+        12
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[391px] rounded-[6px] top-[1370px] w-[24px]" data-node-id="1012:451" data-name="Spacing Bar 12" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[545px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:452">
+        16
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[545px] rounded-[6px] top-[1370px] w-[32px]" data-node-id="1012:453" data-name="Spacing Bar 16" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[699px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:454">
+        24
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[699px] rounded-[6px] top-[1370px] w-[48px]" data-node-id="1012:455" data-name="Spacing Bar 24" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[853px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:456">
+        32
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[853px] rounded-[6px] top-[1370px] w-[64px]" data-node-id="1012:457" data-name="Spacing Bar 32" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[1007px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:458">
+        40
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[1007px] rounded-[6px] top-[1370px] w-[80px]" data-node-id="1012:459" data-name="Spacing Bar 40" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[1161px] not-italic text-[#2c8c8a] text-[11px] top-[1340px] tracking-[0.3px] w-[40px]" data-node-id="1012:460">
+        48
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[20px] left-[1161px] rounded-[6px] top-[1370px] w-[96px]" data-node-id="1012:461" data-name="Spacing Bar 48" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[70px] left-[84px] rounded-[8px] top-[1440px] w-[120px]" data-node-id="1012:462" data-name="Radius Sample 8" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[84px] not-italic text-[#2c8c8a] text-[11px] top-[1518px] tracking-[0.3px] w-[120px]" data-node-id="1012:463">
+        RADIUS / 8
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[70px] left-[263px] rounded-[12px] top-[1440px] w-[120px]" data-node-id="1012:464" data-name="Radius Sample 12" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[263px] not-italic text-[#2c8c8a] text-[11px] top-[1518px] tracking-[0.3px] w-[120px]" data-node-id="1012:465">
+        RADIUS / 12
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[70px] left-[443px] rounded-[16px] top-[1440px] w-[120px]" data-node-id="1012:466" data-name="Radius Sample 16" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[443px] not-italic text-[#2c8c8a] text-[11px] top-[1518px] tracking-[0.3px] w-[120px]" data-node-id="1012:467">
+        RADIUS / 16
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[70px] left-[623px] rounded-[35px] top-[1440px] w-[120px]" data-node-id="1012:468" data-name="Radius Sample Full" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[623px] not-italic text-[#2c8c8a] text-[11px] top-[1518px] tracking-[0.3px] w-[120px]" data-node-id="1012:469">
+        RADIUS / Full
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold h-[18px] leading-[16px] left-[859px] not-italic text-[#f4f8fb] text-[22px] top-[1440px] tracking-[0.2px] w-[220px]" data-node-id="1012:470">
+        CONTROL HEIGHTS
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[28px] leading-[26px] left-[859px] not-italic text-[#a8b8c5] text-[18px] top-[1468px] w-[350px] whitespace-pre-wrap" data-node-id="1012:471">{`SM 40   •   MD 48   •   LG 56`}</p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[20px] leading-[18px] left-[859px] not-italic text-[#a8b8c5] text-[12px] top-[1504px] w-[430px]" data-node-id="1012:472">
+        Use 4px for tight internal alignment; 8px increments for structural spacing.
+      </p>
+      <div className="absolute bg-[#12304a] border border-[#2774ae] border-solid h-[300px] left-[39px] rounded-[14px] top-[1720px] w-[1360px]" data-node-id="1012:473" data-name="STATUS CONTRACT Surface" />
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[26px] left-[71px] not-italic text-[#f4f8fb] text-[22px] top-[1744px] w-[980px]" data-node-id="1012:474">
+        STATUS CONTRACT
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[19px] leading-[18px] left-[71px] not-italic text-[#a8b8c5] text-[12px] top-[1773px] w-[1120px]" data-node-id="1012:475">
+        Roles share the same brand palette. Operational statuses keep fixed meanings so color supports workflow, not decoration.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-px left-[71px] top-[1810px] w-[1260px]" data-node-id="1012:476" data-name="STATUS CONTRACT Divider" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[83px] rounded-[14px] top-[1830px] w-[292px]" data-node-id="1012:477" data-name="Status Contract AVAILABLE" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid left-[98px] rounded-[6px] size-[12px] top-[1815px]" data-node-id="1012:478" data-name="Status Dot AVAILABLE" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] left-[122px] not-italic text-[#2c8c8a] text-[12px] top-[1805px] tracking-[0.2px] w-[135px]" data-node-id="1012:479">
+        AVAILABLE
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[122px] not-italic text-[#a8b8c5] text-[12px] top-[1826px] w-[235px]" data-node-id="1012:480">
+        Ready to borrow
+      </p>
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[398px] rounded-[14px] top-[1830px] w-[292px]" data-node-id="1012:481" data-name="Status Contract RESERVED" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid left-[412px] rounded-[6px] size-[12px] top-[1815px]" data-node-id="1012:482" data-name="Status Dot RESERVED" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] left-[436px] not-italic text-[#2c8c8a] text-[12px] top-[1805px] tracking-[0.2px] w-[135px]" data-node-id="1012:483">
+        RESERVED
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[436px] not-italic text-[#a8b8c5] text-[12px] top-[1826px] w-[235px]" data-node-id="1012:484">
+        Requested / held
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[56px] left-[713px] rounded-[14px] top-[1830px] w-[292px]" data-node-id="1012:485" data-name="Status Contract BORROWED" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid left-[727px] rounded-[6px] size-[12px] top-[1815px]" data-node-id="1012:486" data-name="Status Dot BORROWED" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] left-[751px] not-italic text-[#2c8c8a] text-[12px] top-[1805px] tracking-[0.2px] w-[135px]" data-node-id="1012:487">
+        BORROWED
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[751px] not-italic text-[#a8b8c5] text-[12px] top-[1826px] w-[235px]" data-node-id="1012:488">
+        Currently in use
+      </p>
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid h-[56px] left-[1028px] rounded-[14px] top-[1830px] w-[292px]" data-node-id="1012:489" data-name="Status Contract MAINTENANCE" />
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid left-[1042px] rounded-[6px] size-[12px] top-[1815px]" data-node-id="1012:490" data-name="Status Dot MAINTENANCE" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] left-[1066px] not-italic text-[#2c8c8a] text-[12px] top-[1805px] tracking-[0.2px] w-[135px]" data-node-id="1012:491">
+        MAINTENANCE
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[1066px] not-italic text-[#a8b8c5] text-[12px] top-[1826px] w-[235px]" data-node-id="1012:492">
+        Needs inspection
+      </p>
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[56px] left-[83px] rounded-[14px] top-[1905px] w-[292px]" data-node-id="1012:493" data-name="Status Contract RETURNED" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid left-[98px] rounded-[6px] size-[12px] top-[1895px]" data-node-id="1012:494" data-name="Status Dot RETURNED" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] left-[122px] not-italic text-[#2c8c8a] text-[12px] top-[1885px] tracking-[0.2px] w-[135px]" data-node-id="1012:495">
+        RETURNED
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[121px] not-italic text-[#a8b8c5] text-[12px] top-[1906px] w-[235px]" data-node-id="1012:496">
+        Transaction completed
+      </p>
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid h-[56px] left-[398px] rounded-[14px] top-[1905px] w-[292px]" data-node-id="1012:497" data-name="Status Contract LATE" />
+      <div className="absolute bg-[#c77833] border border-[#2774ae] border-solid left-[412px] rounded-[6px] size-[12px] top-[1895px]" data-node-id="1012:498" data-name="Status Dot LATE" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] left-[436px] not-italic text-[#2c8c8a] text-[12px] top-[1885px] tracking-[0.2px] w-[135px]" data-node-id="1012:499">
+        LATE
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[436px] not-italic text-[#a8b8c5] text-[12px] top-[1906px] w-[235px]" data-node-id="1012:500">
+        Attention required
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[56px] left-[713px] rounded-[14px] top-[1905px] w-[292px]" data-node-id="1012:501" data-name="Status Contract INACTIVE" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid left-[727px] rounded-[6px] size-[12px] top-[1895px]" data-node-id="1012:502" data-name="Status Dot INACTIVE" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[18px] leading-[16px] left-[751px] not-italic text-[#2c8c8a] text-[12px] top-[1885px] tracking-[0.2px] w-[135px]" data-node-id="1012:503">
+        INACTIVE
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[751px] not-italic text-[#a8b8c5] text-[12px] top-[1906px] w-[235px]" data-node-id="1012:504">
+        Access disabled
+      </p>
+      <div className="absolute bg-[#12304a] border border-[#2774ae] border-solid h-[310px] left-[39px] rounded-[14px] top-[2050px] w-[1360px]" data-node-id="1012:505" data-name="COMPONENT LIBRARY Surface" />
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[26px] left-[71px] not-italic text-[#f4f8fb] text-[22px] top-[2074px] w-[980px]" data-node-id="1012:506">
+        COMPONENT LIBRARY
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[19px] leading-[18px] left-[71px] not-italic text-[#a8b8c5] text-[12px] top-[2103px] w-[1120px]" data-node-id="1012:507">
+        Reusable patterns to standardize next; these support the existing UI rather than adding product scope.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-px left-[71px] top-[2142px] w-[1260px]" data-node-id="1012:508" data-name="COMPONENT LIBRARY Divider" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[62px] left-[83px] rounded-[12px] top-[2160px] w-[292px]" data-node-id="1012:509" data-name="Component Roadmap Button" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[98px] not-italic text-[#2c8c8a] text-[11px] top-[2139px] tracking-[0.3px] w-[264px]" data-node-id="1012:510">
+        BUTTON
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[98px] not-italic text-[#a8b8c5] text-[12px] top-[2161px] w-[264px]" data-node-id="1012:511">
+        Core control
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[62px] left-[398px] rounded-[12px] top-[2160px] w-[292px]" data-node-id="1012:512" data-name="Component Roadmap Form Field" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[412px] not-italic text-[#2c8c8a] text-[11px] top-[2139px] tracking-[0.3px] w-[264px]" data-node-id="1012:513">
+        FORM FIELD
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[412px] not-italic text-[#a8b8c5] text-[12px] top-[2161px] w-[264px]" data-node-id="1012:514">
+        Core control
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[62px] left-[713px] rounded-[12px] top-[2160px] w-[292px]" data-node-id="1012:515" data-name="Component Roadmap Select" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[727px] not-italic text-[#2c8c8a] text-[11px] top-[2139px] tracking-[0.3px] w-[264px]" data-node-id="1012:516">
+        SELECT
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[727px] not-italic text-[#a8b8c5] text-[12px] top-[2161px] w-[264px]" data-node-id="1012:517">
+        Core control
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[62px] left-[1028px] rounded-[12px] top-[2160px] w-[292px]" data-node-id="1012:518" data-name="Component Roadmap Status Pill" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[1042px] not-italic text-[#2c8c8a] text-[11px] top-[2139px] tracking-[0.3px] w-[264px]" data-node-id="1012:519">
+        STATUS PILL
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[1042px] not-italic text-[#a8b8c5] text-[12px] top-[2161px] w-[264px]" data-node-id="1012:520">
+        Navigation/state
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[62px] left-[83px] rounded-[12px] top-[2238px] w-[292px]" data-node-id="1012:521" data-name="Component Roadmap Navigation Item" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[98px] not-italic text-[#2c8c8a] text-[11px] top-[2221px] tracking-[0.3px] w-[264px]" data-node-id="1012:522">
+        NAVIGATION ITEM
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[98px] not-italic text-[#a8b8c5] text-[12px] top-[2243px] w-[264px]" data-node-id="1012:523">
+        Navigation/state
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[62px] left-[398px] rounded-[12px] top-[2238px] w-[292px]" data-node-id="1012:524" data-name="Component Roadmap Metric Card" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[412px] not-italic text-[#2c8c8a] text-[11px] top-[2221px] tracking-[0.3px] w-[264px]" data-node-id="1012:525">
+        METRIC CARD
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[412px] not-italic text-[#a8b8c5] text-[12px] top-[2243px] w-[264px]" data-node-id="1012:526">
+        Data/workflow
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[62px] left-[713px] rounded-[12px] top-[2238px] w-[292px]" data-node-id="1012:527" data-name="Component Roadmap Table Row" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[727px] not-italic text-[#2c8c8a] text-[11px] top-[2221px] tracking-[0.3px] w-[264px]" data-node-id="1012:528">
+        TABLE ROW
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[727px] not-italic text-[#a8b8c5] text-[12px] top-[2243px] w-[264px]" data-node-id="1012:529">
+        Data/workflow
+      </p>
+      <div className="absolute bg-[#2c8c8a] border border-[#2774ae] border-solid h-[62px] left-[1028px] rounded-[12px] top-[2238px] w-[292px]" data-node-id="1012:530" data-name="Component Roadmap Confirmation / Alert" />
+      <p className="[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold h-[16px] leading-[14px] left-[1042px] not-italic text-[#2c8c8a] text-[11px] top-[2221px] tracking-[0.3px] w-[264px]" data-node-id="1012:531">
+        CONFIRMATION / ALERT
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[1042px] not-italic text-[#a8b8c5] text-[12px] top-[2243px] w-[264px]" data-node-id="1012:532">
+        Data/workflow
+      </p>
+      <div className="absolute bg-[#12304a] border border-[#2774ae] border-solid h-[220px] left-[39px] rounded-[14px] top-[2400px] w-[1360px]" data-node-id="1012:533" data-name="UX RULES Surface" />
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[26px] left-[72px] not-italic text-[#f4f8fb] text-[22px] top-[2424px] w-[980px]" data-node-id="1012:534">
+        UX RULES
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[19px] leading-[18px] left-[71px] not-italic text-[#a8b8c5] text-[12px] top-[2453px] w-[1120px]" data-node-id="1012:535">
+        Clarity and system behavior take priority over decorative complexity.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-px left-[71px] top-[2464px] w-[1260px]" data-node-id="1012:536" data-name="UX RULES Divider" />
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[112px] left-[83px] rounded-[12px] top-[2494px] w-[292px]" data-node-id="1012:537" data-name="UX Rule 01" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium h-[18px] leading-[16px] left-[98px] not-italic text-[#a8b8c5] text-[12px] top-[2507px] tracking-[0.2px] w-[30px]" data-node-id="1012:538">
+        01
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[20px] left-[135px] not-italic text-[#f4f8fb] text-[22px] top-[2505px] w-[220px]" data-node-id="1012:539">
+        State before action
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[97px] not-italic text-[#a8b8c5] text-[12px] top-[2537px] w-[260px]" data-node-id="1012:540">
+        Show what is allowed in the current state.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[112px] left-[398px] rounded-[12px] top-[2494px] w-[292px]" data-node-id="1012:541" data-name="UX Rule 02" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium h-[18px] leading-[16px] left-[412px] not-italic text-[#a8b8c5] text-[12px] top-[2507px] tracking-[0.2px] w-[30px]" data-node-id="1012:542">
+        02
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[20px] left-[450px] not-italic text-[#f4f8fb] text-[22px] top-[2505px] w-[220px]" data-node-id="1012:543">
+        Identity ≠ status
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[412px] not-italic text-[#a8b8c5] text-[12px] top-[2537px] w-[260px]" data-node-id="1012:544">
+        Keep role accents distinct from operational status.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[112px] left-[713px] rounded-[12px] top-[2494px] w-[292px]" data-node-id="1012:545" data-name="UX Rule 03" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium h-[18px] leading-[16px] left-[727px] not-italic text-[#a8b8c5] text-[12px] top-[2507px] tracking-[0.2px] w-[30px]" data-node-id="1012:546">
+        03
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[20px] left-[765px] not-italic text-[#f4f8fb] text-[22px] top-[2505px] w-[220px]" data-node-id="1012:547">
+        Feedback is explicit
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[727px] not-italic text-[#a8b8c5] text-[12px] top-[2537px] w-[260px]" data-node-id="1012:548">
+        Success, error, loading, and disabled states explain themselves.
+      </p>
+      <div className="absolute bg-[#102a43] border border-[#2774ae] border-solid h-[112px] left-[1028px] rounded-[12px] top-[2494px] w-[292px]" data-node-id="1012:549" data-name="UX Rule 04" />
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium h-[18px] leading-[16px] left-[1042px] not-italic text-[#a8b8c5] text-[12px] top-[2507px] tracking-[0.2px] w-[30px]" data-node-id="1012:550">
+        04
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold leading-[20px] left-[1080px] not-italic text-[#f4f8fb] text-[22px] top-[2505px] w-[220px]" data-node-id="1012:551">
+        One source of truth
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[16px] leading-[18px] left-[1042px] not-italic text-[#a8b8c5] text-[12px] top-[2537px] w-[260px]" data-node-id="1012:552">
+        Tokens and reusable components govern repeated UI.
+      </p>
+      <p className="[word-break:break-word] absolute font-['Inter:Medium'] font-medium h-[16px] leading-[14px] left-[71px] not-italic text-[#a8b8c5] text-[11px] top-[2640px] tracking-[0.3px] w-[600px]" data-node-id="1012:553">
+        DESIGN SYSTEM • FOUNDATION • SOURCE OF TRUTH
+      </p>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[28px] justify-center leading-[0] left-[59px] not-italic text-[#f4f8fb] text-[18px] top-[1914px] w-[500px]" data-node-id="1199:430">
+        <p className="leading-[normal]">Three Color System</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[22px] justify-center leading-[0] left-[59px] not-italic text-[#a8b8c5] text-[10px] top-[1944px] w-[560px]" data-node-id="1199:431">
+        <p className="leading-[normal]">Primary • Secondary • Equipment Accent</p>
+      </div>
+      <div className="absolute bg-[#102a43] h-[42px] left-[59px] rounded-[10px] top-[1970px] w-[180px]" data-node-id="1199:432" data-name="Rectangle" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[42px] justify-center leading-[0] left-[150px] not-italic text-[#f4f8fb] text-[9px] text-center top-[1991px] w-[180px]" data-node-id="1199:433">
+        <p className="leading-[normal] whitespace-pre-wrap">{`#16324F  NAVY`}</p>
+      </div>
+      <div className="absolute bg-[#2c8c8a] h-[42px] left-[259px] rounded-[10px] top-[1970px] w-[180px]" data-node-id="1199:434" data-name="Rectangle" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[42px] justify-center leading-[0] left-[349px] not-italic text-[#f4f8fb] text-[9px] text-center top-[1991px] w-[180px]" data-node-id="1199:435">
+        <p className="leading-[normal] whitespace-pre-wrap">{`#2774AE  ROYAL CAMPUS BLUE`}</p>
+      </div>
+      <div className="absolute bg-[#c77833] h-[42px] left-[459px] rounded-[10px] top-[1970px] w-[180px]" data-node-id="1199:436" data-name="Rectangle" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[42px] justify-center leading-[0] left-[549px] not-italic text-[#f4f8fb] text-[9px] text-center top-[1991px] w-[180px]" data-node-id="1199:437">
+        <p className="leading-[normal] whitespace-pre-wrap">{`#D39B2C  ACADEMIC AMBER`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Medium'] font-medium h-[30px] justify-center leading-[0] left-[59px] not-italic text-[#a8b8c5] text-[10px] top-[2043px] w-[580px]" data-node-id="1199:438">
+        <p className="leading-[normal]">Use neutrals for surfaces, borders, and body copy. Do not introduce additional brand colors.</p>
+      </div>
+    </div>
+  );
+}

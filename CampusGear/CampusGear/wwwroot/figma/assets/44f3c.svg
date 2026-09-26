@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="228" height="900" viewBox="0 0 228 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="LEFT PANEL &#226;&#128;&#162; ADMIN GOVERNANCE SIGNATURE" clip-path="url(#clip0_0_94)">
+<circle id="Admin &#226;&#128;&#162; Bronze Orbit" cx="10" cy="170" r="129" stroke="#C77833" stroke-opacity="0.24" stroke-width="2"/>
+<circle id="Admin &#226;&#128;&#162; Teal Core" cx="15" cy="185" r="95" fill="#2C8C8A" fill-opacity="0.09"/>
+<rect id="Admin &#226;&#128;&#162; Bronze Facet" x="150" y="480" width="100" height="220" transform="rotate(24 150 480)" fill="#C77833" fill-opacity="0.07"/>
+<circle id="Admin &#226;&#128;&#162; Governance Node" cx="193" cy="535" r="5" fill="#C77833" fill-opacity="0.85"/>
+<circle id="Admin &#226;&#128;&#162; Teal Halo" cx="175" cy="759" r="58" stroke="#2C8C8A" stroke-opacity="0.26" stroke-width="2"/>
+</g>
+<defs>
+<clipPath id="clip0_0_94">
+<rect width="228" height="900" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,0 +1,32 @@
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Administrator verification";
+    ViewData["FigmaFrame"] = ViewData["ErrorMessage"] is string || ViewData.ModelState.ErrorCount > 0 ? "691_402" : "691_358";
+    ViewData["StatusMessage"] = "ADMINISTRATOR SECURITY  •  SECOND FACTOR REQUIRED";
+}
+<section class="auth-card compact" aria-labelledby="account-title">
+    <header>
+        <div class="auth-card-top"><div><p class="auth-eyebrow">Security step 2 of 2</p><h1 id="account-title">Verify administrator access</h1></div><span class="auth-badge">Admin 2FA</span></div>
+        <p class="auth-description">Enter the 6-digit code sent to your registered administrator email address.</p>
+    </header>
+    <hr class="auth-divider" />
+    @await Html.PartialAsync("_AccountFeedback")
+    <div class="auth-summary"><strong>Verification code sent</strong><p>@(ViewData["MaskedEmail"] as string ?? "Registered administrator email") &nbsp;•&nbsp; Code valid for 10 minutes</p></div>
+    <form class="auth-form" action="/auth/two-factor" method="post">
+        @Html.AntiForgeryToken()
+        <label class="auth-field" for="Code"><span class="auth-field-label">6-digit verification code</span>
+            <input class="auth-input auth-code" id="Code" name="Code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="••••••" required />
+            @Html.ValidationMessage("Code", null, new { @class = "auth-field-error" })
+            <span class="auth-field-help">Use the newest code. Request another code only if the current one is unavailable.</span>
+        </label>
+        <button class="auth-action" type="submit">VERIFY AND CONTINUE</button>
+    </form>
+    <div class="auth-actions">
+        <form class="auth-inline-form" action="/auth/resend-two-factor" method="post">@Html.AntiForgeryToken()<button type="submit">Resend verification code</button></form>
+        <a class="auth-link" href="/auth/login">Back to sign in</a>
+    </div>
+    <div class="auth-spacer"></div>
+    <div class="auth-panel"><img src="/figma/assets/bb17f.svg" alt="" /><div><strong>Administrator security</strong><span>Administrator access remains protected until verification is completed.</span></div></div>
+    <div class="auth-spacer"></div>
+    @await Html.PartialAsync("_AccountStatus")
+</section>

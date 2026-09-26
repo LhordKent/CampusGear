@@ -1,0 +1,288 @@
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/8b249a25-24a6-4f2d-bb2b-78fc8ba7bdad";
+const imgAdministratorOpenGovernanceAtmosphere = `${assetPathPrefix}/e0141.svg`;
+const imgAdministratorEnhancedAmbientDetail = `${assetPathPrefix}/7a4b9.svg`;
+const imgLeftPanelAdminGovernanceSignature = `${assetPathPrefix}/44f3c.svg`;
+const imgDashboardShellCircle = `${assetPathPrefix}/a698b.svg`;
+const imgDashboardShellCircle1 = `${assetPathPrefix}/7ac1a.svg`;
+const imgDashboardShellCircle2 = `${assetPathPrefix}/d3b6f.svg`;
+const imgDashboardShellCircle3 = `${assetPathPrefix}/2680a.svg`;
+const imgBrandLogoCgSupplied = `${assetPathPrefix}/b95f3.svg`;
+const imgGroup = `${assetPathPrefix}/edd56.svg`;
+const imgGroup1 = `${assetPathPrefix}/7e0b6.svg`;
+const imgGroup2 = `${assetPathPrefix}/9177b.svg`;
+const imgGroup3 = `${assetPathPrefix}/a40a1.svg`;
+const imgGroup4 = `${assetPathPrefix}/be9c1.svg`;
+const imgGroup5 = `${assetPathPrefix}/e1db6.svg`;
+const imgGroup6 = `${assetPathPrefix}/9f767.svg`;
+const imgGroup7 = `${assetPathPrefix}/bc2d0.svg`;
+
+export default function Component12BEditAccountAndRole() {
+  return (
+    <div className="bg-[#071b2b] relative size-full" data-node-id="695:7445" data-name="12B — Edit Account and Role">
+      <div className="absolute h-[900px] left-0 top-0 w-[1440px]" data-node-id="1507:319" data-name="Administrator • Open Governance Atmosphere">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAdministratorOpenGovernanceAtmosphere} />
+      </div>
+      <div className="absolute h-[760px] left-[720px] top-[90px] w-[560px]" data-node-id="1599:437" data-name="Administrator • Enhanced Ambient Detail">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAdministratorEnhancedAmbientDetail} />
+      </div>
+      <div className="absolute bg-[rgba(12,32,48,0.94)] border border-[rgba(44,140,138,0.84)] border-solid h-[92px] left-[246px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[88px] w-[1100px]" data-node-id="1411:49" data-name="DESIGN • PAGE HEADER SURFACE" />
+      <a className="absolute bg-[#071b2b] block border border-[#c77833] border-solid cursor-pointer h-[40px] left-[14px] rounded-[10px] top-[806px] w-[202px]" data-node-id="695:7570" data-name="Logout Button" />
+      <div className="absolute bg-[#0e2537] h-[28px] left-[12px] rounded-[2px] top-[340px] w-[3px]" data-node-id="1259:5412" data-name="PERSISTENT ACTIVE INDICATOR" />
+      <div className="absolute h-[900px] left-0 top-0 w-[228px]" data-node-id="1677:208" data-name="LEFT PANEL • ADMIN GOVERNANCE SIGNATURE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgLeftPanelAdminGovernanceSignature} />
+      </div>
+      <div className="absolute bg-[rgba(8,27,41,0.88)] h-[900px] left-0 top-0 w-[228px]" data-node-id="1266:7495" data-name="DASHBOARD SHELL • Sidebar" />
+      <div className="absolute bg-[rgba(8,27,41,0.94)] border border-[#1a4a6b] border-solid h-[44px] left-[14px] rounded-[10px] top-[124px] w-[200px]" data-node-id="1535:288" data-name="CANONICAL NAV • Dashboard" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[176px] w-[200px]" data-node-id="1535:289" data-name="CANONICAL NAV • Equipment Categories" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[228px] w-[200px]" data-node-id="1535:290" data-name="CANONICAL NAV • Equipment Items" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[280px] w-[200px]" data-node-id="1535:291" data-name="CANONICAL NAV • Borrower Profiles" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[332px] w-[200px]" data-node-id="1535:292" data-name="CANONICAL NAV • User & Role Management" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[384px] w-[200px]" data-node-id="1535:293" data-name="CANONICAL NAV • Borrowing History" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[436px] w-[200px]" data-node-id="1535:294" data-name="CANONICAL NAV • Availability Calendar" />
+      <a className="absolute bg-[rgba(8,27,41,0.94)] block border border-[#1a4a6b] border-solid cursor-pointer h-[44px] left-[14px] rounded-[10px] top-[488px] w-[200px]" data-node-id="1535:295" data-name="CANONICAL NAV • System Audit Log" />
+      <div className="absolute bg-[#0b2233] h-[72px] left-[228px] top-0 w-[1212px]" data-node-id="1266:7496" data-name="DASHBOARD SHELL • Topbar" />
+      <div className="absolute bg-[#21455c] h-px left-[228px] rounded-[1px] top-[71px] w-[1212px]" data-node-id="1266:7497" data-name="DASHBOARD SHELL • Topbar Divider" />
+      <div className="absolute left-[28px] size-[36px] top-[22px]" data-node-id="1266:7498" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle} />
+      </div>
+      <div className="absolute bg-[#2c8c8a] h-[3px] left-[39px] rounded-[1px] top-[33px] w-[14px]" data-node-id="1266:7499" data-name="DASHBOARD SHELL • Divider" />
+      <div className="absolute bg-[#2c8c8a] h-[3px] left-[39px] rounded-[1px] top-[40px] w-[10px]" data-node-id="1266:7500" data-name="DASHBOARD SHELL • Divider" />
+      <div className="absolute bg-[#2c8c8a] border border-[#2c8c8a] border-solid h-[34px] left-[22px] rounded-[9px] top-[86px] w-[184px]" data-node-id="1266:7503" data-name="DASHBOARD SHELL • Shape" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold h-[14px] justify-center leading-[0] left-[28px] not-italic text-[#f4f8fb] text-[10.5px] top-[98px] w-[170px]" data-node-id="1266:7504">
+        <p className="leading-[normal]">ADMINISTRATOR WORKSPACE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#b9c6d1] text-[11.5px] top-[146px] w-[148px]" data-node-id="1266:7506">
+        <p className="leading-[normal]">Dashboard</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#b9c6d1] text-[11.5px] top-[198px] w-[148px]" data-node-id="1266:7507">
+        <p className="leading-[normal]">Equipment Categories</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#b9c6d1] text-[11.5px] top-[250px] w-[148px]" data-node-id="1266:7508">
+        <p className="leading-[normal]">Equipment Items</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#b9c6d1] text-[11.5px] top-[302px] w-[148px]" data-node-id="1266:7509">
+        <p className="leading-[normal]">Borrower Profiles</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#f4f8fb] text-[11.5px] top-[354px] w-[148px]" data-node-id="1266:7510">
+        <p className="leading-[normal]">{`User & Role Management`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#b9c6d1] text-[11.5px] top-[406px] w-[148px]" data-node-id="1266:7511">
+        <p className="leading-[normal]">Borrowing History</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic text-[#b9c6d1] text-[11.5px] top-[458px] w-[148px]" data-node-id="1266:7513">
+        <p className="leading-[normal]">Availability Calendar</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[58px] not-italic opacity-84 text-[#b9c6d1] text-[11.5px] top-[510px] w-[148px]" data-node-id="1266:7515">
+        <p className="leading-[normal]">System Audit Log</p>
+      </div>
+      <div className="absolute bg-[#071b2b] border border-[#1a4a6b] border-solid h-[96px] left-[22px] rounded-[14px] top-[720px] w-[184px]" data-node-id="1266:7516" data-name="DASHBOARD SHELL • Shape" />
+      <div className="absolute left-[36px] size-[38px] top-[738px]" data-node-id="1266:7517" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle1} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[55px] not-italic text-[#f4f8fb] text-[11.5px] text-center top-[757px] w-[38px]" data-node-id="1266:7518">
+        <p className="leading-[normal]">A</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[84px] not-italic text-[#f4f8fb] text-[11.5px] top-[746px] w-[106px]" data-node-id="1266:7519">
+        <p className="leading-[normal]">Alex Rivera</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[84px] not-italic text-[#99b0bf] text-[10.5px] top-[761px] w-[110px]" data-node-id="1266:7520">
+        <p className="leading-[normal]">System Administrator</p>
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[14px] justify-center leading-[0] left-[114px] not-italic text-[#c77833] text-[11px] text-center top-[826px] w-[184px]" data-node-id="1266:7521">
+        <p className="leading-[normal]">Log out</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[14px] top-[27.5px] w-[300px]" data-node-id="1266:7522">
+        <p className="leading-[normal]">{`User & Role Management`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal h-[14px] justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[10.5px] top-[47px] w-[330px]" data-node-id="1266:7523">
+        <p className="leading-[normal]">Manage accounts, roles, and access permissions.</p>
+      </div>
+      <div className="absolute bg-[#2c8c8a] border-0 border-[#1a4a6b] border-solid h-[34px] left-[1024px] rounded-[17px] top-[18px] w-[132px]" data-node-id="1266:7524" data-name="DASHBOARD SHELL • Shape" />
+      <div className="absolute left-[1040px] size-[8px] top-[31px]" data-node-id="1266:7525" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle2} />
+      </div>
+      <div className="absolute left-[1180px] size-[36px] top-[18px]" data-node-id="1266:7527" data-name="DASHBOARD SHELL • Circle">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgDashboardShellCircle3} />
+      </div>
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[1198px] not-italic text-[#f4f8fb] text-[11.5px] text-center top-[36px] w-[36px]" data-node-id="1266:7528">
+        <p className="leading-[normal]">A</p>
+      </div>
+      <div className="[word-break:break-word] absolute bg-[#0c2230] border border-[#2c8c8a] border-solid content-stretch flex flex-col gap-[7px] h-[400px] items-start leading-[normal] left-[270px] not-italic overflow-clip px-[16px] py-[12px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[205px] w-[1080px]" data-node-id="1283:1995" data-name="FORM • Account">
+        <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[10px] w-[220px]" data-node-id="1283:1996">
+          ACCOUNT INFORMATION
+        </p>
+        <div className="content-stretch flex gap-[14px] h-[58px] items-start overflow-clip relative shrink-0 w-[1044px]" data-node-id="1283:1997" data-name="Frame">
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[300px]" data-node-id="1283:1998" data-name="FIELD • Name">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[272px]" data-node-id="1283:1999">
+              NAME
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[272px]" data-node-id="1283:2000">
+              John Reyes
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[390px]" data-node-id="1283:2001" data-name="FIELD • ID / Email">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[362px]" data-node-id="1283:2002">
+              ID / EMAIL
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[362px]" data-node-id="1283:2003">
+              custodian@campus.edu
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[300px]" data-node-id="1283:2004" data-name="FIELD • Department">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[272px]" data-node-id="1283:2005">
+              DEPARTMENT
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[272px]" data-node-id="1283:2006">
+              Engineering
+            </p>
+          </div>
+        </div>
+        <div className="content-stretch flex gap-[14px] h-[58px] items-start overflow-clip relative shrink-0 w-[1044px]" data-node-id="1283:2007" data-name="Frame">
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[280px]" data-node-id="1283:2008" data-name="FIELD • Contact">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[252px]" data-node-id="1283:2009">
+              CONTACT
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[252px]" data-node-id="1283:2010">
+              09XX XXX XXXX
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[260px]" data-node-id="1283:2011" data-name="FIELD • Role">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#a8b8c5] text-[9px] w-[232px]" data-node-id="1283:2012">
+              ROLE
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[232px]" data-node-id="1283:2013">
+              Custodian
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[200px]" data-node-id="1283:2014" data-name="FIELD • Status">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#a8b8c5] text-[9px] w-[172px]" data-node-id="1283:2015">
+              STATUS
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[172px]" data-node-id="1283:2016">
+              Active
+            </p>
+          </div>
+          <div className="bg-[#081925] border border-[#1a4a6b] border-solid content-stretch flex flex-col gap-[4px] h-[58px] items-start overflow-clip pb-[7px] pt-[9px] px-[14px] relative rounded-[10px] shrink-0 w-[260px]" data-node-id="1283:2017" data-name="FIELD • Password">
+            <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[9px] w-[232px]" data-node-id="1283:2018">
+              PASSWORD
+            </p>
+            <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[13px] w-[232px]" data-node-id="1283:2019">
+              ••••••••
+            </p>
+          </div>
+        </div>
+        <p className="font-['Inter:Regular'] font-normal relative shrink-0 text-[#a8b8c5] text-[10px] w-[1044px]" data-node-id="1283:2020">
+          Elevated roles are controlled by Administrator access.
+        </p>
+      </div>
+      <div className="[word-break:break-word] absolute bg-[#0c2230] border border-[#2c8c8a] border-solid content-stretch flex flex-col gap-[7px] items-start leading-[normal] left-[270px] not-italic overflow-clip px-[16px] py-[12px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[620px] w-[340px]" data-node-id="1283:2021" data-name="CONTEXT • CURRENT">
+        <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[8px] w-[300px]" data-node-id="1283:2022">
+          CURRENT
+        </p>
+        <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[11px] w-[300px]" data-node-id="1283:2023">
+          Custodian
+        </p>
+      </div>
+      <div className="[word-break:break-word] absolute bg-[#0c2230] border border-[#2c8c8a] border-solid content-stretch flex flex-col gap-[7px] items-start leading-[normal] left-[630px] not-italic overflow-clip px-[16px] py-[12px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[620px] w-[340px]" data-node-id="1283:2024" data-name="CONTEXT • TARGET">
+        <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[8px] w-[300px]" data-node-id="1283:2025">
+          TARGET
+        </p>
+        <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[11px] w-[300px]" data-node-id="1283:2026">
+          Custodian
+        </p>
+      </div>
+      <div className="[word-break:break-word] absolute bg-[#0c2230] border border-[#2c8c8a] border-solid content-stretch flex flex-col gap-[7px] items-start leading-[normal] left-[990px] not-italic overflow-clip px-[16px] py-[12px] rounded-[14px] shadow-[0px_10px_24px_-8px_rgba(0,0,0,0.22)] top-[620px] w-[340px]" data-node-id="1283:2027" data-name="CONTEXT • ENFORCEMENT">
+        <p className="font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[#99b0bf] text-[8px] w-[300px]" data-node-id="1283:2028">
+          ENFORCEMENT
+        </p>
+        <p className="font-['Inter:Medium'] font-medium relative shrink-0 text-[#f4f8fb] text-[11px] w-[300px]" data-node-id="1283:2029">
+          Administrator controlled
+        </p>
+      </div>
+      <a className="absolute bg-[#0b1b2b] block border border-[#2c8c8a] border-solid cursor-pointer h-[44px] left-[910px] overflow-clip rounded-[12px] shadow-[0px_10px_24px_-8px_rgba(44,140,138,0.22)] top-[710px] w-[190px]" data-node-id="1283:2030" data-name="ACTION • CANCEL">
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[20px] justify-center leading-[0] left-[94px] not-italic text-[#edf2f7] text-[10.5px] text-center top-[21px] w-[174px]" data-node-id="1746:27">
+          <p className="leading-[normal]">CANCEL</p>
+        </div>
+      </a>
+      <a className="absolute bg-[#2c8c8a] block border border-[#2c8c8a] border-solid cursor-pointer h-[44px] left-[1130px] overflow-clip rounded-[12px] shadow-[0px_10px_24px_-8px_rgba(44,140,138,0.22)] top-[710px] w-[200px]" data-node-id="1283:2032" data-name="ACTION • SAVE CHANGES">
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold h-[20px] justify-center leading-[0] left-[99px] not-italic text-[#edf2f7] text-[10.5px] text-center top-[21px] w-[184px]" data-node-id="1746:28">
+          <p className="leading-[normal]">SAVE CHANGES</p>
+        </div>
+      </a>
+      <div className="absolute bg-[#2c8c8a] h-[44px] left-[910px] opacity-0 rounded-[10px] top-[710px] w-[190px]" data-node-id="1266:7494" data-name="CANCEL ACTION HIT • EDIT USER" />
+      <div className="absolute bg-[#2c8c8a] h-[44px] left-[1130px] opacity-0 rounded-[10px] shadow-[0px_4px_10px_0px_rgba(44,140,138,0.28)] top-[710px] w-[200px]" data-node-id="695:7534" data-name="Rectangle" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[12px] top-[109.5px] w-[500px]" data-node-id="1539:128">
+        <p className="leading-[normal]">ADMINISTRATOR • WORKSPACE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[24px] top-[136px] w-[800px]" data-node-id="1539:129">
+        <p className="leading-[34px]">{`Edit Account & Role`}</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[258px] not-italic text-[#e8f2f7] text-[14px] top-[163.5px] w-[900px]" data-node-id="1539:130">
+        <p className="leading-[normal]">{`Update account details or role assignments while preserving the user's existing activity record.`}</p>
+      </div>
+      <div className="absolute h-[36.548px] left-[24px] top-[19.73px] w-[44px]" data-node-id="1649:319" data-name="Brand Logo • CG • Supplied">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgBrandLogoCgSupplied} />
+      </div>
+      <p className="[word-break:break-word] absolute font-['Sora:SemiBold'] font-semibold leading-[0] left-[78px] text-[#edf2fa] text-[0px] top-[27px] tracking-[0.216px] whitespace-nowrap" data-node-id="1653:50">
+        <span className="font-['Oxanium:Medium'] font-medium leading-[normal] text-[18px]">Campus</span>
+        <span className="font-['Oxanium:Bold'] font-bold leading-[normal] text-[#c77833] text-[18px]">Gear</span>
+      </p>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[136px]" data-node-id="1679:1175" data-name="NAV ICON • CONSISTENT • Dashboard">
+        <div className="absolute inset-[19%_16%_21.5%_16%]" data-node-id="1679:1176" data-name="Group">
+          <div className="absolute inset-[-7.98%_-6.99%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[188px]" data-node-id="1679:1180" data-name="NAV ICON • CONSISTENT • Equipment Categories">
+        <div className="absolute inset-[24%_14%]" data-node-id="1679:1181" data-name="Group">
+          <div className="absolute inset-[-9.13%_-6.6%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup1} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[240px]" data-node-id="1679:1184" data-name="NAV ICON • CONSISTENT • Equipment Items">
+        <div className="absolute bottom-[32%] left-1/4 right-1/4 top-[12%]" data-node-id="1679:1185" data-name="Group">
+          <div className="absolute inset-[-8.48%_-9.5%_-8.47%_-9.5%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup2} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#102a3c] left-[28px] overflow-clip size-[20px] top-[292px]" data-node-id="1679:1190" data-name="NAV ICON • CONSISTENT • Borrower Profiles">
+        <div className="absolute inset-[21%_21.5%_17.5%_21.5%]" data-node-id="1679:1191" data-name="Group">
+          <div className="absolute inset-[-7.72%_-8.34%_-7.73%_-8.34%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup3} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[344px]" data-node-id="1679:1194" data-name="NAV ICON • CONSISTENT • User & Role Management">
+        <div className="absolute inset-[23%_23.5%_20%_18.5%]" data-node-id="1679:1195" data-name="Group">
+          <div className="absolute inset-[-8.33%_-8.19%_-8.34%_-8.19%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup4} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#102a3c] left-[28px] overflow-clip size-[20px] top-[396px]" data-node-id="1679:1199" data-name="NAV ICON • CONSISTENT • Borrowing History">
+        <div className="absolute inset-[16.5%]" data-node-id="1679:1200" data-name="Group">
+          <div className="absolute inset-[-7.09%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup5} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[448px]" data-node-id="1679:1203" data-name="NAV ICON • CONSISTENT • Availability Calendar">
+        <div className="absolute inset-[14%_15%_17.5%_15%]" data-node-id="1679:1204" data-name="Group">
+          <div className="absolute inset-[-6.93%_-6.79%_-6.94%_-6.79%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup6} />
+          </div>
+        </div>
+      </div>
+      <div className="absolute bg-[#0e2537] left-[28px] overflow-clip size-[20px] top-[500px]" data-node-id="1679:1208" data-name="NAV ICON • CONSISTENT • System Audit Log">
+        <div className="absolute bottom-[14.5%] left-1/4 right-1/4 top-[14.5%]" data-node-id="1679:1209" data-name="Group">
+          <div className="absolute inset-[-6.69%_-9.5%]">
+            <img alt="" className="block max-w-none size-full" src={imgGroup7} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

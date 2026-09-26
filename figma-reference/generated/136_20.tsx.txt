@@ -1,0 +1,218 @@
+const assetPathPrefix = "https://www.figma.com/api/mcp/asset/49f5f790-c7b3-4b3e-8f9e-400c6a8b8d03";
+const imgAuthConsistentAuthGeometry = `${assetPathPrefix}/159a4.svg`;
+const imgAuthNonGenericAtmosphere = `${assetPathPrefix}/ec54f.svg`;
+const imgAuthAccessGateVisual = `${assetPathPrefix}/32928.svg`;
+const imgAuthNewLeftVisualStage = `${assetPathPrefix}/f93d1.svg`;
+const imgVector = `${assetPathPrefix}/4dfa7.svg`;
+const imgVector1 = `${assetPathPrefix}/a1475.svg`;
+const imgVector2 = `${assetPathPrefix}/a2440.svg`;
+const imgVector3 = `${assetPathPrefix}/e5572.svg`;
+const imgVector4 = `${assetPathPrefix}/8f9fd.svg`;
+const imgVector5 = `${assetPathPrefix}/06691.svg`;
+const imgVector6 = `${assetPathPrefix}/04590.svg`;
+const imgVector7 = `${assetPathPrefix}/c3ea3.svg`;
+const imgVector8 = `${assetPathPrefix}/03121.svg`;
+const imgVector9 = `${assetPathPrefix}/09da1.svg`;
+const imgVector10 = `${assetPathPrefix}/55c3a.svg`;
+const imgVector11 = `${assetPathPrefix}/74b60.svg`;
+const imgVector12 = `${assetPathPrefix}/1353e.svg`;
+const imgVector13 = `${assetPathPrefix}/729ee.svg`;
+const imgVector14 = `${assetPathPrefix}/f364b.svg`;
+const imgVector15 = `${assetPathPrefix}/36e5c.svg`;
+const imgVector16 = `${assetPathPrefix}/a85d7.svg`;
+const imgVector17 = `${assetPathPrefix}/d5823.svg`;
+const imgVector18 = `${assetPathPrefix}/e8011.svg`;
+const imgVector19 = `${assetPathPrefix}/0986c.svg`;
+const imgVector20 = `${assetPathPrefix}/68b4c.svg`;
+const imgVector21 = `${assetPathPrefix}/56a8c.svg`;
+const imgVector22 = `${assetPathPrefix}/35779.svg`;
+const imgAuthBrandMarkUserSuppliedCg = `${assetPathPrefix}/7ef91.svg`;
+
+export default function Component02AAccessDeniedUnauthorizedRole() {
+  return (
+    <div className="bg-[#071b2b] relative size-full" data-node-id="136:20" data-name="02A — Access Denied — Unauthorized Role">
+      <div className="absolute h-[540px] left-0 top-0 w-[420px]" data-node-id="1586:112" data-name="AUTH • CONSISTENT AUTH GEOMETRY">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthConsistentAuthGeometry} />
+      </div>
+      <div className="absolute h-[900px] left-0 top-0 w-[1440px]" data-node-id="1542:121" data-name="AUTH • NON-GENERIC ATMOSPHERE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthNonGenericAtmosphere} />
+      </div>
+      <a className="absolute bg-[#2c8c8a] block border border-[rgba(44,140,138,0.9)] border-solid cursor-pointer h-[54px] left-[600px] rounded-[12px] shadow-[0px_4px_10px_0px_rgba(59,130,246,0.3)] top-[410px] w-[608px]" data-node-id="136:31" data-name="Return Button" />
+      <div className="absolute bg-[rgba(8,27,41,0.97)] border border-[rgba(28,59,79,0.75)] border-solid h-[900px] left-0 top-0 w-[520px]" data-node-id="1199:413" data-name="Rectangle" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[48px] not-italic text-[#c77833] text-[11px] top-[158.5px] w-[420px]" data-node-id="1199:416">
+        <p className="leading-[normal]">SECURITY / AUTHORIZATION GATE</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[48px] not-italic text-[#f4f8fb] text-[30px] top-[218px] w-[420px]" data-node-id="1199:417">
+        <p className="leading-[normal]">Workspace access blocked.</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[48px] not-italic text-[#a8b8c5] text-[13px] top-[312px] w-[420px]" data-node-id="1199:418">
+        <p className="leading-[normal]">Your account is authenticated, but this workspace is outside its assigned role.</p>
+      </div>
+      <div className="absolute bg-[rgba(12,32,48,0.96)] border border-[rgba(31,69,87,0.9)] border-solid h-[772px] left-[560px] rounded-[20px] top-[64px] w-[808px]" data-node-id="1199:419" data-name="Rectangle" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[600px] not-italic text-[#2c8c8a] text-[11px] top-[112.5px] w-[560px]" data-node-id="1199:420">
+        <p className="leading-[normal]">AUTHORIZED ACCESS CHECK</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[600px] not-italic text-[#f4f8fb] text-[22px] top-[147.5px] w-[560px]" data-node-id="1199:421">
+        <p className="leading-[normal]">Workspace permission required.</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[600px] not-italic text-[#a8b8c5] text-[13px] top-[185px] w-[590px]" data-node-id="1199:422">
+        <p className="leading-[normal]">{`The system blocks workspace actions that fall outside the account's assigned role.`}</p>
+      </div>
+      <div className="absolute bg-[rgba(6,20,30,0.98)] border border-[rgba(199,120,51,0.65)] border-solid h-[138px] left-[600px] rounded-[16px] shadow-[0px_3px_12px_0px_rgba(0,0,0,0.08)] top-[232px] w-[608px]" data-node-id="1199:423" data-name="Rectangle" />
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[626px] not-italic text-[#c77833] text-[11px] top-[261.5px] w-[520px]" data-node-id="1199:424">
+        <p className="leading-[normal]">ACCESS DECISION</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold'] font-semibold justify-center leading-[0] left-[626px] not-italic text-[#f4f8fb] text-[14px] top-[303.5px] w-[540px]" data-node-id="1199:425">
+        <p className="leading-[normal]">This account cannot open the requested workspace.</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[626px] not-italic text-[#a8b8c5] text-[11px] top-[340.5px] w-[540px]" data-node-id="1199:426">
+        <p className="leading-[normal]">Return to sign in or ask an administrator to review the assigned role.</p>
+      </div>
+      <div className="absolute bg-[#2c8c8a] border border-[rgba(44,140,138,0.9)] border-solid h-[54px] left-[600px] rounded-[12px] shadow-[0px_3px_12px_0px_rgba(0,0,0,0.08)] top-[410px] w-[608px]" data-node-id="1199:427" data-name="Rectangle" />
+      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Bold'] font-bold justify-center leading-[0] left-[904px] not-italic text-[#f4f8fb] text-[12px] text-center top-[437.5px] w-[608px]" data-node-id="1199:428">
+        <p className="leading-[normal]">RETURN TO SIGN IN</p>
+      </div>
+      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Regular'] font-normal justify-center leading-[0] left-[600px] not-italic text-[#a8b8c5] text-[10px] top-[493px] w-[608px]" data-node-id="1199:429">
+        <p className="leading-[normal]">No access rights are changed from this screen.</p>
+      </div>
+      <div className="absolute left-[155px] size-[160px] top-[390px]" data-node-id="1545:16" data-name="AUTH • ACCESS GATE VISUAL">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthAccessGateVisual} />
+      </div>
+      <div className="absolute h-[900px] left-0 overflow-clip top-0 w-[520px]" data-node-id="1623:332" data-name="AUTH • NEW LEFT • VISUAL STAGE">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthNewLeftVisualStage} />
+        <div className="absolute inset-[62.48%_0_19.51%_0]" data-node-id="1623:334" data-name="Vector">
+          <div className="absolute inset-[-0.62%_-0.15%_-0.62%_-0.12%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector} />
+          </div>
+        </div>
+        <div className="absolute inset-[70.28%_0_11.77%_0]" data-node-id="1623:335" data-name="Vector">
+          <div className="absolute inset-[-0.46%_-0.1%_-0.46%_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector1} />
+          </div>
+        </div>
+        <div className="absolute inset-[31.11%_-15.38%_26.67%_42.31%]" data-node-id="1623:336" data-name="Vector">
+          <div className="absolute inset-[-0.2%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector2} />
+          </div>
+        </div>
+        <div className="absolute inset-[36.11%_-6.73%_31.67%_50.96%]" data-node-id="1623:337" data-name="Vector">
+          <div className="absolute inset-[-0.17%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector3} />
+          </div>
+        </div>
+        <div className="absolute inset-[42%_3.46%_37.56%_61.15%]" data-node-id="1623:338" data-name="Vector">
+          <div className="absolute inset-[-0.27%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector4} />
+          </div>
+        </div>
+        <div className="absolute inset-[50.22%_17.69%_45.78%_75.38%]" data-node-id="1623:339" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector5} />
+        </div>
+        <div className="absolute inset-[46.67%_9.62%_31.11%_23.08%]" data-node-id="1623:340" data-name="Vector">
+          <div className="absolute inset-[-0.44%_-0.16%_-0.47%_-0.44%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector6} />
+          </div>
+        </div>
+        <div className="absolute inset-[46.11%_75.96%_52.78%_22.12%]" data-node-id="1623:341" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector7} />
+        </div>
+        <div className="absolute inset-[51.67%_20.19%_47.22%_77.88%]" data-node-id="1623:342" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector8} />
+        </div>
+        <div className="absolute inset-[68.33%_43.27%_30.56%_54.81%]" data-node-id="1623:343" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector7} />
+        </div>
+        <div className="absolute inset-[67.33%_8.85%_31.78%_89.62%]" data-node-id="1623:344" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector9} />
+        </div>
+        <div className="absolute inset-[63.33%_63.85%_28.22%_13.46%]" data-node-id="1623:345" data-name="Vector">
+          <div className="absolute inset-[-0.66%_-0.42%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector10} />
+          </div>
+        </div>
+        <div className="absolute inset-[64.89%_66.92%_29.78%_16.54%]" data-node-id="1623:346" data-name="Vector">
+          <div className="absolute inset-[-1.04%_-0.58%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector11} />
+          </div>
+        </div>
+        <div className="absolute inset-[71.78%_70.58%_28.22%_20.19%]" data-node-id="1623:347" data-name="Vector">
+          <div className="absolute inset-[-1px_-2.08%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector12} />
+          </div>
+        </div>
+        <div className="absolute inset-[72.22%_30.77%_17.56%_40.38%]" data-node-id="1623:348" data-name="Vector">
+          <div className="absolute inset-[-0.54%_-0.33%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector13} />
+          </div>
+        </div>
+        <div className="absolute inset-[74%_33.85%_20.44%_43.46%]" data-node-id="1623:349" data-name="Vector">
+          <div className="absolute inset-[-1%_-0.42%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector14} />
+          </div>
+        </div>
+        <div className="absolute inset-[81.22%_36.92%_18.78%_46.54%]" data-node-id="1623:350" data-name="Vector">
+          <div className="absolute inset-[-1.5px_-1.74%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector15} />
+          </div>
+        </div>
+        <div className="absolute inset-[72.22%_11.15%_17.78%_71.15%]" data-node-id="1623:351" data-name="Vector">
+          <div className="absolute inset-[-0.56%_-0.54%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector16} />
+          </div>
+        </div>
+        <div className="absolute inset-[74.11%_16.54%_21.89%_76.54%]" data-node-id="1623:352" data-name="Vector">
+          <div className="absolute inset-[-6.94%]">
+            <img alt="" className="block max-w-none size-full" src={imgVector17} />
+          </div>
+        </div>
+        <div className="absolute inset-[75.33%_18.65%_23.11%_78.65%]" data-node-id="1623:353" data-name="Vector">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector18} />
+        </div>
+        <div className="absolute inset-[91.11%_10%_8.89%_10%]" data-node-id="1623:354" data-name="Vector">
+          <div className="absolute inset-[-0.5px_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector19} />
+          </div>
+        </div>
+        <div className="absolute inset-[91.78%_57.69%_8.22%_10%]" data-node-id="1623:355" data-name="Vector">
+          <div className="absolute inset-[-0.5px_0]">
+            <img alt="" className="block max-w-none size-full" src={imgVector20} />
+          </div>
+        </div>
+        <div className="absolute contents inset-[16%_9.23%_5.33%_10%]" data-node-id="1623:360" data-name="Group">
+          <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold inset-[16%_9.23%_82.22%_10%] leading-[normal] not-italic text-[#8fa8b8] text-[10px]" data-node-id="1623:361">
+            AUTHORIZATION / ACCESS GATE
+          </p>
+          <div className="absolute inset-[19.33%_53.46%_78%_10%]" data-node-id="1623:362" data-name="Vector">
+            <div className="absolute inset-[-2.08%_-0.26%]">
+              <img alt="" className="block max-w-none size-full" src={imgVector21} />
+            </div>
+          </div>
+          <div className="absolute inset-[20.22%_86.54%_78.89%_11.92%]" data-node-id="1623:363" data-name="Vector">
+            <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector22} />
+          </div>
+          <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold inset-[20%_19.62%_78.22%_15%] leading-[normal] not-italic text-[#f3f7fa] text-[10px]" data-node-id="1623:364">
+            ACCESS / RESTRICTED
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold inset-[23.78%_9.23%_71.67%_10%] leading-[normal] not-italic text-[#f3f7fa] text-[34px]" data-node-id="1623:365">
+            Workspace access
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold inset-[28%_9.23%_67.44%_10%] leading-[normal] not-italic text-[#c77833] text-[34px]" data-node-id="1623:366">
+            is restricted.
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal inset-[34.44%_9.23%_63.67%_10%] leading-[normal] not-italic text-[#a8b8c5] text-[14px]" data-node-id="1623:367">
+            Your account is authenticated, but this workspace is outsi
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Regular'] font-normal inset-[36.67%_9.23%_61.44%_10%] leading-[normal] not-italic text-[#a8b8c5] text-[14px]" data-node-id="1623:368">
+            de its assigned campus role.
+          </p>
+          <p className="[word-break:break-word] absolute font-['Inter:Bold'] font-bold inset-[93.44%_20.77%_5.33%_10%] leading-[normal] not-italic text-[#8fa8b8] text-[9px]" data-node-id="1623:372">
+            CAMPUSGEAR / UNIVERSITY OF CEBU / SOUTH CAMPUS
+          </p>
+        </div>
+        <div className="absolute h-[103px] left-[48px] top-[38px] w-[124px]" data-node-id="1627:67" data-name="AUTH • BRAND MARK • USER SUPPLIED CG">
+          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAuthBrandMarkUserSuppliedCg} />
+        </div>
+      </div>
+    </div>
+  );
+}
