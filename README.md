@@ -16,7 +16,11 @@ dotnet run --project .\CampusGear\CampusGear\CampusGear.csproj --launch-profile 
 
 Open `http://localhost:5264/auth/login`. Self-registration creates a Borrower account; after verifying any email, the borrower can reserve immediately. Passwords require at least 8 characters including upper/lower case, a number, and a non-alphanumeric character.
 
-By default, local development uses an in-memory email inbox. Open `/development/email` to read a signup, administrator login, or password recovery code. Refresh the inbox after requesting a code. It is available only in Development over a loopback connection and only with the Development email provider. `/auth/development-inbox` exposes the same messages as JSON for smoke tests. Codes expire after 10 minutes, allow five attempts, and have a 60-second resend cooldown.
+SMTP is the default email provider, including in Development. The startup log identifies the selected provider. An in-memory inbox requires explicitly selecting `Email:Provider=Development`; this provider does not send real email. With it selected, open `/development/email` to read a signup, administrator login, or password recovery code. Refresh the inbox after requesting a code. It is available only in Development over a loopback connection and only with the Development email provider. `/auth/development-inbox` exposes the same messages as JSON for smoke tests. Codes expire after 10 minutes, allow five attempts, and have a 60-second resend cooldown.
+
+Development startup loads an optional shared fallback at `%USERPROFILE%\.campusgear\email-secrets.json`, then CampusGear's standard User Secrets. This handles packaged tools whose private AppData store is invisible to Visual Studio. `Email:DevelopmentSettingsFile` can override the fallback path. Keep this file outside the repository and restrict access to your Windows account. Standard User Secrets, environment variables, and command-line arguments take precedence in that order. Startup diagnostics report file presence and whether Host/From are configured, without showing their values. Production does not load this fallback or local User Secrets.
+
+Retrying signup with an active, unconfirmed account and its original password resumes verification without replacing account details. Confirmed accounts still use sign-in. Delivery failures invalidate the unsent code and permit an immediate retry. Logs record the sender, challenge ID, purpose, exception type, and SMTP status without logging codes, credentials, or message bodies. SMTP acceptance does not confirm inbox receipt; check Spam as well as Inbox. Asynchronous SMTP sends have a 45-second timeout.
 
 If a previously opened account form becomes invalid after a restart or sign-in change, the rejected submission returns to a fresh form with a retry message. Re-enter your details; the rejected request does not create an account or send a code.
 
@@ -40,7 +44,7 @@ If a previously opened account form becomes invalid after a restart or sign-in c
 
 The script selects `Email:Provider=Smtp` and configures `smtp.gmail.com`, port `587`, and STARTTLS (`EnableSsl=true`), as documented in [Gmail's SMTP settings](https://support.google.com/mail/answer/7104828). It saves the App Password in [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-8.0), outside the repository. This development store is not encrypted. It passes the password through standard input, so it is not included in command arguments. No password belongs in `appsettings.json`, GitHub, or chat.
 
-Real email delivery can run in Development without changing the local SQL Server or authentication setup. The development inbox is disabled when SMTP is selected. Test signup and password recovery with addresses you control; the automated live smoke script requires the Development provider and must not run against real email delivery. Gmail delivery has not been verified until a real sender is configured and a recipient receives a code.
+Real email delivery can run in Development without changing the local SQL Server or authentication setup. The development inbox is disabled when SMTP is selected. Test signup and password recovery with addresses you control; the automated live smoke script requires the Development provider and must not run against real email delivery. Local Gmail signup delivery was confirmed by the recipient on September 26, 2026.
 
 To switch back to the local inbox for smoke tests, run this and restart the app:
 
@@ -90,9 +94,9 @@ For a deployment, configure `ConnectionStrings__CampusGear` and these SMTP envir
 - `Email__Smtp__Host`, `Email__Smtp__From`
 - `Email__Smtp__Port` (default 587), `Email__Smtp__EnableSsl` (default true)
 - `Email__Smtp__Username`, `Email__Smtp__Password` when required by the mail server
-- `Email__Provider=Smtp` (the default outside Development)
+- `Email__Provider=Smtp` (the default in every environment)
 
-Use HTTPS and a valid SQL Server certificate in deployment. `TrustServerCertificate=True` is only in the local Development connection. User Secrets are loaded only in Development; deployed SMTP credentials must be configured through the host's secret store. Gmail SMTP is configured locally and its STARTTLS connection and account authentication were verified; receipt of a real verification email still needs checking. Authentication flow sessions and the development inbox are in memory, so restarting clears them. A deployment across multiple app instances also needs shared session storage and persistent/shared Data Protection keys.
+Use HTTPS and a valid SQL Server certificate in deployment. `TrustServerCertificate=True` is only in the local Development connection. User Secrets are loaded only in Development; deployed SMTP credentials must be configured through the host's secret store. Gmail SMTP is configured locally; STARTTLS, account authentication, and receipt of a real signup verification email were verified. Authentication flow sessions and the development inbox are in memory, so restarting clears them. A deployment across multiple app instances also needs shared session storage and persistent/shared Data Protection keys.
 
 ## Figma sources and UI reference
 
@@ -119,4 +123,4 @@ dotnet test .\CampusGear\CampusGear.IntegrationTests\CampusGear.IntegrationTests
 
 Stop the running app before building/testing to release its output files. The SQL tests create and remove a uniquely named test database; see `CampusGear/CampusGear.IntegrationTests/README.md`. The HTTP smoke script uses disposable accounts/items in the Development CampusGear database and removes them after the run. It supports `-KeepFixtures` for local browser inspection; that option retains synthetic credentials in a temporary file until the fixtures are removed.
 
-The latest checks passed with zero build warnings, 13 SQL integration tests, 594 HTTP/data assertions, all 70 reference states and 127 local images, responsive layouts, and keyboard access. Gmail account authentication passed; actual inbox delivery remains unverified. Earlier verification results are recorded in `scripts/verification.md`.
+Previous full checks passed with zero build warnings, 13 SQL integration tests, 594 HTTP/data assertions, all 70 reference states and 127 local images, responsive layouts, and keyboard access. The signup email investigation passed focused email/configuration tests and real HTTP signups; the recipient confirmed receiving a verification email. The shared settings fix still requires a normal Visual Studio signup/resend check. Verification results are recorded in `scripts/verification.md`.

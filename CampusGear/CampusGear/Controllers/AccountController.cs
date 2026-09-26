@@ -165,10 +165,27 @@ public sealed class AccountController : Controller
         if (!ModelState.IsValid) return SignUpView(input);
 
         var email = input.Email.Trim();
-        if (await _users.FindByEmailAsync(email) is not null)
+        var existing = await _users.FindByEmailAsync(email);
+        if (existing is not null)
         {
+            // Resume a pending account only after validating its original password.
+            // Retrying signup must never replace the account's password or profile.
+            if (existing.IsActive && !existing.EmailConfirmed && !await _users.IsLockedOutAsync(existing))
+            {
+                if (await _users.CheckPasswordAsync(existing, input.Password))
+                {
+                    await _users.ResetAccessFailedCountAsync(existing);
+                    HttpContext.Session.SetString(PendingVerificationUserId, existing.Id);
+                    var retry = await _challenges.IssueAsync(existing, EmailChallengePurpose.SignupVerification,
+                        HttpContext.RequestAborted);
+                    SetIssueFeedback(retry);
+                    await AuditAsync("Auth.SignUp", "ResumedPendingVerification", existing.Id);
+                    return RedirectToAction(nameof(EmailVerification));
+                }
+                await _users.AccessFailedAsync(existing);
+            }
             await AuditAsync("Auth.SignUp", "DuplicateEmail", null);
-            ModelState.AddModelError(nameof(input.Email), "An account already uses this email address.");
+            ModelState.AddModelError(nameof(input.Email), "An account already uses this email address. Sign in to continue verification or reset your password.");
             return SignUpView(input);
         }
 

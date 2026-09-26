@@ -24,14 +24,17 @@ public sealed class EmailChallengeService
     private readonly ApplicationDbContext _db;
     private readonly IEmailSender _emailSender;
     private readonly IDataProtector _protector;
+    private readonly ILogger<EmailChallengeService> _logger;
 
     public EmailChallengeService(
         ApplicationDbContext db,
         IEmailSender emailSender,
-        IDataProtectionProvider dataProtectionProvider)
+        IDataProtectionProvider dataProtectionProvider,
+        ILogger<EmailChallengeService> logger)
     {
         _db = db;
         _emailSender = emailSender;
+        _logger = logger;
         _protector = dataProtectionProvider.CreateProtector("CampusGear.EmailChallenge.v1");
     }
 
@@ -97,10 +100,16 @@ public sealed class EmailChallengeService
                 $"Your CampusGear verification code is {code}. It expires in 10 minutes. " +
                 "If you did not request this code, you can ignore this email.",
                 cancellationToken);
+            _logger.LogInformation("Email challenge {ChallengeId} ({Purpose}) accepted by {Sender}. Inbox receipt is not confirmed.",
+                challenge.Id, purpose, _emailSender.GetType().Name);
             return new ChallengeIssueResult(ChallengeIssueStatus.Sent);
         }
-        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
         {
+            // Do not log message bodies, codes, credentials, or server exception text.
+            _logger.LogError("Email challenge {ChallengeId} ({Purpose}) delivery failed using {Sender}. Error: {ErrorType}; SMTP status: {SmtpStatus}.",
+                challenge.Id, purpose, _emailSender.GetType().Name, exception.GetType().Name,
+                exception is System.Net.Mail.SmtpException smtp ? smtp.StatusCode.ToString() : "Not available");
             // An unsent challenge must not keep the user in the resend cooldown.
             challenge.InvalidatedAtUtc = DateTime.UtcNow;
             challenge.LastSentAtUtc = challenge.InvalidatedAtUtc.Value.Subtract(ResendCooldown);

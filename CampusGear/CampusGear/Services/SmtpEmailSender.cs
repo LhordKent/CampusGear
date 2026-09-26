@@ -26,7 +26,9 @@ public sealed class SmtpEmailSender : IEmailSender
         if (!string.IsNullOrWhiteSpace(username))
             client.Credentials = new NetworkCredential(username, password);
 
-        cancellationToken.ThrowIfCancellationRequested();
-        await client.SendMailAsync(message);
+        // SmtpClient.Timeout does not bound asynchronous sends.
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(45));
+        await client.SendMailAsync(message, timeout.Token);
     }
 }

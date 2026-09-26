@@ -10,6 +10,8 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var developmentSecrets = DevelopmentConfiguration.LoadProjectSecrets(builder.Configuration, builder.Environment, args);
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // The Figma reference demo remains under /demo.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -68,8 +70,8 @@ builder.Services.AddScoped<EmailChallengeService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddHostedService<ReservationExpiryWorker>();
-var emailProvider = builder.Configuration["Email:Provider"]
-    ?? (builder.Environment.IsDevelopment() ? "Development" : "Smtp");
+// The in-memory mailbox must be explicitly selected; it never delivers to an inbox.
+var emailProvider = builder.Configuration["Email:Provider"] ?? "Smtp";
 if (emailProvider.Equals("Development", StringComparison.OrdinalIgnoreCase))
 {
     if (!builder.Environment.IsDevelopment())
@@ -87,6 +89,17 @@ else
 }
 
 var app = builder.Build();
+
+app.Logger.LogInformation("Email provider: {EmailProvider}; environment: {Environment}",
+    emailProvider, app.Environment.EnvironmentName);
+if (emailProvider.Equals("Smtp", StringComparison.OrdinalIgnoreCase))
+    app.Logger.LogInformation("SMTP startup configuration: Host configured={HostConfigured}; From configured={FromConfigured}.",
+        !string.IsNullOrWhiteSpace(builder.Configuration["Email:Smtp:Host"]),
+        !string.IsNullOrWhiteSpace(builder.Configuration["Email:Smtp:From"]));
+if (app.Environment.IsDevelopment())
+    app.Logger.LogInformation("Shared Development email settings: file found={FileFound}.", developmentSecrets.FileFound);
+if (emailProvider.Equals("Development", StringComparison.OrdinalIgnoreCase))
+    app.Logger.LogWarning("The Development email provider stores messages in memory and does not send email. Select Smtp for inbox delivery.");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
