@@ -1,5 +1,15 @@
 # Verification — September 26, 2026
 
+## Teacher base-code structure migration — October 3, 2026
+
+- Inspected `keder-asi/ASIBasecodeCsharp` at commit `2df3206` and adopted its WebApp, Services, Data, and Resources project boundaries.
+- Moved EF Core entities, DbContext, initialization, and migrations into `CampusGear.Data`; email/reservation contracts and implementations into `CampusGear.Services`; domain enums into `CampusGear.Resources`; and retained HTTP/UI/configuration code in `CampusGear.WebApp`.
+- Preserved existing namespaces, database schema, User Secrets ID, Identity implementation, and runtime behavior. Updated scripts and Figma tooling to the new WebApp path.
+- Remaining architectural work is documented in `docs/TEACHER_BASECODE_ALIGNMENT.md`; administrator controller processing should be extracted incrementally rather than hidden behind unused pass-through repositories.
+- The five-project solution built with **0 errors and 0 warnings**; all **25 integration tests passed**.
+- EF Core discovered the existing `20260926010541_InitialCampusGear` migration from the Data project and reported the local database up to date.
+- The renamed WebApp started from its new project path and served `/auth/login` with HTTP 200. The Figma verifier passed all **70 frames** and **127 local image files**.
+
 ## Build and database
 
 - .NET 8 application build: **0 errors, 0 warnings**.

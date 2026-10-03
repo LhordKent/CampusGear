@@ -22,7 +22,10 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <ProjectReference Include="../CampusGear/CampusGear.csproj" />
+    <ProjectReference Include="../CampusGear.Data/CampusGear.Data.csproj" />
+    <ProjectReference Include="../CampusGear.Resources/CampusGear.Resources.csproj" />
+    <ProjectReference Include="../CampusGear.Services/CampusGear.Services.csproj" />
+    <ProjectReference Include="../CampusGear.WebApp/CampusGear.WebApp.csproj" />
   </ItemGroup>
 
 </Project>

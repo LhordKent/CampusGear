@@ -3,7 +3,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$taskProject = Join-Path $PSScriptRoot '..\CampusGear\CampusGear\CampusGear.csproj'
+$taskProject = Join-Path $PSScriptRoot '..\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj'
 if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     throw 'Install the .NET SDK before running this setup.'
 }

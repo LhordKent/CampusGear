@@ -8,8 +8,8 @@ const crypto = require('node:crypto');
 
 const root = path.resolve(__dirname, '..');
 const sourceDir = path.join(__dirname, 'generated');
-const viewDir = path.join(root, 'CampusGear', 'CampusGear', 'Pages', 'Figma', 'Frames');
-const assetDir = path.join(root, 'CampusGear', 'CampusGear', 'wwwroot', 'figma', 'assets');
+const viewDir = path.join(root, 'CampusGear', 'CampusGear.WebApp', 'Pages', 'Figma', 'Frames');
+const assetDir = path.join(root, 'CampusGear', 'CampusGear.WebApp', 'wwwroot', 'figma', 'assets');
 const toolDir = process.env.FIGMA_TOOLS_DIR || path.join(process.env.TEMP || '', 'campusgear-figma-tools');
 const esbuild = require(path.join(toolDir, 'node_modules', 'esbuild'));
 const frames = JSON.parse(fs.readFileSync(path.join(__dirname, 'frames.json'), 'utf8')).frames;
@@ -89,7 +89,7 @@ function generateViews() {
     }
   }
   if (catalog.length !== frames.length || new Set(catalog.map(x => x.id)).size !== frames.length) throw new Error('Route catalog does not cover every Figma frame once');
-  const catalogDir = path.join(root, 'CampusGear', 'CampusGear', 'wwwroot', 'figma');
+  const catalogDir = path.join(root, 'CampusGear', 'CampusGear.WebApp', 'wwwroot', 'figma');
   fs.mkdirSync(catalogDir, { recursive: true });
   fs.writeFileSync(path.join(catalogDir, 'catalog.json'), JSON.stringify(catalog, null, 2));
   console.log(`Generated ${manifest.length} Razor frame partials and indexed ${assets.size} unique assets.`);

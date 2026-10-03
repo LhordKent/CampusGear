@@ -1,7 +1,7 @@
 {
   "fileKey": "Lm8g0wbEaJBwsHZNGK16RV",
   "generatedSourceDirectory": "figma-reference/generated",
-  "completeReferenceCatalog": "CampusGear/CampusGear/wwwroot/figma/catalog.json",
+  "completeReferenceCatalog": "CampusGear/CampusGear.WebApp/wwwroot/figma/catalog.json",
   "liveScreens": [
     { "route": "/auth/login", "nodes": ["15:3"] },
     { "route": "/auth/two-factor", "nodes": ["691:358"] },

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.FileProviders;
 
-namespace CampusGear.Services;
+namespace CampusGear.WebApp.Configuration;
 
 public static class DevelopmentConfiguration
 {
@@ -20,7 +20,7 @@ public static class DevelopmentConfiguration
                 Path.GetFileName(sharedFile), optional: false, reloadOnChange: true);
 
         // Standard User Secrets and explicit overrides take precedence.
-        configuration.AddUserSecrets(typeof(SmtpEmailSender).Assembly, optional: true, reloadOnChange: true);
+        configuration.AddUserSecrets(typeof(DevelopmentConfiguration).Assembly, optional: true, reloadOnChange: true);
         configuration.AddEnvironmentVariables();
         if (args.Length > 0) configuration.AddCommandLine(args);
         return new(fileFound,

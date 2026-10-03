@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const project = path.resolve(__dirname, '..', 'CampusGear', 'CampusGear');
+const project = path.resolve(__dirname, '..', 'CampusGear', 'CampusGear.WebApp');
 const catalog = JSON.parse(fs.readFileSync(path.join(project, 'wwwroot', 'figma', 'catalog.json'), 'utf8'));
 const assets = path.join(project, 'wwwroot', 'figma', 'assets');
 const views = path.join(project, 'Pages', 'Figma', 'Frames');

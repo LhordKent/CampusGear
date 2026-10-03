@@ -1,4 +1,4 @@
-using CampusGear.Services;
+using CampusGear.WebApp.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 

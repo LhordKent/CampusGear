@@ -4,24 +4,25 @@
 
 ## Developer cheatsheet: start here
 
-New to the project? Read the [complete codebase cheatsheet](docs/CODEBASE_CHEATSHEET.md). It explains the folder structure, every controller's responsibilities, routes, database relationships, signup/email flows, reservation lifecycle, UI files, configuration, debugging, and common changes.
+New to the project? Read the [complete codebase cheatsheet](docs/CODEBASE_CHEATSHEET.md). It explains the folder structure, every controller's responsibilities, routes, database relationships, signup/email flows, reservation lifecycle, UI files, configuration, debugging, and common changes. The [teacher base-code alignment](docs/TEACHER_BASECODE_ALIGNMENT.md) records what was adopted from the provided reference and what remains to be extracted.
 
 | What you want to understand or change | Start with | What it controls |
 | --- | --- | --- |
-| Application startup and registered services | [Program.cs](CampusGear/CampusGear/Program.cs) | Database, Identity, email provider, sessions, permissions, middleware, and startup initialization |
-| Signup, login, email codes, password recovery | [AccountController.cs](CampusGear/CampusGear/Controllers/AccountController.cs) | Account forms, pending verification sessions, role redirects, and authentication |
-| Code generation and verification | [EmailChallengeService.cs](CampusGear/CampusGear/Services/EmailChallengeService.cs) | Code lifetime, resend cooldown, attempts, invalidation, and consumption |
-| Real email delivery and local settings | [SmtpEmailSender.cs](CampusGear/CampusGear/Services/SmtpEmailSender.cs), [DevelopmentConfiguration.cs](CampusGear/CampusGear/Services/DevelopmentConfiguration.cs) | SMTP sends and Development configuration loading |
-| Reservation rules and equipment loans | [ReservationService.cs](CampusGear/CampusGear/Services/Reservations/ReservationService.cs) | Availability, approval, cancellation, release, return, concurrency, and audit events |
-| Borrower screens | [BorrowerController.cs](CampusGear/CampusGear/Controllers/BorrowerController.cs), [Views/Borrower](CampusGear/CampusGear/Views/Borrower) | Booking form, own history, and calendar |
-| Custodian operations | [CustodianController.cs](CampusGear/CampusGear/Controllers/CustodianController.cs), [Views/Custodian](CampusGear/CampusGear/Views/Custodian) | Approval queue, releases, returns, details, and calendars |
-| Administrator management | [Controllers](CampusGear/CampusGear/Controllers) | Inventory, categories, accounts, borrower eligibility, maintenance, reservations, and audit log |
-| Database shape and first-run data | [ApplicationDbContext.cs](CampusGear/CampusGear/Data/ApplicationDbContext.cs), [DbInitializer.cs](CampusGear/CampusGear/Data/DbInitializer.cs) | Tables, relationships, constraints, migrations, roles, sample equipment, and initial administrator |
-| Shared screen layout and navigation | [Views/Shared](CampusGear/CampusGear/Views/Shared), [FigmaUi.cs](CampusGear/CampusGear/Models/FigmaUi.cs) | Account/workspace shells, shared partials, role navigation, and Figma assets |
-| Styles and browser interactions | [wwwroot/css](CampusGear/CampusGear/wwwroot/css), [wwwroot/js](CampusGear/CampusGear/wwwroot/js) | Responsive layouts, forms, navigation, and presentation |
+| Application startup and registered services | [Program.cs](CampusGear/CampusGear.WebApp/Program.cs) | Database, Identity, email provider, sessions, permissions, middleware, and startup initialization |
+| Signup, login, email codes, password recovery | [AccountController.cs](CampusGear/CampusGear.WebApp/Controllers/AccountController.cs) | Account forms, pending verification sessions, role redirects, and authentication |
+| Code generation and verification | [EmailChallengeService.cs](CampusGear/CampusGear.Services/Services/EmailChallengeService.cs) | Code lifetime, resend cooldown, attempts, invalidation, and consumption |
+| Real email delivery and local settings | [SmtpEmailSender.cs](CampusGear/CampusGear.Services/Services/SmtpEmailSender.cs), [DevelopmentConfiguration.cs](CampusGear/CampusGear.WebApp/Configuration/DevelopmentConfiguration.cs) | SMTP sends and Development configuration loading |
+| Reservation rules and equipment loans | [ReservationService.cs](CampusGear/CampusGear.Services/Services/Reservations/ReservationService.cs) | Availability, approval, cancellation, release, return, concurrency, and audit events |
+| Borrower screens | [BorrowerController.cs](CampusGear/CampusGear.WebApp/Controllers/BorrowerController.cs), [Views/Borrower](CampusGear/CampusGear.WebApp/Views/Borrower) | Booking form, own history, and calendar |
+| Custodian operations | [CustodianController.cs](CampusGear/CampusGear.WebApp/Controllers/CustodianController.cs), [Views/Custodian](CampusGear/CampusGear.WebApp/Views/Custodian) | Approval queue, releases, returns, details, and calendars |
+| Administrator management | [Controllers](CampusGear/CampusGear.WebApp/Controllers) | Inventory, categories, accounts, borrower eligibility, maintenance, reservations, and audit log |
+| Database shape and first-run data | [ApplicationDbContext.cs](CampusGear/CampusGear.Data/ApplicationDbContext.cs), [DbInitializer.cs](CampusGear/CampusGear.Data/DbInitializer.cs) | Tables, relationships, constraints, migrations, roles, sample equipment, and initial administrator |
+| Shared constants and enums | [Constants](CampusGear/CampusGear.Resources/Constants) | Cross-layer workflow states and static application vocabulary |
+| Shared screen layout and navigation | [Views/Shared](CampusGear/CampusGear.WebApp/Views/Shared), [FigmaUi.cs](CampusGear/CampusGear.WebApp/Models/FigmaUi.cs) | Account/workspace shells, shared partials, role navigation, and Figma assets |
+| Styles and browser interactions | [wwwroot/css](CampusGear/CampusGear.WebApp/wwwroot/css), [wwwroot/js](CampusGear/CampusGear.WebApp/wwwroot/js) | Responsive layouts, forms, navigation, and presentation |
 | Automated checks | [CampusGear.IntegrationTests](CampusGear/CampusGear.IntegrationTests), [scripts](scripts) | SQL lifecycle tests, email regressions, and local HTTP smoke checks |
 
-The web project is `CampusGear/CampusGear/`; the solution is `CampusGear/CampusGear.sln`. Live features use `Controllers` + `Views`; the saved Figma reference screens use `Pages/Screen.cshtml` + `Pages/Figma/Frames` under `/demo`. Editing a demo frame does not change the live reservation or account workflow.
+The solution follows the teacher base-code layout: `CampusGear.WebApp` contains controllers/views and startup, `CampusGear.Services` contains processing and workflows, `CampusGear.Data` contains EF/database code and entities, and `CampusGear.Resources` contains shared constants. The solution is `CampusGear/CampusGear.sln`. The saved Figma reference screens remain under WebApp at `/demo`; editing a demo frame does not change the live workflow.
 
 ### README navigation
 
@@ -42,8 +43,8 @@ From `C:\CampusGear`:
 
 ```powershell
 dotnet tool restore
-dotnet restore .\CampusGear\CampusGear\CampusGear.csproj
-dotnet run --project .\CampusGear\CampusGear\CampusGear.csproj --launch-profile http
+dotnet restore .\CampusGear\CampusGear.sln
+dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http
 ```
 
 Open `http://localhost:5264/auth/login`. Self-registration creates a Borrower account; after verifying any email, the borrower can reserve immediately. Passwords require at least 8 characters including upper/lower case, a number, and a non-alphanumeric character.
@@ -69,7 +70,7 @@ If a previously opened account form becomes invalid after a restart or sign-in c
 4. Stop the app if it is running, then restart it:
 
    ```powershell
-   dotnet run --project .\CampusGear\CampusGear\CampusGear.csproj --launch-profile http
+   dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http
    ```
 
 5. Open `http://localhost:5264/auth/signup` and register using an email you control. Check Inbox and Spam for the verification code, then enter it in CampusGear. Password recovery and administrator login codes use the same sender.
@@ -81,7 +82,7 @@ Real email delivery can run in Development without changing the local SQL Server
 To switch back to the local inbox for smoke tests, run this and restart the app:
 
 ```powershell
-dotnet user-secrets set "Email:Provider" "Development" --project .\CampusGear\CampusGear\CampusGear.csproj
+dotnet user-secrets set "Email:Provider" "Development" --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj
 ```
 
 ### Create the first administrator
@@ -93,7 +94,7 @@ $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_EMAIL = 'your-email@example.com'
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_NAME = 'Your Name'
 $setupPassword = Read-Host 'Initial administrator password' -AsSecureString
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD = [System.Net.NetworkCredential]::new('', $setupPassword).Password
-dotnet run --project .\CampusGear\CampusGear\CampusGear.csproj --launch-profile http -- --initialize-only
+dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http -- --initialize-only
 ```
 
 The bootstrap runs only when no administrator account exists. `--initialize-only` creates the account and exits without starting the web server. Account creation and role assignment commit together. The initial account is confirmed by this local operator setup and requires an email code at login. Remove the password environment variable afterward with `Remove-Item Env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD`. No default administrator password is checked into the project.
@@ -118,7 +119,7 @@ Reservations use a transaction-owned SQL Server application lock per item to ser
 The repository includes the initial migration. Apply migrations explicitly outside Development:
 
 ```powershell
-dotnet ef database update --project .\CampusGear\CampusGear\CampusGear.csproj
+dotnet ef database update --project .\CampusGear\CampusGear.Data\CampusGear.Data.csproj --startup-project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj
 ```
 
 For a deployment, configure `ConnectionStrings__CampusGear` and these SMTP environment variables through the host's secret store:
@@ -135,9 +136,9 @@ Use HTTPS and a valid SQL Server certificate in deployment. `TrustServerCertific
 - `figma-reference/frames.json`: all 70 visible application frames with node IDs.
 - `figma-reference/live-screen-manifest.json`: source frame mappings for the database-backed MVC screens and management forms.
 - `figma-reference/generated/`: generated React/Tailwind code returned by Figma for every frame, foundations, and component boards. These are source snapshots, with no runtime React or Tailwind dependency.
-- `CampusGear/CampusGear/wwwroot/figma/catalog.json`: each frame's stable `/demo/{workspace}/{screen}?state=...` URL.
-- `CampusGear/CampusGear/Pages/Figma/Frames/`: Razor partials converted from those snapshots.
-- `CampusGear/CampusGear/wwwroot/figma/`: local SVG/images and self-hosted fonts. Temporary Figma URLs are retained only in offline source snapshots.
+- `CampusGear/CampusGear.WebApp/wwwroot/figma/catalog.json`: each frame's stable `/demo/{workspace}/{screen}?state=...` URL.
+- `CampusGear/CampusGear.WebApp/Pages/Figma/Frames/`: Razor partials converted from those snapshots.
+- `CampusGear/CampusGear.WebApp/wwwroot/figma/`: local SVG/images and self-hosted fonts. Temporary Figma URLs are retained only in offline source snapshots.
 
 The live MVC screens translate the saved Figma-generated markup into shared workspace shells, dashboard panels, rounded table rows, request decision panels, full-page add/edit forms, and summary/action strips. Original navigation icons, background graphics, and fonts are served locally. Dashboard totals and rows come from SQL Server, including empty states. Search, booking end time, maintenance information, and account eligibility controls accommodate the real backend. Borrower Profiles has its own live listing. The complete visual state catalog remains available in the reference demo. `/demo/auth/login` retains optional empty-field sign-in and role selection as a sample-only interaction; live sign-in verifies credentials and administrator email codes.
 
@@ -146,7 +147,7 @@ Desktop layouts support the Figma 1440×900 view and 1920×1080. Tablet/phone la
 ## Verification
 
 ```powershell
-dotnet build .\CampusGear\CampusGear\CampusGear.csproj
+dotnet build .\CampusGear\CampusGear.sln
 node .\figma-reference\verify.cjs
 dotnet test .\CampusGear\CampusGear.IntegrationTests\CampusGear.IntegrationTests.csproj
 # Start the Development app before the HTTP check:

@@ -6,6 +6,7 @@ using CampusGear.Data;
 using CampusGear.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CampusGear.Services;
 

@@ -48,31 +48,40 @@ repository root/
 ├── .config/dotnet-tools.json          Local dotnet-ef tool version
 ├── CampusGear/
 │   ├── CampusGear.sln                 Visual Studio solution
-│   ├── CampusGear/                    ASP.NET Core web project
-│   │   ├── CampusGear.csproj           Packages, target framework, User Secrets ID
+│   ├── CampusGear.WebApp/             ASP.NET Core executable project
+│   │   ├── CampusGear.WebApp.csproj    Web SDK, User Secrets ID, project references
 │   │   ├── Program.cs                 Startup, services, middleware, routes
 │   │   ├── Controllers/               Live HTTP endpoints and screen models
-│   │   ├── Data/                      DbContext, initialization, EF migrations
+│   │   ├── Configuration/             Web-host configuration loaders
 │   │   ├── Filters/                   Account antiforgery recovery
-│   │   ├── Models/                    Stored entities, enums, UI mappings
-│   │   ├── Services/                  Email configuration, delivery, challenges
-│   │   │   └── Reservations/          Booking/loan rules and expiry worker
+│   │   ├── Models/                    Web/UI mappings only
 │   │   ├── Views/                     Live Razor views and shared layouts
 │   │   ├── Pages/                     Root redirect, errors, reference demo
 │   │   │   └── Figma/Frames/          Generated reference Razor partials
 │   │   ├── Properties/launchSettings.json  Local launch URLs and environment
 │   │   ├── appsettings*.json          Committed non-secret settings
 │   │   └── wwwroot/                   Public CSS, JS, images, fonts, libraries
+│   ├── CampusGear.Services/           Business processing layer
+│   │   ├── Interfaces/                Email/reservation contracts
+│   │   └── Services/                  Workflow implementations
+│   │       └── Reservations/          Booking/loan rules and expiry worker
+│   ├── CampusGear.Data/               DbContext, entities, initialization, migrations
+│   │   ├── Models/                    Persisted domain/Identity entities
+│   │   └── Migrations/                EF Core schema history
+│   ├── CampusGear.Resources/          Shared constants and static resources
+│   │   └── Constants/                 Cross-layer domain enums
 │   └── CampusGear.IntegrationTests/   SQL and email/configuration tests
 ├── scripts/                          Gmail setup, local smoke test, verification notes
 └── figma-reference/                  Saved frames, manifests, source snapshots, tools
 ```
 
-All paths in the following tables are relative to `CampusGear/CampusGear/` unless another root is explicitly shown. The doubled folder name is intentional: one directory contains the solution, the next contains the web project.
+This matches the teacher base-code separation: WebApp owns HTTP/UI, Services owns processing, Data owns persistence, and Resources owns shared static vocabulary. Project dependencies point inward: WebApp references Services/Data/Resources; Services references Data/Resources; Data references Resources. IntegrationTests references all layers. Existing namespaces were kept during the move so the schema and feature code did not need a risky rewrite.
+
+In the tables below, bare `Controllers/`, `Views/`, `Pages/`, `Configuration/`, and `wwwroot/` paths are inside `CampusGear.WebApp`; `Models/` entity paths are inside `CampusGear.Data`; service contracts and implementations are inside `CampusGear.Services`.
 
 ## Startup and request handling
 
-[Program.cs](../CampusGear/CampusGear/Program.cs) is the application entry point. Read it first to understand how the pieces are connected.
+[Program.cs](../CampusGear/CampusGear.WebApp/Program.cs) is the application entry point. Read it first to understand how the pieces are connected.
 
 1. Create the web host and load Development-only email settings through `DevelopmentConfiguration.LoadProjectSecrets`.
 2. Register MVC, Razor Pages, `ApplicationDbContext`, Identity, auth cookies, sessions, and the `auth-post` rate limiter.
@@ -134,11 +143,11 @@ Routes use HTTP attributes such as `[HttpGet("borrower/reservation")]`; they are
 
 POST forms require antiforgery tokens. Account POSTs additionally use `auth-post`: 20 requests per minute per remote IP with no queue, returning HTTP 429 at the limit.
 
-Many input DTOs and screen view models are declared at the bottom of their controller file. For example, `SignUpInput` lives in `AccountController.cs`; `ReservationInputModel` lives in `BorrowerController.cs`. Persisted entities live in `Models/`. Search the type name before creating another similarly named class.
+Many input DTOs and screen view models are declared at the bottom of their WebApp controller file. For example, `SignUpInput` lives in `AccountController.cs`; `ReservationInputModel` lives in `BorrowerController.cs`. Persisted entities live in `CampusGear.Data/Models`. Search the type name before creating another similarly named class.
 
 ## Database and models
 
-[Data/ApplicationDbContext.cs](../CampusGear/CampusGear/Data/ApplicationDbContext.cs) extends `IdentityDbContext<ApplicationUser>`. It defines the DbSets, relationships, indexes, SQL check constraints, string lengths, enum storage, and row versions. [Data/Migrations](../CampusGear/CampusGear/Data/Migrations) contains the initial schema and model snapshot.
+[ApplicationDbContext.cs](../CampusGear/CampusGear.Data/ApplicationDbContext.cs) extends `IdentityDbContext<ApplicationUser>`. It defines the DbSets, relationships, indexes, SQL check constraints, string lengths, enum storage, and row versions. [CampusGear.Data/Migrations](../CampusGear/CampusGear.Data/Migrations) contains the initial schema and model snapshot.
 
 | Model file | Database concept | Important relationship or field |
 | --- | --- | --- |
@@ -151,7 +160,7 @@ Many input DTOs and screen view models are declared at the bottom of their contr
 | `Models/MaintenanceCase.cs` | Repair or inspection record | Belongs to an item; may link the loan that caused it; status, description, resolution, staff |
 | `Models/EmailChallenge.cs` | One-time email verification attempt | User + purpose, protected code data, lifetime, attempts, consumed/invalidated timestamps |
 | `Models/AuditEvent.cs` | Recorded account/equipment operation | Actor, action, entity, outcome, before/after JSON, IP, correlation ID, timestamp |
-| `Models/DomainEnums.cs` | Shared state vocabulary | Reservation status, equipment condition, maintenance status, challenge purpose |
+| `CampusGear.Resources/Constants/DomainEnums.cs` | Shared state vocabulary | Reservation status, equipment condition, maintenance status, challenge purpose |
 
 Relationship map:
 
@@ -174,7 +183,7 @@ Despite its `CodeHash` name, the email challenge field contains Data Protection-
 
 ## Account and email flows
 
-Read [AccountController.cs](../CampusGear/CampusGear/Controllers/AccountController.cs) alongside [EmailChallengeService.cs](../CampusGear/CampusGear/Services/EmailChallengeService.cs). The controller owns the user journey; the service owns code issuance and consumption.
+Read [AccountController.cs](../CampusGear/CampusGear.WebApp/Controllers/AccountController.cs) alongside [EmailChallengeService.cs](../CampusGear/CampusGear.Services/Services/EmailChallengeService.cs). The controller owns the user journey; the service owns code issuance and consumption.
 
 ### Signup
 
@@ -218,7 +227,7 @@ The reset request returns generic feedback to avoid exposing whether an email ha
 
 ## Reservation and loan lifecycle
 
-The shared contract is [IReservationService.cs](../CampusGear/CampusGear/Services/Reservations/IReservationService.cs); the rules live in [ReservationService.cs](../CampusGear/CampusGear/Services/Reservations/ReservationService.cs). Borrower, custodian, and administrator controllers call this same service.
+The shared contract is [IReservationService.cs](../CampusGear/CampusGear.Services/Interfaces/IReservationService.cs); the rules live in [ReservationService.cs](../CampusGear/CampusGear.Services/Services/Reservations/ReservationService.cs). Borrower, custodian, and administrator controllers call this same service.
 
 ```mermaid
 stateDiagram-v2
@@ -314,8 +323,8 @@ JavaScript improves presentation. It does not replace server validation, permiss
 | `figma-reference/live-screen-manifest.json` | Maps live screens/forms to design references |
 | `figma-reference/generate.cjs` | Offline conversion to Razor partials/catalog and local assets; requires external Figma tooling dependencies |
 | `figma-reference/verify.cjs` | Checks the 70-frame catalog, routes, partials, and local assets |
-| `CampusGear/CampusGear/Pages/Screen.cshtml(.cs)` | `/demo/{workspace}/{screen}?state=...` lookup and reference rendering |
-| `CampusGear/CampusGear/Pages/Figma/Frames/` | Converted reference partials |
+| `CampusGear/CampusGear.WebApp/Pages/Screen.cshtml(.cs)` | `/demo/{workspace}/{screen}?state=...` lookup and reference rendering |
+| `CampusGear/CampusGear.WebApp/Pages/Figma/Frames/` | Converted reference partials |
 
 `Pages/Index.cshtml.cs` redirects `/` to `/auth/login`. The default Razor Page layouts, privacy/error pages, and template `site.css`/`site.js` also exist; verify which layout a live view actually loads before editing them.
 
@@ -346,12 +355,12 @@ The shared fallback exists because packaged desktop tooling can save User Secret
 ```powershell
 # From repository root:
 dotnet tool restore
-dotnet restore .\CampusGear\CampusGear\CampusGear.csproj
-dotnet run --project .\CampusGear\CampusGear\CampusGear.csproj --launch-profile http
+dotnet restore .\CampusGear\CampusGear.sln
+dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http
 
 # Local inbox for tests, selected only for this process:
 $env:Email__Provider = 'Development'
-dotnet run --project .\CampusGear\CampusGear\CampusGear.csproj --launch-profile http
+dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http
 # After stopping that run:
 Remove-Item Env:Email__Provider
 ```
@@ -361,8 +370,8 @@ In Visual Studio, open `CampusGear/CampusGear.sln`, select the web project as st
 To change the schema, edit the entity and DbContext mapping, then add a migration:
 
 ```powershell
-dotnet ef migrations add DescribeYourChange --project .\CampusGear\CampusGear\CampusGear.csproj --output-dir Data/Migrations
-dotnet ef database update --project .\CampusGear\CampusGear\CampusGear.csproj
+dotnet ef migrations add DescribeYourChange --project .\CampusGear\CampusGear.Data\CampusGear.Data.csproj --startup-project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --output-dir Migrations
+dotnet ef database update --project .\CampusGear\CampusGear.Data\CampusGear.Data.csproj --startup-project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj
 ```
 
 Review generated migrations before applying them to a database with real records. The second command uses the configured database; it is not an isolated test database. For production, configure the host's connection/SMTP secret store, apply migrations explicitly, use HTTPS, and plan shared session storage and persistent/shared Data Protection keys if running multiple instances.
@@ -403,7 +412,7 @@ For a new booking action, keep identity/actor information server-derived, pass a
 | `scripts/verification.md` | Historical results and unresolved verification limits |
 
 ```powershell
-dotnet build .\CampusGear\CampusGear\CampusGear.csproj
+dotnet build .\CampusGear\CampusGear.sln
 dotnet test .\CampusGear\CampusGear.IntegrationTests\CampusGear.IntegrationTests.csproj
 
 # Focused email/configuration regressions:

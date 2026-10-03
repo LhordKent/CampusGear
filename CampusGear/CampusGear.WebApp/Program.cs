@@ -2,6 +2,7 @@ using CampusGear.Data;
 using CampusGear.Models;
 using CampusGear.Services;
 using CampusGear.Services.Reservations;
+using CampusGear.WebApp.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;

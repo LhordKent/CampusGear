@@ -184,12 +184,12 @@ try {
     Check ($result.Location -eq '/auth/two-factor') 'New admin flow pending'
     [void](Sql 'UPDATE AspNetUsers SET SecurityStamp=NEWID(),ConcurrencyStamp=NEWID() WHERE Id=@id' @{id=$admin.Id})
     Check ((Http $pending '/auth/two-factor').Location -eq '/auth/login') 'Stale administrator password step rejected'
-    $catalog=Get-Content -Raw "$PSScriptRoot\..\CampusGear\CampusGear\wwwroot\figma\catalog.json" | ConvertFrom-Json
+    $catalog=Get-Content -Raw "$PSScriptRoot\..\CampusGear\CampusGear.WebApp\wwwroot\figma\catalog.json" | ConvertFrom-Json
     foreach ($frame in $catalog) {
         $result=Http $anonymous $frame.url
         Check ($result.Status -eq 200 -and $result.Body.Contains('data-node-id="' + $frame.id + '"')) "Figma frame $($frame.id)"
     }
-    $checkAssetFiles=Get-ChildItem "$PSScriptRoot\..\CampusGear\CampusGear\wwwroot\figma\assets" -File
+    $checkAssetFiles=Get-ChildItem "$PSScriptRoot\..\CampusGear\CampusGear.WebApp\wwwroot\figma\assets" -File
     foreach ($file in $checkAssetFiles) { Check ((Http $anonymous ('/figma/assets/' + $file.Name)).Status -eq 200) "Local asset $($file.Name)" }
     $checks | ConvertTo-Json | Set-Content "$PSScriptRoot\live-smoke-results.json"
     $successful = $true
