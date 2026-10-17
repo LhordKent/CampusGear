@@ -25,7 +25,11 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<ApplicationUser>(entity =>
         {
-            entity.Property(x => x.FullName).HasMaxLength(160).IsRequired();
+            entity.Property(x => x.FirstName).HasMaxLength(100).IsRequired();
+            entity.Property(x => x.LastName).HasMaxLength(100).IsRequired();
+            entity.Property(x => x.FullName).HasMaxLength(201)
+                .HasComputedColumnSql("LTRIM(RTRIM([FirstName] + N' ' + [LastName]))", stored: true);
+            entity.Property(x => x.ApprovalStatus).HasConversion<string>().HasMaxLength(32);
             entity.HasIndex(x => x.NormalizedEmail)
                 .IsUnique()
                 .HasFilter("[NormalizedEmail] IS NOT NULL");

@@ -7,7 +7,7 @@
     string Local(DateTime value) => TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(value, DateTimeKind.Utc), manila).ToString("MMM d, yyyy h:mm tt");
 }
 <main class="live-content">
-    <header class="live-heading"><p class="live-eyebrow">EQUIPMENT OPERATIONS</p><h1>Equipment Maintenance</h1><p>Record repairs and restore items to borrowing availability.</p></header>
+    <header class="live-heading"><h1>Equipment Maintenance</h1></header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
     <section class="live-panel">
         <h2>Maintenance cases</h2>

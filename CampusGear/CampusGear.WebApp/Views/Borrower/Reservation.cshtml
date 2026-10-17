@@ -10,16 +10,12 @@
 @section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
 <main class="live-content borrower-page" data-figma-source="695:2">
     <header class="live-heading borrower-heading">
-        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
         <h1><img src="~/figma/assets/5fc0e.svg" alt="" />Equipment Reservation</h1>
-        <p>Reserve available equipment and submit a borrowing request for approval.</p>
     </header>
-    <partial name="_BorrowerTabs" />
 
     @if (Model.Submitted is { } submitted)
     {
         <section class="borrower-feedback borrower-success" role="status" data-figma-source="695:280">
-            <p class="borrower-eyebrow">REQUEST RECORDED</p>
             <h2>Reservation request submitted</h2>
             <p>Your request is saved. Staff will review it before the equipment can be released.</p>
             <dl class="borrower-summary">
@@ -75,7 +71,6 @@
                 <input type="hidden" name="RequestId" value="@Model.Input.RequestId" />
                 <div class="borrower-reservation-grid">
                     <section class="borrower-card borrower-equipment" aria-labelledby="equipment-title">
-                        <p class="borrower-eyebrow">SELECTED EQUIPMENT</p>
                         <h2 id="equipment-title">@(selected?.Name ?? "Choose equipment")</h2>
                         <label class="borrower-field" for="EquipmentItemId">
                             <span>Equipment item</span>
@@ -91,12 +86,10 @@
                             @Html.ValidationMessage("EquipmentItemId", null, new { @class = "borrower-field-error" })
                         </label>
                         <p class="borrower-muted" id="selected-code">@selected?.AssetCode · @selected?.Category</p>
-                        <span class="borrower-badge">TIME SLOT CHECKED ON SUBMIT</span>
                         <dl class="borrower-equipment-details">
                             <div><dt>CONDITION</dt><dd id="selected-condition">@selected?.Condition</dd></div>
                             <div><dt>LOCATION</dt><dd id="selected-location">@(selected?.Location ?? "Not specified")</dd></div>
                         </dl>
-                        <p class="borrower-muted">Each asset code represents one physical equipment item.</p>
                     </section>
                     <section class="borrower-card" aria-labelledby="request-title">
                         <h2 id="request-title">REQUEST DETAILS</h2>
@@ -125,10 +118,7 @@
                         </label>
                     </section>
                 </div>
-                <section class="borrower-hold-note">
-                    <strong>REQUEST SUMMARY</strong>
-                    <p>A pending request holds the slot for up to 24 hours or until its start time. Approval keeps the booking; rejection, cancellation, or expiry releases the slot.</p>
-                </section>
+                <p class="borrower-muted">A pending request holds the slot for up to 24 hours or until its start time.</p>
                 <div class="borrower-actions borrower-actions-end">
                     <a class="borrower-button borrower-button-secondary" href="/borrower/calendar">Check calendar</a>
                     <button class="borrower-button" type="submit" disabled="@(!Model.IsEligible)">SUBMIT RESERVATION</button>
@@ -136,7 +126,6 @@
             </form>
         }
     }
-    <p class="borrower-workflow">CAMPUSGEAR / BORROWER <span>RESERVE → APPROVE → RELEASE → RETURN</span></p>
 </main>
 <script>
 (() => {

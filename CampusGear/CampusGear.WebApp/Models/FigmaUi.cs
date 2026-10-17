@@ -1,7 +1,6 @@
 namespace CampusGear.Models;
 
-public sealed record FigmaEditorValue(string Label, string Value, string? InputId = null);
-public sealed record FigmaEditorFooter(string FormId, string CancelUrl, IReadOnlyList<FigmaEditorValue> Values);
+public sealed record FigmaEditorFooter(string FormId, string CancelUrl);
 
 public sealed record FigmaNavigation(string Path, string Label, string Icon);
 

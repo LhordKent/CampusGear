@@ -10,7 +10,7 @@
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
 <main class="live-content" data-figma-source="@source">
-    <header class="live-heading"><p class="live-eyebrow">@(staffPath == "/admin" ? "ADMINISTRATOR" : "CUSTODIAN") • EQUIPMENT WORKFLOW</p><h1>@(history ? "Borrowing History Report" : returns ? "Return & Condition Check" : "Approval & Release")</h1><p>@Model.Intro</p></header>
+    <header class="live-heading"><h1>@(history ? "Borrowing History Report" : returns ? "Return & Condition Check" : "Approval & Release")</h1></header>
     <div class="live-metrics custodian-metrics">
         <a class="live-metric" href="@staffPath/approvals"><strong>@Model.PendingCount</strong><span>Pending requests</span></a>
         <a class="live-metric" href="@staffPath/returns?queue=release"><strong>@Model.ApprovedCount</strong><span>Approved for release</span></a>
@@ -51,7 +51,7 @@
         </form>
         @if (Model.Rows.Count == 0)
         {
-            <div class="live-empty"><h3>No matching records</h3><p>Try another search or date range. New requests and active loans will appear here as they are recorded.</p></div>
+            <div class="live-empty"><h3>No matching records</h3><p>Try another search or date range.</p></div>
         }
         else
         {

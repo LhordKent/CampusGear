@@ -10,11 +10,8 @@
 @section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
 <main class="live-content borrower-page" data-figma-source="695:562">
     <header class="live-heading borrower-heading">
-        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
         <h1><img src="~/figma/assets/e1db6.svg" alt="" />Borrowing History Report</h1>
-        <p>Review your reservation records, borrowing activity, and return status.</p>
     </header>
-    <partial name="_BorrowerTabs" />
     @if (Model.Feedback is not null)
     {
         <section class="borrower-feedback borrower-success" role="status"><p>@Model.Feedback</p></section>
@@ -84,5 +81,4 @@
             </nav>
         }
     </section>
-    <p class="borrower-workflow">CAMPUSGEAR / BORROWER <span>HISTORY / REQUEST + RETURN STATUS</span></p>
 </main>
