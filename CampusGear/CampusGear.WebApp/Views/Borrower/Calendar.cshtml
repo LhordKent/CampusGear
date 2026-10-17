@@ -11,11 +11,8 @@
 @section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
 <main class="live-content borrower-page" data-figma-source="695:1234">
     <header class="live-heading borrower-heading">
-        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
         <h1><img src="~/figma/assets/1f786.svg" alt="" />Availability Calendar</h1>
-        <p>Check equipment availability by date and review scheduled reservations and maintenance status.</p>
     </header>
-    <partial name="_BorrowerTabs" />
     @if (Model.Items.Count == 0)
     {
         <section class="borrower-empty"><h2>No active equipment</h2><p>Equipment availability will appear here when items are added.</p></section>
@@ -92,5 +89,4 @@
             </section>
         </div>
     }
-    <p class="borrower-workflow">CAMPUSGEAR / BORROWER <span>AVAILABILITY / DATE + STATUS</span></p>
 </main>

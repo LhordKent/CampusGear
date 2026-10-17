@@ -1,0 +1,128 @@
+/* CampusGear motion layer: subtle, non-blocking transitions shared by every screen.
+   Adjust timing and easing here; every animation below reads these variables. */
+:root {
+    --motion-fast: 220ms;      /* hover, press, colour changes */
+    --motion-base: 340ms;      /* panels, alerts, menus */
+    --motion-slow: 480ms;      /* page entrance, success marks */
+    --motion-stagger: 70ms;    /* delay step between sibling sections */
+    --motion-ease: cubic-bezier(.2, .7, .2, 1);         /* decelerate: entering elements */
+    --motion-ease-press: cubic-bezier(.3, 0, .2, 1);     /* quick in/out: hover and press */
+    --motion-distance: 6px;    /* how far entering content slides */
+    --motion-lift: -1px;       /* hover lift for buttons and cards */
+    --motion-press: .97;       /* press scale */
+    --motion-spin: 700ms;      /* loading spinner rotation */
+}
+
+@keyframes motion-enter { from { opacity: 0; transform: translateY(var(--motion-distance)); } to { opacity: 1; transform: none; } }
+@keyframes motion-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes motion-drop { from { opacity: 0; transform: translateY(calc(var(--motion-distance) * -1)); } to { opacity: 1; transform: none; } }
+@keyframes motion-pop { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: none; } }
+@keyframes motion-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+@keyframes motion-spin { to { transform: rotate(360deg); } }
+@keyframes motion-progress { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+/* Page and section entrance. Content stays clickable while it fades in. */
+.live-content > *,
+.live-metrics > *,
+.auth-card {
+    animation: motion-enter var(--motion-slow) var(--motion-ease) both;
+}
+.live-content > :nth-child(2), .live-metrics > :nth-child(2) { animation-delay: var(--motion-stagger); }
+.live-content > :nth-child(3), .live-metrics > :nth-child(3) { animation-delay: calc(var(--motion-stagger) * 2); }
+.live-content > :nth-child(4), .live-metrics > :nth-child(4) { animation-delay: calc(var(--motion-stagger) * 3); }
+.live-content > :nth-child(n + 5) { animation-delay: calc(var(--motion-stagger) * 4); }
+.auth-backdrop { animation: motion-fade var(--motion-slow) var(--motion-ease) both; }
+
+/* Buttons: smooth colour changes, a slight lift on hover and a press-in on click. */
+:is(.live-button, .borrower-button, .auth-action, .auth-secondary, .live-logout button, .live-filters button, .live-dashboard-shortcuts a) {
+    transition: background-color var(--motion-fast) var(--motion-ease-press), border-color var(--motion-fast) var(--motion-ease-press),
+        color var(--motion-fast) var(--motion-ease-press), box-shadow var(--motion-fast) var(--motion-ease-press),
+        filter var(--motion-fast) var(--motion-ease-press), transform var(--motion-fast) var(--motion-ease-press);
+}
+:is(.live-button, .borrower-button, .auth-action, .auth-secondary, .live-logout button):not(:disabled):hover { transform: translateY(var(--motion-lift)); }
+:is(.live-button, .borrower-button, .auth-action, .auth-secondary, .live-logout button):not(:disabled):active { transform: scale(var(--motion-press)); transition-duration: 60ms; }
+
+/* Links and inline text actions. */
+:is(.live-link, .auth-link, .auth-inline-form button, .borrower-page a:not([class])) { transition: color var(--motion-fast) var(--motion-ease-press), opacity var(--motion-fast) var(--motion-ease-press); }
+
+/* Clickable cards: dashboard metrics, activity items, calendar days, custodian shortcuts. */
+:is(.live-metric, .live-activity, .borrower-day, .custodian-calendar-day, .custodian-metrics a) {
+    transition: transform var(--motion-fast) var(--motion-ease-press), border-color var(--motion-fast) var(--motion-ease-press),
+        box-shadow var(--motion-fast) var(--motion-ease-press), background-color var(--motion-fast) var(--motion-ease-press);
+}
+:is(a.live-metric, .live-activity, .borrower-day, .custodian-calendar-day, .custodian-metrics a):hover { transform: translateY(calc(var(--motion-lift) * 2)); }
+:is(a.live-metric, .live-activity, .borrower-day, .custodian-calendar-day, .custodian-metrics a):active { transform: scale(.99); transition-duration: 60ms; }
+
+/* Table rows: the existing hover colour fades in instead of snapping. */
+:is(.live-table, .borrower-table) td { transition: background-color var(--motion-fast) var(--motion-ease-press); }
+
+/* Sidebar menu items. */
+:is(.live-navigation nav > a, .live-extra-navigation a, .live-sidebar nav a) {
+    transition: background-color var(--motion-fast) var(--motion-ease-press), border-color var(--motion-fast) var(--motion-ease-press),
+        color var(--motion-fast) var(--motion-ease-press), transform var(--motion-fast) var(--motion-ease-press);
+}
+:is(.live-navigation nav > a, .live-extra-navigation a):hover:not(.live-nav-active) { transform: translateX(2px); }
+
+/* Form fields: focus and hover borders ease in. */
+:is(.auth-input, .live-field input, .live-field select, .live-field textarea, .live-filters input, .live-filters select,
+    .borrower-field input, .borrower-field select, .borrower-field textarea) {
+    transition: border-color var(--motion-fast) var(--motion-ease-press), box-shadow var(--motion-fast) var(--motion-ease-press),
+        background-color var(--motion-fast) var(--motion-ease-press);
+}
+
+/* Expanding panels and menus (<details>): reveal on open; browsers with ::details-content also fade on close. */
+details:not(.live-navigation)[open] > :not(summary) { animation: motion-drop var(--motion-base) var(--motion-ease) both; }
+details:not(.live-navigation)::details-content {
+    opacity: 0;
+    transition: opacity var(--motion-base) var(--motion-ease), content-visibility var(--motion-base) allow-discrete;
+}
+details:not(.live-navigation)[open]::details-content { opacity: 1; }
+summary { transition: color var(--motion-fast) var(--motion-ease-press), background-color var(--motion-fast) var(--motion-ease-press), filter var(--motion-fast) var(--motion-ease-press); }
+@media (max-width: 1000px) {
+    .live-navigation[open] > nav { animation: motion-drop var(--motion-base) var(--motion-ease) both; }
+}
+
+/* Alerts, notices and empty states slide in; success marks pop. */
+:is(.live-feedback, .auth-error, .auth-validation, .auth-notice, .auth-panel[role='status'], .borrower-feedback, .borrower-validation, .validation-summary-errors) {
+    animation: motion-drop var(--motion-base) var(--motion-ease) both;
+}
+:is(.live-empty, .borrower-empty) { animation: motion-fade var(--motion-slow) var(--motion-ease) both; }
+.auth-success-mark { animation: motion-pop var(--motion-slow) var(--motion-ease) calc(var(--motion-stagger) * 2) both; }
+
+/* Validation: messages fade in and the invalid input gives a gentle shake. */
+:is(.field-validation-error, .auth-field-error, .borrower-field-error):not(:empty) { animation: motion-drop var(--motion-base) var(--motion-ease) both; }
+:is(.auth-field, .live-field, .borrower-field):has(.field-validation-error:not(:empty)) :is(input, select, textarea),
+.motion-shake {
+    animation: motion-shake var(--motion-slow) var(--motion-ease-press);
+}
+
+/* Loading: a thin progress bar while the next page loads, and a spinner on the button that submitted. */
+.motion-progress {
+    position: fixed; z-index: 9999; inset: 0 0 auto; height: 3px; overflow: hidden; pointer-events: none;
+    opacity: 0; transition: opacity var(--motion-base) var(--motion-ease);
+}
+.motion-progress::before {
+    content: ''; position: absolute; inset: 0; width: 40%;
+    background: linear-gradient(90deg, transparent, #2c8c8a, #c77833, transparent);
+    animation: motion-progress 1.1s var(--motion-ease-press) infinite;
+}
+.motion-navigating .motion-progress { opacity: 1; }
+.motion-busy { position: relative; }
+.motion-busy::after {
+    content: ''; position: absolute; top: 50%; right: 14px; width: 14px; height: 14px; margin-top: -7px;
+    border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; opacity: .85;
+    animation: motion-spin var(--motion-spin) linear infinite, motion-fade var(--motion-fast) var(--motion-ease) both;
+    pointer-events: none;
+}
+
+/* Respect reduced-motion: no movement, near-instant fades, static loading indicators. */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --motion-fast: 1ms; --motion-base: 1ms; --motion-slow: 1ms; --motion-stagger: 0ms;
+        --motion-distance: 0px; --motion-lift: 0px; --motion-press: 1;
+    }
+    .motion-shake, :is(.auth-field, .live-field, .borrower-field):has(.field-validation-error:not(:empty)) :is(input, select, textarea) { animation: none; }
+    .motion-progress::before { animation: none; left: 0; width: 100%; opacity: .6; }
+    .motion-busy::after { animation: none; }
+    :is(.live-navigation nav > a, .live-extra-navigation a):hover:not(.live-nav-active) { transform: none; }
+}

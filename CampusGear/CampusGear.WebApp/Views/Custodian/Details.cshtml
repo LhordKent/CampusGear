@@ -13,7 +13,7 @@
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
 <main class="live-content" data-figma-source="@source">
-    <header class="live-heading"><p class="live-eyebrow">@(admin ? "ADMINISTRATOR" : "CUSTODIAN") • EQUIPMENT WORKFLOW</p><h1>@ViewData["Title"]</h1><p>@(returning ? "Record equipment returns and update item condition." : "Review reservation requests and record equipment release.")</p></header>
+    <header class="live-heading"><h1>@ViewData["Title"]</h1></header>
     @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status">@Model.Feedback</div> }
     @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert">@Model.Error</div> }
     @if (!string.IsNullOrWhiteSpace(Model.AvailabilityNote)) { <div class="live-feedback" role="status">@Model.AvailabilityNote</div> }

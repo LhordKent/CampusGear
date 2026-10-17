@@ -33,7 +33,7 @@ public sealed class AdminUsersController(
     {
         q = SearchText(q);
         role = PrimaryRoles.Contains(role) ? role! : "all";
-        status = status is "active" or "inactive" or "unverified" ? status : "all";
+        status = status is "active" or "inactive" or "pending" or "rejected" ? status : "all";
         var query = db.Users.AsNoTracking();
         if (q.Length > 0)
             query = query.Where(x => x.FullName.Contains(q) || x.Email!.Contains(q) ||
@@ -45,13 +45,16 @@ public sealed class AdminUsersController(
                 db.Roles.Any(r => r.Id == ur.RoleId && r.Name == role)));
         query = status switch
         {
-            "active" => query.Where(x => x.IsActive),
+            "active" => query.Where(x => x.IsActive && x.ApprovalStatus == AccountApprovalStatus.Approved),
             "inactive" => query.Where(x => !x.IsActive),
-            "unverified" => query.Where(x => !x.EmailConfirmed),
+            "pending" => query.Where(x => x.ApprovalStatus == AccountApprovalStatus.PendingApproval),
+            "rejected" => query.Where(x => x.ApprovalStatus == AccountApprovalStatus.Rejected),
             _ => query
         };
 
         var total = await query.CountAsync(cancellationToken);
+        var pendingTotal = await db.Users.CountAsync(
+            x => x.ApprovalStatus == AccountApprovalStatus.PendingApproval, cancellationToken);
         var pages = Math.Max(1, (int)Math.Ceiling(total / (double)UserPageSize));
         page = Math.Clamp(page, 1, pages);
         var accounts = await query.Include(x => x.BorrowerProfile)
@@ -64,10 +67,66 @@ public sealed class AdminUsersController(
         var rows = accounts.Select(x => new AdminUserRow(
             x.Id, x.FullName, x.Email ?? string.Empty,
             string.Join(", ", roleRows.Where(r => r.UserId == x.Id).Select(r => r.Name).Order()),
-            x.IsActive, x.EmailConfirmed, x.BorrowerProfile?.StudentNumber,
+            x.IsActive, x.ApprovalStatus, x.BorrowerProfile?.StudentNumber,
             x.BorrowerProfile?.Department, x.BorrowerProfile?.IsEligible)).ToList();
-        return View("Index", new AdminUsersPage(rows, q, role, status, page, pages, total,
-            TempData["AdminUsersFeedback"] as string));
+        return View("Index", new AdminUsersPage(rows, q, role, status, page, pages, total, pendingTotal,
+            TempData["AdminUsersFeedback"] as string, TempData["AdminUsersError"] as string));
+    }
+
+    [HttpPost("admin/users/{id}/approve")]
+    public Task<IActionResult> Approve(string id, string? returnUrl, CancellationToken cancellationToken) =>
+        DecideRegistrationAsync(id, AccountApprovalStatus.Approved, returnUrl, cancellationToken);
+
+    [HttpPost("admin/users/{id}/reject")]
+    public Task<IActionResult> Reject(string id, string? returnUrl, CancellationToken cancellationToken) =>
+        DecideRegistrationAsync(id, AccountApprovalStatus.Rejected, returnUrl, cancellationToken);
+
+    private async Task<IActionResult> DecideRegistrationAsync(string id, AccountApprovalStatus decision,
+        string? returnUrl, CancellationToken cancellationToken)
+    {
+        var back = Url.IsLocalUrl(returnUrl) ? returnUrl! : "/admin/users?status=pending";
+        var target = await db.Users.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (target is null) return NotFound();
+
+        // Pending registrations can be approved or rejected; a rejected registration can still be approved later.
+        var allowed = target.ApprovalStatus == AccountApprovalStatus.PendingApproval ||
+            decision == AccountApprovalStatus.Approved && target.ApprovalStatus == AccountApprovalStatus.Rejected;
+        if (!allowed)
+        {
+            TempData["AdminUsersError"] = $"{target.FullName}'s registration has already been decided.";
+            return Redirect(back);
+        }
+
+        var before = JsonSerializer.Serialize(new { target.ApprovalStatus, target.EmailConfirmed });
+        target.ApprovalStatus = decision;
+        // Administrator approval replaces sign-up email verification.
+        if (decision == AccountApprovalStatus.Approved) target.EmailConfirmed = true;
+        target.UpdatedAtUtc = DateTime.UtcNow;
+        var updated = await users.UpdateAsync(target);
+        if (!updated.Succeeded)
+        {
+            TempData["AdminUsersError"] = "This account changed while the page was open. Review it and try again.";
+            return Redirect(back);
+        }
+
+        var approved = decision == AccountApprovalStatus.Approved;
+        db.AuditEvents.Add(new AuditEvent
+        {
+            ActorUserId = users.GetUserId(User),
+            Action = approved ? "Admin.RegistrationApproved" : "Admin.RegistrationRejected",
+            EntityType = "ApplicationUser",
+            EntityId = target.Id,
+            Outcome = "Succeeded",
+            BeforeJson = before,
+            AfterJson = JsonSerializer.Serialize(new { target.ApprovalStatus, target.EmailConfirmed }),
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            CorrelationId = HttpContext.TraceIdentifier
+        });
+        await db.SaveChangesAsync(cancellationToken);
+        TempData["AdminUsersFeedback"] = approved
+            ? $"{target.FullName}'s account was approved."
+            : $"{target.FullName}'s registration was rejected.";
+        return Redirect(back);
     }
 
     [HttpGet("admin/users/{id}/edit")]
@@ -113,8 +172,8 @@ public sealed class AdminUsersController(
             var roleChanged = currentRoles.Count != 1 || currentRoles[0] != input.Role;
             if (target.Id == actorId && (!input.IsActive || input.Role != "Administrator"))
                 throw new AdminUserEditException("You cannot deactivate your own account or remove your own Administrator role.");
-            if (input.Role != "Borrower" && !target.EmailConfirmed)
-                throw new AdminUserEditException("The account must verify its email before receiving a staff role.");
+            if (input.Role != "Borrower" && target.ApprovalStatus != AccountApprovalStatus.Approved)
+                throw new AdminUserEditException("The account must be approved before receiving a staff role.");
 
             if (target.IsActive && currentRoles.Contains("Administrator") &&
                 (!input.IsActive || input.Role != "Administrator"))
@@ -135,13 +194,14 @@ public sealed class AdminUsersController(
             if (input.StudentNumber is not null && await db.BorrowerProfiles.AnyAsync(
                     x => x.UserId != target.Id && x.StudentNumber == input.StudentNumber, cancellationToken))
             {
-                ModelState.AddModelError(nameof(input.StudentNumber), "Another borrower already uses this student number.");
+                ModelState.AddModelError(nameof(input.StudentNumber), "This Student ID Number is already registered.");
                 return await EditViewAsync(id, input, cancellationToken);
             }
 
             var before = Snapshot(target, currentRoles, profile);
             var activeChanged = target.IsActive != input.IsActive;
-            target.FullName = input.FullName.Trim();
+            target.FirstName = input.FirstName.Trim();
+            target.LastName = input.LastName.Trim();
             target.IsActive = input.IsActive;
             target.UpdatedAtUtc = DateTime.UtcNow;
             EnsureIdentityResult(await users.UpdateAsync(target));
@@ -207,7 +267,7 @@ public sealed class AdminUsersController(
         catch (DbUpdateException exception) when (exception.InnerException is SqlException { Number: 2601 or 2627 })
         {
             db.ChangeTracker.Clear();
-            ModelState.AddModelError(nameof(input.StudentNumber), "Another borrower already uses this student number.");
+            ModelState.AddModelError(nameof(input.StudentNumber), "This Student ID Number is already registered.");
             return await EditViewAsync(id, input, cancellationToken);
         }
     }
@@ -246,7 +306,8 @@ public sealed class AdminUsersController(
         var currentRole = PrimaryRoles.LastOrDefault(currentRoles.Contains) ?? "Borrower";
         input ??= new AdminUserEditInput
         {
-            FullName = target.FullName,
+            FirstName = target.FirstName,
+            LastName = target.LastName,
             Role = currentRole,
             IsActive = target.IsActive,
             StudentNumber = target.BorrowerProfile?.StudentNumber,
@@ -257,7 +318,7 @@ public sealed class AdminUsersController(
             ProfileRowVersion = target.BorrowerProfile is null ? string.Empty : Convert.ToBase64String(target.BorrowerProfile.RowVersion)
         };
         return View("Edit", new AdminUserEditPage(id, target.Email ?? string.Empty,
-            target.EmailConfirmed, target.PhoneNumber, string.Join(", ", currentRoles),
+            target.ApprovalStatus, target.PhoneNumber, string.Join(", ", currentRoles),
             target.BorrowerProfile is not null, target.Id == users.GetUserId(User), input));
     }
 
@@ -291,7 +352,7 @@ public sealed class AdminUsersController(
     private static string Snapshot(ApplicationUser user, IEnumerable<string> roles, BorrowerProfile? profile) =>
         JsonSerializer.Serialize(new
         {
-            user.FullName, user.IsActive, user.EmailConfirmed, Roles = roles.Order().ToArray(),
+            user.FirstName, user.LastName, user.IsActive, user.ApprovalStatus, user.EmailConfirmed, Roles = roles.Order().ToArray(),
             Borrower = profile is null ? null : new
             {
                 profile.StudentNumber, profile.Department, profile.IsEligible, profile.EligibilityNotes
@@ -324,16 +385,18 @@ public sealed class AdminUsersController(
 }
 
 public sealed record AdminUserRow(string Id, string FullName, string Email, string Role,
-    bool IsActive, bool EmailConfirmed, string? StudentNumber, string? Department, bool? IsEligible);
+    bool IsActive, AccountApprovalStatus ApprovalStatus, string? StudentNumber, string? Department, bool? IsEligible);
 public sealed record AdminUsersPage(IReadOnlyList<AdminUserRow> Rows, string Query, string Role,
-    string Status, int Page, int PageCount, int Total, string? Feedback);
-public sealed record AdminUserEditPage(string Id, string Email, bool EmailConfirmed,
+    string Status, int Page, int PageCount, int Total, int PendingTotal, string? Feedback, string? Error);
+public sealed record AdminUserEditPage(string Id, string Email, AccountApprovalStatus ApprovalStatus,
     string? ContactNumber, string CurrentRole, bool HasBorrowerProfile, bool IsSelf, AdminUserEditInput Input);
 
 public sealed class AdminUserEditInput
 {
-    [Required, StringLength(160, MinimumLength = 2)]
-    public string FullName { get; set; } = string.Empty;
+    [Required, StringLength(100), Display(Name = "First name")]
+    public string FirstName { get; set; } = string.Empty;
+    [Required, StringLength(100), Display(Name = "Last name")]
+    public string LastName { get; set; } = string.Empty;
     [Required]
     public string Role { get; set; } = "Borrower";
     public bool IsActive { get; set; }

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="1010 -130 500 500" fill="none">
+<!-- Top-right rings from the auth atmosphere (ec54f.svg), unclipped so they run off the screen edge. -->
+<defs>
+<radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1260 120) scale(250)">
+<stop stop-color="#2E9AA8" stop-opacity="0.18"/>
+<stop offset="1" stop-color="#2E9AA8" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<circle cx="1260" cy="120" r="250" fill="url(#glow)"/>
+<circle cx="1260" cy="120" r="150" stroke="#C77833" opacity="0.32"/>
+<circle cx="1260" cy="120" r="105" stroke="#2C8C8A" stroke-width="1.5" opacity="0.42"/>
+<circle cx="1260" cy="120" r="60" stroke="#2C8C8A" opacity="0.3"/>
+</svg>

@@ -124,7 +124,7 @@ app.Use(async (context, next) =>
     {
         var users = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
         var user = await users.GetUserAsync(context.User);
-        if (user is null || !user.IsActive)
+        if (user is null || !user.IsActive || user.ApprovalStatus != AccountApprovalStatus.Approved)
         {
             await context.SignOutAsync(IdentityConstants.ApplicationScheme);
             context.User = new System.Security.Claims.ClaimsPrincipal();

@@ -7,12 +7,11 @@
 @section Styles { <link rel="stylesheet" href="~/css/admin-users.css" asp-append-version="true" /> }
 <main class="live-content" data-figma-source="945:195">
     <header class="live-heading">
-        <p class="live-eyebrow">ADMINISTRATOR • WORKSPACE</p>
+        
         <h1>System Audit Log</h1>
-        <p>Review account and equipment activity. Audit records are read-only and times are shown in Manila time.</p>
+        <p>Times are shown in Manila time.</p>
     </header>
-    <section class="live-panel" aria-labelledby="audit-title">
-        <h2 id="audit-title">AUDIT HISTORY</h2>
+    <section class="live-panel" aria-label="Audit history">
         <form class="live-filters" method="get" action="/admin/audit" aria-label="Search audit history">
             <label for="q">Search action, actor, record, result, or IP address<input id="q" name="q" type="search" value="@Model.Query" maxlength="120" /></label>
             <button class="live-button" type="submit">Search</button><a class="live-button secondary" href="/admin/audit">Clear</a>
