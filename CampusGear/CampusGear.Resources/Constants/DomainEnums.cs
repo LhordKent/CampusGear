@@ -33,3 +33,10 @@ public enum EmailChallengePurpose
     AdministratorLogin,
     PasswordReset
 }
+
+public enum AccountApprovalStatus
+{
+    Approved,
+    PendingApproval,
+    Rejected
+}

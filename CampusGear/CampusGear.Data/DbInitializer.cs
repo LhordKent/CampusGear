@@ -43,12 +43,15 @@ public static class DbInitializer
         if (await users.FindByEmailAsync(email) is not null)
             throw new InvalidOperationException("Bootstrap administrator email already belongs to an account.");
 
+        var name = (Environment.GetEnvironmentVariable("CAMPUSGEAR_BOOTSTRAP_ADMIN_NAME") ?? "CampusGear Administrator").Trim();
+        var lastSpace = name.LastIndexOf(' ');
         var user = new ApplicationUser
         {
             UserName = email,
             Email = email,
             EmailConfirmed = true,
-            FullName = Environment.GetEnvironmentVariable("CAMPUSGEAR_BOOTSTRAP_ADMIN_NAME") ?? "CampusGear Administrator"
+            FirstName = lastSpace < 0 ? name : name[..lastSpace].TrimEnd(),
+            LastName = lastSpace < 0 ? string.Empty : name[(lastSpace + 1)..]
         };
         await using var transaction = await db.Database.BeginTransactionAsync();
         var result = await users.CreateAsync(user, password);

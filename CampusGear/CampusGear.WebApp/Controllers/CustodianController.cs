@@ -32,7 +32,6 @@ public sealed class CustodianController(
         if (status == "pending") query = query.Where(x => x.Status == ReservationStatus.Pending);
         if (status == "approved") query = query.Where(x => x.Status == ReservationStatus.Approved);
         var model = await ListAsync(query, User.IsInRole("Administrator") ? nameof(AdminApprovals) : nameof(Approvals), "Reservation approvals",
-            "Review pending requests, approve or reject them, and open approved bookings for release.",
             q, status, from, to, page, "approvals", cancellationToken);
         return View("Queue", model);
     }
@@ -47,7 +46,6 @@ public sealed class CustodianController(
             ? x.Status == ReservationStatus.Approved
             : x.Status == ReservationStatus.Released && x.Loan != null && x.Loan.ReturnedAtUtc == null);
         var model = await ListAsync(query, User.IsInRole("Administrator") ? nameof(AdminReturns) : nameof(Returns), "Release and return desk",
-            "Record equipment handover during the approved booking time, then inspect and record each return.",
             q, "all", from, to, page, queue, cancellationToken);
         return View("Queue", model);
     }
@@ -74,7 +72,6 @@ public sealed class CustodianController(
         };
         if (status is not ("pending" or "approved" or "borrowed" or "returned" or "rejected" or "cancelled" or "expired" or "late")) status = "all";
         return View("Queue", await ListAsync(query, User.IsInRole("Administrator") ? nameof(AdminHistory) : nameof(History), "Borrowing history",
-            "Track decisions, release records, return condition, and late equipment across all borrowers.",
             q, status, from, to, page, "history", cancellationToken));
     }
 
@@ -206,7 +203,7 @@ public sealed class CustodianController(
         CancellationToken cancellationToken) => Calendar(year, month, equipmentItemId, day, cancellationToken);
 
     private async Task<CustodianListViewModel> ListAsync(IQueryable<Reservation> query, string action,
-        string title, string intro, string? search, string status, string? from, string? to,
+        string title, string? search, string status, string? from, string? to,
         int page, string queue, CancellationToken cancellationToken)
     {
         search = search?.Trim();
@@ -250,7 +247,7 @@ public sealed class CustodianController(
         var approved = await db.Reservations.CountAsync(x => x.Status == ReservationStatus.Approved, cancellationToken);
         var active = await db.Loans.CountAsync(x => x.ReturnedAtUtc == null, cancellationToken);
         var pending = await db.Reservations.CountAsync(x => x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now, cancellationToken);
-        return new(title, intro, action, search ?? string.Empty, status, from ?? string.Empty, to ?? string.Empty,
+        return new(title, action, search ?? string.Empty, status, from ?? string.Empty, to ?? string.Empty,
             queue, page, pages, total, rows, pending, approved, active,
             TempData["CustodianFeedback"] as string, filterError ?? TempData["CustodianError"] as string);
     }
@@ -293,7 +290,7 @@ public sealed class CustodianController(
 public sealed record CustodianListRow(Guid Id, string BorrowerName, string BorrowerEmail,
     string EquipmentName, string AssetCode, string StartManila, string EndManila,
     string Status, string? ReturnCondition, string? ReturnedManila);
-public sealed record CustodianListViewModel(string Title, string Intro, string ActionName,
+public sealed record CustodianListViewModel(string Title, string ActionName,
     string Search, string Status, string From, string To, string Queue, int Page, int PageCount,
     int Total, IReadOnlyList<CustodianListRow> Rows, int PendingCount, int ApprovedCount, int ActiveCount,
     string? Feedback, string? Error);
