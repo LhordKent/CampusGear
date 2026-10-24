@@ -33,6 +33,7 @@ public sealed class AccountController : Controller
     private readonly EmailChallengeService _challenges;
     private readonly IWebHostEnvironment _environment;
     private readonly DevelopmentEmailSender? _developmentEmail;
+    private readonly IConfiguration _configuration;
 
     public AccountController(
         ApplicationDbContext db,
@@ -48,6 +49,7 @@ public sealed class AccountController : Controller
         _challenges = challenges;
         _environment = environment;
         _developmentEmail = services.GetService<DevelopmentEmailSender>();
+        _configuration = services.GetRequiredService<IConfiguration>();
     }
 
     [AllowAnonymous]
@@ -113,7 +115,7 @@ public sealed class AccountController : Controller
             return LoginView(email);
         }
 
-        if (await _users.IsInRoleAsync(user, "Administrator"))
+        if (await _users.IsInRoleAsync(user, "Administrator") && !SkipAdministratorCode())
         {
             // CheckPasswordSignInAsync validates the password without creating an auth cookie.
             HttpContext.Session.SetString(PendingAdministratorUserId, user.Id);
@@ -541,6 +543,11 @@ public sealed class AccountController : Controller
                string.Equals(user.SecurityStamp, stamp, StringComparison.Ordinal) &&
                await _users.IsInRoleAsync(user, "Administrator");
     }
+
+    // Local Development without SMTP cannot deliver the administrator code, so the password alone is accepted.
+    private bool SkipAdministratorCode() =>
+        _environment.IsDevelopment() && _developmentEmail is null &&
+        string.IsNullOrWhiteSpace(_configuration["Email:Smtp:Host"]);
 
     private bool MatchesPendingReset(ApplicationUser? user)
     {
