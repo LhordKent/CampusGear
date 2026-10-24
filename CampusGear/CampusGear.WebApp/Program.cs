@@ -82,7 +82,17 @@ if (emailProvider.Equals("Development", StringComparison.OrdinalIgnoreCase))
 }
 else if (emailProvider.Equals("Smtp", StringComparison.OrdinalIgnoreCase))
 {
-    builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+    if (builder.Environment.IsDevelopment())
+    {
+        // Temporary: Development also copies every message to /development/email.
+        builder.Services.AddSingleton<DevelopmentEmailSender>();
+        builder.Services.AddSingleton<SmtpEmailSender>();
+        builder.Services.AddSingleton<IEmailSender, DevelopmentMirrorEmailSender>();
+    }
+    else
+    {
+        builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+    }
 }
 else
 {

@@ -33,7 +33,7 @@ public sealed class AccountController : Controller
     private readonly EmailChallengeService _challenges;
     private readonly IWebHostEnvironment _environment;
     private readonly DevelopmentEmailSender? _developmentEmail;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration? _configuration;
 
     public AccountController(
         ApplicationDbContext db,
@@ -49,7 +49,7 @@ public sealed class AccountController : Controller
         _challenges = challenges;
         _environment = environment;
         _developmentEmail = services.GetService<DevelopmentEmailSender>();
-        _configuration = services.GetRequiredService<IConfiguration>();
+        _configuration = services.GetService<IConfiguration>();
     }
 
     [AllowAnonymous]
@@ -546,8 +546,9 @@ public sealed class AccountController : Controller
 
     // Local Development without SMTP cannot deliver the administrator code, so the password alone is accepted.
     private bool SkipAdministratorCode() =>
-        _environment.IsDevelopment() && _developmentEmail is null &&
-        string.IsNullOrWhiteSpace(_configuration["Email:Smtp:Host"]);
+        _environment.IsDevelopment() &&
+        (_configuration?["Email:Provider"] ?? "Smtp").Equals("Smtp", StringComparison.OrdinalIgnoreCase) &&
+        string.IsNullOrWhiteSpace(_configuration?["Email:Smtp:Host"]);
 
     private bool MatchesPendingReset(ApplicationUser? user)
     {
