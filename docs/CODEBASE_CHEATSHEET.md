@@ -27,7 +27,7 @@ CampusGear manages equipment borrowing for a campus. Borrowers request equipment
 | Live pages | MVC controllers and Razor `.cshtml` views | Server-rendered forms, tables, dashboards, and feedback |
 | Database access | Entity Framework Core 8 / SQL Server | Queries, relationships, migrations, and transactions |
 | Accounts | ASP.NET Core Identity | Passwords, roles, email confirmation, lockout, cookies, and security stamps |
-| Email codes | `EmailChallengeService` + `IEmailSender` | Signup verification, administrator sign-in, and password recovery |
+| Email codes | `EmailChallengeService` + `IEmailSender` | Administrator sign-in and password recovery (sign-up uses administrator approval instead) |
 | Reservation rules | `IReservationService` / `ReservationService` | Booking validation and reservation/loan state changes |
 | Scheduled expiry | `ReservationExpiryWorker` | Marks elapsed pending reservations as expired |
 | Browser behavior | CSS and plain JavaScript | Responsive navigation, form summaries, and visual states |

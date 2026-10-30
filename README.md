@@ -99,7 +99,7 @@ dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --l
 
 The bootstrap runs only when no administrator account exists. `--initialize-only` creates the account and exits without starting the web server. Account creation and role assignment commit together. The initial account is confirmed by this local operator setup and requires an email code at login. Remove the password environment variable afterward with `Remove-Item Env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD`. No default administrator password is checked into the project.
 
-Custodians and additional administrators first register and verify their email. An administrator then assigns their role in User Management. Account history is retained when roles change or access is paused.
+New accounts start as Pending Approval; an administrator approves or rejects them in User & Role Management. Custodians and additional administrators register the same way, and an administrator assigns their role after approval. Account history is retained when roles change or access is paused.
 
 ## Live workflows
 

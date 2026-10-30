@@ -19,7 +19,6 @@ namespace CampusGear.Controllers;
 [TypeFilter(typeof(AccountAntiforgeryRecoveryFilter))]
 public sealed class AccountController : Controller
 {
-    private const string PendingVerificationUserId = "CampusGear.PendingVerificationUserId";
     private const string PendingAdministratorUserId = "CampusGear.PendingAdministratorUserId";
     private const string PendingAdministratorStamp = "CampusGear.PendingAdministratorStamp";
     private const string PendingResetUserId = "CampusGear.PendingResetUserId";
@@ -34,6 +33,7 @@ public sealed class AccountController : Controller
     private readonly EmailChallengeService _challenges;
     private readonly IWebHostEnvironment _environment;
     private readonly DevelopmentEmailSender? _developmentEmail;
+    private readonly IConfiguration? _configuration;
 
     public AccountController(
         ApplicationDbContext db,
@@ -49,6 +49,7 @@ public sealed class AccountController : Controller
         _challenges = challenges;
         _environment = environment;
         _developmentEmail = services.GetService<DevelopmentEmailSender>();
+        _configuration = services.GetService<IConfiguration>();
     }
 
     [AllowAnonymous]
@@ -74,7 +75,6 @@ public sealed class AccountController : Controller
         if (!ModelState.IsValid) return LoginView(input.Email);
 
         ClearPendingAdministrator();
-        HttpContext.Session.Remove(PendingVerificationUserId);
 
         var email = input.Email.Trim();
         var user = await _users.FindByEmailAsync(email);
@@ -85,8 +85,9 @@ public sealed class AccountController : Controller
             return LoginView(email);
         }
 
-        if (!user.EmailConfirmed)
+        if (user.ApprovalStatus != AccountApprovalStatus.Approved)
         {
+            // The approval status is revealed only after the password is confirmed.
             if (await _users.IsLockedOutAsync(user) || !await _users.CheckPasswordAsync(user, input.Password))
             {
                 if (!await _users.IsLockedOutAsync(user)) await _users.AccessFailedAsync(user);
@@ -96,21 +97,12 @@ public sealed class AccountController : Controller
             }
 
             await _users.ResetAccessFailedCountAsync(user);
-            HttpContext.Session.SetString(PendingVerificationUserId, user.Id);
-            var issued = await _challenges.IssueAsync(user, EmailChallengePurpose.SignupVerification,
-                HttpContext.RequestAborted);
-            if (issued.Status == ChallengeIssueStatus.DeliveryUnavailable)
-            {
-                await AuditAsync("Auth.LoginPassword", "CodeDeliveryFailed", user.Id);
-                ViewData["ErrorMessage"] = "We could not send a verification email. Please try again.";
-                return View("EmailVerification");
-            }
-
-            TempData["NoticeMessage"] = issued.Status == ChallengeIssueStatus.Cooldown
-                ? "A code was requested recently. Please wait before requesting a new one."
-                : "We sent a verification code to your email address.";
-            await AuditAsync("Auth.LoginPassword", "EmailVerificationRequired", user.Id);
-            return RedirectToAction(nameof(EmailVerification));
+            var pending = user.ApprovalStatus == AccountApprovalStatus.PendingApproval;
+            await AuditAsync("Auth.LoginPassword", pending ? "PendingApproval" : "RegistrationRejected", user.Id);
+            ViewData["ErrorMessage"] = pending
+                ? "Your account is pending administrator approval."
+                : "Your registration was not approved. Please contact the administrator.";
+            return LoginView(email);
         }
 
         var passwordResult = await _signIn.CheckPasswordSignInAsync(user, input.Password, lockoutOnFailure: true);
@@ -123,7 +115,7 @@ public sealed class AccountController : Controller
             return LoginView(email);
         }
 
-        if (await _users.IsInRoleAsync(user, "Administrator"))
+        if (await _users.IsInRoleAsync(user, "Administrator") && !SkipAdministratorCode())
         {
             // CheckPasswordSignInAsync validates the password without creating an auth cookie.
             HttpContext.Session.SetString(PendingAdministratorUserId, user.Id);
@@ -165,29 +157,18 @@ public sealed class AccountController : Controller
         if (!ModelState.IsValid) return SignUpView(input);
 
         var email = input.Email.Trim();
-        var existing = await _users.FindByEmailAsync(email);
-        if (existing is not null)
+        var studentId = input.StudentIdNumber.Trim();
+        if (await _users.FindByEmailAsync(email) is not null)
         {
-            // Resume a pending account only after validating its original password.
-            // Retrying signup must never replace the account's password or profile.
-            if (existing.IsActive && !existing.EmailConfirmed && !await _users.IsLockedOutAsync(existing))
-            {
-                if (await _users.CheckPasswordAsync(existing, input.Password))
-                {
-                    await _users.ResetAccessFailedCountAsync(existing);
-                    HttpContext.Session.SetString(PendingVerificationUserId, existing.Id);
-                    var retry = await _challenges.IssueAsync(existing, EmailChallengePurpose.SignupVerification,
-                        HttpContext.RequestAborted);
-                    SetIssueFeedback(retry);
-                    await AuditAsync("Auth.SignUp", "ResumedPendingVerification", existing.Id);
-                    return RedirectToAction(nameof(EmailVerification));
-                }
-                await _users.AccessFailedAsync(existing);
-            }
             await AuditAsync("Auth.SignUp", "DuplicateEmail", null);
-            ModelState.AddModelError(nameof(input.Email), "An account already uses this email address. Sign in to continue verification or reset your password.");
-            return SignUpView(input);
+            ModelState.AddModelError(nameof(input.Email), "An account already uses this email address.");
         }
+        if (await _db.BorrowerProfiles.AnyAsync(x => x.StudentNumber == studentId, HttpContext.RequestAborted))
+        {
+            await AuditAsync("Auth.SignUp", "DuplicateStudentId", null);
+            ModelState.AddModelError(nameof(input.StudentIdNumber), "This Student ID Number is already registered.");
+        }
+        if (!ModelState.IsValid) return SignUpView(input);
 
         ApplicationUser user;
         try
@@ -198,8 +179,10 @@ public sealed class AccountController : Controller
                 UserName = email,
                 Email = email,
                 EmailConfirmed = false,
-                FullName = input.FullName.Trim(),
+                FirstName = input.FirstName.Trim(),
+                LastName = input.LastName.Trim(),
                 PhoneNumber = input.MobileNumber.Trim(),
+                ApprovalStatus = AccountApprovalStatus.PendingApproval,
                 IsActive = true
             };
             var created = await _users.CreateAsync(user, input.Password);
@@ -220,6 +203,7 @@ public sealed class AccountController : Controller
             _db.BorrowerProfiles.Add(new BorrowerProfile
             {
                 UserId = user.Id,
+                StudentNumber = studentId,
                 ContactNumber = input.MobileNumber.Trim(),
                 IsEligible = true
             });
@@ -227,96 +211,24 @@ public sealed class AccountController : Controller
             await transaction.CommitAsync(HttpContext.RequestAborted);
         }
         catch (DbUpdateException exception) when (exception.InnerException is SqlException
-               { Number: 2601 or 2627 })
+               { Number: 2601 or 2627 } duplicate)
         {
-            // The unique email index also protects a race between simultaneous signups.
-            ModelState.AddModelError(nameof(input.Email), "An account already uses this email address.");
+            // The unique indexes also protect a race between simultaneous signups.
+            _db.ChangeTracker.Clear();
+            if (duplicate.Message.Contains("StudentNumber", StringComparison.OrdinalIgnoreCase))
+                ModelState.AddModelError(nameof(input.StudentIdNumber), "This Student ID Number is already registered.");
+            else
+                ModelState.AddModelError(nameof(input.Email), "An account already uses this email address.");
             return SignUpView(input);
         }
 
-        await AuditAsync("Auth.SignUp", "CreatedPendingVerification", user.Id);
-        HttpContext.Session.SetString(PendingVerificationUserId, user.Id);
-        var issued = await _challenges.IssueAsync(user, EmailChallengePurpose.SignupVerification,
-            HttpContext.RequestAborted);
-        if (issued.Status == ChallengeIssueStatus.DeliveryUnavailable)
-        {
-            TempData["ErrorMessage"] = "Your account was created, but we could not send the code. Try resending it.";
-        }
-        else
-        {
-            TempData["NoticeMessage"] = "We sent a verification code to your email address.";
-        }
-
-        return RedirectToAction(nameof(EmailVerification));
+        await AuditAsync("Auth.SignUp", "CreatedPendingApproval", user.Id);
+        return RedirectToAction(nameof(RegistrationSubmitted));
     }
 
     [AllowAnonymous]
-    [HttpGet("email-verification")]
-    public IActionResult EmailVerification()
-    {
-        if (HttpContext.Session.GetString(PendingVerificationUserId) is null)
-            return RedirectToAction(nameof(Login));
-        PopulateFeedback();
-        return View();
-    }
-
-    [AllowAnonymous]
-    [EnableRateLimiting("auth-post")]
-    [HttpPost("email-verification")]
-    public async Task<IActionResult> EmailVerification([FromForm] CodeInput input)
-    {
-        var userId = HttpContext.Session.GetString(PendingVerificationUserId);
-        if (userId is null) return RedirectToAction(nameof(Login));
-        if (!ModelState.IsValid) return View();
-
-        var result = await _challenges.VerifyAsync(userId, EmailChallengePurpose.SignupVerification,
-            input.Code, HttpContext.RequestAborted);
-        if (result != ChallengeVerifyStatus.Verified)
-        {
-            await AuditAsync("Auth.EmailVerification", result.ToString(), userId);
-            ViewData["ErrorMessage"] = ChallengeError(result);
-            return View();
-        }
-
-        var user = await _users.FindByIdAsync(userId);
-        if (user is null || !user.IsActive) return RedirectToAction(nameof(Login));
-        user.EmailConfirmed = true;
-        user.UpdatedAtUtc = DateTime.UtcNow;
-        var updated = await _users.UpdateAsync(user);
-        if (!updated.Succeeded)
-        {
-            await AuditAsync("Auth.EmailVerification", "UpdateFailed", user.Id);
-            ViewData["ErrorMessage"] = "We could not finish verification. Please contact support.";
-            return View();
-        }
-
-        await AuditAsync("Auth.EmailVerification", "Succeeded", user.Id);
-        HttpContext.Session.Remove(PendingVerificationUserId);
-        if (await _users.IsInRoleAsync(user, "Administrator") ||
-            await _users.IsInRoleAsync(user, "Custodian"))
-        {
-            TempData["NoticeMessage"] = "Email verified. Sign in to continue.";
-            return RedirectToAction(nameof(Login));
-        }
-        await _signIn.SignInAsync(user, isPersistent: false);
-        return Redirect("/auth/success?kind=signup");
-    }
-
-    [AllowAnonymous]
-    [EnableRateLimiting("auth-post")]
-    [HttpPost("resend-email-verification")]
-    public async Task<IActionResult> ResendEmailVerification()
-    {
-        var userId = HttpContext.Session.GetString(PendingVerificationUserId);
-        if (userId is null) return RedirectToAction(nameof(Login));
-        var user = await _users.FindByIdAsync(userId);
-        if (user is null || user.EmailConfirmed || !user.IsActive) return RedirectToAction(nameof(Login));
-
-        var result = await _challenges.IssueAsync(user, EmailChallengePurpose.SignupVerification,
-            HttpContext.RequestAborted);
-        SetIssueFeedback(result);
-        return RedirectToAction(nameof(EmailVerification));
-    }
+    [HttpGet("registration-submitted")]
+    public IActionResult RegistrationSubmitted() => View();
 
     [AllowAnonymous]
     [HttpGet("two-factor")]
@@ -524,16 +436,12 @@ public sealed class AccountController : Controller
         await AuditAsync("Auth.PasswordReset", "Succeeded", user.Id);
         ClearAuthorizedReset();
         await _signIn.SignOutAsync();
-        return Redirect("/auth/success?kind=password-reset");
+        return RedirectToAction(nameof(Success));
     }
 
     [AllowAnonymous]
     [HttpGet("success")]
-    public IActionResult Success([FromQuery] string? kind)
-    {
-        ViewData["SuccessKind"] = kind == "password-reset" ? "password-reset" : "signup";
-        return View();
-    }
+    public IActionResult Success() => View();
 
     [AllowAnonymous]
     [HttpGet("access-denied")]
@@ -572,7 +480,9 @@ public sealed class AccountController : Controller
 
     private ViewResult SignUpView(SignUpInput input)
     {
-        ViewData["FullName"] = input.FullName;
+        ViewData["FirstName"] = input.FirstName;
+        ViewData["LastName"] = input.LastName;
+        ViewData["StudentIdNumber"] = input.StudentIdNumber;
         ViewData["Email"] = input.Email;
         ViewData["MobileNumber"] = input.MobileNumber;
         return View("SignUp");
@@ -633,6 +543,12 @@ public sealed class AccountController : Controller
                string.Equals(user.SecurityStamp, stamp, StringComparison.Ordinal) &&
                await _users.IsInRoleAsync(user, "Administrator");
     }
+
+    // Local Development without SMTP cannot deliver the administrator code, so the password alone is accepted.
+    private bool SkipAdministratorCode() =>
+        _environment.IsDevelopment() &&
+        (_configuration?["Email:Provider"] ?? "Smtp").Equals("Smtp", StringComparison.OrdinalIgnoreCase) &&
+        string.IsNullOrWhiteSpace(_configuration?["Email:Smtp:Host"]);
 
     private bool MatchesPendingReset(ApplicationUser? user)
     {
@@ -710,19 +626,25 @@ public sealed class LoginInput
 
 public sealed class SignUpInput
 {
-    [Required, StringLength(160, MinimumLength = 2)]
-    public string FullName { get; set; } = string.Empty;
+    [Required, StringLength(100), Display(Name = "First name")]
+    public string FirstName { get; set; } = string.Empty;
 
-    [Required, EmailAddress, StringLength(256)]
+    [Required, StringLength(100), Display(Name = "Last name")]
+    public string LastName { get; set; } = string.Empty;
+
+    [Required, StringLength(64), Display(Name = "Student ID Number")]
+    public string StudentIdNumber { get; set; } = string.Empty;
+
+    [Required, EmailAddress(ErrorMessage = "Enter a valid email address."), StringLength(256)]
     public string Email { get; set; } = string.Empty;
 
-    [Required, Phone, StringLength(40)]
+    [Required, Phone(ErrorMessage = "Enter a valid mobile number."), StringLength(40), Display(Name = "Mobile number")]
     public string MobileNumber { get; set; } = string.Empty;
 
-    [Required, StringLength(100, MinimumLength = 8)]
+    [Required, StringLength(100, MinimumLength = 8, ErrorMessage = "Use at least 8 characters.")]
     public string Password { get; set; } = string.Empty;
 
-    [Required, Compare(nameof(Password))]
+    [Required, Compare(nameof(Password), ErrorMessage = "Passwords do not match."), Display(Name = "Confirm password")]
     public string ConfirmPassword { get; set; } = string.Empty;
 }
 
