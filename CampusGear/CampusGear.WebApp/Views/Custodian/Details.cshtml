@@ -53,8 +53,7 @@
         @if (admin || !Model.CanReturn && record.Status != ReservationStatus.Approved && !Model.CanApprove && !Model.CanReject)
         { <div class="live-actions"><a class="live-button secondary" href="@staffPath/history">View borrowing history</a></div> }
     </section>
-    <div class="live-grid live-record-footer">
-        <section class="live-panel"><h2>@(returning ? "Condition result" : "Request snapshot")</h2><dl class="live-details">
+    <section class="live-panel"><h2>@(returning ? "Condition result" : "Request snapshot")</h2><dl class="live-details">
             <dt>Submitted</dt><dd>@CustodianTime.Format(record.CreatedAtUtc)</dd>
             @if (record.HoldExpiresAtUtc is { } expiry) { <dt>Pending hold expires</dt><dd>@CustodianTime.Format(expiry)</dd> }
             @if (record.DecidedAtUtc is { } decided) { <dt>Decision recorded</dt><dd>@CustodianTime.Format(decided) by @(record.DecidedByUser?.FullName ?? "staff")</dd> }
@@ -64,6 +63,4 @@
                 @if (loan.ReturnedAtUtc is { } returned) { <dt>Returned</dt><dd>@CustodianTime.Format(returned) by @(loan.ReceivedByUser?.FullName ?? "staff")</dd><dt>Return condition</dt><dd>@loan.ConditionAtReturn</dd><dt>Timeliness</dt><dd>@(returned > loan.DueAtUtc ? "Returned late" : "Returned on time")</dd><dt>Return notes</dt><dd class="custodian-preserve">@(loan.ReturnNotes ?? "—")</dd> }
             }
         </dl></section>
-        <section class="live-panel"><h2>@(admin ? "Read-only record" : "Next step")</h2><p class="live-muted">@(admin ? "Administrators can review reservation records but do not take part in approval, release, or return. The custodian handles every step of the borrowing flow." : returning ? "Inspect the returned equipment before recording its condition. Damaged or unserviceable items enter maintenance; late returns are recorded independently." : record.Status == ReservationStatus.Approved ? "Inspect the item and record its condition at handoff. Release is available during the approved booking time." : "Check the borrower, purpose, and requested time. Approval checks availability again; rejection releases the pending hold.")</p><div class="live-actions"><a class="live-button secondary" href="@staffPath/calendar">Availability calendar</a><a class="live-button secondary" href="@staffPath/history">Borrowing history</a></div></section>
-    </div>
 </main>
