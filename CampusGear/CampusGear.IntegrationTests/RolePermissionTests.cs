@@ -157,6 +157,19 @@ public sealed class RolePermissionTests(WebAppFixture app)
 
         // Administrators can read the record but are offered no actions on it.
         var adminView = await app.Client("Administrator").GetStringAsync($"/custodian/reservations/{id}");
+        var borrowerStudentNumber = await app.DbAsync(db => db.BorrowerProfiles
+            .Where(x => x.Id == app.BorrowerA.ProfileId)
+            .Select(x => x.StudentNumber)
+            .SingleAsync());
+        var equipmentName = await app.DbAsync(db => db.EquipmentItems
+            .Where(x => x.Id == itemId)
+            .Select(x => x.Name)
+            .SingleAsync());
+        Assert.Contains("borrowing-id-card", adminView);
+        Assert.Contains($"RES-{id:N}".ToUpperInvariant(), adminView);
+        Assert.Contains("Test Borrower", adminView);
+        Assert.Contains(borrowerStudentNumber!, adminView);
+        Assert.Contains(equipmentName, adminView);
         Assert.DoesNotContain("/release\"", adminView);
         Assert.DoesNotContain("/approve\"", adminView);
     }
