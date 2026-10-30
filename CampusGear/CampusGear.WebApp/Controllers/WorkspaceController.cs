@@ -66,14 +66,13 @@ public sealed class WorkspaceController : Controller
     public async Task<IActionResult> Administrator()
     {
         var user = (await _users.GetUserAsync(User))!;
-        var now = DateTime.UtcNow;
         var activity = await _db.Reservations.AsNoTracking().Include(x => x.EquipmentItem).Include(x => x.BorrowerProfile.User)
             .OrderByDescending(x => x.UpdatedAtUtc).Take(3).ToListAsync();
         return Dashboard("Administrator", user.FullName, activity,
             new("Total Equipment", await _db.EquipmentItems.CountAsync(x => x.IsActive), "/admin/equipment"),
-            new("Active Borrowings", await _db.Loans.CountAsync(x => x.ReturnedAtUtc == null), "/admin/returns"),
-            new("Pending Approvals", await _db.Reservations.CountAsync(x => x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now), "/admin/approvals"),
-            new("Total Borrowers", await _db.UserRoles.CountAsync(x => _db.Roles.Any(r => r.Id == x.RoleId && r.Name == "Borrower")), "/admin/borrowers"));
+            new("Under Maintenance", await _db.EquipmentItems.CountAsync(x => x.IsActive && x.IsMaintenanceHold), "/admin/maintenance"),
+            new("Total Borrowers", await _db.UserRoles.CountAsync(x => _db.Roles.Any(r => r.Id == x.RoleId && r.Name == "Borrower")), "/admin/borrowers"),
+            new("Pending Registrations", await _db.Users.CountAsync(x => x.ApprovalStatus == AccountApprovalStatus.PendingApproval), "/admin/users?status=pending"));
     }
 
     private ViewResult Dashboard(string role, string name, IReadOnlyList<Reservation> activity, params DashboardMetric[] metrics)

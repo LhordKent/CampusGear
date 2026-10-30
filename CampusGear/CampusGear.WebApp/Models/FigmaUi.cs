@@ -15,12 +15,12 @@ public static class FigmaUi
             new("/admin/borrowers", "Borrower Profiles", "a40a1.svg"),
             new("/admin/users", "User & Role Management", "be9c1.svg"),
             new("/admin/history", "Borrowing History", "e1db6.svg"),
-            new("/admin/calendar", "Availability Calendar", "9f767.svg"),
-            new("/admin/audit", "System Audit Log", "bc2d0.svg")],
+            new("/admin/calendar", "Availability Calendar", "9f767.svg")],
         "Custodian" => [
             new("/custodian/dashboard", "Dashboard", "edd56.svg"),
             new("/custodian/approvals", "Approval & Release", "e7a8d.svg"),
             new("/custodian/returns", "Return & Condition Check", "9970e.svg"),
+            new("/custodian/history", "Borrowing History", "e1db6.svg"),
             new("/custodian/calendar", "Availability Calendar", "9f767.svg")],
         _ => [
             new("/borrower/dashboard", "Dashboard", "edd56.svg"),

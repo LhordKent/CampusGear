@@ -20,7 +20,7 @@
         }
     </section>
     <section class="live-panel live-dashboard-activity"><h2>@(admin ? "Recent borrowing activity" : borrower ? "Upcoming reservations" : "Requests awaiting review")</h2>
-        @if (Model.Activity.Count == 0) { <div class="live-empty"><p>@(borrower ? "You have no upcoming reservations." : "No borrowing activity to display yet.")</p><a class="live-link" href="/@slug/@(borrower ? "reservation" : admin ? "reservations" : "approvals")">@(borrower ? "Reserve equipment" : "Open reservation records")</a></div> }
+        @if (Model.Activity.Count == 0) { <div class="live-empty"><p>@(borrower ? "You have no upcoming reservations." : "No borrowing activity to display yet.")</p><a class="live-link" href="/@slug/@(borrower ? "reservation" : admin ? "history" : "approvals")">@(borrower ? "Reserve equipment" : admin ? "Open borrowing history" : "Open reservation records")</a></div> }
         else if (admin)
         {
             <div class="live-activity-list">

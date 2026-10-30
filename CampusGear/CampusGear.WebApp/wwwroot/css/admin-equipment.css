@@ -1,0 +1,202 @@
+.admin-equipment-page .live-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    min-height: 72px;
+    margin: 0 0 16px 24px;
+    padding: 14px 20px;
+}
+
+.admin-equipment-page .live-heading h1 {
+    flex: 1 1 250px;
+    margin: 0;
+}
+
+.equipment-heading-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.equipment-heading-actions .heading-action {
+    position: static;
+    min-width: 0;
+    height: auto;
+}
+
+.equipment-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 236px), 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.equipment-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--cg-border);
+    border-radius: 14px;
+    background: var(--cg-surface);
+    color: var(--cg-text);
+}
+
+.equipment-card-media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-bottom: 1px solid var(--cg-rule);
+    background: #081e2e;
+}
+
+.equipment-card-media > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.equipment-card-placeholder {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(120% 90% at 30% 20%, rgb(44 140 138 / .22), transparent 60%),
+        linear-gradient(160deg, var(--cg-raised), #081e2e);
+    color: var(--cg-teal);
+    font: 500 18px Oxanium, sans-serif;
+    letter-spacing: .04em;
+}
+
+.equipment-card-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    backdrop-filter: blur(6px);
+}
+
+.equipment-card-body {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px 12px;
+}
+
+.equipment-card-category,
+.equipment-card-asset {
+    margin: 0;
+    color: var(--cg-muted);
+}
+
+.equipment-card-category {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.equipment-card-body h3 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.equipment-card-asset {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+
+.equipment-card-body dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: auto 0 0;
+    padding-top: 10px;
+}
+
+.equipment-card-body dl div {
+    min-width: 0;
+}
+
+.equipment-card-body dt {
+    color: var(--cg-muted);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.equipment-card-body dd {
+    margin: 3px 0 0;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.equipment-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 16px;
+    border-top: 1px solid var(--cg-rule);
+    font-size: 11px;
+}
+
+.equipment-card-footer > span {
+    color: var(--cg-muted);
+}
+
+.equipment-card-footer a {
+    flex: 0 0 auto;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.equipment-card-footer a:hover {
+    text-decoration: underline;
+}
+
+.equipment-empty {
+    margin: 16px 0 0;
+    padding: 22px;
+    border: 1px dashed var(--cg-border);
+    border-radius: 12px;
+    color: var(--cg-muted);
+    text-align: center;
+}
+
+@media (max-width: 1000px) {
+    .admin-equipment-page .live-heading {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .admin-equipment-page .live-heading {
+        align-items: flex-start;
+        padding: 14px 16px;
+    }
+
+    .admin-equipment-page .live-heading h1 {
+        flex-basis: 100%;
+    }
+
+    .equipment-heading-actions {
+        width: 100%;
+    }
+
+    .equipment-heading-actions .live-button {
+        flex: 1;
+    }
+}

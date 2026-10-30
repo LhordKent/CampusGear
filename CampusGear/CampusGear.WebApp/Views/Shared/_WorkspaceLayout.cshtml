@@ -43,15 +43,6 @@
                             item.Path == "/admin/users" && path.StartsWith("/admin/users/", StringComparison.OrdinalIgnoreCase);
                         <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)"><span class="live-nav-icon"><img src="/figma/assets/@item.Icon" alt="" /></span><span>@item.Label</span></a>
                     }
-                    @if (role != "Borrower")
-                    {
-                        <details class="live-extra-navigation"><summary>More operations</summary>
-                            @if (role == "Administrator")
-                            { <a href="/admin/reservations">Reservation Management</a><a href="/admin/approvals">Approval &amp; Release</a><a href="/admin/returns">Return &amp; Condition Check</a> }
-                            else { <a href="/custodian/history">Borrowing History</a> }
-                            <a href="/admin/maintenance">Equipment Maintenance</a>
-                        </details>
-                    }
                 </nav>
             </details>
             <form method="post" action="/auth/logout" class="live-logout">@Html.AntiForgeryToken()<button type="submit">Log out</button></form>
