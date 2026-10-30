@@ -18,13 +18,13 @@
     @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert">@Model.Error</div> }
     @if (!string.IsNullOrWhiteSpace(Model.AvailabilityNote)) { <div class="live-feedback" role="status">@Model.AvailabilityNote</div> }
     <section class="live-panel live-decision" aria-labelledby="request-title">
-        <div class="live-toolbar"><h2 id="request-title">@(returning ? "RETURN & CONDITION CHECK" : "REQUEST DECISION")</h2><span class="live-badge">@Model.Status</span></div>
+        <div class="live-toolbar"><h2 id="request-title">@(returning ? "Return & condition check" : "Request decision")</h2><span class="live-badge">@Model.Status</span></div>
         <div class="live-request-fields">
-            <div class="live-request-field"><small>BORROWER</small><strong>@record.BorrowerProfile.User.FullName</strong><p class="live-muted">@record.BorrowerProfile.User.Email<br />@(record.BorrowerProfile.ContactNumber ?? "No contact number recorded")</p></div>
-            <div class="live-request-field"><small>EQUIPMENT</small><strong>@record.EquipmentItem.Name</strong><p class="live-muted">@record.EquipmentItem.AssetCode · @record.EquipmentItem.Category.Name<br />@record.EquipmentItem.Condition · @(record.EquipmentItem.Location ?? "No location recorded")</p></div>
-            <div class="live-request-field"><small>REQUESTED DATE &amp; TIME</small><strong>@CustodianTime.Format(record.StartAtUtc)</strong><p class="live-muted">Until @CustodianTime.Format(record.EndAtUtc)<br />Manila time (UTC+8)</p></div>
+            <div class="live-request-field"><small>Borrower</small><strong>@record.BorrowerProfile.User.FullName</strong><p class="live-muted">@record.BorrowerProfile.User.Email<br />@(record.BorrowerProfile.ContactNumber ?? "No contact number recorded")</p></div>
+            <div class="live-request-field"><small>Equipment</small><strong>@record.EquipmentItem.Name</strong><p class="live-muted">@record.EquipmentItem.AssetCode · @record.EquipmentItem.Category.Name<br />@record.EquipmentItem.Condition · @(record.EquipmentItem.Location ?? "No location recorded")</p></div>
+            <div class="live-request-field"><small>Requested date &amp; time</small><strong>@CustodianTime.Format(record.StartAtUtc)</strong><p class="live-muted">Until @CustodianTime.Format(record.EndAtUtc)<br />Manila time (UTC+8)</p></div>
         </div>
-        <div class="live-request-field"><small>PURPOSE</small><strong class="custodian-preserve">@record.Purpose</strong><p class="live-muted custodian-preserve">@(record.Notes ?? "No additional notes")</p></div>
+        <div class="live-request-field"><small>Purpose</small><strong class="custodian-preserve">@record.Purpose</strong><p class="live-muted custodian-preserve">@(record.Notes ?? "No additional notes")</p></div>
         @if (Model.CanApprove || Model.CanReject)
         {
             <div class="live-decision-actions"><a class="live-button secondary" href="@staffPath/approvals">Back to requests</a>

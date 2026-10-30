@@ -16,11 +16,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#071b2b" />
+    @await Html.PartialAsync("_ThemeHead")
     <title>@title · CampusGear</title>
     <link rel="stylesheet" href="/css/figma-generated.css" />
     <link rel="stylesheet" href="/css/figma-app.css" />
     @await Html.PartialAsync("_AccountStyles")
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
 </head>
 <body class="auth-page">
     <div class="auth-shell">
@@ -30,6 +31,7 @@
             </div>
         </aside>
         <main class="auth-main" id="main-content">
+            @await Html.PartialAsync("_ThemeToggle")
             <div class="auth-mobile-brand">
                 <img src="/figma/assets/7ef91.svg" alt="" />
                 <span>CampusGear</span>
@@ -37,6 +39,8 @@
             @RenderBody()
         </main>
     </div>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/account.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

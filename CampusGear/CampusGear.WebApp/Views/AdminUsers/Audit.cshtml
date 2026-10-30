@@ -12,7 +12,7 @@
         <p>Review account and equipment activity. Audit records are read-only and times are shown in Manila time.</p>
     </header>
     <section class="live-panel" aria-labelledby="audit-title">
-        <h2 id="audit-title">AUDIT HISTORY</h2>
+        <h2 id="audit-title">Audit history</h2>
         <form class="live-filters" method="get" action="/admin/audit" aria-label="Search audit history">
             <label for="q">Search action, actor, record, result, or IP address<input id="q" name="q" type="search" value="@Model.Query" maxlength="120" /></label>
             <button class="live-button" type="submit">Search</button><a class="live-button secondary" href="/admin/audit">Clear</a>
@@ -24,7 +24,7 @@
         {
             <div class="live-table-wrap" tabindex="0" aria-label="Audit events table">
                 <table class="live-table">
-                    <thead><tr><th scope="col">TIME</th><th scope="col">ACTION / ACTOR</th><th scope="col">RECORD</th><th scope="col">RESULT</th><th scope="col">DETAILS</th></tr></thead>
+                    <thead><tr><th scope="col">Time</th><th scope="col">Action / Actor</th><th scope="col">Record</th><th scope="col">Result</th><th scope="col">Details</th></tr></thead>
                     <tbody>
                     @foreach (var row in Model.Rows)
                     {

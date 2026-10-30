@@ -19,14 +19,14 @@
             @Html.ValidationMessage("Code", null, new { @class = "auth-field-error" })
             <span class="auth-field-help">Use the newest code. Request another code only if the current one is unavailable.</span>
         </label>
-        <button class="auth-action" type="submit">VERIFY AND CONTINUE</button>
+        <button class="auth-action" type="submit">Verify and continue</button>
     </form>
     <div class="auth-actions">
         <form class="auth-inline-form" action="/auth/resend-two-factor" method="post">@Html.AntiForgeryToken()<button type="submit">Resend verification code</button></form>
         <a class="auth-link" href="/auth/login">Back to sign in</a>
     </div>
     <div class="auth-spacer"></div>
-    <div class="auth-panel"><img src="/figma/assets/bb17f.svg" alt="" /><div><strong>Administrator security</strong><span>Administrator access remains protected until verification is completed.</span></div></div>
+    <div class="auth-panel"><svg class="icon" aria-hidden="true"><use href="/icons.svg#shield"></use></svg><div><strong>Administrator security</strong><span>Administrator access remains protected until verification is completed.</span></div></div>
     <div class="auth-spacer"></div>
     @await Html.PartialAsync("_AccountStatus")
 </section>

@@ -2,20 +2,20 @@
 @{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Equipment Categories"; ViewData["WorkspaceRole"] = "Administrator";
    var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid; }
 <main class="live-content" data-figma-source="@(editor ? Model.Input.Id is null ? "695:5184" : "695:5347" : "695:4991")">
-    <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • INVENTORY</p><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Category" : "Edit Equipment Category" : "Equipment Categories")</h1><p>Organize equipment for inventory and reservations.</p></header>
+    <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • INVENTORY</p><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Category" : "Edit Equipment Category" : "Equipment Categories")</h1><p>Organize equipment for inventory and reservations.</p>
+        @if (!editor) { <a class="live-button heading-action" href="/admin/categories?form=add"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>Add category</a> }
+    </header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
     @if (!editor) {
-    <section class="live-panel live-toolbar"><div><h2>CATEGORY MANAGEMENT</h2><p class="live-muted">Organize equipment into categories for easy browsing.</p></div><a class="live-button" href="/admin/categories?form=add">Add Category</a></section>
     <section class="live-panel"><h2>Category records <span class="live-badge">@Model.Categories.Count categories</span></h2><div class="live-table-wrap"><table class="live-table"><thead><tr><th>Name</th><th>Description</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>
         @foreach (var category in Model.Categories)
         { <tr><td>@category.Name</td><td>@category.Description</td><td>@category.Items</td><td><span class="live-badge">@(category.IsActive ? "Active" : "Inactive")</span></td><td><a class="live-button secondary" href="/admin/categories?id=@category.Id">Edit</a></td></tr> }
         @if (Model.Categories.Count == 0) { <tr><td colspan="5">No categories yet. Add a category to organize your equipment.</td></tr> }
     </tbody></table></div></section>
-    <div class="live-summary"><span>Category summary</span><strong>@Model.Categories.Count categories</strong><a class="live-link" href="/admin/equipment">Manage equipment →</a></div>
     }
     @if (editor)
     {
-    <section class="live-panel live-editor-sheet category-editor" aria-labelledby="category-editor-title"><h2 id="category-editor-title">CATEGORY INFORMATION</h2><div asp-validation-summary="All"></div>
+    <section class="live-panel live-editor-sheet category-editor" aria-labelledby="category-editor-title"><h2 id="category-editor-title">Category information</h2><div asp-validation-summary="All"></div>
         <form id="category-editor-form" method="post" action="/admin/categories/save" class="live-form">
             @Html.AntiForgeryToken()<input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
             <label class="live-field wide">Category name<input asp-for="Input.Name" required maxlength="120" /></label>

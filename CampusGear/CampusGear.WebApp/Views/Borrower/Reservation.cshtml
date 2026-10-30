@@ -11,7 +11,7 @@
 <main class="live-content borrower-page" data-figma-source="695:2">
     <header class="live-heading borrower-heading">
         <p class="live-eyebrow">BORROWER • WORKSPACE</p>
-        <h1><img src="~/figma/assets/5fc0e.svg" alt="" />Equipment Reservation</h1>
+        <h1>Equipment Reservation</h1>
         <p>Reserve available equipment and submit a borrowing request for approval.</p>
     </header>
     <partial name="_BorrowerTabs" />
@@ -19,16 +19,15 @@
     @if (Model.Submitted is { } submitted)
     {
         <section class="borrower-feedback borrower-success" role="status" data-figma-source="695:280">
-            <p class="borrower-eyebrow">REQUEST RECORDED</p>
-            <h2>Reservation request submitted</h2>
+            <h2><svg class="icon" aria-hidden="true"><use href="/icons.svg#check-circle"></use></svg>Reservation request submitted</h2>
             <p>Your request is saved. Staff will review it before the equipment can be released.</p>
             <dl class="borrower-summary">
-                <div><dt>EQUIPMENT</dt><dd>@submitted.EquipmentName <span>@submitted.AssetCode</span></dd></div>
-                <div><dt>MANILA TIME</dt><dd>@submitted.StartManila<br />to @submitted.EndManila</dd></div>
-                <div><dt>STATUS</dt><dd><span class="borrower-badge">@submitted.Status</span></dd></div>
+                <div><dt>Equipment</dt><dd>@submitted.EquipmentName <span>@submitted.AssetCode</span></dd></div>
+                <div><dt>Manila time</dt><dd>@submitted.StartManila<br />to @submitted.EndManila</dd></div>
+                <div><dt>Status</dt><dd><span class="borrower-badge">@submitted.Status</span></dd></div>
                 @if (submitted.HoldExpiresManila is not null)
                 {
-                    <div><dt>PENDING HOLD ENDS</dt><dd>@submitted.HoldExpiresManila</dd></div>
+                    <div><dt>Pending hold ends</dt><dd>@submitted.HoldExpiresManila</dd></div>
                 }
             </dl>
             <div class="borrower-actions">
@@ -75,7 +74,7 @@
                 <input type="hidden" name="RequestId" value="@Model.Input.RequestId" />
                 <div class="borrower-reservation-grid">
                     <section class="borrower-card borrower-equipment" aria-labelledby="equipment-title">
-                        <p class="borrower-eyebrow">SELECTED EQUIPMENT</p>
+                        <p class="borrower-eyebrow">Selected equipment</p>
                         <h2 id="equipment-title">@(selected?.Name ?? "Choose equipment")</h2>
                         <label class="borrower-field" for="EquipmentItemId">
                             <span>Equipment item</span>
@@ -91,15 +90,14 @@
                             @Html.ValidationMessage("EquipmentItemId", null, new { @class = "borrower-field-error" })
                         </label>
                         <p class="borrower-muted" id="selected-code">@selected?.AssetCode · @selected?.Category</p>
-                        <span class="borrower-badge">TIME SLOT CHECKED ON SUBMIT</span>
                         <dl class="borrower-equipment-details">
-                            <div><dt>CONDITION</dt><dd id="selected-condition">@selected?.Condition</dd></div>
-                            <div><dt>LOCATION</dt><dd id="selected-location">@(selected?.Location ?? "Not specified")</dd></div>
+                            <div><dt>Condition</dt><dd id="selected-condition">@selected?.Condition</dd></div>
+                            <div><dt>Location</dt><dd id="selected-location">@(selected?.Location ?? "Not specified")</dd></div>
                         </dl>
                         <p class="borrower-muted">Each asset code represents one physical equipment item.</p>
                     </section>
                     <section class="borrower-card" aria-labelledby="request-title">
-                        <h2 id="request-title">REQUEST DETAILS</h2>
+                        <h2 id="request-title">Request details</h2>
                         <p class="borrower-muted">All dates and times use Manila time (UTC+8).</p>
                         <div class="borrower-field-grid">
                             <label class="borrower-field" for="StartLocal">
@@ -126,17 +124,15 @@
                     </section>
                 </div>
                 <section class="borrower-hold-note">
-                    <strong>REQUEST SUMMARY</strong>
-                    <p>A pending request holds the slot for up to 24 hours or until its start time. Approval keeps the booking; rejection, cancellation, or expiry releases the slot.</p>
+                    <p>The time slot is checked when you submit. A pending request holds the slot for up to 24 hours or until its start time.</p>
                 </section>
                 <div class="borrower-actions borrower-actions-end">
-                    <a class="borrower-button borrower-button-secondary" href="/borrower/calendar">Check calendar</a>
-                    <button class="borrower-button" type="submit" disabled="@(!Model.IsEligible)">SUBMIT RESERVATION</button>
+                    <a class="borrower-button borrower-button-secondary" href="/borrower/calendar"><svg class="icon" aria-hidden="true"><use href="/icons.svg#calendar"></use></svg>Check calendar</a>
+                    <button class="borrower-button" type="submit" disabled="@(!Model.IsEligible)">Submit reservation</button>
                 </div>
             </form>
         }
     }
-    <p class="borrower-workflow">CAMPUSGEAR / BORROWER <span>RESERVE → APPROVE → RELEASE → RETURN</span></p>
 </main>
 <script>
 (() => {
@@ -151,7 +147,7 @@
     document.getElementById('reservation-form')?.addEventListener('submit', event => {
         const button = event.currentTarget.querySelector('button[type="submit"]');
         button.disabled = true;
-        button.textContent = 'SUBMITTING RESERVATION…';
+        button.textContent = 'Submitting…';
     });
 })();
 </script>

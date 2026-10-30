@@ -6,51 +6,61 @@
 }
 <section class="auth-card auth-signup" aria-labelledby="account-title">
     <header>
-        <div class="auth-card-top">
-            <div>
-                <p class="auth-eyebrow">New account</p>
-                <h1 id="account-title">Create your campus account</h1>
-            </div>
-            <span class="auth-badge">Borrower access</span>
-        </div>
-        <p class="auth-description">Register your borrower account with your details. Verify your email address before access is activated.</p>
+        <p class="auth-eyebrow">Step 1 of 2</p>
+        <h1 id="account-title">Create your account</h1>
+        <p class="auth-description">We'll email you a code to verify your address, then you can start reserving equipment.</p>
     </header>
     <hr class="auth-divider" />
     @await Html.PartialAsync("_AccountFeedback")
     <form class="auth-form" action="/auth/signup" method="post">
         @Html.AntiForgeryToken()
-        <label class="auth-field" for="FullName">
-            <span class="auth-field-label">Full name</span>
-            <input class="auth-input" id="FullName" name="FullName" type="text" value="@(ViewData["FullName"] as string)" placeholder="Jordan Lee" autocomplete="name" maxlength="150" required />
-            @Html.ValidationMessage("FullName", null, new { @class = "auth-field-error" })
-        </label>
+        <div class="auth-form-grid">
+            <label class="auth-field" for="FullName">
+                <span class="auth-field-label">Full name</span>
+                <span class="auth-input-wrap">
+                    <svg class="icon auth-input-icon" aria-hidden="true"><use href="/icons.svg#user"></use></svg>
+                    <input class="auth-input has-icon" id="FullName" name="FullName" type="text" value="@(ViewData["FullName"] as string)" placeholder="Jordan Lee" autocomplete="name" maxlength="150" required autofocus />
+                </span>
+                @Html.ValidationMessage("FullName", null, new { @class = "auth-field-error" })
+            </label>
+            <label class="auth-field" for="MobileNumber">
+                <span class="auth-field-label">Mobile number</span>
+                <span class="auth-input-wrap">
+                    <svg class="icon auth-input-icon" aria-hidden="true"><use href="/icons.svg#phone"></use></svg>
+                    <input class="auth-input has-icon" id="MobileNumber" name="MobileNumber" type="tel" value="@(ViewData["MobileNumber"] as string)" placeholder="09XX XXX XXXX" autocomplete="tel" required />
+                </span>
+                @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
+            </label>
+        </div>
         <label class="auth-field" for="Email">
             <span class="auth-field-label">Email address</span>
-            <input class="auth-input" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="jordan@example.com" autocomplete="email" required />
+            <span class="auth-input-wrap">
+                <svg class="icon auth-input-icon" aria-hidden="true"><use href="/icons.svg#mail"></use></svg>
+                <input class="auth-input has-icon" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="jordan@example.com" autocomplete="email" required />
+            </span>
             @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
         </label>
-        <label class="auth-field" for="MobileNumber">
-            <span class="auth-field-label">Mobile number</span>
-            <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" value="@(ViewData["MobileNumber"] as string)" placeholder="09XX XXX XXXX" autocomplete="tel" required />
-            @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
-        </label>
-        <label class="auth-field" for="Password">
-            <span class="auth-field-label">Password</span>
-            <input class="auth-input" id="Password" name="Password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required />
-            @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
-        </label>
-        <label class="auth-field" for="ConfirmPassword">
-            <span class="auth-field-label">Confirm password</span>
-            <input class="auth-input" id="ConfirmPassword" name="ConfirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password" minlength="8" required />
-            @Html.ValidationMessage("ConfirmPassword", null, new { @class = "auth-field-error" })
-        </label>
-        <div class="auth-panel">
-            <img src="/figma/assets/bb17f.svg" alt="" />
-            <div><strong>Borrower access</strong><span>Self-registration creates Borrower access. Other roles require administrator assignment.</span></div>
+        <div class="auth-form-grid">
+            <div class="auth-field">
+                <label class="auth-field-label" for="Password">Password</label>
+                <span class="auth-input-wrap">
+                    <input class="auth-input has-reveal" id="Password" name="Password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required aria-describedby="password-help" />
+                    @await Html.PartialAsync("_PasswordReveal", "Password")
+                </span>
+                @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
+            </div>
+            <div class="auth-field">
+                <label class="auth-field-label" for="ConfirmPassword">Confirm password</label>
+                <span class="auth-input-wrap">
+                    <input class="auth-input has-reveal" id="ConfirmPassword" name="ConfirmPassword" type="password" placeholder="Repeat it" autocomplete="new-password" minlength="8" required />
+                    @await Html.PartialAsync("_PasswordReveal", "ConfirmPassword")
+                </span>
+                @Html.ValidationMessage("ConfirmPassword", null, new { @class = "auth-field-error" })
+            </div>
         </div>
-        <button class="auth-action" type="submit">SEND VERIFICATION CODE</button>
+        <p class="auth-field-help" id="password-help">At least 8 characters, with upper and lower case letters, a number, and a symbol.</p>
+        <button class="auth-action" type="submit">Create account</button>
+        <p class="auth-note">New accounts get Borrower access. Staff roles are assigned by an administrator.</p>
     </form>
-    <div class="auth-actions"><a class="auth-link" href="/auth/login">Already have an account? Return to sign in</a></div>
-    <div class="auth-spacer"></div>
-    @await Html.PartialAsync("_AccountStatus")
+    <p class="auth-switch">Already have an account? <a class="auth-link" href="/auth/login">Sign in</a></p>
 </section>

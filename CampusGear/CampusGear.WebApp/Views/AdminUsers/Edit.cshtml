@@ -12,7 +12,7 @@
         <p>Update account details or role assignments while preserving the user's existing activity record.</p>
     </header>
     <section class="live-panel live-editor-sheet" aria-labelledby="account-information">
-        <h2 id="account-information">ACCOUNT INFORMATION</h2>
+        <h2 id="account-information">Account information</h2>
         @Html.ValidationSummary(false)
 
         @if (Model.IsSelf)
@@ -23,17 +23,17 @@
             @Html.AntiForgeryToken()
             <input type="hidden" name="ConcurrencyStamp" value="@Model.Input.ConcurrencyStamp" />
             <input type="hidden" name="ProfileRowVersion" value="@Model.Input.ProfileRowVersion" />
-            <label class="live-field" for="FullName"><span>NAME</span>
+            <label class="live-field" for="FullName"><span>Name</span>
                 <input id="FullName" name="FullName" value="@Model.Input.FullName" required maxlength="160" autocomplete="name" />
                 @Html.ValidationMessage("FullName")
             </label>
-            <div class="live-field live-readonly"><span>ID / EMAIL</span><strong>@Model.Email</strong><small>@(Model.EmailConfirmed ? "Email verified" : "Email not verified")</small></div>
-            <label class="live-field" for="Department"><span>DEPARTMENT</span>
+            <div class="live-field live-readonly"><span>ID / Email</span><strong>@Model.Email</strong><small>@(Model.EmailConfirmed ? "Email verified" : "Email not verified")</small></div>
+            <label class="live-field" for="Department"><span>Department</span>
                 <input id="Department" name="Department" value="@Model.Input.Department" maxlength="160" />
                 @Html.ValidationMessage("Department")
             </label>
-<div class="live-field live-readonly"><span>CONTACT</span><strong>@(Model.ContactNumber ?? "Not recorded")</strong></div>
-            <label class="live-field" for="Role"><span>ROLE</span>
+<div class="live-field live-readonly"><span>Contact</span><strong>@(Model.ContactNumber ?? "Not recorded")</strong></div>
+            <label class="live-field" for="Role"><span>Role</span>
                 <select id="Role" name="Role" disabled="@Model.IsSelf">
                     @foreach (var role in roles)
                     { <option value="@role" selected="@(Model.Input.Role == role)" disabled="@(!Model.EmailConfirmed && role != "Borrower")">@role</option> }
@@ -42,7 +42,7 @@
                 @Html.ValidationMessage("Role")
             </label>
             <div class="live-field">
-                <span>STATUS</span>
+                <span>Status</span>
                 <label class="live-check" for="IsActive"><input id="IsActive" name="IsActive" type="checkbox" value="true" checked="@Model.Input.IsActive" disabled="@Model.IsSelf" />Account is active</label>
                 <input type="hidden" name="IsActive" value="@(Model.IsSelf ? "true" : "false")" />
                 <p class="live-muted">Deactivation signs the user out and blocks new access. Their reservations and history stay intact.</p>
@@ -52,17 +52,17 @@
                 <h2>Borrower profile</h2>
                 <p class="live-muted">@(Model.HasBorrowerProfile ? "The existing borrower profile is retained when roles change." : "Profile details are created when Borrower is selected. Leave these fields empty when assigning a staff role.")</p>
             </div>
-            <label class="live-field" for="StudentNumber"><span>STUDENT / BORROWER NUMBER</span>
+            <label class="live-field" for="StudentNumber"><span>Student / borrower number</span>
                 <input id="StudentNumber" name="StudentNumber" value="@Model.Input.StudentNumber" maxlength="64" />
                 @Html.ValidationMessage("StudentNumber")
             </label>
 
             <div class="live-field wide">
-                <span>BORROWING ACCESS</span>
+                <span>Borrowing access</span>
                 <label class="live-check" for="IsEligible"><input id="IsEligible" name="IsEligible" type="checkbox" value="true" checked="@Model.Input.IsEligible" />Eligible to reserve equipment</label>
                 <input type="hidden" name="IsEligible" value="false" />
             </div>
-            <label class="live-field wide" for="EligibilityNotes"><span>ELIGIBILITY NOTES</span>
+            <label class="live-field wide" for="EligibilityNotes"><span>Eligibility notes</span>
                 <textarea id="EligibilityNotes" name="EligibilityNotes" maxlength="1000">@Model.Input.EligibilityNotes</textarea>
                 @Html.ValidationMessage("EligibilityNotes")
             </label>

@@ -8,8 +8,8 @@
     <header><p class="auth-eyebrow">Security / authorization gate</p><h1 id="account-title">Workspace access blocked.</h1><p class="auth-description">Your account is authenticated, but this workspace is outside its assigned role.</p></header>
     <hr class="auth-divider" />
     <div class="auth-summary"><strong>Workspace permission required</strong><p>The system blocks workspace actions that fall outside the account's assigned role.</p></div>
-    <div class="auth-panel"><img src="/figma/assets/bb17f.svg" alt="" /><div><strong>Access decision</strong><span>This account cannot open the requested workspace. Ask an administrator to review the assigned role.</span></div></div>
-    <div class="auth-actions"><a class="auth-action" href="/auth/login">RETURN TO SIGN IN</a></div>
+    <div class="auth-panel"><svg class="icon" aria-hidden="true"><use href="/icons.svg#shield"></use></svg><div><strong>Access decision</strong><span>This account cannot open the requested workspace. Ask an administrator to review the assigned role.</span></div></div>
+    <div class="auth-actions"><a class="auth-action" href="/auth/login">Return to sign in</a></div>
     <div class="auth-spacer"></div>
     @await Html.PartialAsync("_AccountStatus")
 </section>

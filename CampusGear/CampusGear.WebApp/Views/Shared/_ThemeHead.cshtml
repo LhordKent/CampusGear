@@ -1,0 +1,13 @@
+@* Resolves the saved or system color theme before first paint so pages never flash the wrong theme. *@
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#071b2b" />
+<script>
+    (function () {
+        var theme;
+        try { theme = localStorage.getItem('cg-theme'); } catch (e) { }
+        if (theme !== 'light' && theme !== 'dark') {
+            theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.dataset.theme = theme;
+    })();
+</script>
