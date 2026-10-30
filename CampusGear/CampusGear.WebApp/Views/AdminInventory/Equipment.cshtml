@@ -6,20 +6,70 @@
     ViewData["WorkspaceRole"] = "Administrator";
     var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid;
 }
-<main class="live-content" data-figma-source="@(editor ? Model.Input.Id is null ? "695:5882" : "695:6052" : "695:5691")">
-    <header class="live-heading"><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Item" : "Edit Equipment Item" : "Equipment Management")</h1>@if (!editor) { <a class="live-button heading-action" href="/admin/equipment?form=add">Add Item</a> }</header>
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin-equipment.css" asp-append-version="true" />
+}
+<main class="live-content admin-equipment-page" data-figma-source="@(editor ? Model.Input.Id is null ? "695:5882" : "695:6052" : "695:5691")">
+    <header class="live-heading">
+        <h1>@(editor ? Model.Input.Id is null ? "Add Equipment Item" : "Edit Equipment Item" : "Equipment Management")</h1>
+        @if (!editor)
+        {
+            <div class="equipment-heading-actions">
+                <a class="live-button secondary heading-action" href="/admin/maintenance">Maintenance</a>
+                <a class="live-button heading-action" href="/admin/equipment?form=add">Add Item</a>
+            </div>
+        }
+    </header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
     @if (!editor) {
     <section class="live-panel" aria-labelledby="inventory-title">
         <h2 id="inventory-title">Equipment inventory <span class="live-badge">@Model.Total items</span></h2>
         <details class="live-search" open="@(!string.IsNullOrEmpty(Model.Query))"><summary>Search inventory</summary><form method="get" class="live-filters"><label>Search name or asset code<input name="q" value="@Model.Query" /></label><button class="live-button" type="submit">Search</button><a class="live-button secondary" href="/admin/equipment">Reset</a></form></details>
-        <div class="live-table-wrap"><table class="live-table"><thead><tr><th>Equipment</th><th>Category</th><th>Condition</th><th>Availability</th><th>Action</th></tr></thead><tbody>
+        @if (Model.Items.Count > 0)
+        {
+            <div class="equipment-card-grid">
             @foreach (var item in Model.Items)
             {
-                <tr><td>@item.Name<small>@item.AssetCode · @item.Location</small></td><td>@item.Category.Name</td><td>@item.Condition</td><td><span class="live-badge">@(!item.IsActive ? "Inactive" : item.IsMaintenanceHold ? "Maintenance hold" : "Active")</span></td><td><a class="live-link" href="/admin/equipment?id=@item.Id">Edit</a></td></tr>
+                <article class="equipment-card">
+                    <div class="equipment-card-media">
+                        @if (item.ImagePath is not null)
+                        {
+                            <img src="@item.ImagePath" alt="" loading="lazy" decoding="async" />
+                        }
+                        else
+                        {
+                            <div class="equipment-card-placeholder" aria-hidden="true"><span>CampusGear</span></div>
+                        }
+                        @if (item.IsActive && item.IsMaintenanceHold)
+                        {
+                            <a class="live-badge equipment-card-status live-link" href="/admin/maintenance" title="Open maintenance cases">Maintenance hold</a>
+                        }
+                        else
+                        {
+                            <span class="live-badge equipment-card-status">@(item.IsActive ? "Active" : "Inactive")</span>
+                        }
+                    </div>
+                    <div class="equipment-card-body">
+                        <p class="equipment-card-category">@item.Category.Name</p>
+                        <h3>@item.Name</h3>
+                        <p class="equipment-card-asset">@item.AssetCode</p>
+                        <dl>
+                            <div><dt>Condition</dt><dd>@item.Condition</dd></div>
+                            <div><dt>Location</dt><dd>@(string.IsNullOrWhiteSpace(item.Location) ? "Not specified" : item.Location)</dd></div>
+                        </dl>
+                    </div>
+                    <footer class="equipment-card-footer">
+                        <span>Equipment details</span>
+                        <a class="live-link" href="/admin/equipment?id=@item.Id">Edit item</a>
+                    </footer>
+                </article>
             }
-            @if (Model.Items.Count == 0) { <tr><td colspan="5">No equipment matches this search.</td></tr> }
-        </tbody></table></div>
+            </div>
+        }
+        else
+        {
+            <p class="equipment-empty">No equipment matches this search.</p>
+        }
         <nav class="live-pager" aria-label="Inventory pages">
             @if (Model.Page > 1) { <a class="live-link" href="/admin/equipment?q=@Uri.EscapeDataString(Model.Query)&amp;page=@(Model.Page - 1)">Previous</a> }
             <span>Page @Model.Page of @Model.Pages</span>
@@ -33,7 +83,7 @@
 
         <h2 id="edit-title">ITEM INFORMATION</h2>
         <div asp-validation-summary="All"></div>
-        <form id="equipment-editor-form" method="post" action="/admin/equipment/save" class="live-form live-form-three">
+        <form id="equipment-editor-form" method="post" action="/admin/equipment/save" enctype="multipart/form-data" class="live-form live-form-three">
             @Html.AntiForgeryToken()
             <input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
             <label class="live-field">Asset code<input asp-for="Input.AssetCode" required maxlength="64" /></label>
@@ -43,10 +93,35 @@
             <label class="live-field">Serial number<input asp-for="Input.SerialNumber" maxlength="120" /></label>
             <label class="live-field">Storage location<input asp-for="Input.Location" maxlength="160" /></label>
             <label class="live-field wide">Description<textarea asp-for="Input.Description" maxlength="2000"></textarea></label>
+            <div class="live-field wide inventory-photo">
+                <label for="imageFile">Equipment photo <small class="live-muted">JPEG, PNG, WebP or GIF · up to 5 MB · shown to borrowers in the equipment catalog</small></label>
+                <div class="inventory-photo-row">
+                    <img id="inventory-photo-preview" class="inventory-photo-preview" src="@Model.Input.ImagePath" alt="" hidden="@(Model.Input.ImagePath is null)" />
+                    <input id="imageFile" name="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+                </div>
+                @Html.ValidationMessage("imageFile", null, new { @class = "field-validation-error" })
+                @if (Model.Input.ImagePath is not null)
+                {
+                    <label class="live-check"><input asp-for="Input.RemoveImage" /> Remove the current photo</label>
+                }
+            </div>
             <label class="live-check wide"><input asp-for="Input.IsActive" /> Active inventory item</label>
             <p class="live-muted wide">Damaged or unserviceable items enter maintenance. Close their maintenance case after repair to restore availability. Equipment with an active loan cannot be edited.</p>
         </form>
     </section>
     <partial name="_EditorFooter" model='new FigmaEditorFooter("equipment-editor-form", "/admin/equipment")' />
+    <script>
+    (() => {
+        const input = document.getElementById('imageFile');
+        const preview = document.getElementById('inventory-photo-preview');
+        input?.addEventListener('change', () => {
+            const file = input.files[0];
+            if (!file) return;
+            if (preview.src.startsWith('blob:')) URL.revokeObjectURL(preview.src);
+            preview.src = URL.createObjectURL(file);
+            preview.hidden = false;
+        });
+    })();
+    </script>
     }
 </main>

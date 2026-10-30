@@ -9,6 +9,8 @@ public sealed class EquipmentItem
     public string? Description { get; set; }
     public string? SerialNumber { get; set; }
     public string? Location { get; set; }
+    // Web path of the uploaded photo under wwwroot (e.g. /uploads/equipment/{file}); null shows a placeholder.
+    public string? ImagePath { get; set; }
     public EquipmentCondition Condition { get; set; } = EquipmentCondition.Good;
     public bool IsActive { get; set; } = true;
     public bool IsMaintenanceHold { get; set; }

@@ -3,9 +3,11 @@ using System.Data;
 using System.Text.Json;
 using CampusGear.Data;
 using CampusGear.Models;
+using CampusGear.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +16,7 @@ namespace CampusGear.Controllers;
 [Authorize(Roles = "Administrator")]
 [AutoValidateAntiforgeryToken]
 public sealed class AdminInventoryController(ApplicationDbContext db, UserManager<ApplicationUser> users,
-    TimeProvider clock) : Controller
+    TimeProvider clock, IEquipmentImageStore images) : Controller
 {
     [HttpGet("admin/equipment")]
     public async Task<IActionResult> Equipment(string? q, Guid? id, int page = 1, CancellationToken cancellationToken = default)
@@ -28,24 +30,44 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
             {
                 Id = item.Id, CategoryId = item.CategoryId, AssetCode = item.AssetCode, Name = item.Name,
                 SerialNumber = item.SerialNumber, Location = item.Location, Description = item.Description,
-                Condition = item.Condition, IsActive = item.IsActive, RowVersion = Convert.ToBase64String(item.RowVersion)
+                Condition = item.Condition, IsActive = item.IsActive, RowVersion = Convert.ToBase64String(item.RowVersion),
+                ImagePath = item.ImagePath
             };
         }
         return View(await BuildPageAsync(input, q, page, cancellationToken));
     }
 
     [HttpPost("admin/equipment/save")]
+    [RequestSizeLimit(8 * 1024 * 1024)]
     public async Task<IActionResult> Save([Bind(Prefix = "Input")] EquipmentEditInput input,
-        CancellationToken cancellationToken)
+        IFormFile? imageFile, CancellationToken cancellationToken)
     {
         input.AssetCode = input.AssetCode?.Trim() ?? "";
         input.Name = input.Name?.Trim() ?? "";
         if (!Enum.IsDefined(input.Condition)) ModelState.AddModelError("Input.Condition", "Choose a valid condition.");
         if (!await db.EquipmentCategories.AnyAsync(x => x.Id == input.CategoryId && x.IsActive, cancellationToken))
             ModelState.AddModelError("Input.CategoryId", "Choose an active category.");
+        if (imageFile is { Length: > 0 } && imageFile.Length > images.MaxBytes)
+            ModelState.AddModelError("imageFile", "Use an image of 5 MB or smaller.");
         if (!ModelState.IsValid) return View("Equipment", await BuildPageAsync(input, null, 1, cancellationToken));
 
         var itemId = input.Id ?? Guid.NewGuid();
+        // The new photo is written first so its path can be saved with the record; it is removed again if the save fails.
+        string? newImagePath = null;
+        if (imageFile is { Length: > 0 })
+        {
+            try
+            {
+                await using var stream = imageFile.OpenReadStream();
+                newImagePath = await images.SaveAsync(itemId, stream, imageFile.Length, cancellationToken);
+            }
+            catch (InvalidOperationException exception)
+            {
+                ModelState.AddModelError("imageFile", exception.Message);
+                return View("Equipment", await BuildPageAsync(input, null, 1, cancellationToken));
+            }
+        }
+        string? replacedImagePath = null;
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         try
         {
@@ -55,7 +77,7 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
                 throw new InvalidOperationException("This category is inactive. Choose another category.");
             var item = input.Id is null ? new EquipmentItem { Id = itemId } :
                 await db.EquipmentItems.SingleOrDefaultAsync(x => x.Id == itemId, cancellationToken);
-            if (item is null) return NotFound();
+            if (item is null) { images.Delete(newImagePath); return NotFound(); }
             if (input.Id is not null && !SqlWorkflowLocks.MatchesVersion(input.RowVersion, item.RowVersion))
                 throw new InvalidOperationException("This equipment changed. Reload it before saving.");
             if (await db.Loans.AnyAsync(x => x.Reservation.EquipmentItemId == itemId && x.ReturnedAtUtc == null, cancellationToken))
@@ -74,6 +96,11 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
             item.Description = Clean(input.Description);
             item.Condition = input.Condition;
             item.IsActive = input.IsActive;
+            if (newImagePath is not null || input.RemoveImage)
+            {
+                replacedImagePath = item.ImagePath;
+                item.ImagePath = newImagePath;
+            }
             item.UpdatedAtUtc = now;
             if (input.Id is null) db.EquipmentItems.Add(item);
             if (input.Condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
@@ -94,6 +121,7 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
                 before, JsonSerializer.Serialize(new { item.AssetCode, item.Name, item.Condition, item.IsActive, item.IsMaintenanceHold })));
             await db.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
+            images.Delete(replacedImagePath);
             TempData["InventoryFeedback"] = input.Id is null ? "Equipment added." : "Equipment updated.";
             return Redirect("/admin/equipment");
         }
@@ -102,6 +130,7 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
         {
             await transaction.RollbackAsync(cancellationToken);
             db.ChangeTracker.Clear();
+            images.Delete(newImagePath);
             ModelState.AddModelError("", exception is DbUpdateException
                 ? "The asset code or serial number already exists, or the record changed. Reload and try again."
                 : exception.Message);
@@ -139,6 +168,9 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
         var items = await query.Include(x => x.Category).OrderBy(x => x.AssetCode).Skip((page - 1) * 15).Take(15).ToListAsync(cancellationToken);
         var categories = await db.EquipmentCategories.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.Name).ToListAsync(cancellationToken);
         if (input.CategoryId == Guid.Empty) input.CategoryId = categories.FirstOrDefault()?.Id ?? Guid.Empty;
+        if (input.Id is not null && input.ImagePath is null)
+            input.ImagePath = await db.EquipmentItems.AsNoTracking().Where(x => x.Id == input.Id)
+                .Select(x => x.ImagePath).SingleOrDefaultAsync(cancellationToken);
         return new(input, items, categories, q ?? "", page, pages, total, TempData["InventoryFeedback"] as string);
     }
 
@@ -157,6 +189,9 @@ public sealed class EquipmentEditInput
     public EquipmentCondition Condition { get; set; } = EquipmentCondition.Good;
     public bool IsActive { get; set; } = true;
     public string? RowVersion { get; set; }
+    // Display-only: the current photo is read from the database, never trusted from the form.
+    [BindNever] public string? ImagePath { get; set; }
+    public bool RemoveImage { get; set; }
 }
 public sealed record InventoryPageModel(EquipmentEditInput Input, IReadOnlyList<EquipmentItem> Items,
     IReadOnlyList<EquipmentCategory> Categories, string Query, int Page, int Pages, int Total, string? Feedback);

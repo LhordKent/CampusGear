@@ -73,6 +73,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(x => x.Description).HasMaxLength(2000);
             entity.Property(x => x.SerialNumber).HasMaxLength(120);
             entity.Property(x => x.Location).HasMaxLength(160);
+            entity.Property(x => x.ImagePath).HasMaxLength(260);
             entity.Property(x => x.Condition).HasConversion<string>().HasMaxLength(32);
             entity.Property(x => x.RowVersion).IsRowVersion();
             entity.HasIndex(x => x.AssetCode).IsUnique();

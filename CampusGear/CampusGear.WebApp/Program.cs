@@ -70,6 +70,7 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddScoped<EmailChallengeService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddSingleton<IEquipmentImageStore, EquipmentImageStore>();
 builder.Services.AddHostedService<ReservationExpiryWorker>();
 // The in-memory mailbox must be explicitly selected; it never delivers to an inbox.
 var emailProvider = builder.Configuration["Email:Provider"] ?? "Smtp";
