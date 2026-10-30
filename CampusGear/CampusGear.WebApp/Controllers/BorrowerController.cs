@@ -1,4 +1,6 @@
+using System.Buffers.Binary;
 using System.Globalization;
+using System.Security.Cryptography;
 using CampusGear.Data;
 using CampusGear.Models;
 using CampusGear.Services.Reservations;
@@ -18,10 +20,12 @@ public sealed class BorrowerController(
 {
     private static readonly TimeZoneInfo ManilaZone = ResolveManilaZone();
     private const int HistoryPageSize = 12;
+    // Upper bound on units in one request; each unit becomes its own reservation for staff to approve.
+    internal const int MaxUnitsPerRequest = 10;
 
     [HttpGet("borrower/reservation")]
     public async Task<IActionResult> Reservation(
-        Guid? equipmentItemId, string? state, Guid? id, CancellationToken cancellationToken)
+        Guid? equipmentItemId, string? state, Guid[]? id, CancellationToken cancellationToken)
     {
         var profile = await OwnProfileAsync(cancellationToken);
         if (profile is null) return Forbid();
@@ -37,25 +41,63 @@ public sealed class BorrowerController(
             EndLocal = LocalInput(start.AddHours(2))
         };
         var model = await BuildReservationPageAsync(profile, input, cancellationToken);
-        if (input.EquipmentItemId == Guid.Empty && model.Items.Count > 0)
-            input.EquipmentItemId = model.Items[0].Id;
 
-        // A query string is never proof of submission. Confirm the persisted record belongs to this borrower.
-        if (state == "submitted" && id is not null)
+        // A query string is never proof of submission. Confirm the persisted records belong to this borrower.
+        if (state == "submitted" && id is { Length: > 0 })
         {
-            model.Submitted = await db.Reservations.AsNoTracking()
+            var ids = id.Distinct().Take(MaxUnitsPerRequest).ToList();
+            var submitted = await db.Reservations.AsNoTracking()
                 .Include(x => x.EquipmentItem)
-                .FirstOrDefaultAsync(x => x.Id == id && x.BorrowerProfileId == profile.Id,
-                    cancellationToken) is { } submitted
-                ? new SubmittedReservation(
-                    submitted.Id, submitted.EquipmentItem.Name, submitted.EquipmentItem.AssetCode,
-                    FormatManila(submitted.StartAtUtc), FormatManila(submitted.EndAtUtc),
-                    submitted.HoldExpiresAtUtc is { } hold ? FormatManila(hold) : null,
-                    submitted.Status)
-                : null;
+                .Where(x => ids.Contains(x.Id) && x.BorrowerProfileId == profile.Id)
+                .OrderBy(x => x.EquipmentItem.AssetCode)
+                .ToListAsync(cancellationToken);
+            model.Submitted = submitted.Select(x => new SubmittedReservation(
+                x.Id, x.EquipmentItem.Name, x.EquipmentItem.AssetCode,
+                FormatManila(x.StartAtUtc), FormatManila(x.EndAtUtc),
+                x.HoldExpiresAtUtc is { } hold ? FormatManila(hold) : null,
+                x.Status)).ToList();
         }
+        // A deep link such as the calendar's "Reserve this equipment" opens that item's request dialog.
+        model.OpenDialog = model.Submitted.Count == 0 && model.Selected is not null;
 
         return View(model);
+    }
+
+    [HttpGet("borrower/reservation/availability")]
+    public async Task<IActionResult> Availability(
+        Guid equipmentItemId, string? start, string? end, CancellationToken cancellationToken)
+    {
+        var profile = await OwnProfileAsync(cancellationToken);
+        if (profile is null) return Forbid();
+
+        var unit = await db.EquipmentItems.AsNoTracking()
+            .Where(x => x.Id == equipmentItemId && x.IsActive)
+            .Select(x => new { x.CategoryId, x.Name })
+            .SingleOrDefaultAsync(cancellationToken);
+        if (unit is null) return NotFound();
+        if (!TryParseManila(start, out var startUtc) || !TryParseManila(end, out var endUtc))
+            return BadRequest(new { message = "Choose a valid borrowing and return date and time." });
+        if (startUtc >= endUtc)
+            return BadRequest(new { message = "The return time must be after the borrowing time." });
+        var now = clock.GetUtcNow().UtcDateTime;
+        if (startUtc <= now)
+            return BadRequest(new { message = "Choose a future borrowing time." });
+
+        var bookable = await db.EquipmentItems.AsNoTracking()
+            .Where(x => x.IsActive && x.CategoryId == unit.CategoryId && x.Name == unit.Name &&
+                !x.IsMaintenanceHold &&
+                x.Condition != EquipmentCondition.Damaged &&
+                x.Condition != EquipmentCondition.Unserviceable)
+            .OrderBy(x => x.AssetCode)
+            .Select(x => x.Id)
+            .ToListAsync(cancellationToken);
+        var free = await FreeUnitsAsync(bookable, startUtc, endUtc, now, equipmentItemId, cancellationToken);
+        return Json(new
+        {
+            bookableUnits = bookable.Count,
+            freeUnits = free.Count,
+            maxQuantity = Math.Min(free.Count, MaxUnitsPerRequest)
+        });
     }
 
     [HttpPost("borrower/reservation")]
@@ -67,12 +109,18 @@ public sealed class BorrowerController(
         if (profile is null) return Forbid();
 
         var model = await BuildReservationPageAsync(profile, input, cancellationToken);
+        model.OpenDialog = true;
+        var selected = model.Selected;
         if (!profile.IsEligible)
             ModelState.AddModelError(string.Empty, "Your borrowing access is currently paused. Contact an administrator.");
         if (input.RequestId == Guid.Empty)
             ModelState.AddModelError(nameof(input.RequestId), "Reload the form and try again.");
-        if (!model.Items.Any(x => x.Id == input.EquipmentItemId))
+        if (selected is not { IsRequestable: true })
             ModelState.AddModelError(nameof(input.EquipmentItemId), "Choose available equipment.");
+        else if (input.Quantity < 1 || input.Quantity > selected.MaxQuantity)
+            ModelState.AddModelError(nameof(input.Quantity), selected.MaxQuantity == 1
+                ? "Only 1 unit of this equipment can be requested."
+                : $"Request between 1 and {selected.MaxQuantity} units.");
         if (string.IsNullOrWhiteSpace(input.Purpose))
             ModelState.AddModelError(nameof(input.Purpose), "Enter the purpose of your request.");
         else if (input.Purpose.Trim().Length > 500)
@@ -90,23 +138,84 @@ public sealed class BorrowerController(
         if (!ModelState.IsValid)
             return View("Reservation", model);
 
+        // A resubmitted form (double click, refresh, back button) shows the reservations it already created.
+        var requestIds = RequestIdsFor(input.RequestId, input.Quantity);
+        var earlier = await FindRequestsAsync(profile.Id, requestIds, cancellationToken);
+        if (earlier.Count > 0)
+        {
+            if (earlier.All(x => x.Status != ReservationStatus.Cancelled))
+                return RedirectToSubmitted(input.EquipmentItemId, earlier.Select(x => x.Id));
+            model.Input.RequestId = Guid.NewGuid();
+            model.Feedback = "This request form was already used. Review the details and submit again.";
+            return View("Reservation", model);
+        }
+
+        var now = clock.GetUtcNow().UtcDateTime;
+        var candidates = new Queue<Guid>(await FreeUnitsAsync(selected!.BookableUnitIds,
+            startUtc!.Value, endUtc!.Value, now, input.EquipmentItemId, cancellationToken));
+        if (candidates.Count < input.Quantity)
+        {
+            model.Feedback = candidates.Count == 0
+                ? "This equipment is unavailable for the requested time."
+                : $"Only {candidates.Count} of the {input.Quantity} units you requested are free for that time. Lower the quantity or choose another time.";
+            model.IsConflict = true;
+            return View("Reservation", model);
+        }
+
+        // Each unit is its own reservation, so every unit goes through the same locking, conflict checks,
+        // pending hold and staff approval as before. A batch is not abandoned halfway if the browser disconnects.
+        var created = new List<ReservationResult>();
         try
         {
-            var result = await reservations.CreateAsync(
-                Actor(),
-                new CreateReservationCommand(input.RequestId, profile.UserId,
-                    input.EquipmentItemId, startUtc!.Value, endUtc!.Value,
-                    input.Purpose!.Trim(), input.Notes), cancellationToken);
-            return Redirect($"/borrower/reservation?equipmentItemId={result.EquipmentItemId:D}&state=submitted&id={result.Id:D}");
+            for (var index = 0; index < input.Quantity; index++)
+            {
+                while (true)
+                {
+                    if (!candidates.TryDequeue(out var unitId))
+                        throw new ReservationWorkflowException(ReservationErrorCode.ScheduleConflict,
+                            "Another borrower just reserved this equipment for the requested time. Lower the quantity or choose another time.");
+                    try
+                    {
+                        created.Add(await reservations.CreateAsync(
+                            Actor(),
+                            new CreateReservationCommand(requestIds[index], profile.UserId,
+                                unitId, startUtc.Value, endUtc.Value,
+                                input.Purpose!.Trim(), input.Notes), CancellationToken.None));
+                        break;
+                    }
+                    catch (ReservationWorkflowException exception) when (exception.Code is
+                        ReservationErrorCode.ScheduleConflict or ReservationErrorCode.UnavailableEquipment)
+                    {
+                        // This unit was taken after the availability check; try the next free unit.
+                    }
+                }
+            }
         }
         catch (ReservationWorkflowException exception)
         {
+            if (exception.Code == ReservationErrorCode.Forbidden)
+            {
+                await WithdrawAsync(created);
+                return Forbid();
+            }
+            if (exception.Code == ReservationErrorCode.DuplicateRequest)
+            {
+                // The same form was submitted twice at once; show what that submission saved.
+                var saved = await FindRequestsAsync(profile.Id, requestIds, CancellationToken.None);
+                if (saved.Count > 0)
+                    return RedirectToSubmitted(input.EquipmentItemId, saved.Select(x => x.Id));
+            }
+            if (created.Count > 0)
+            {
+                // All-or-nothing: never leave the borrower with fewer units than they asked for.
+                await WithdrawAsync(created);
+                model.Input.RequestId = Guid.NewGuid();
+            }
             model.Feedback = exception.Message;
             model.IsConflict = exception.Code == ReservationErrorCode.ScheduleConflict;
-            if (exception.Code == ReservationErrorCode.Forbidden)
-                return Forbid();
             return View("Reservation", model);
         }
+        return RedirectToSubmitted(input.EquipmentItemId, created.Select(x => x.Id));
     }
 
     [HttpPost("borrower/reservation/{id:guid}/cancel")]
@@ -278,29 +387,147 @@ public sealed class BorrowerController(
         HttpContext.Connection.RemoteIpAddress?.ToString(),
         HttpContext.TraceIdentifier);
 
+    /// <summary>
+    /// Builds the catalog. Units that share a category and name (e.g. five "Canon EOS Camera" assets)
+    /// are shown as one product whose quantity is the number of units that can be borrowed.
+    /// </summary>
     private async Task<ReservationPageViewModel> BuildReservationPageAsync(
         BorrowerProfile profile, ReservationInputModel input, CancellationToken cancellationToken)
     {
-        var items = await db.EquipmentItems.AsNoTracking()
-            .Where(x => x.IsActive && !x.IsMaintenanceHold &&
-                x.Condition != EquipmentCondition.Damaged &&
-                x.Condition != EquipmentCondition.Unserviceable)
+        var now = clock.GetUtcNow().UtcDateTime;
+        var units = await db.EquipmentItems.AsNoTracking()
+            .Where(x => x.IsActive)
             .OrderBy(x => x.Name).ThenBy(x => x.AssetCode)
-            .Select(x => new EquipmentChoice(x.Id, x.Name, x.AssetCode,
-                x.Category.Name, x.Condition, x.Location))
+            .Select(x => new
+            {
+                x.Id, x.CategoryId, Category = x.Category.Name, x.Name, x.Description,
+                x.ImagePath, x.Location, x.Condition,
+                IsBookable = !x.IsMaintenanceHold &&
+                    x.Condition != EquipmentCondition.Damaged &&
+                    x.Condition != EquipmentCondition.Unserviceable
+            })
             .ToListAsync(cancellationToken);
-        return new ReservationPageViewModel(input, items, profile.IsEligible);
+        // Units that are out right now: released on a loan, or inside an approved booking.
+        var inUse = (await db.Reservations.AsNoTracking()
+            .Where(x => x.Status == ReservationStatus.Released ||
+                x.Status == ReservationStatus.Approved && x.StartAtUtc <= now && x.EndAtUtc > now)
+            .Select(x => x.EquipmentItemId).Distinct()
+            .ToListAsync(cancellationToken)).ToHashSet();
+
+        var items = units.GroupBy(x => (x.CategoryId, x.Name))
+            .Select(group =>
+            {
+                var bookable = group.Where(x => x.IsBookable).ToList();
+                var lead = group.FirstOrDefault(x => x.Id == input.EquipmentItemId)
+                    ?? bookable.FirstOrDefault() ?? group.First();
+                return new CatalogEquipment(
+                    lead.Id, lead.Name, lead.Category,
+                    group.Select(x => x.Description).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x)),
+                    group.Select(x => x.ImagePath).FirstOrDefault(x => !string.IsNullOrEmpty(x)),
+                    group.Select(x => x.Location).Where(x => !string.IsNullOrWhiteSpace(x))
+                        .Select(x => x!).Distinct().ToList(),
+                    bookable.Select(x => x.Condition).Distinct().Order().ToList(),
+                    group.Select(x => x.Id).ToList(),
+                    bookable.Select(x => x.Id).ToList(),
+                    bookable.Count(x => !inUse.Contains(x.Id)));
+            })
+            .OrderByDescending(x => x.IsRequestable).ThenBy(x => x.Name).ThenBy(x => x.Category)
+            .ToList();
+        return new ReservationPageViewModel(input, items, profile.IsEligible)
+        {
+            MinStartLocal = LocalInput(Manila(now).AddMinutes(1))
+        };
+    }
+
+    /// <summary>
+    /// Returns the units free for the whole window, the preferred unit first. This mirrors the
+    /// reservation service's conflict rule; the service checks again under its per-item lock.
+    /// </summary>
+    private async Task<List<Guid>> FreeUnitsAsync(IReadOnlyList<Guid> unitIds,
+        DateTime startUtc, DateTime endUtc, DateTime now, Guid preferredUnitId,
+        CancellationToken cancellationToken)
+    {
+        if (unitIds.Count == 0) return [];
+        var blocked = await db.Reservations.AsNoTracking()
+            .Where(x => unitIds.Contains(x.EquipmentItemId) &&
+                x.StartAtUtc < endUtc && x.EndAtUtc > startUtc &&
+                (x.Status == ReservationStatus.Approved ||
+                 x.Status == ReservationStatus.Released ||
+                 x.Status == ReservationStatus.Pending &&
+                     x.HoldExpiresAtUtc != null && x.HoldExpiresAtUtc > now && x.StartAtUtc > now))
+            .Select(x => x.EquipmentItemId).Distinct()
+            .ToListAsync(cancellationToken);
+        return unitIds.Where(x => !blocked.Contains(x))
+            .OrderByDescending(x => x == preferredUnitId)
+            .ToList();
+    }
+
+    private async Task<List<(Guid Id, ReservationStatus Status)>> FindRequestsAsync(
+        Guid profileId, Guid[] requestIds, CancellationToken cancellationToken) =>
+        (await db.Reservations.AsNoTracking()
+            .Where(x => x.BorrowerProfileId == profileId && requestIds.Contains(x.RequestId))
+            .Select(x => new { x.Id, x.Status })
+            .ToListAsync(cancellationToken))
+        .Select(x => (x.Id, x.Status)).ToList();
+
+    /// <summary>Cancels reservations created earlier in a batch that could not be completed.</summary>
+    private async Task WithdrawAsync(IEnumerable<ReservationResult> created)
+    {
+        foreach (var reservation in created)
+        {
+            try
+            {
+                await reservations.CancelAsync(Actor(), reservation.Id,
+                    "Withdrawn automatically: the full requested quantity was not available.",
+                    CancellationToken.None);
+            }
+            catch (ReservationWorkflowException)
+            {
+                // It stays visible in the borrower's history, where it can be cancelled by hand.
+            }
+        }
+    }
+
+    private RedirectResult RedirectToSubmitted(Guid equipmentItemId, IEnumerable<Guid> reservationIds) =>
+        Redirect($"/borrower/reservation?equipmentItemId={equipmentItemId:D}&state=submitted" +
+            string.Concat(reservationIds.Select(x => $"&id={x:D}")));
+
+    /// <summary>
+    /// The first unit keeps the form's request ID, so a one-unit request is stored exactly as before.
+    /// Later units get IDs derived from it, so a resubmitted form can find every unit it created.
+    /// </summary>
+    private static Guid[] RequestIdsFor(Guid requestId, int quantity)
+    {
+        var ids = new Guid[Math.Max(1, quantity)];
+        ids[0] = requestId;
+        Span<byte> seed = stackalloc byte[20];
+        for (var index = 1; index < ids.Length; index++)
+        {
+            requestId.TryWriteBytes(seed);
+            BinaryPrimitives.WriteInt32LittleEndian(seed[16..], index);
+            ids[index] = new Guid(SHA256.HashData(seed)[..16]);
+        }
+        return ids;
     }
 
     private DateTime? ParseManilaInput(string? value, string field)
     {
-        if (!DateTime.TryParseExact(value, "yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out var local) || local.Year is < 2000 or > 2100)
+        if (!TryParseManila(value, out var utc))
         {
             ModelState.AddModelError(field, "Choose a valid date and time in Manila time.");
             return null;
         }
-        return ToUtc(DateTime.SpecifyKind(local, DateTimeKind.Unspecified));
+        return utc;
+    }
+
+    private static bool TryParseManila(string? value, out DateTime utc)
+    {
+        utc = default;
+        if (!DateTime.TryParseExact(value, "yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out var local) || local.Year is < 2000 or > 2100)
+            return false;
+        utc = ToUtc(DateTime.SpecifyKind(local, DateTimeKind.Unspecified));
+        return true;
     }
 
     private static bool TryParseDate(string? value, out DateOnly date) =>
@@ -357,6 +584,7 @@ public sealed class ReservationInputModel
 {
     public Guid RequestId { get; set; }
     public Guid EquipmentItemId { get; set; }
+    public int Quantity { get; set; } = 1;
     public string? StartLocal { get; set; }
     public string? EndLocal { get; set; }
     public string? Purpose { get; set; }
@@ -364,19 +592,47 @@ public sealed class ReservationInputModel
 }
 
 public sealed class ReservationPageViewModel(
-    ReservationInputModel input, IReadOnlyList<EquipmentChoice> items, bool isEligible)
+    ReservationInputModel input, IReadOnlyList<CatalogEquipment> items, bool isEligible)
 {
     public ReservationInputModel Input { get; } = input;
-    public IReadOnlyList<EquipmentChoice> Items { get; } = items;
+    public IReadOnlyList<CatalogEquipment> Items { get; } = items;
     public bool IsEligible { get; } = isEligible;
-    public EquipmentChoice? Selected => Items.FirstOrDefault(x => x.Id == Input.EquipmentItemId);
-    public SubmittedReservation? Submitted { get; set; }
+    public IReadOnlyList<string> Categories => Items.Select(x => x.Category).Distinct().Order().ToList();
+    public CatalogEquipment? Selected => Items.FirstOrDefault(x => x.UnitIds.Contains(Input.EquipmentItemId));
+    public IReadOnlyList<SubmittedReservation> Submitted { get; set; } = [];
     public string? Feedback { get; set; }
     public bool IsConflict { get; set; }
+    public bool OpenDialog { get; set; }
+    /// <summary>The earliest borrowing time the date pickers offer, in Manila time.</summary>
+    public string MinStartLocal { get; init; } = string.Empty;
 }
 
-public sealed record EquipmentChoice(Guid Id, string Name, string AssetCode,
-    string Category, EquipmentCondition Condition, string? Location);
+/// <summary>One catalog product: every active unit that shares a category and name.</summary>
+/// <param name="Id">The unit the request form posts; the server picks the actual free units.</param>
+/// <param name="FreeNowUnits">Bookable units not on loan or inside an approved booking right now.</param>
+public sealed record CatalogEquipment(
+    Guid Id, string Name, string Category, string? Description, string? ImagePath,
+    IReadOnlyList<string> Locations, IReadOnlyList<EquipmentCondition> Conditions,
+    IReadOnlyList<Guid> UnitIds, IReadOnlyList<Guid> BookableUnitIds, int FreeNowUnits)
+{
+    public int TotalUnits => UnitIds.Count;
+    public int BookableUnits => BookableUnitIds.Count;
+    public bool IsRequestable => BookableUnits > 0;
+    public int MaxQuantity => Math.Min(BookableUnits, BorrowerController.MaxUnitsPerRequest);
+    public string Availability => !IsRequestable ? "Unavailable" : FreeNowUnits == 0 ? "In use" : "Available";
+    public string AvailabilityDetail => !IsRequestable
+        ? "Under maintenance"
+        : FreeNowUnits == 0
+            ? "All units are out now · reserve a later time"
+            : $"{FreeNowUnits} of {TotalUnits} {(TotalUnits == 1 ? "unit" : "units")} ready now";
+    public string ConditionText => Conditions.Count == 0 ? "Under maintenance" : string.Join(" · ", Conditions);
+    public string LocationText => Locations.Count switch
+    {
+        0 => "Not specified",
+        1 => Locations[0],
+        _ => string.Join(", ", Locations)
+    };
+}
 
 public sealed record SubmittedReservation(Guid Id, string EquipmentName, string AssetCode,
     string StartManila, string EndManila, string? HoldExpiresManila, ReservationStatus Status);

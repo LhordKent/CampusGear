@@ -5,57 +5,79 @@
     ViewData["WorkspaceRole"] = "Borrower";
     ViewData["BorrowerPage"] = "reservation";
     var selected = Model.Selected;
+    var hasErrors = !ViewData.ModelState.IsValid || Model.Feedback is not null;
+    // Errors are shown in the request dialog; they fall back to the page when no equipment is selected.
+    var errorsInDialog = hasErrors && selected is not null;
+    var hasSubmitted = Model.Submitted.Count > 0;
+
+    static string StatusClass(string availability) => availability switch
+    {
+        "Available" => "is-available",
+        "In use" => "is-in-use",
+        _ => "is-unavailable"
+    };
+    static string Icon(string name, string category)
+    {
+        var text = $"{name} {category}".ToLowerInvariant();
+        if (new[] { "laptop", "computer", "notebook", "macbook", "chromebook" }.Any(text.Contains)) return "laptop";
+        if (new[] { "camera", "camcorder", "dslr", "lens", "tripod" }.Any(text.Contains)) return "camera";
+        if (text.Contains("projector")) return "projector";
+        if (new[] { "mic", "audio", "speaker", "sound", "headphone" }.Any(text.Contains)) return "audio";
+        return "box";
+    }
 }
-@* Figma sources: 695:2 reservation, 695:154 conflict, 695:280 submitted, 695:409 submitting. *@
-@section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
+@* Figma sources: 695:2 reservation, 695:154 conflict, 695:280 submitted. The catalog groups units by category and name. *@
+@section Styles {
+    <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/borrower-catalog.css" asp-append-version="true" />
+}
 <main class="live-content borrower-page" data-figma-source="695:2">
     <header class="live-heading borrower-heading">
         <h1><img src="~/figma/assets/5fc0e.svg" alt="" />Equipment Reservation</h1>
+        <p>Browse campus equipment and request what you need. Staff review every request before release.</p>
     </header>
 
-    @if (Model.Submitted is { } submitted)
-    {
-        <section class="borrower-feedback borrower-success" role="status" data-figma-source="695:280">
-            <h2>Reservation request submitted</h2>
-            <p>Your request is saved. Staff will review it before the equipment can be released.</p>
-            <dl class="borrower-summary">
-                <div><dt>EQUIPMENT</dt><dd>@submitted.EquipmentName <span>@submitted.AssetCode</span></dd></div>
-                <div><dt>MANILA TIME</dt><dd>@submitted.StartManila<br />to @submitted.EndManila</dd></div>
-                <div><dt>STATUS</dt><dd><span class="borrower-badge">@submitted.Status</span></dd></div>
-                @if (submitted.HoldExpiresManila is not null)
-                {
-                    <div><dt>PENDING HOLD ENDS</dt><dd>@submitted.HoldExpiresManila</dd></div>
-                }
-            </dl>
-            <div class="borrower-actions">
-                <a class="borrower-button" href="/borrower/history">View borrowing history</a>
-                <a class="borrower-button borrower-button-secondary" href="/borrower/reservation">Create another request</a>
-            </div>
-        </section>
-    }
-    else
-    {
-        @if (Model.Feedback is not null)
+    <div class="catalog-page">
+        @if (hasSubmitted)
         {
-            <section class="borrower-feedback borrower-error" role="alert" data-figma-source="@(Model.IsConflict ? "695:154" : "695:2")">
-                <h2>@(Model.IsConflict ? "Reservation conflict" : "Request could not be submitted")</h2>
-                <p>@Model.Feedback</p>
-                @if (Model.IsConflict)
-                {
-                    <a href="/borrower/calendar?equipmentItemId=@Model.Input.EquipmentItemId">Review the availability calendar →</a>
-                }
+            var first = Model.Submitted[0];
+            <section class="borrower-feedback borrower-success" role="status" data-figma-source="695:280">
+                <h2>Reservation request submitted</h2>
+                <p>Your request is saved. Staff will review it before the equipment can be released.</p>
+                <dl class="borrower-summary">
+                    <div>
+                        <dt>EQUIPMENT</dt>
+                        <dd>@first.EquipmentName @(Model.Submitted.Count > 1 ? $"× {Model.Submitted.Count}" : "")
+                            <span>@string.Join(", ", Model.Submitted.Select(x => x.AssetCode))</span></dd>
+                    </div>
+                    <div><dt>MANILA TIME</dt><dd>@first.StartManila<br />to @first.EndManila</dd></div>
+                    <div><dt>STATUS</dt><dd><span class="borrower-badge">@first.Status</span></dd></div>
+                    @if (first.HoldExpiresManila is not null)
+                    {
+                        <div><dt>PENDING HOLD ENDS</dt><dd>@first.HoldExpiresManila</dd></div>
+                    }
+                </dl>
+                <div class="borrower-actions">
+                    <a class="borrower-button" href="/borrower/history">View borrowing history</a>
+                    <a class="borrower-button borrower-button-secondary" href="/borrower/reservation">Browse more equipment</a>
+                </div>
             </section>
         }
-        @if (!ViewData.ModelState.IsValid)
+        @if (hasErrors && !errorsInDialog)
         {
-            <div class="borrower-validation" role="alert">@Html.ValidationSummary(false)</div>
+            <section class="borrower-feedback borrower-error" role="alert">
+                <h2>@(Model.IsConflict ? "Reservation conflict" : "Request could not be submitted")</h2>
+                @if (Model.Feedback is not null) { <p>@Model.Feedback</p> }
+                <div class="borrower-validation-inline">@Html.ValidationSummary(false)</div>
+            </section>
         }
         @if (!Model.IsEligible)
         {
             <section class="borrower-feedback borrower-error" role="alert">
-                <h2>Borrowing access is paused</h2><p>Contact an administrator before making another reservation.</p>
+                <h2>Borrowing access is paused</h2><p>You can browse equipment, but contact an administrator before making another reservation.</p>
             </section>
         }
+
         @if (Model.Items.Count == 0)
         {
             <section class="borrower-empty">
@@ -66,81 +88,210 @@
         }
         else
         {
-            <form method="post" action="/borrower/reservation" id="reservation-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="RequestId" value="@Model.Input.RequestId" />
-                <div class="borrower-reservation-grid">
-                    <section class="borrower-card borrower-equipment" aria-labelledby="equipment-title">
-                        <h2 id="equipment-title">@(selected?.Name ?? "Choose equipment")</h2>
-                        <label class="borrower-field" for="EquipmentItemId">
-                            <span>Equipment item</span>
-                            <select id="EquipmentItemId" name="EquipmentItemId" required>
-                                <option value="">Choose an item</option>
-                                @foreach (var item in Model.Items)
-                                {
-                                    <option value="@item.Id" selected="@(item.Id == Model.Input.EquipmentItemId)"
-                                            data-name="@item.Name" data-code="@item.AssetCode" data-category="@item.Category"
-                                            data-condition="@item.Condition" data-location="@(item.Location ?? "Not specified")">@item.Name · @item.AssetCode</option>
-                                }
-                            </select>
-                            @Html.ValidationMessage("EquipmentItemId", null, new { @class = "borrower-field-error" })
+            <section class="catalog" aria-labelledby="catalog-title" data-catalog>
+                <div class="catalog-toolbar">
+                    <div class="catalog-toolbar-top">
+                        <h2 id="catalog-title">Equipment catalog</h2>
+                        <p class="catalog-count" data-catalog-count aria-live="polite">@Model.Items.Count @(Model.Items.Count == 1 ? "item" : "items")</p>
+                    </div>
+                    <div class="catalog-filters" hidden data-catalog-filters>
+                        <label class="catalog-search">
+                            <span class="visually-hidden">Search equipment</span>
+                            <svg class="catalog-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+                            <input type="search" placeholder="Search equipment" autocomplete="off" data-catalog-search />
                         </label>
-                        <p class="borrower-muted" id="selected-code">@selected?.AssetCode · @selected?.Category</p>
-                        <dl class="borrower-equipment-details">
-                            <div><dt>CONDITION</dt><dd id="selected-condition">@selected?.Condition</dd></div>
-                            <div><dt>LOCATION</dt><dd id="selected-location">@(selected?.Location ?? "Not specified")</dd></div>
-                        </dl>
-                    </section>
-                    <section class="borrower-card" aria-labelledby="request-title">
-                        <h2 id="request-title">REQUEST DETAILS</h2>
-                        <p class="borrower-muted">All dates and times use Manila time (UTC+8).</p>
-                        <div class="borrower-field-grid">
-                            <label class="borrower-field" for="StartLocal">
-                                <span>Start date and time</span>
-                                <input id="StartLocal" name="StartLocal" type="datetime-local" value="@Model.Input.StartLocal" required />
-                                @Html.ValidationMessage("StartLocal", null, new { @class = "borrower-field-error" })
-                            </label>
-                            <label class="borrower-field" for="EndLocal">
-                                <span>End date and time</span>
-                                <input id="EndLocal" name="EndLocal" type="datetime-local" value="@Model.Input.EndLocal" required />
-                                @Html.ValidationMessage("EndLocal", null, new { @class = "borrower-field-error" })
-                            </label>
+                        <div class="catalog-chips" role="group" aria-label="Filter by category">
+                            <button type="button" class="catalog-chip" aria-pressed="true" data-category="">All</button>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <button type="button" class="catalog-chip" aria-pressed="false" data-category="@category">@category</button>
+                            }
                         </div>
-                        <label class="borrower-field" for="Purpose">
-                            <span>Purpose</span>
-                            <input id="Purpose" name="Purpose" value="@Model.Input.Purpose" maxlength="500" placeholder="e.g. Class presentation" required />
-                            @Html.ValidationMessage("Purpose", null, new { @class = "borrower-field-error" })
+                        <label class="catalog-toggle">
+                            <input type="checkbox" data-catalog-available />
+                            <span>Available to reserve</span>
                         </label>
-                        <label class="borrower-field" for="Notes">
-                            <span>Note <span class="borrower-optional">Optional</span></span>
-                            <textarea id="Notes" name="Notes" maxlength="2000" rows="4" placeholder="Additional details for the custodian">@Model.Input.Notes</textarea>
-                            @Html.ValidationMessage("Notes", null, new { @class = "borrower-field-error" })
-                        </label>
-                    </section>
+                    </div>
                 </div>
-                <p class="borrower-muted">A pending request holds the slot for up to 24 hours or until its start time.</p>
-                <div class="borrower-actions borrower-actions-end">
-                    <a class="borrower-button borrower-button-secondary" href="/borrower/calendar">Check calendar</a>
-                    <button class="borrower-button" type="submit" disabled="@(!Model.IsEligible)">SUBMIT RESERVATION</button>
+
+                <ul class="catalog-grid" role="list">
+                    @foreach (var item in Model.Items)
+                    {
+                        var icon = Icon(item.Name, item.Category);
+                        <li class="catalog-card @StatusClass(item.Availability)"
+                            data-card
+                            data-id="@item.Id"
+                            data-name="@item.Name"
+                            data-category="@item.Category"
+                            data-description="@item.Description"
+                            data-image="@item.ImagePath"
+                            data-icon="@icon"
+                            data-availability="@item.Availability"
+                            data-availability-detail="@item.AvailabilityDetail"
+                            data-condition="@item.ConditionText"
+                            data-location="@item.LocationText"
+                            data-total="@item.TotalUnits"
+                            data-bookable="@item.BookableUnits"
+                            data-max="@item.MaxQuantity"
+                            data-requestable="@(item.IsRequestable ? "true" : "false")">
+                            <a class="catalog-card-link" href="/borrower/reservation?equipmentItemId=@item.Id" data-open-card>
+                                <div class="catalog-media">
+                                    @if (item.ImagePath is not null)
+                                    {
+                                        <img src="@item.ImagePath" alt="" loading="lazy" decoding="async" />
+                                    }
+                                    else
+                                    {
+                                        <span class="catalog-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cg-icon-@icon" /></svg></span>
+                                    }
+                                    <span class="catalog-status"><i aria-hidden="true"></i>@item.Availability</span>
+                                </div>
+                                <div class="catalog-body">
+                                    <p class="catalog-category">@item.Category</p>
+                                    <h3 class="catalog-name">@item.Name</h3>
+                                    <p class="catalog-description">@(item.Description ?? "No description provided yet.")</p>
+                                    <dl class="catalog-meta">
+                                        <div><dt>Available</dt><dd>@item.BookableUnits of @item.TotalUnits</dd></div>
+                                        <div><dt>Condition</dt><dd>@item.ConditionText</dd></div>
+                                    </dl>
+                                </div>
+                                <div class="catalog-footer">
+                                    <span class="catalog-detail">@item.AvailabilityDetail</span>
+                                    <span class="catalog-cta">@(item.IsRequestable ? "Reserve" : "View details")<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span>
+                                </div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+                <div class="borrower-empty catalog-no-results" hidden data-catalog-empty>
+                    <h3>No equipment matches your filters</h3>
+                    <p>Try another search term or category.</p>
+                    <button type="button" class="borrower-button borrower-button-secondary" data-catalog-reset>Clear filters</button>
                 </div>
-            </form>
+            </section>
+
+            @* Rendered open by the server after a failed submit or a deep link; the script upgrades it to a modal. *@
+            <dialog class="reserve-dialog" id="reserve-dialog" aria-labelledby="reserve-title"
+                    open="@Model.OpenDialog" data-reserve-dialog data-open-on-load="@(Model.OpenDialog ? "true" : "false")"
+                    data-eligible="@(Model.IsEligible ? "true" : "false")">
+                <form method="post" action="/borrower/reservation" class="reserve-form" id="reservation-form" novalidate data-reserve-form>
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="RequestId" value="@Model.Input.RequestId" />
+                    <input type="hidden" name="EquipmentItemId" value="@(selected?.Id ?? Model.Input.EquipmentItemId)" data-field="id" />
+
+                    <header class="reserve-header">
+                        <p class="reserve-eyebrow">Equipment details</p>
+                        <a class="reserve-close" href="/borrower/reservation" aria-label="Close" data-close-dialog>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                        </a>
+                    </header>
+
+                    <div class="reserve-scroll">
+                        <section class="reserve-equipment @(selected is null ? "" : StatusClass(selected.Availability))" data-field="status-host">
+                            <div class="reserve-media" data-field="media">
+                                @if (selected?.ImagePath is not null)
+                                {
+                                    <img src="@selected.ImagePath" alt="@selected.Name" />
+                                }
+                                else
+                                {
+                                    <span class="catalog-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cg-icon-@(selected is null ? "box" : Icon(selected.Name, selected.Category))" /></svg></span>
+                                }
+                            </div>
+                            <div class="reserve-info">
+                                <p class="catalog-category" data-field="category">@selected?.Category</p>
+                                <h2 id="reserve-title" data-field="name">@(selected?.Name ?? "Equipment")</h2>
+                                <p class="reserve-status"><span class="catalog-status"><i aria-hidden="true"></i><span data-field="availability">@selected?.Availability</span></span>
+                                    <span class="reserve-status-detail" data-field="availability-detail">@selected?.AvailabilityDetail</span></p>
+                                <p class="reserve-description" data-field="description">@(selected?.Description ?? "No description provided yet.")</p>
+                                <dl class="reserve-facts">
+                                    <div><dt>Available quantity</dt><dd data-field="quantity-text">@(selected is null ? "" : $"{selected.BookableUnits} of {selected.TotalUnits}")</dd></div>
+                                    <div><dt>Condition</dt><dd data-field="condition">@selected?.ConditionText</dd></div>
+                                    <div><dt>Location</dt><dd data-field="location">@selected?.LocationText</dd></div>
+                                </dl>
+                            </div>
+                        </section>
+
+                        <section class="reserve-request" aria-labelledby="reserve-request-title">
+                            <h3 id="reserve-request-title">Reservation request</h3>
+
+                            <div class="reserve-alert" role="alert" data-reserve-alert hidden="@(!errorsInDialog)">
+                                @if (errorsInDialog)
+                                {
+                                    <strong>@(Model.IsConflict ? "Reservation conflict" : "Request could not be submitted")</strong>
+                                    @if (Model.Feedback is not null) { <p>@Model.Feedback</p> }
+                                    @Html.ValidationSummary(true, null, new { @class = "reserve-alert-list" })
+                                    @Html.ValidationMessage("EquipmentItemId", null, new { @class = "reserve-alert-line" })
+                                    @Html.ValidationMessage("RequestId", null, new { @class = "reserve-alert-line" })
+                                    @if (Model.IsConflict)
+                                    {
+                                        <a href="/borrower/calendar?equipmentItemId=@Model.Input.EquipmentItemId">Review the availability calendar →</a>
+                                    }
+                                }
+                            </div>
+
+                            <p class="reserve-unavailable" data-field="unavailable" hidden="@(selected is null || selected.IsRequestable)">
+                                This equipment is under maintenance and can't be requested right now. Check back later or browse other equipment.
+                            </p>
+
+                            <fieldset class="reserve-fields" data-field="fields" disabled="@(selected is { IsRequestable: false })">
+                                <legend class="visually-hidden">Request details</legend>
+                                <div class="reserve-grid">
+                                    <div class="borrower-field reserve-quantity">
+                                        <label for="Quantity">Quantity</label>
+                                        <div class="reserve-stepper">
+                                            <button type="button" aria-label="Decrease quantity" data-step="-1">−</button>
+                                            <input id="Quantity" name="Quantity" type="number" inputmode="numeric" min="1"
+                                                   max="@(selected?.MaxQuantity ?? 1)" value="@Model.Input.Quantity" required
+                                                   aria-describedby="quantity-hint" data-field="quantity" />
+                                            <button type="button" aria-label="Increase quantity" data-step="1">+</button>
+                                        </div>
+                                        <small id="quantity-hint" class="reserve-hint" data-field="quantity-hint">Up to @(selected?.MaxQuantity ?? 1) per request</small>
+                                        @Html.ValidationMessage("Quantity", null, new { @class = "borrower-field-error", data_error_for = "Quantity" })
+                                    </div>
+                                    <label class="borrower-field" for="StartLocal">
+                                        <span>Borrowing date and time</span>
+                                        <input id="StartLocal" name="StartLocal" type="datetime-local" value="@Model.Input.StartLocal" min="@Model.MinStartLocal" required />
+                                        @Html.ValidationMessage("StartLocal", null, new { @class = "borrower-field-error", data_error_for = "StartLocal" })
+                                    </label>
+                                    <label class="borrower-field" for="EndLocal">
+                                        <span>Expected return date and time</span>
+                                        <input id="EndLocal" name="EndLocal" type="datetime-local" value="@Model.Input.EndLocal" min="@(Model.Input.StartLocal ?? Model.MinStartLocal)" required />
+                                        @Html.ValidationMessage("EndLocal", null, new { @class = "borrower-field-error", data_error_for = "EndLocal" })
+                                    </label>
+                                </div>
+                                <p class="reserve-availability" aria-live="polite" data-availability-hint hidden></p>
+                                <label class="borrower-field" for="Purpose">
+                                    <span>Purpose of borrowing</span>
+                                    <input id="Purpose" name="Purpose" value="@Model.Input.Purpose" maxlength="500" placeholder="e.g. Class presentation for IT 101" required />
+                                    @Html.ValidationMessage("Purpose", null, new { @class = "borrower-field-error", data_error_for = "Purpose" })
+                                </label>
+                                <label class="borrower-field" for="Notes">
+                                    <span>Note <span class="borrower-optional">Optional</span></span>
+                                    <textarea id="Notes" name="Notes" maxlength="2000" rows="3" placeholder="Additional details for the custodian">@Model.Input.Notes</textarea>
+                                    @Html.ValidationMessage("Notes", null, new { @class = "borrower-field-error", data_error_for = "Notes" })
+                                </label>
+                                <p class="reserve-note">All times use Manila time (UTC+8). A pending request holds the equipment for up to 24 hours or until its start time.</p>
+                            </fieldset>
+                        </section>
+                    </div>
+
+                    <footer class="reserve-actions">
+                        <a class="borrower-button borrower-button-secondary" href="/borrower/reservation" data-close-dialog>Cancel</a>
+                        <button class="borrower-button" type="submit" data-submit
+                                disabled="@(!Model.IsEligible || selected is { IsRequestable: false })">Submit Request</button>
+                    </footer>
+                </form>
+            </dialog>
         }
-    }
+    </div>
+
+    <svg class="visually-hidden" aria-hidden="true" focusable="false">
+        <symbol id="cg-icon-laptop" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="1.5" /><path d="M2 19h20" /></symbol>
+        <symbol id="cg-icon-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></symbol>
+        <symbol id="cg-icon-projector" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="9" rx="2" /><circle cx="16" cy="12.5" r="2.5" /><path d="M6 12.5h4M5 17v2M19 17v2" /></symbol>
+        <symbol id="cg-icon-audio" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></symbol>
+        <symbol id="cg-icon-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z" /><path d="M3 7v10l9 4 9-4V7M12 11v10" /></symbol>
+    </svg>
 </main>
-<script>
-(() => {
-    const select = document.getElementById('EquipmentItemId');
-    if (select) select.addEventListener('change', () => {
-        const option = select.selectedOptions[0];
-        document.getElementById('equipment-title').textContent = option.dataset.name || 'Choose equipment';
-        document.getElementById('selected-code').textContent = option.dataset.code ? `${option.dataset.code} · ${option.dataset.category}` : '';
-        document.getElementById('selected-condition').textContent = option.dataset.condition || '—';
-        document.getElementById('selected-location').textContent = option.dataset.location || '—';
-    });
-    document.getElementById('reservation-form')?.addEventListener('submit', event => {
-        const button = event.currentTarget.querySelector('button[type="submit"]');
-        button.disabled = true;
-        button.textContent = 'SUBMITTING RESERVATION…';
-    });
-})();
-</script>
+@section Scripts { <script src="~/js/borrower-catalog.js" asp-append-version="true"></script> }

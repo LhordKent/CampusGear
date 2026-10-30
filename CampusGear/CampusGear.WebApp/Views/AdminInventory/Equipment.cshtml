@@ -16,7 +16,7 @@
         <div class="live-table-wrap"><table class="live-table"><thead><tr><th>Equipment</th><th>Category</th><th>Condition</th><th>Availability</th><th>Action</th></tr></thead><tbody>
             @foreach (var item in Model.Items)
             {
-                <tr><td>@item.Name<small>@item.AssetCode · @item.Location</small></td><td>@item.Category.Name</td><td>@item.Condition</td><td><span class="live-badge">@(!item.IsActive ? "Inactive" : item.IsMaintenanceHold ? "Maintenance hold" : "Active")</span></td><td><a class="live-link" href="/admin/equipment?id=@item.Id">Edit</a></td></tr>
+                <tr><td><span class="inventory-item">@if (item.ImagePath is not null) { <img class="inventory-thumb" src="@item.ImagePath" alt="" loading="lazy" /> }<span>@item.Name<small>@item.AssetCode · @item.Location</small></span></span></td><td>@item.Category.Name</td><td>@item.Condition</td><td><span class="live-badge">@(!item.IsActive ? "Inactive" : item.IsMaintenanceHold ? "Maintenance hold" : "Active")</span></td><td><a class="live-link" href="/admin/equipment?id=@item.Id">Edit</a></td></tr>
             }
             @if (Model.Items.Count == 0) { <tr><td colspan="5">No equipment matches this search.</td></tr> }
         </tbody></table></div>
@@ -33,7 +33,7 @@
 
         <h2 id="edit-title">ITEM INFORMATION</h2>
         <div asp-validation-summary="All"></div>
-        <form id="equipment-editor-form" method="post" action="/admin/equipment/save" class="live-form live-form-three">
+        <form id="equipment-editor-form" method="post" action="/admin/equipment/save" enctype="multipart/form-data" class="live-form live-form-three">
             @Html.AntiForgeryToken()
             <input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
             <label class="live-field">Asset code<input asp-for="Input.AssetCode" required maxlength="64" /></label>
@@ -43,10 +43,35 @@
             <label class="live-field">Serial number<input asp-for="Input.SerialNumber" maxlength="120" /></label>
             <label class="live-field">Storage location<input asp-for="Input.Location" maxlength="160" /></label>
             <label class="live-field wide">Description<textarea asp-for="Input.Description" maxlength="2000"></textarea></label>
+            <div class="live-field wide inventory-photo">
+                <label for="imageFile">Equipment photo <small class="live-muted">JPEG, PNG, WebP or GIF · up to 5 MB · shown to borrowers in the equipment catalog</small></label>
+                <div class="inventory-photo-row">
+                    <img id="inventory-photo-preview" class="inventory-photo-preview" src="@Model.Input.ImagePath" alt="" hidden="@(Model.Input.ImagePath is null)" />
+                    <input id="imageFile" name="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+                </div>
+                @Html.ValidationMessage("imageFile", null, new { @class = "field-validation-error" })
+                @if (Model.Input.ImagePath is not null)
+                {
+                    <label class="live-check"><input asp-for="Input.RemoveImage" /> Remove the current photo</label>
+                }
+            </div>
             <label class="live-check wide"><input asp-for="Input.IsActive" /> Active inventory item</label>
             <p class="live-muted wide">Damaged or unserviceable items enter maintenance. Close their maintenance case after repair to restore availability. Equipment with an active loan cannot be edited.</p>
         </form>
     </section>
     <partial name="_EditorFooter" model='new FigmaEditorFooter("equipment-editor-form", "/admin/equipment")' />
+    <script>
+    (() => {
+        const input = document.getElementById('imageFile');
+        const preview = document.getElementById('inventory-photo-preview');
+        input?.addEventListener('change', () => {
+            const file = input.files[0];
+            if (!file) return;
+            if (preview.src.startsWith('blob:')) URL.revokeObjectURL(preview.src);
+            preview.src = URL.createObjectURL(file);
+            preview.hidden = false;
+        });
+    })();
+    </script>
     }
 </main>

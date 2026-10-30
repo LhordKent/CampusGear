@@ -354,6 +354,10 @@ namespace CampusGear.Data.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<string>("ImagePath")
+                        .HasMaxLength(260)
+                        .HasColumnType("nvarchar(260)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 

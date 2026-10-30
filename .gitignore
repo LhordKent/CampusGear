@@ -36,3 +36,6 @@ coverage/
 # Operating system files
 Thumbs.db
 .DS_Store
+
+# Equipment photos uploaded through Admin > Equipment
+**/wwwroot/uploads/
