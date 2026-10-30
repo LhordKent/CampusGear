@@ -118,7 +118,7 @@ public sealed class SqlReservationFixture : IAsyncLifetime
         var email = $"{Guid.NewGuid():N}@integration.test";
         var user = new ApplicationUser
         {
-            UserName = email, Email = email, FullName = "Integration test " + role,
+            UserName = email, Email = email, FirstName = "Integration", LastName = "Test " + role,
             EmailConfirmed = true, IsActive = true
         };
         var result = await users.CreateAsync(user, "Integration-Pass!42");

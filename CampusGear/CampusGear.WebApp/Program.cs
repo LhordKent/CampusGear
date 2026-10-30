@@ -82,7 +82,17 @@ if (emailProvider.Equals("Development", StringComparison.OrdinalIgnoreCase))
 }
 else if (emailProvider.Equals("Smtp", StringComparison.OrdinalIgnoreCase))
 {
-    builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+    if (builder.Environment.IsDevelopment())
+    {
+        // Temporary: Development also copies every message to /development/email.
+        builder.Services.AddSingleton<DevelopmentEmailSender>();
+        builder.Services.AddSingleton<SmtpEmailSender>();
+        builder.Services.AddSingleton<IEmailSender, DevelopmentMirrorEmailSender>();
+    }
+    else
+    {
+        builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+    }
 }
 else
 {
@@ -124,7 +134,7 @@ app.Use(async (context, next) =>
     {
         var users = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
         var user = await users.GetUserAsync(context.User);
-        if (user is null || !user.IsActive)
+        if (user is null || !user.IsActive || user.ApprovalStatus != AccountApprovalStatus.Approved)
         {
             await context.SignOutAsync(IdentityConstants.ApplicationScheme);
             context.User = new System.Security.Claims.ClaimsPrincipal();

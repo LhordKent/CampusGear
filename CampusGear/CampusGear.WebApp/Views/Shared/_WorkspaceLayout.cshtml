@@ -10,61 +10,61 @@
     var initial = name.Length > 0 ? name[..1].ToUpperInvariant() : "C";
     var title = ViewData["Title"] as string ?? "Campus equipment workspace";
     var dashboard = path.EndsWith("/dashboard", StringComparison.OrdinalIgnoreCase);
+    var avatar = role == "Borrower" ? "a698b.svg" : "2680a.svg";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    @await Html.PartialAsync("_ThemeHead")
+    <meta name="theme-color" content="#071b2b" />
     <title>@title · CampusGear</title>
     <link rel="stylesheet" href="~/css/live-workspace.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/figma-live.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
 </head>
 <body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaUi.Frame(path)">
     <a class="live-skip" href="#workspace-content">Skip to content</a>
     <div class="live-shell">
+        <div class="live-atmosphere" aria-hidden="true" inert>
+            <img class="live-atmosphere-base" src="/figma/assets/@FigmaUi.Atmosphere(role)" alt="" />
+            <img class="live-atmosphere-detail" src="/figma/assets/@FigmaUi.Detail(role)" alt="" />
+        </div>
         <aside class="live-sidebar">
+            @if (role != "Borrower") { <img class="live-sidebar-signature" src="/figma/assets/@FigmaUi.Signature(role)" alt="" aria-hidden="true" /> }
             <a class="live-brand" href="/@slug/dashboard"><img src="/figma/assets/b95f3.svg" alt="" /><span>Campus<strong>Gear</strong></span></a>
-            <div class="live-role">@role workspace</div>
             <details class="live-navigation" open>
-                <summary>Menu</summary>
+                <summary>Workspace menu</summary>
                 <nav aria-label="Workspace navigation">
                     @foreach (var item in FigmaUi.Navigation(role))
                     {
                         var active = path.Equals(item.Path, StringComparison.OrdinalIgnoreCase) ||
                             item.Path == "/admin/users" && path.StartsWith("/admin/users/", StringComparison.OrdinalIgnoreCase);
-                        <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)"><svg class="icon" aria-hidden="true"><use href="/icons.svg#@item.Icon"></use></svg><span>@item.Label</span></a>
+                        <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)"><span class="live-nav-icon"><img src="/figma/assets/@item.Icon" alt="" /></span><span>@item.Label</span></a>
                     }
                     @if (role != "Borrower")
                     {
-                        <details class="live-extra-navigation"><summary>More</summary>
+                        <details class="live-extra-navigation"><summary>More operations</summary>
                             @if (role == "Administrator")
-                            { <a href="/admin/reservations">Reservations</a><a href="/admin/approvals">Approvals</a><a href="/admin/returns">Returns</a> }
+                            { <a href="/admin/reservations">Reservation Management</a><a href="/admin/approvals">Approval &amp; Release</a><a href="/admin/returns">Return &amp; Condition Check</a> }
                             else { <a href="/custodian/history">Borrowing History</a> }
-                            <a href="/admin/maintenance">Maintenance</a>
+                            <a href="/admin/maintenance">Equipment Maintenance</a>
                         </details>
                     }
                 </nav>
             </details>
-            <form method="post" action="/auth/logout" class="live-logout">@Html.AntiForgeryToken()<button type="submit"><svg class="icon" aria-hidden="true"><use href="/icons.svg#logout"></use></svg>Log out</button></form>
+            <form method="post" action="/auth/logout" class="live-logout">@Html.AntiForgeryToken()<button type="submit">Log out</button></form>
         </aside>
         <div class="live-main">
             <header class="live-topbar">
-                <div class="live-topbar-title"><strong>@title</strong></div>
-                <div class="live-topbar-account">
-                    @await Html.PartialAsync("_ThemeToggle")
-                    <span class="live-avatar" aria-hidden="true"><b>@initial</b></span>
-                    <div><strong>@name</strong><small>@role</small></div>
-                </div>
+                <div class="live-topbar-account"><span class="live-avatar"><img src="/figma/assets/@avatar" alt="" /><b>@initial</b></span><div><strong>@name</strong><small>@role</small></div></div>
             </header>
             <div id="workspace-content" tabindex="-1">@RenderBody()</div>
         </div>
     </div>
     <script src="~/js/figma-live.js" asp-append-version="true"></script>
-    <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/motion.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

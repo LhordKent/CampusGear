@@ -7,9 +7,7 @@
     var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid;
 }
 <main class="live-content" data-figma-source="@(editor ? Model.Input.Id is null ? "695:5882" : "695:6052" : "695:5691")">
-    <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • INVENTORY</p><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Item" : "Edit Equipment Item" : "Equipment Management")</h1><p>@(editor ? "Register equipment with its identifier, category, condition, and availability details." : "Track individual items, their condition, and borrowing availability.")</p>
-        @if (!editor) { <a class="live-button heading-action" href="/admin/equipment?form=add"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>Add item</a> }
-    </header>
+    <header class="live-heading"><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Item" : "Edit Equipment Item" : "Equipment Management")</h1>@if (!editor) { <a class="live-button heading-action" href="/admin/equipment?form=add">Add Item</a> }</header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
     @if (!editor) {
     <section class="live-panel" aria-labelledby="inventory-title">
@@ -33,7 +31,7 @@
     {
     <section class="live-panel live-editor-sheet" aria-labelledby="edit-title">
 
-        <h2 id="edit-title">Item information</h2>
+        <h2 id="edit-title">ITEM INFORMATION</h2>
         <div asp-validation-summary="All"></div>
         <form id="equipment-editor-form" method="post" action="/admin/equipment/save" class="live-form live-form-three">
             @Html.AntiForgeryToken()
@@ -49,6 +47,6 @@
             <p class="live-muted wide">Damaged or unserviceable items enter maintenance. Close their maintenance case after repair to restore availability. Equipment with an active loan cannot be edited.</p>
         </form>
     </section>
-    <partial name="_EditorFooter" model='new FigmaEditorFooter("equipment-editor-form", "/admin/equipment", new FigmaEditorValue[] { new("IDENTIFIER", Model.Input.AssetCode ?? "New equipment", "Input_AssetCode"), new("CURRENT", Model.Input.IsActive ? "Active" : "Inactive"), new("IMPACT", Model.Input.Id is null ? "New inventory item" : "Update equipment record") })' />
+    <partial name="_EditorFooter" model='new FigmaEditorFooter("equipment-editor-form", "/admin/equipment")' />
     }
 </main>

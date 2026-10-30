@@ -5,17 +5,14 @@
     ViewData["WorkspaceRole"] = "Borrower";
     ViewData["BorrowerPage"] = "calendar";
     var itemId = Model.SelectedItem?.Id;
-    var weekdays = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+    var weekdays = new[] { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
 }
 @* Figma source: 695:1234 availability calendar. The grid reflects persisted equipment reservations. *@
 @section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
 <main class="live-content borrower-page" data-figma-source="695:1234">
     <header class="live-heading borrower-heading">
-        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
-        <h1>Availability Calendar</h1>
-        <p>Check equipment availability by date and review scheduled reservations and maintenance status.</p>
+        <h1><img src="~/figma/assets/1f786.svg" alt="" />Availability Calendar</h1>
     </header>
-    <partial name="_BorrowerTabs" />
     @if (Model.Items.Count == 0)
     {
         <section class="borrower-empty"><h2>No active equipment</h2><p>Equipment availability will appear here when items are added.</p></section>
@@ -52,7 +49,7 @@
                        aria-label="@day.Date.ToString("dddd, MMMM d, yyyy"), @day.Status, @day.BookingCount scheduled slots"
                        aria-current="@(day.IsSelected ? "date" : null)">
                         <time datetime="@day.Date.ToString("yyyy-MM-dd")">@day.Date.Day</time>
-                        <span class="borrower-day-status">@day.Status</span>
+                        <span class="borrower-day-status">@day.Status.ToUpperInvariant()</span>
                         @if (day.BookingCount > 0) { <span class="borrower-day-count">@day.BookingCount slot@(day.BookingCount == 1 ? "" : "s")</span> }
                     </a>
                 }
@@ -60,12 +57,12 @@
         </section>
         <div class="borrower-calendar-bottom">
             <section class="borrower-card borrower-calendar-legend" aria-label="Calendar status legend">
-                <h2>Legend</h2>
+                <h2>STATUS</h2>
                 <span class="borrower-badge status-available">Available</span><span class="borrower-badge status-reserved">Reserved</span><span class="borrower-badge status-borrowed">Borrowed</span><span class="borrower-badge status-maintenance">Maintenance</span>
                 <p class="borrower-muted">A day can contain several time slots. Exact availability is checked when you submit your requested start and end time.</p>
             </section>
             <section class="borrower-card borrower-selected-day" aria-labelledby="selected-date-title">
-                <p class="borrower-eyebrow">Selected date · Manila time</p>
+                <p class="borrower-eyebrow">SELECTED DATE · MANILA TIME</p>
                 <h2 id="selected-date-title">@Model.SelectedDate.ToString("MMM d, yyyy")</h2>
                 <p>@Model.SelectedItem?.Name <span class="borrower-muted">@Model.SelectedItem?.AssetCode</span></p>
                 @if (Model.SelectedItem?.IsMaintenanceHold == true)

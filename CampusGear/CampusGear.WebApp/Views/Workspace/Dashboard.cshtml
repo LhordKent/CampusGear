@@ -7,54 +7,33 @@
     var sourceNode = Model.Role switch { "Administrator" => "690:212", "Custodian" => "690:8", _ => "689:2" };
     var borrower = Model.Role == "Borrower";
     var admin = Model.Role == "Administrator";
-    var steps = admin ? new[] { "Manage data", "Update records", "Control access", "Latest audit events" }
-        : borrower ? new[] { "Request", "Review", "Release", "Return" } : new[] { "Review", "Release", "Return", "Condition" };
-    var stepLinks = admin ? new[] { "/admin/categories", "/admin/equipment", "/admin/users", "/admin/audit" }
-        : borrower ? new[] { "/borrower/reservation", "/borrower/history", "/borrower/history", "/borrower/history" }
-        : new[] { "/custodian/approvals", "/custodian/returns?queue=release", "/custodian/returns", "/admin/maintenance" };
-    var metricHelp = borrower ? new[] { "Awaiting review", "Currently borrowed by you", "Borrowing activity", "Past due date" }
-        : admin ? new[] { "Active inventory items", "Equipment in use", "Awaiting review", "Registered borrowers" }
-        : new[] { "Awaiting review", "Equipment in use", "Needs attention", "Past due date" };
 }
 <main class="live-content" data-figma-source="@sourceNode">
     <header class="live-heading">
         <h1>@Model.Role Dashboard</h1>
-        <p>@(admin ? "Equipment, users, reservations, and audit records at a glance." : borrower ? "Your reservations and what's happening with them." : "Review requests, release equipment, and keep returns on track.")</p>
-        @if (borrower) { <a class="live-button heading-action" href="/borrower/reservation"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>Reserve equipment</a> }
+        @if (borrower) { <a class="live-button heading-action" href="/borrower/reservation">Reserve equipment</a> }
     </header>
     <section class="live-metrics" aria-label="Workspace summary">
-        @for (var i = 0; i < Model.Metrics.Count; i++)
+        @foreach (var metric in Model.Metrics)
         {
-            var metric = Model.Metrics[i];
-            <article class="live-metric"><span>@metric.Label</span><strong>@metric.Value</strong><small>@metricHelp[i]</small></article>
+            <a class="live-metric" href="@metric.Url"><span>@metric.Label</span><strong>@metric.Value</strong></a>
         }
     </section>
-    <div class="live-dashboard-grid">
-        <section class="live-panel"><h2>@(admin ? "Live borrowing activity" : borrower ? "Upcoming reservations" : "Requests awaiting review")</h2><p class="live-muted">@(borrower ? "Next bookings and their status." : "Latest requests and their progress.")</p>
-            @if (Model.Activity.Count == 0) { <div class="live-empty"><p>@(borrower ? "You have no upcoming reservations." : "No borrowing activity to display yet.")</p><a class="live-link" href="/@slug/@(borrower ? "reservation" : admin ? "reservations" : "approvals")">@(borrower ? "Reserve equipment" : "Open reservation records")</a></div> }
-            else if (admin)
-            {
-                <div class="live-activity-list">
-                @foreach (var item in Model.Activity)
-                { <a class="live-activity" href="/custodian/reservations/@item.Id"><div><strong>RES-@item.Id.ToString("N")[..8].ToUpperInvariant()</strong><span>@CustodianTime.Status(item, DateTime.UtcNow).ToUpperInvariant()</span></div><p><strong>@item.BorrowerProfile.User.FullName</strong><span>@item.EquipmentItem.Name · @item.EquipmentItem.AssetCode</span></p><small>Requested @CustodianTime.Format(item.StartAtUtc) · Until @CustodianTime.Format(item.EndAtUtc)</small></a> }
-                </div>
-            }
-            else
-            {
-                <div class="live-table-wrap"><table class="live-table"><thead><tr><th>@(borrower ? "Equipment" : "Borrower / Equipment")</th><th>@(borrower ? "Booking time" : "Requested")</th><th>Status</th><th>Action</th></tr></thead><tbody>
-                @foreach (var item in Model.Activity)
-                { <tr><td><strong>@(borrower ? item.EquipmentItem.Name : item.BorrowerProfile.User.FullName)</strong><small>@(borrower ? item.EquipmentItem.AssetCode : item.EquipmentItem.Name)</small></td><td>@CustodianTime.Format(item.StartAtUtc)<small>Until @CustodianTime.Format(item.EndAtUtc)</small></td><td><span class="live-badge">@item.Status</span></td><td><a class="live-button secondary" href="@(borrower ? "/borrower/history" : $"/custodian/reservations/{item.Id}")">View</a></td></tr> }
-                </tbody></table></div>
-            }
-        </section>
-        <section class="live-panel live-lifecycle"><h2>@(admin ? "Control surface" : borrower ? "Borrowing lifecycle" : "Operations lifecycle")</h2><p class="live-muted">@(admin ? "Every state change is traceable." : borrower ? "Request → review → release → return." : "Review → release → return → condition.")</p>
-            @for (var i = 0; i < steps.Length; i++)
-            { <a class="live-step" href="@stepLinks[i]"><span class="live-step-number">@(i + 1)</span><strong>@steps[i]</strong><svg class="icon" aria-hidden="true"><use href="/icons.svg#chevron-right"></use></svg></a> }
-        </section>
-    </div>
-    @if (!admin) {
-    <section class="live-dashboard-foot"><div><h2>@(Model.Metrics[0].Value == 0 ? "Nothing is waiting on review." : borrower ? $"{Model.Metrics[0].Value} of your requests are awaiting review." : $"{Model.Metrics[0].Value} requests are awaiting review.")</h2><p class="live-muted">@(borrower ? "Check approval status before your pickup date." : "Approve or reject them from the approvals queue.")</p></div>
-        <div class="live-actions"><a class="live-button" href="/@slug/@(borrower ? "history" : "approvals")">@(borrower ? "View my requests" : "Open approvals")</a><a class="live-button secondary" href="/@slug/calendar"><svg class="icon" aria-hidden="true"><use href="/icons.svg#calendar"></use></svg>Calendar</a></div>
+    <section class="live-panel live-dashboard-activity"><h2>@(admin ? "Recent borrowing activity" : borrower ? "Upcoming reservations" : "Requests awaiting review")</h2>
+        @if (Model.Activity.Count == 0) { <div class="live-empty"><p>@(borrower ? "You have no upcoming reservations." : "No borrowing activity to display yet.")</p><a class="live-link" href="/@slug/@(borrower ? "reservation" : admin ? "reservations" : "approvals")">@(borrower ? "Reserve equipment" : "Open reservation records")</a></div> }
+        else if (admin)
+        {
+            <div class="live-activity-list">
+            @foreach (var item in Model.Activity)
+            { <a class="live-activity" href="/custodian/reservations/@item.Id"><div><strong>RES-@item.Id.ToString("N")[..8].ToUpperInvariant()</strong><span>@CustodianTime.Status(item, DateTime.UtcNow).ToUpperInvariant()</span></div><p><strong>@item.BorrowerProfile.User.FullName</strong><span>@item.EquipmentItem.Name · @item.EquipmentItem.AssetCode</span></p><small>Requested @CustodianTime.Format(item.StartAtUtc) · Until @CustodianTime.Format(item.EndAtUtc)</small></a> }
+            </div>
+        }
+        else
+        {
+            <div class="live-table-wrap"><table class="live-table"><thead><tr><th>@(borrower ? "Equipment" : "Borrower / Equipment")</th><th>@(borrower ? "Booking time" : "Requested")</th><th>Status</th><th>Action</th></tr></thead><tbody>
+            @foreach (var item in Model.Activity)
+            { <tr><td><strong>@(borrower ? item.EquipmentItem.Name : item.BorrowerProfile.User.FullName)</strong><small>@(borrower ? item.EquipmentItem.AssetCode : item.EquipmentItem.Name)</small></td><td>@CustodianTime.Format(item.StartAtUtc)<small>Until @CustodianTime.Format(item.EndAtUtc)</small></td><td><span class="live-badge">@item.Status</span></td><td><a class="live-button secondary" href="@(borrower ? "/borrower/history" : $"/custodian/reservations/{item.Id}")">View</a></td></tr> }
+            </tbody></table></div>
+        }
     </section>
-    }
 </main>

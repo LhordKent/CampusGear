@@ -2,9 +2,7 @@
 @{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Equipment Categories"; ViewData["WorkspaceRole"] = "Administrator";
    var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid; }
 <main class="live-content" data-figma-source="@(editor ? Model.Input.Id is null ? "695:5184" : "695:5347" : "695:4991")">
-    <header class="live-heading"><p class="live-eyebrow">ADMINISTRATOR • INVENTORY</p><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Category" : "Edit Equipment Category" : "Equipment Categories")</h1><p>Organize equipment for inventory and reservations.</p>
-        @if (!editor) { <a class="live-button heading-action" href="/admin/categories?form=add"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>Add category</a> }
-    </header>
+    <header class="live-heading"><h1>@(editor ? Model.Input.Id is null ? "Add Equipment Category" : "Edit Equipment Category" : "Equipment Categories")</h1>@if (!editor) { <a class="live-button heading-action" href="/admin/categories?form=add">Add Category</a> }</header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
     @if (!editor) {
     <section class="live-panel"><h2>Category records <span class="live-badge">@Model.Categories.Count categories</span></h2><div class="live-table-wrap"><table class="live-table"><thead><tr><th>Name</th><th>Description</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>
@@ -15,15 +13,15 @@
     }
     @if (editor)
     {
-    <section class="live-panel live-editor-sheet category-editor" aria-labelledby="category-editor-title"><h2 id="category-editor-title">Category information</h2><div asp-validation-summary="All"></div>
+    <section class="live-panel live-editor-sheet category-editor" aria-labelledby="category-editor-title"><h2 id="category-editor-title">CATEGORY INFORMATION</h2><div asp-validation-summary="All"></div>
         <form id="category-editor-form" method="post" action="/admin/categories/save" class="live-form">
             @Html.AntiForgeryToken()<input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
             <label class="live-field wide">Category name<input asp-for="Input.Name" required maxlength="120" /></label>
             <label class="live-field wide">Description<textarea asp-for="Input.Description" maxlength="1000"></textarea></label>
             <label class="live-check wide"><input asp-for="Input.IsActive" /> Active category</label>
-            <p class="live-muted wide">A category with active equipment must stay active. Historical equipment records are retained.</p>
+            <p class="live-muted wide">A category with active equipment must stay active.</p>
         </form>
     </section>
-    <partial name="_EditorFooter" model='new CampusGear.Models.FigmaEditorFooter("category-editor-form", "/admin/categories", new CampusGear.Models.FigmaEditorValue[] { new("NAME", Model.Input.Name ?? "New category", "Input_Name"), new("REFERENCES", Model.Input.Id is null ? "New category" : "Existing equipment records"), new("STATUS", Model.Input.IsActive ? "Active" : "Inactive") })' />
+    <partial name="_EditorFooter" model='new CampusGear.Models.FigmaEditorFooter("category-editor-form", "/admin/categories")' />
     }
 </main>

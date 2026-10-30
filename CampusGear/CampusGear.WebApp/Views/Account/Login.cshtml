@@ -2,13 +2,10 @@
     Layout = "_AccountLayout";
     ViewData["Title"] = "Sign in";
     ViewData["FigmaFrame"] = "15_3";
-    ViewData["StatusMessage"] = "CAMPUS AUTHENTICATION  •  READY FOR ACCOUNT VERIFICATION";
 }
 <section class="auth-card" aria-labelledby="account-title">
     <header>
-        <p class="auth-eyebrow">Welcome back</p>
-        <h1 id="account-title">Sign in to CampusGear</h1>
-        <p class="auth-description">Use your campus email. You'll land in the right workspace for your role.</p>
+        <h1 id="account-title">Account sign in</h1>
     </header>
     <hr class="auth-divider" />
     @await Html.PartialAsync("_AccountFeedback")
@@ -17,24 +14,23 @@
         <label class="auth-field" for="Email">
             <span class="auth-field-label">Campus email</span>
             <span class="auth-input-wrap">
-                <svg class="icon auth-input-icon" aria-hidden="true"><use href="/icons.svg#mail"></use></svg>
-                <input class="auth-input has-icon" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="name@campus.edu" autocomplete="username" required autofocus />
+                <img class="auth-input-icon" src="/figma/assets/afa76.svg" alt="" />
+                <input class="auth-input has-icon" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="name@campus.edu" autocomplete="username" required />
             </span>
             @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
         </label>
-        <div class="auth-field">
-            <div class="auth-label-row">
-                <label class="auth-field-label" for="Password">Password</label>
-                <a class="auth-link" href="/auth/password-reset-request">Forgot password?</a>
-            </div>
+        <label class="auth-field" for="Password">
+            <span class="auth-field-label">Password</span>
             <span class="auth-input-wrap">
-                <svg class="icon auth-input-icon" aria-hidden="true"><use href="/icons.svg#lock"></use></svg>
-                <input class="auth-input has-icon has-reveal" id="Password" name="Password" type="password" placeholder="Enter your password" autocomplete="current-password" required />
-                @await Html.PartialAsync("_PasswordReveal", "Password")
+                <img class="auth-input-icon" src="/figma/assets/5e774.svg" alt="" />
+                <input class="auth-input has-icon" id="Password" name="Password" type="password" placeholder="Enter your password" autocomplete="current-password" required />
             </span>
             @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
-        </div>
-        <button class="auth-action" type="submit">Sign in</button>
+        </label>
+        <button class="auth-action" type="submit">SIGN IN</button>
     </form>
-    <p class="auth-switch">New to CampusGear? <a class="auth-link" href="/auth/signup">Create an account</a></p>
+    <div class="auth-actions">
+        <a class="auth-link" href="/auth/password-reset-request">Forgot password?</a>
+        <a class="auth-secondary" href="/auth/signup">CREATE A NEW ACCOUNT</a>
+    </div>
 </section>

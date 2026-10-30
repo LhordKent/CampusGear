@@ -1,3 +1,4 @@
+@using CampusGear.Models
 @model AdminUsersPage
 @{
     Layout = "_WorkspaceLayout";
@@ -6,31 +7,34 @@
     ViewData["Title"] = borrowers ? "Borrower Profiles" : "User & Role Management";
     ViewData["WorkspaceRole"] = "Administrator";
     var roles = new[] { "Borrower", "Custodian", "Administrator" };
+    var returnUrl = ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page });
 }
 <main class="live-content" data-figma-source="@(borrowers ? "695:6398" : "695:7067")">
     <header class="live-heading">
-        <p class="live-eyebrow">ADMINISTRATOR • WORKSPACE</p>
         <h1>@(borrowers ? "Borrower Profiles" : "User & Role Management")</h1>
-        <p>@(borrowers ? "Manage borrower information, departments, and borrowing access." : "Manage user accounts and role access.")</p>
-        <a class="live-button secondary heading-action" href="/admin/users?status=unverified"><svg class="icon" aria-hidden="true"><use href="/icons.svg#mail"></use></svg>Unverified accounts</a>
+        @if (Model.PendingTotal > 0 && Model.Status != "pending")
+        { <a class="live-button heading-action" href="@basePath?status=pending">Review pending approvals (@Model.PendingTotal)</a> }
     </header>
     @if (Model.Feedback is not null)
     {
         <div class="live-feedback" role="status">@Model.Feedback</div>
     }
-    <section class="live-panel" aria-labelledby="accounts-title">
-        <h2 id="accounts-title">@(borrowers ? "Borrower records" : "Account records")</h2>
-        <p class="live-muted">Borrowers create and verify their own accounts. Staff must sign up and verify their email before an administrator assigns Custodian or Administrator access.</p>
+    @if (Model.Error is not null)
+    {
+        <div class="live-feedback error" role="alert">@Model.Error</div>
+    }
+    <section class="live-panel" aria-label="Accounts">
         <form class="live-filters" method="get" action="@basePath" aria-label="Find user accounts">
-            <label for="q">Search name, email, student number, or department<input id="q" name="q" value="@Model.Query" maxlength="120" type="search" /></label>
+            <label for="q">Search name, email, Student ID Number, or department<input id="q" name="q" value="@Model.Query" maxlength="120" type="search" /></label>
             @if (!borrowers) { <label for="role">Role<select id="role" name="role"><option value="all" selected="@(Model.Role == "all")">All roles</option>
                 @foreach (var role in roles) { <option value="@role" selected="@(Model.Role == role)">@role</option> }
             </select></label> }
             <label for="status">Account status<select id="status" name="status">
                 <option value="all" selected="@(Model.Status == "all")">All accounts</option>
+                <option value="pending" selected="@(Model.Status == "pending")">Pending approval</option>
                 <option value="active" selected="@(Model.Status == "active")">Active</option>
                 <option value="inactive" selected="@(Model.Status == "inactive")">Inactive</option>
-                <option value="unverified" selected="@(Model.Status == "unverified")">Email not verified</option>
+                <option value="rejected" selected="@(Model.Status == "rejected")">Rejected</option>
             </select></label>
             <button class="live-button" type="submit">Search</button>
             <a class="live-button secondary" href="@basePath">Clear</a>
@@ -38,24 +42,41 @@
         <p class="live-muted">@Model.Total matching account@(Model.Total == 1 ? "" : "s")</p>
         @if (Model.Rows.Count == 0)
         {
-            <p class="live-empty">No accounts match these filters.</p>
+            <p class="live-empty">@(Model.Status == "pending" ? "No registrations are waiting for approval." : "No accounts match these filters.")</p>
         }
         else
         {
             <div class="live-table-wrap" tabindex="0" aria-label="User accounts table">
                 <table class="live-table">
-                    <thead><tr><th scope="col">@(borrowers ? "Borrower" : "User")</th><th scope="col">ID / Email</th><th scope="col">@(borrowers ? "Department" : "Role")</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+                    <thead><tr><th scope="col">NAME</th><th scope="col">STUDENT ID NUMBER</th><th scope="col">EMAIL</th><th scope="col">@(borrowers ? "DEPARTMENT" : "ROLE")</th><th scope="col">STATUS</th><th scope="col">ACTION</th></tr></thead>
                     <tbody>
                     @foreach (var row in Model.Rows)
                     {
+                        var status = row.ApprovalStatus switch
+                        {
+                            AccountApprovalStatus.PendingApproval => "Pending approval",
+                            AccountApprovalStatus.Rejected => "Rejected",
+                            _ => row.IsActive ? "Active" : "Inactive"
+                        };
                         <tr>
-                            <td><strong>@row.FullName</strong><small>@(row.Department ?? "No department recorded")</small></td>
-                            <td>@row.Email<small>@(row.StudentNumber ?? "No student number")</small></td>
-                            <td>@if (borrowers) { @(row.Department ?? "Not recorded") } else { <span class="live-badge">@(row.Role.Length > 0 ? row.Role : "No role")</span> }</td>
-                            <td><span class="live-badge">@(row.IsActive ? "Active" : "Inactive")</span><small>@(row.EmailConfirmed ? "Email verified" : "Email not verified")</small>
+                            <td><strong>@row.FullName</strong></td>
+                            <td>@(row.StudentNumber ?? "—")</td>
+                            <td>@row.Email</td>
+                            <td>@if (borrowers) { @(row.Department ?? "—") } else { <span class="live-badge">@(row.Role.Length > 0 ? row.Role : "No role")</span> }</td>
+                            <td><span class="live-badge">@status</span>
                                 @if (row.IsEligible is false) { <small>Borrowing access paused</small> }
                             </td>
-                            <td><a class="live-button secondary" href="/admin/users/@row.Id/edit">Edit</a></td>
+                            <td><div class="admin-user-actions">
+                                @if (row.ApprovalStatus != AccountApprovalStatus.Approved)
+                                {
+                                    <form method="post" action="/admin/users/@row.Id/approve">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button" type="submit" aria-label="Approve @row.FullName">Approve</button></form>
+                                }
+                                @if (row.ApprovalStatus == AccountApprovalStatus.PendingApproval)
+                                {
+                                    <form method="post" action="/admin/users/@row.Id/reject">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button danger" type="submit" aria-label="Reject @row.FullName">Reject</button></form>
+                                }
+                                <a class="live-button secondary" href="/admin/users/@row.Id/edit">Edit</a>
+                            </div></td>
                         </tr>
                     }
                     </tbody>

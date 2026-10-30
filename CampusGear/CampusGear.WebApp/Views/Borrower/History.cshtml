@@ -10,11 +10,8 @@
 @section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
 <main class="live-content borrower-page" data-figma-source="695:562">
     <header class="live-heading borrower-heading">
-        <p class="live-eyebrow">BORROWER • WORKSPACE</p>
-        <h1>Borrowing History</h1>
-        <p>Review your reservation records, borrowing activity, and return status.</p>
+        <h1><img src="~/figma/assets/e1db6.svg" alt="" />Borrowing History Report</h1>
     </header>
-    <partial name="_BorrowerTabs" />
     @if (Model.Feedback is not null)
     {
         <section class="borrower-feedback borrower-success" role="status"><p>@Model.Feedback</p></section>
@@ -32,15 +29,15 @@
                 <option value="@value" selected="@(Model.Status == value)">@label</option>
             }
         </select></label>
-        <div class="borrower-filter-actions"><button class="borrower-button" type="submit">Apply filter</button><a href="/borrower/history">Clear</a></div>
+        <div class="borrower-filter-actions"><button class="borrower-button" type="submit">APPLY FILTER</button><a href="/borrower/history">Clear</a></div>
     </form>
     <section class="borrower-card borrower-history" aria-labelledby="history-title">
-        <div class="borrower-section-heading"><h2 id="history-title">Borrowing records</h2><span class="borrower-muted">@Model.Total record@(Model.Total == 1 ? "" : "s") · Manila time</span></div>
+        <div class="borrower-section-heading"><h2 id="history-title">BORROWING RECORDS</h2><span class="borrower-muted">@Model.Total record@(Model.Total == 1 ? "" : "s") · Manila time</span></div>
         @if (Model.Rows.Count == 0)
         {
             <div class="borrower-empty" data-figma-source="695:1079">
                 <h3>No matching records</h3><p>Your requests will appear here after you submit a reservation.</p>
-                <a class="borrower-button" href="/borrower/reservation"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>Reserve equipment</a>
+                <a class="borrower-button" href="/borrower/reservation">Reserve equipment</a>
             </div>
         }
         else
