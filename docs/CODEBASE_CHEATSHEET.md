@@ -114,17 +114,18 @@ Routes use HTTP attributes such as `[HttpGet("borrower/reservation")]`; they are
 | Controller file | Main GET routes | Responsibility and live view folder |
 | --- | --- | --- |
 | `Controllers/AccountController.cs` | `/auth/login`, `/auth/signup`, `/auth/email-verification`, `/auth/two-factor`, `/auth/password-reset-request`, `/auth/password-reset-code`, `/auth/password-reset-new`, `/auth/success`, `/auth/access-denied` | Identity, pending sessions, email challenges, and authentication feedback; `Views/Account/` |
-| `Controllers/WorkspaceController.cs` | `/borrower/dashboard`, `/custodian/dashboard`, `/admin/dashboard` | Role-specific SQL-backed dashboard metrics and rows; `Views/Workspace/Dashboard.cshtml` |
+| `Controllers/WorkspaceController.cs` | `/custodian/dashboard`, `/admin/dashboard` | SQL-backed staff dashboards with charts (`Views/Workspace/AdminDashboard.cshtml`, `CustodianDashboard.cshtml`, chart partials in `Views/Shared/Charts`). The borrower homepage `/borrower/home` is `BorrowerController.Home` |
 | `Controllers/BorrowerController.cs` | `/borrower/reservation`, `/borrower/history`, `/borrower/calendar` | Own booking form, cancellation, filtered history, availability calendar; `Views/Borrower/` |
 | `Controllers/CustodianController.cs` | `/custodian/approvals`, `/custodian/returns`, `/custodian/history`, `/custodian/calendar`, `/custodian/reservations/{id}` | Queues, details, approve/reject/release/return actions; `Views/Custodian/` |
-| `Controllers/AdminReservationsController.cs` | `/admin/reservations` | Create reservations for borrowers and cancel requests through the shared service; `Views/AdminReservations/` |
+| `Controllers/CustodianDirectoryController.cs` | `/custodian/categories`, `/custodian/borrowers` | Read-only categories (with unit status) and borrower profiles (with eligibility) for custodians |
+| `Controllers/StatusController.cs` | `/status/{code}` | Renders the access-denied page for 403s while keeping the status code |
 | `Controllers/AdminInventoryController.cs` | `/admin/equipment` | Item search, add/edit forms, active status, condition, and inventory validation; `Views/AdminInventory/` |
 | `Controllers/AdminCategoriesController.cs` | `/admin/categories` | Category listing and editing; `Views/AdminCategories/` |
 | `Controllers/AdminUsersController.cs` | `/admin/users`, `/admin/borrowers`, `/admin/users/{id}/edit`, `/admin/audit` | Roles, active accounts, borrower profiles/eligibility, and audit listing; `Views/AdminUsers/` |
 | `Controllers/MaintenanceController.cs` | `/admin/maintenance` | Open repair cases, update their status, close repairs; accessible to Administrator and Custodian; `Views/Maintenance/` |
 | `Controllers/DevelopmentController.cs` | `/development/email` | In-memory mailbox UI; Development + loopback + selected Development sender only; `Views/Development/` |
 
-`CustodianController` also exposes administrator queue/calendar aliases: `/admin/approvals`, `/admin/returns`, `/admin/history`, and `/admin/calendar`. It uses the same workflow implementation and shared custodian views. Custodian operations permit Custodian and Administrator; role dashboard endpoints have their specific role requirement.
+`CustodianController` serves the custodian desk. Approve, reject, release, return and the approval/return queues are Custodian-only; administrators get read-only `/admin/history`, `/admin/calendar` and reservation details. Each action names its own roles (see [PERMISSIONS.md](PERMISSIONS.md)).
 
 ### Mutation routes worth knowing
 
@@ -135,7 +136,6 @@ Routes use HTTP attributes such as `[HttpGet("borrower/reservation")]`; they are
 | Sign out | `/auth/logout` | Identity sign-out + flow session clear |
 | Borrower request/cancel | `/borrower/reservation`, `/borrower/reservation/{id}/cancel` | `BorrowerController` → reservation service |
 | Staff approve/reject/release/return | `/custodian/reservations/{id}/approve`, `/reject`, `/release`, `/return` suffixes | `CustodianController` → reservation service |
-| Administrator request/cancel | `/admin/reservations`, `/admin/reservations/{id}/cancel` | `AdminReservationsController` → reservation service |
 | Save equipment/category | `/admin/equipment/save`, `/admin/categories/save` | Inventory/category controller |
 | Add category from inventory | `/admin/categories` | `AdminInventoryController.AddCategory` |
 | Edit an account | `/admin/users/{id}/edit` | `AdminUsersController` |
@@ -199,7 +199,7 @@ An email failure leaves the account pending rather than creating another account
 
 Confirmed Borrower/Custodian accounts sign in after password validation. Administrator password validation creates a pending administrator session; it does not issue the final auth cookie until the `AdministratorLogin` code succeeds. The pending session includes the user's security stamp so account changes can invalidate it.
 
-Role redirects are implemented in `WorkspaceForAsync`: Administrator → `/admin/dashboard`, Custodian → `/custodian/dashboard`, Borrower → `/borrower/dashboard`. An account without one of those roles reaches access denied.
+Role redirects are implemented in `WorkspaceForAsync`: Administrator → `/admin/dashboard`, Custodian → `/custodian/dashboard`, Borrower → `/borrower/home`. An account without one of those roles reaches access denied.
 
 ### Password recovery
 
@@ -308,6 +308,16 @@ Inventory and maintenance share a helper named `SqlWorkflowLocks`, declared near
 | `wwwroot/css/figma-generated.css`, `figma-app.css` | Generated/reference/account visual styles |
 | `wwwroot/js/figma-live.js` | Responsive navigation, form-summary updates, visual badge state attributes |
 | `wwwroot/figma/` | Locally served Figma assets, fonts, and screen catalog |
+| `wwwroot/css/theme-tokens.css` | Every colour, dark and light. Stylesheets use these roles only; `<html data-theme>` picks the theme |
+| `Views/Shared/_ThemeHead.cshtml`, `_ThemeToggle.cshtml`, `wwwroot/js/theme.js` | Theme before first paint (saved choice, else the system setting), the toggle button, and saving the choice |
+| `wwwroot/js/toast.js` | Top-right toasts. A server message opts in with `data-toast="success|error|warning|info"`; scripts call `CampusGear.toast(message, type)` |
+| `wwwroot/js/live-search.js` | Automatic table search: a form with `data-live-search data-live-target="#region"` swaps that region as the user types; pager links use `data-live-page`, Clear uses `data-live-reset` |
+| `wwwroot/js/modal-forms.js` | `<dialog>` modals (`data-modal-open`) whose `data-modal-form` posts with fetch and expects `{ ok, message, field }` JSON; used by Maintenance |
+| `Views/Shared/_EquipmentPicker.cshtml`, `wwwroot/js/equipment-picker.js` | Searchable equipment cards on both availability calendars; `calendar.js` loads the chosen unit in place |
+| `wwwroot/js/home-motion.js` | Borrower homepage scroll reveal (off under reduced motion) |
+| `CampusGear.Data/DemoData.cs` | Demo Mode sample records and their removal (see README, Demo Mode) |
+
+Forms use a six-column grid: a field takes half a row, `span-2` suits codes, dates, and short selects, `span-4` names, emails, and locations, `wide` descriptions and notes. Editor cards stop at 920 px (`form-narrow`: 680 px).
 
 Razor views combine a model with HTML. `@model` identifies the screen data; `Layout` selects its shell. Controllers also use `ViewData` and `TempData` for page settings and feedback across redirects. View imports enable tag helpers; forms and `asp-append-version` use them.
 

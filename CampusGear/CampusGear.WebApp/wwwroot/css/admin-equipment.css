@@ -51,7 +51,7 @@
     overflow: hidden;
     aspect-ratio: 4 / 3;
     border-bottom: 1px solid var(--cg-rule);
-    background: #081e2e;
+    background: var(--ws-input);
 }
 
 .equipment-card-media > img {
@@ -68,8 +68,8 @@
     align-items: center;
     justify-content: center;
     background:
-        radial-gradient(120% 90% at 30% 20%, rgb(44 140 138 / .22), transparent 60%),
-        linear-gradient(160deg, var(--cg-raised), #081e2e);
+        radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(--ws-teal) 22%, transparent), transparent 60%),
+        linear-gradient(160deg, var(--cg-raised), var(--ws-input));
     color: var(--cg-teal);
     font: 500 18px Oxanium, sans-serif;
     letter-spacing: .04em;

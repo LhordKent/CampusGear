@@ -42,6 +42,21 @@ builder.Services.ConfigureApplicationCookie(options =>
         ? CookieSecurePolicy.SameAsRequest
         : CookieSecurePolicy.Always;
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    // Not signed in: a browser page visit goes to the login page; fetch calls and form posts get 401.
+    // Signed in with the wrong role: always 403 (StatusController renders the access-denied page for browsers).
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (CampusGear.Controllers.AuthResponses.IsPageNavigation(context.Request))
+            context.Response.Redirect(context.RedirectUri);
+        else
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
 });
 builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
 builder.Services.AddDistributedMemoryCache();
@@ -121,6 +136,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/status/{0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -149,5 +165,25 @@ app.MapControllers();
 app.MapRazorPages();
 
 await DbInitializer.InitializeAsync(app.Services, app.Environment.IsDevelopment());
+// Demo Mode (DemoMode:Enabled, on in appsettings.Development.json) adds sample records for the demo accounts. It is
+// refused outside Development so a real deployment can never receive demo data; see CampusGear.Data/DemoData.cs.
+if (app.Environment.IsDevelopment() && args.Contains("--remove-demo-data", StringComparer.OrdinalIgnoreCase))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    app.Logger.LogInformation("Demo Mode: {Result}", await DemoData.RemoveAsync(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()));
+    return;
+}
+if (app.Configuration.GetValue<bool>("DemoMode:Enabled"))
+{
+    if (!app.Environment.IsDevelopment())
+        app.Logger.LogWarning("DemoMode:Enabled is ignored outside the Development environment; no demo data was added.");
+    else
+    {
+        await using var scope = app.Services.CreateAsyncScope();
+        app.Logger.LogInformation("Demo Mode: {Result}", await DemoData.SeedAsync(
+            scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), TimeProvider.System.GetUtcNow().UtcDateTime));
+    }
+}
 if (args.Contains("--initialize-only", StringComparer.OrdinalIgnoreCase)) return;
 app.Run();
+public partial class Program;

@@ -1,0 +1,22 @@
+@model IReadOnlyList<CampusGear.Models.ActivityItem>
+@{
+    var empty = ViewData["Empty"] as string ?? "Nothing to show yet.";
+}
+@if (Model.Count == 0)
+{
+    <div class="dash-empty"><svg class="icon" aria-hidden="true"><use href="/icons.svg#check-circle"></use></svg><p>@empty</p></div>
+}
+else
+{
+    <ul class="dash-activity">
+        @foreach (var item in Model)
+        {
+            <li>
+                <a href="@item.Url">
+                    <span class="dash-activity-main"><strong>@item.Title</strong><span>@item.Detail</span></span>
+                    <span class="dash-activity-meta"><span class="live-badge">@item.Status</span><small>@item.When</small></span>
+                </a>
+            </li>
+        }
+    </ul>
+}

@@ -9,7 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CampusGear.Controllers;
 
-[Authorize(Roles = "Custodian,Administrator")]
+// The borrowing desk belongs to the custodian. Administrators get read-only access to history, the calendar and
+// reservation details; every decision, release and return is Custodian-only. Each action states its roles, because
+// stacked [Authorize] attributes must all pass.
+[Authorize]
 [AutoValidateAntiforgeryToken]
 public sealed class CustodianController(
     ApplicationDbContext db,
@@ -19,6 +22,7 @@ public sealed class CustodianController(
 {
     private const int PageSize = 12;
 
+    [Authorize(Roles = "Custodian")]
     [HttpGet("custodian/approvals")]
     public async Task<IActionResult> Approvals(string? q, string? status, string? from, string? to,
         int page = 1, CancellationToken cancellationToken = default)
@@ -31,11 +35,12 @@ public sealed class CustodianController(
             x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now);
         if (status == "pending") query = query.Where(x => x.Status == ReservationStatus.Pending);
         if (status == "approved") query = query.Where(x => x.Status == ReservationStatus.Approved);
-        var model = await ListAsync(query, User.IsInRole("Administrator") ? nameof(AdminApprovals) : nameof(Approvals), "Reservation approvals",
+        var model = await ListAsync(query, nameof(Approvals), "Reservation approvals",
             q, status, from, to, page, "approvals", cancellationToken);
         return View("Queue", model);
     }
 
+    [Authorize(Roles = "Custodian")]
     [HttpGet("custodian/returns")]
     public async Task<IActionResult> Returns(string? q, string? queue, string? from, string? to,
         int page = 1, CancellationToken cancellationToken = default)
@@ -45,11 +50,12 @@ public sealed class CustodianController(
         var query = db.Reservations.AsNoTracking().Where(x => queue == "release"
             ? x.Status == ReservationStatus.Approved
             : x.Status == ReservationStatus.Released && x.Loan != null && x.Loan.ReturnedAtUtc == null);
-        var model = await ListAsync(query, User.IsInRole("Administrator") ? nameof(AdminReturns) : nameof(Returns), "Release and return desk",
+        var model = await ListAsync(query, nameof(Returns), "Release and return desk",
             q, "all", from, to, page, queue, cancellationToken);
         return View("Queue", model);
     }
 
+    [Authorize(Roles = "Custodian")]
     [HttpGet("custodian/history")]
     public async Task<IActionResult> History(string? q, string? status, string? from, string? to,
         int page = 1, CancellationToken cancellationToken = default)
@@ -75,6 +81,7 @@ public sealed class CustodianController(
             q, status, from, to, page, "history", cancellationToken));
     }
 
+    [Authorize(Roles = "Custodian,Administrator")]
     [HttpGet("custodian/reservations/{id:guid}")]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
@@ -97,17 +104,21 @@ public sealed class CustodianController(
             : record.Status == ReservationStatus.Approved && now >= record.EndAtUtc ? "The booking time has ended. Equipment can no longer be released."
             : record.Status == ReservationStatus.Pending && !pending ? "The pending hold expired. This request cannot be approved or rejected."
             : null;
+        // Administrators see the record read-only: every action below is offered to custodians only.
+        var custodian = User.IsInRole("Custodian");
         return View(new CustodianDetailViewModel(record, CustodianTime.Status(record, now),
-            pending && usable, pending, canRelease,
-            record.Status == ReservationStatus.Released && record.Loan is { ReturnedAtUtc: null },
+            custodian && pending && usable, custodian && pending, custodian && canRelease,
+            custodian && record.Status == ReservationStatus.Released && record.Loan is { ReturnedAtUtc: null },
             note, TempData["CustodianFeedback"] as string, TempData["CustodianError"] as string));
     }
 
+    [Authorize(Roles = "Custodian")]
     [HttpPost("custodian/reservations/{id:guid}/approve")]
     public Task<IActionResult> Approve(Guid id, CancellationToken cancellationToken) =>
         TransitionAsync(id, actor => reservations.ApproveAsync(actor, id, cancellationToken),
             "Reservation approved. The booking is ready for release at its start time.");
 
+    [Authorize(Roles = "Custodian")]
     [HttpPost("custodian/reservations/{id:guid}/reject")]
     public Task<IActionResult> Reject(Guid id, [FromForm] string? reason, CancellationToken cancellationToken)
     {
@@ -117,6 +128,7 @@ public sealed class CustodianController(
             "Request rejected. Its equipment slot is available again.");
     }
 
+    [Authorize(Roles = "Custodian")]
     [HttpPost("custodian/reservations/{id:guid}/release")]
     public Task<IActionResult> Release(Guid id, [FromForm] string? condition, [FromForm] string? notes,
         CancellationToken cancellationToken)
@@ -128,6 +140,7 @@ public sealed class CustodianController(
             "Release recorded. The equipment is now on loan.");
     }
 
+    [Authorize(Roles = "Custodian")]
     [HttpPost("custodian/reservations/{id:guid}/return")]
     public Task<IActionResult> RecordReturn(Guid id, [FromForm] string? condition, [FromForm] string? notes,
         CancellationToken cancellationToken)
@@ -138,6 +151,7 @@ public sealed class CustodianController(
             "Return recorded. The equipment condition and borrowing history are updated.", returnTransition: true);
     }
 
+    [Authorize(Roles = "Custodian")]
     [HttpGet("custodian/calendar")]
     public async Task<IActionResult> Calendar(int? year, int? month, Guid? equipmentItemId, string? day,
         CancellationToken cancellationToken)
@@ -179,18 +193,9 @@ public sealed class CustodianController(
         var slots = bookings.Where(x => x.StartAtUtc < selectedEnd && x.EndAtUtc > selectedStart)
             .Select(x => new CustodianCalendarSlot(x.Id, x.BorrowerProfile.User.FullName,
                 CustodianTime.Format(x.StartAtUtc), CustodianTime.Format(x.EndAtUtc), CustodianTime.Status(x, now))).ToList();
-        return View("Calendar", new CustodianCalendarViewModel(items, selectedItem, first, days, selectedDay, slots));
+        return View("Calendar", new CustodianCalendarViewModel(items, selectedItem, first, days, selectedDay, slots,
+            await EquipmentPicker.LoadAsync(db, clock.GetUtcNow().UtcDateTime, cancellationToken)));
     }
-
-    [Authorize(Roles = "Administrator")]
-    [HttpGet("admin/approvals")]
-    public Task<IActionResult> AdminApprovals(string? q, string? status, string? from, string? to,
-        int page = 1, CancellationToken cancellationToken = default) => Approvals(q, status, from, to, page, cancellationToken);
-
-    [Authorize(Roles = "Administrator")]
-    [HttpGet("admin/returns")]
-    public Task<IActionResult> AdminReturns(string? q, string? queue, string? from, string? to,
-        int page = 1, CancellationToken cancellationToken = default) => Returns(q, queue, from, to, page, cancellationToken);
 
     [Authorize(Roles = "Administrator")]
     [HttpGet("admin/history")]
@@ -233,9 +238,14 @@ public sealed class CustodianController(
         page = Math.Clamp(page, 1, pages);
         var included = query.Include(x => x.BorrowerProfile).ThenInclude(x => x.User)
             .Include(x => x.EquipmentItem).Include(x => x.Loan);
-        var ordered = action is nameof(History) or nameof(AdminHistory)
-            ? included.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id)
-            : included.OrderBy(x => x.StartAtUtc).ThenBy(x => x.CreatedAtUtc);
+        // Most recent first everywhere: active loans by release time, the release queue by approval time,
+        // and request lists and history by submission time.
+        var ordered = queue switch
+        {
+            "active" => included.OrderByDescending(x => x.Loan!.ReleasedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
+            "release" => included.OrderByDescending(x => x.DecidedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
+            _ => included.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id)
+        };
         var records = await ordered
             .Skip((page - 1) * PageSize).Take(PageSize).ToListAsync(cancellationToken);
         var now = clock.GetUtcNow().UtcDateTime;
@@ -303,7 +313,7 @@ public sealed record CustodianCalendarSlot(Guid Id, string BorrowerName, string 
     string EndManila, string Status);
 public sealed record CustodianCalendarViewModel(IReadOnlyList<CustodianCalendarItem> Items,
     CustodianCalendarItem? SelectedItem, DateOnly Month, IReadOnlyList<CustodianCalendarDay> Days,
-    DateOnly SelectedDay, IReadOnlyList<CustodianCalendarSlot> Slots);
+    DateOnly SelectedDay, IReadOnlyList<CustodianCalendarSlot> Slots, IReadOnlyList<EquipmentPickerItem> Picker);
 
 public static class CustodianTime
 {

@@ -1,0 +1,103 @@
+@model CampusGear.Models.SeriesChart
+@using System.Globalization
+@{
+    // Geometry is in percent of the plot box, so the chart reflows with its card. Lines are drawn in a
+    // 100×100 SVG stretched to the plot (strokes stay 2px via vector-effect); text and dots stay HTML.
+    var axisMax = Model.AxisMax;
+    var count = Model.Labels.Count;
+    var line = Model.Kind == "line";
+    string P(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+    double X(int index) => count <= 1 ? 50 : index * 100.0 / (count - 1);
+    double Y(int value) => value * 100.0 / axisMax;
+    string Tip(int index) => Model.Labels[index] + "\n" +
+        string.Join("\n", Model.Series.Select(s => $"{s.Name}: {s.Values[index]:N0}"));
+    // Long axes label every other point so the text never collides.
+    var labelEvery = count > 8 ? 2 : 1;
+}
+<div class="chart-head">
+    <div><h2>@Model.Title</h2>@if (Model.Subtitle is not null) { <p>@Model.Subtitle</p> }</div>
+    @if (Model.Series.Count > 1)
+    {
+        <ul class="chart-legend" aria-label="Legend">
+            @foreach (var series in Model.Series)
+            {
+                <li><span class="chart-legend-row"><i class="chart-swatch chart-swatch-line series-@series.Slot" aria-hidden="true"></i><span>@series.Name</span></span></li>
+            }
+        </ul>
+    }
+</div>
+<div class="chart-series chart-series-@Model.Kind" role="img"
+     aria-label="@Model.Title. @string.Join(". ", Model.Series.Select(s => $"{s.Name}: {s.Values.Sum():N0} in total"))">
+    <div class="chart-plot">
+        <div class="chart-grid" aria-hidden="true">
+            @for (var step = 4; step >= 0; step--)
+            {
+                <div class="chart-gridline @(step == 0 ? "is-baseline" : "")" style="bottom:@(step * 25)%"><span>@((axisMax * step / 4).ToString("N0"))</span></div>
+            }
+        </div>
+        @if (line)
+        {
+            <svg class="chart-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                @foreach (var series in Model.Series)
+                {
+                    var points = string.Join(" ", series.Values.Select((v, i) => $"{P(X(i))},{P(100 - Y(v))}"));
+                    if (Model.Series.Count == 1)
+                    {
+                        <polygon class="chart-area series-@series.Slot" points="0,100 @points 100,100" />
+                    }
+                    <polyline class="chart-line series-@series.Slot" points="@points" />
+                }
+            </svg>
+            foreach (var series in Model.Series)
+            {
+                <span class="chart-dot chart-dot-end series-@series.Slot" style="left:@P(X(count - 1))%;bottom:@P(Y(series.Values[^1]))%" aria-hidden="true"></span>
+            }
+            <div class="chart-hits">
+                @for (var i = 0; i < count; i++)
+                {
+                    <span class="chart-hit" style="left:@P(X(i))%" data-tip="@Tip(i)" tabindex="0">
+                        <i class="chart-crosshair" aria-hidden="true"></i>
+                        @foreach (var series in Model.Series)
+                        {
+                            <i class="chart-dot series-@series.Slot" style="bottom:@P(Y(series.Values[i]))%" aria-hidden="true"></i>
+                        }
+                    </span>
+                }
+            </div>
+        }
+        else
+        {
+            var series = Model.Series[0];
+            <div class="chart-columns">
+                @for (var i = 0; i < count; i++)
+                {
+                    <span class="chart-column" data-tip="@Tip(i)" tabindex="0">
+                        <span class="chart-column-bar series-@series.Slot" style="height:@P(Y(series.Values[i]))%">
+                            <span class="chart-column-value">@series.Values[i].ToString("N0")</span>
+                        </span>
+                    </span>
+                }
+            </div>
+        }
+    </div>
+    <div class="chart-xaxis chart-xaxis-@Model.Kind" aria-hidden="true">
+        @for (var i = 0; i < count; i++)
+        {
+            <span class="@((count - 1 - i) % labelEvery != 0 ? "is-minor" : "")" style="@(line ? $"left:{P(X(i))}%" : "")">@Model.Labels[i]</span>
+        }
+    </div>
+</div>
+<details class="chart-data">
+    <summary>View as table</summary>
+    <div class="live-table-wrap">
+        <table class="chart-data-table">
+            <thead><tr><th scope="col">Period</th>@foreach (var series in Model.Series) { <th scope="col">@series.Name</th> }</tr></thead>
+            <tbody>
+                @for (var i = count - 1; i >= 0; i--)
+                {
+                    <tr><th scope="row">@Model.Labels[i]</th>@foreach (var series in Model.Series) { <td>@series.Values[i].ToString("N0")</td> }</tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</details>

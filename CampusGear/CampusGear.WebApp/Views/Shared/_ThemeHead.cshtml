@@ -9,5 +9,7 @@
             theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
         document.documentElement.dataset.theme = theme;
+        // Lets CSS hide server messages that toast.js will show as toasts, so they never flash inline first.
+        document.documentElement.classList.add('js');
     })();
 </script>

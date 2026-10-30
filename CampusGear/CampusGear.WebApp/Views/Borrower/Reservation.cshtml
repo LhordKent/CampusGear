@@ -1,7 +1,7 @@
 @model ReservationPageViewModel
 @{
     Layout = "_WorkspaceLayout";
-    ViewData["Title"] = "Equipment Reservation";
+    ViewData["Title"] = "Browse Equipment";
     ViewData["WorkspaceRole"] = "Borrower";
     ViewData["BorrowerPage"] = "reservation";
     var selected = Model.Selected;
@@ -16,15 +16,7 @@
         "In use" => "is-in-use",
         _ => "is-unavailable"
     };
-    static string Icon(string name, string category)
-    {
-        var text = $"{name} {category}".ToLowerInvariant();
-        if (new[] { "laptop", "computer", "notebook", "macbook", "chromebook" }.Any(text.Contains)) return "laptop";
-        if (new[] { "camera", "camcorder", "dslr", "lens", "tripod" }.Any(text.Contains)) return "camera";
-        if (text.Contains("projector")) return "projector";
-        if (new[] { "mic", "audio", "speaker", "sound", "headphone" }.Any(text.Contains)) return "audio";
-        return "box";
-    }
+    static string Icon(string name, string category) => EquipmentIcon.For(name, category);
 }
 @* Figma sources: 695:2 reservation, 695:154 conflict, 695:280 submitted. The catalog groups units by category and name. *@
 @section Styles {
@@ -32,16 +24,23 @@
     <link rel="stylesheet" href="~/css/borrower-catalog.css" asp-append-version="true" />
 }
 <main class="live-content borrower-page" data-figma-source="695:2">
-    <header class="live-heading borrower-heading">
-        <h1><img src="~/figma/assets/5fc0e.svg" alt="" />Equipment Reservation</h1>
-        <p>Browse campus equipment and request what you need. Staff review every request before release.</p>
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Equipment catalog</p>
+            <h1>Browse Equipment</h1>
+            <p class="page-description">Find what you need and request a time. The equipment desk reviews every request before release.</p>
+        </div>
+        <div class="page-header-actions">
+            <a class="live-button secondary" href="/borrower/calendar"><svg class="icon" aria-hidden="true"><use href="/icons.svg#calendar"></use></svg>Availability calendar</a>
+            <a class="live-button secondary" href="/borrower/history">My reservations</a>
+        </div>
     </header>
 
     <div class="catalog-page">
         @if (hasSubmitted)
         {
             var first = Model.Submitted[0];
-            <section class="borrower-feedback borrower-success" role="status" data-figma-source="695:280">
+            <section class="borrower-feedback borrower-success" role="status" data-figma-source="695:280" data-toast="success" data-toast-keep data-toast-text="Reservation request submitted. The equipment desk will review it before release.">
                 <h2>Reservation request submitted</h2>
                 <p>Your request is saved. Staff will review it before the equipment can be released.</p>
                 <dl class="borrower-summary">
@@ -286,12 +285,6 @@
         }
     </div>
 
-    <svg class="visually-hidden" aria-hidden="true" focusable="false">
-        <symbol id="cg-icon-laptop" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="1.5" /><path d="M2 19h20" /></symbol>
-        <symbol id="cg-icon-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></symbol>
-        <symbol id="cg-icon-projector" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="9" rx="2" /><circle cx="16" cy="12.5" r="2.5" /><path d="M6 12.5h4M5 17v2M19 17v2" /></symbol>
-        <symbol id="cg-icon-audio" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></symbol>
-        <symbol id="cg-icon-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z" /><path d="M3 7v10l9 4 9-4V7M12 11v10" /></symbol>
-    </svg>
+    <partial name="_EquipmentIcons" />
 </main>
 @section Scripts { <script src="~/js/borrower-catalog.js" asp-append-version="true"></script> }

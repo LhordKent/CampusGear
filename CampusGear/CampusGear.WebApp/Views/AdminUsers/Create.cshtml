@@ -1,0 +1,61 @@
+@model AdminUserCreateInput
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Create Account";
+    ViewData["WorkspaceRole"] = "Administrator";
+    var roles = new[] { "Borrower", "Custodian", "Administrator" };
+}
+<main class="live-content">
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">People</p>
+            <h1>Create Account</h1>
+            <p class="page-description">The account is approved and verified at once. Share the temporary password with its owner; they can change it with Forgot password.</p>
+        </div>
+        <div class="page-header-actions"><a class="live-button secondary" href="/admin/users">Back to users</a></div>
+    </header>
+    <section class="live-panel live-editor-sheet" aria-label="New account">
+        <div asp-validation-summary="ModelOnly" class="live-feedback error"></div>
+        <form id="account-create-form" class="live-form" method="post" action="/admin/users/new">
+            @Html.AntiForgeryToken()
+            <p class="form-section-title wide">Account</p>
+            <label class="live-field" for="FirstName"><span>First name</span>
+                <input id="FirstName" name="FirstName" value="@Model.FirstName" required maxlength="100" autocomplete="off" />
+                @Html.ValidationMessage("FirstName")
+            </label>
+            <label class="live-field" for="LastName"><span>Last name</span>
+                <input id="LastName" name="LastName" value="@Model.LastName" required maxlength="100" autocomplete="off" />
+                @Html.ValidationMessage("LastName")
+            </label>
+            <label class="live-field span-4" for="Email"><span>Email</span>
+                <input id="Email" name="Email" type="email" value="@Model.Email" required maxlength="256" autocomplete="off" placeholder="name@school.edu" />
+                @Html.ValidationMessage("Email")
+            </label>
+            <label class="live-field span-2" for="Role"><span>Role</span>
+                <select id="Role" name="Role">
+                    @foreach (var role in roles) { <option value="@role" selected="@(Model.Role == role)">@role</option> }
+                </select>
+                @Html.ValidationMessage("Role")
+            </label>
+            <label class="live-field" for="Password"><span>Temporary password</span>
+                <input id="Password" name="Password" type="password" required minlength="8" maxlength="100" autocomplete="new-password" />
+                <small class="live-help">At least 8 characters with upper and lower case letters, a number, and a symbol.</small>
+                @Html.ValidationMessage("Password")
+            </label>
+            <label class="live-field" for="ContactNumber"><span>Contact number <small>Optional</small></span>
+                <input id="ContactNumber" name="ContactNumber" type="tel" value="@Model.ContactNumber" maxlength="32" placeholder="09XX XXX XXXX" />
+                @Html.ValidationMessage("ContactNumber")
+            </label>
+            <p class="form-section-title wide">Borrower profile <small>Borrowers only</small></p>
+            <label class="live-field span-2" for="StudentNumber"><span>Student ID Number</span>
+                <input id="StudentNumber" name="StudentNumber" value="@Model.StudentNumber" maxlength="64" />
+                @Html.ValidationMessage("StudentNumber")
+            </label>
+            <label class="live-field span-4" for="Department"><span>Department</span>
+                <input id="Department" name="Department" value="@Model.Department" maxlength="160" placeholder="e.g. College of Engineering" />
+                @Html.ValidationMessage("Department")
+            </label>
+        </form>
+        <partial name="_EditorFooter" model='new CampusGear.Models.FigmaEditorFooter("account-create-form", "/admin/users")' />
+    </section>
+</main>

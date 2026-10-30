@@ -9,52 +9,103 @@
     var name = account?.FullName ?? role;
     var initial = name.Length > 0 ? name[..1].ToUpperInvariant() : "C";
     var title = ViewData["Title"] as string ?? "Campus equipment workspace";
-    var dashboard = path.EndsWith("/dashboard", StringComparison.OrdinalIgnoreCase);
-    var avatar = role == "Borrower" ? "a698b.svg" : "2680a.svg";
+    var borrower = role == "Borrower";
+    var home = borrower ? "/borrower/home" : $"/{slug}/dashboard";
+    var dashboard = path.EndsWith("/dashboard", StringComparison.OrdinalIgnoreCase) ||
+        path.Equals("/borrower/home", StringComparison.OrdinalIgnoreCase);
+    var navigation = FigmaUi.Navigation(role);
+    bool IsActive(FigmaNavigation item) =>
+        path.Equals(item.Path, StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWith(item.Path + "/", StringComparison.OrdinalIgnoreCase) ||
+        item.Path == "/borrower/home" && path.Equals("/borrower/dashboard", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#071b2b" />
+    <partial name="_ThemeHead" />
     <title>@title · CampusGear</title>
+    <link rel="stylesheet" href="~/css/theme-tokens.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/live-workspace.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/figma-live.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
 </head>
 <body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaUi.Frame(path)">
     <a class="live-skip" href="#workspace-content">Skip to content</a>
-    <div class="live-shell">
-        <div class="live-atmosphere" aria-hidden="true" inert>
-            <img class="live-atmosphere-base" src="/figma/assets/@FigmaUi.Atmosphere(role)" alt="" />
-            <img class="live-atmosphere-detail" src="/figma/assets/@FigmaUi.Detail(role)" alt="" />
-        </div>
-        <aside class="live-sidebar">
-            @if (role != "Borrower") { <img class="live-sidebar-signature" src="/figma/assets/@FigmaUi.Signature(role)" alt="" aria-hidden="true" /> }
-            <a class="live-brand" href="/@slug/dashboard"><img src="/figma/assets/b95f3.svg" alt="" /><span>Campus<strong>Gear</strong></span></a>
-            <details class="live-navigation" open>
-                <summary>Workspace menu</summary>
-                <nav aria-label="Workspace navigation">
-                    @foreach (var item in FigmaUi.Navigation(role))
-                    {
-                        var active = path.Equals(item.Path, StringComparison.OrdinalIgnoreCase) ||
-                            item.Path == "/admin/users" && path.StartsWith("/admin/users/", StringComparison.OrdinalIgnoreCase);
-                        <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)"><span class="live-nav-icon"><img src="/figma/assets/@item.Icon" alt="" /></span><span>@item.Label</span></a>
-                    }
-                </nav>
-            </details>
-            <form method="post" action="/auth/logout" class="live-logout">@Html.AntiForgeryToken()<button type="submit">Log out</button></form>
-        </aside>
-        <div class="live-main">
-            <header class="live-topbar">
-                <div class="live-topbar-account"><span class="live-avatar"><img src="/figma/assets/@avatar" alt="" /><b>@initial</b></span><div><strong>@name</strong><small>@role</small></div></div>
+    @if (borrower)
+    {
+        @* Borrowers get a website-style header instead of the staff sidebar. *@
+        <div class="site-shell">
+            <header class="site-header">
+                <div class="site-header-inner">
+                    <a class="site-brand" href="@home"><img src="/figma/assets/b95f3.svg" alt="" /><span>Campus<strong>Gear</strong></span></a>
+                    <details class="site-menu" data-site-menu>
+                        <summary aria-label="Open menu"><svg class="icon" aria-hidden="true"><use href="/icons.svg#list"></use></svg><span>Menu</span></summary>
+                        <nav class="site-nav" aria-label="Main navigation">
+                            @foreach (var item in navigation)
+                            {
+                                var active = IsActive(item);
+                                <a class="@(active ? "is-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)">@item.Label</a>
+                            }
+                        </nav>
+                    </details>
+                    <div class="site-account">
+                        <partial name="_ThemeToggle" />
+                        <span class="site-avatar" aria-hidden="true">@initial</span>
+                        <span class="site-account-name">@name</span>
+                        <form method="post" action="/auth/logout">@Html.AntiForgeryToken()<button type="submit" class="site-logout">Log out</button></form>
+                    </div>
+                </div>
             </header>
-            <div id="workspace-content" tabindex="-1">@RenderBody()</div>
+            <div id="workspace-content" class="site-main" tabindex="-1">@RenderBody()</div>
+            <footer class="site-footer">
+                <div class="site-footer-inner">
+                    <span>Campus<strong>Gear</strong> · Campus equipment borrowing</span>
+                    <span>All times are Manila time (UTC+8)</span>
+                </div>
+            </footer>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="live-shell">
+            <aside class="live-sidebar" aria-label="Workspace">
+                <a class="live-brand" href="@home"><img src="/figma/assets/b95f3.svg" alt="" /><span>Campus<strong>Gear</strong></span></a>
+                <details class="live-navigation" open>
+                    <summary>Workspace menu</summary>
+                    <nav aria-label="Workspace navigation">
+                        @foreach (var item in navigation)
+                        {
+                            var active = IsActive(item);
+                            if (item.Group is not null) { <p class="live-nav-group">@item.Group</p> }
+                            <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)"><svg class="icon" aria-hidden="true"><use href="/icons.svg#@item.Icon"></use></svg><span>@item.Label</span></a>
+                        }
+                    </nav>
+                </details>
+                <div class="live-sidebar-footer">
+                    <div class="live-sidebar-user"><span class="live-avatar-initial" aria-hidden="true">@initial</span><div><strong>@name</strong><small>@role</small></div></div>
+                    <form method="post" action="/auth/logout" class="live-logout">@Html.AntiForgeryToken()<button type="submit"><svg class="icon" aria-hidden="true"><use href="/icons.svg#logout"></use></svg>Log out</button></form>
+                </div>
+            </aside>
+            <div class="live-main">
+                <header class="live-topbar">
+                    <p class="live-topbar-context"><span>@(role == "Administrator" ? "Administrator" : "Custodian") workspace</span><span aria-hidden="true">/</span><strong>@title</strong></p>
+                    <div class="live-topbar-tools">
+                    <time class="live-topbar-date" datetime="@CustodianTime.Local(DateTime.UtcNow).ToString("yyyy-MM-dd")">@CustodianTime.Local(DateTime.UtcNow).ToString("dddd, MMMM d, yyyy")</time>
+                    <partial name="_ThemeToggle" />
+                    </div>
+                </header>
+                <div id="workspace-content" tabindex="-1">@RenderBody()</div>
+            </div>
+        </div>
+    }
+    <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/toast.js" asp-append-version="true"></script>
     <script src="~/js/figma-live.js" asp-append-version="true"></script>
+    <script src="~/js/live-search.js" asp-append-version="true"></script>
     <script src="~/js/motion.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

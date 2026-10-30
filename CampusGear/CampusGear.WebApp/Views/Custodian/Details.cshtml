@@ -8,14 +8,24 @@
     var admin = ViewData["WorkspaceRole"] as string == "Administrator";
     var staffPath = admin ? "/admin" : "/custodian";
     var returning = Model.CanReturn || record.Status == ReservationStatus.Completed;
-    ViewData["Title"] = returning ? "Return & Condition Check" : "Approval & Release";
+    ViewData["Title"] = admin ? "Reservation Record" : returning ? "Return & Condition Check" : "Approval & Release";
     var source = returning ? admin ? "695:3957" : "695:2032" : admin ? "695:3278" : "695:1499";
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
 <main class="live-content" data-figma-source="@source">
-    <header class="live-heading"><h1>@ViewData["Title"]</h1></header>
-    @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status">@Model.Feedback</div> }
-    @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert">@Model.Error</div> }
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Reservation RES-@record.Id.ToString("N")[..8].ToUpperInvariant()</p>
+            <h1>@ViewData["Title"]</h1>
+            <p class="page-description">@record.BorrowerProfile.User.FullName · @record.EquipmentItem.Name (@record.EquipmentItem.AssetCode) · <span class="live-badge">@Model.Status</span></p>
+        </div>
+        <div class="page-header-actions">
+            @if (admin) { <a class="live-button secondary" href="/admin/history">Back to borrowing history</a> }
+            else { <a class="live-button secondary" href="@staffPath/@(returning ? "returns" : "approvals")">Back to @(returning ? "return desk" : "requests")</a> }
+        </div>
+    </header>
+    @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
+    @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
     @if (!string.IsNullOrWhiteSpace(Model.AvailabilityNote)) { <div class="live-feedback" role="status">@Model.AvailabilityNote</div> }
     <section class="live-panel live-decision" aria-labelledby="request-title">
         <div class="live-toolbar"><h2 id="request-title">@(returning ? "Return & condition check" : "Request decision")</h2><span class="live-badge">@Model.Status</span></div>
@@ -28,19 +38,19 @@
         @if (Model.CanApprove || Model.CanReject)
         {
             <div class="live-decision-actions"><a class="live-button secondary" href="@staffPath/approvals">Back to requests</a>
-                <details class="live-reject"><summary class="live-button danger">Reject request</summary><form class="live-form" method="post" action="@route/reject">@Html.AntiForgeryToken()<label class="live-field wide" for="Reason">Rejection reason<textarea id="Reason" name="Reason" maxlength="1000" required placeholder="Explain why this request cannot proceed"></textarea></label><button class="live-button danger wide" type="submit">Confirm rejection</button></form></details>
+                <details class="live-reject"><summary class="live-button danger">Reject request</summary><form class="live-form" method="post" action="@route/reject">@Html.AntiForgeryToken()<label class="live-field wide" for="Reason"><span>Rejection reason</span><textarea rows="3" id="Reason" name="Reason" maxlength="1000" required placeholder="Explain why this request cannot proceed"></textarea></label><button class="live-button danger wide" type="submit">Confirm rejection</button></form></details>
                 <form method="post" action="@route/approve">@Html.AntiForgeryToken()<button class="live-button" type="submit" disabled="@(!Model.CanApprove)">Approve request</button></form>
             </div>
         }
-        @if (record.Status == ReservationStatus.Approved)
+        @if (record.Status == ReservationStatus.Approved && !admin)
         {
-            <form class="live-form live-release-form" method="post" action="@route/release">@Html.AntiForgeryToken()<label class="live-field" for="ReleaseCondition">Condition at release<select id="ReleaseCondition" name="Condition" required disabled="@(!Model.CanRelease)">@foreach (var condition in new[] { EquipmentCondition.Excellent, EquipmentCondition.Good, EquipmentCondition.Fair }) { <option value="@condition" selected="@(record.EquipmentItem.Condition == condition)">@condition</option> }</select></label><label class="live-field" for="ReleaseNotes">Release notes (optional)<textarea id="ReleaseNotes" name="Notes" maxlength="2000" disabled="@(!Model.CanRelease)"></textarea></label><div class="live-actions wide"><a class="live-button secondary" href="@staffPath/returns?queue=release">Back to release queue</a><button class="live-button" type="submit" disabled="@(!Model.CanRelease)">Record release</button></div></form>
+            <form class="live-form live-release-form" method="post" action="@route/release">@Html.AntiForgeryToken()<label class="live-field span-2" for="ReleaseCondition"><span>Condition at release</span><select id="ReleaseCondition" name="Condition" required disabled="@(!Model.CanRelease)">@foreach (var condition in new[] { EquipmentCondition.Excellent, EquipmentCondition.Good, EquipmentCondition.Fair }) { <option value="@condition" selected="@(record.EquipmentItem.Condition == condition)">@condition</option> }</select></label><label class="live-field span-4" for="ReleaseNotes"><span>Release notes <small>Optional</small></span><textarea rows="3" id="ReleaseNotes" name="Notes" maxlength="2000" disabled="@(!Model.CanRelease)"></textarea></label><div class="live-actions wide"><a class="live-button secondary" href="@staffPath/returns?queue=release">Back to release queue</a><button class="live-button" type="submit" disabled="@(!Model.CanRelease)">Record release</button></div></form>
         }
         @if (Model.CanReturn)
         {
-            <form class="live-form live-release-form" method="post" action="@route/return">@Html.AntiForgeryToken()<label class="live-field" for="ReturnCondition">Condition at return<select id="ReturnCondition" name="Condition" required>@foreach (var condition in Enum.GetValues<EquipmentCondition>()) { <option value="@condition" selected="@(condition == EquipmentCondition.Good)">@condition</option> }</select></label><label class="live-field" for="ReturnNotes">Return notes (optional)<textarea id="ReturnNotes" name="Notes" maxlength="2000" placeholder="Record inspection findings or damage"></textarea></label><div class="live-actions wide"><a class="live-button secondary" href="@staffPath/returns">Back to return queue</a><button class="live-button" type="submit">Record return</button></div></form>
+            <form class="live-form live-release-form" method="post" action="@route/return">@Html.AntiForgeryToken()<label class="live-field span-2" for="ReturnCondition"><span>Condition at return</span><select id="ReturnCondition" name="Condition" required>@foreach (var condition in Enum.GetValues<EquipmentCondition>()) { <option value="@condition" selected="@(condition == EquipmentCondition.Good)">@condition</option> }</select></label><label class="live-field span-4" for="ReturnNotes"><span>Return notes <small>Optional</small></span><textarea rows="3" id="ReturnNotes" name="Notes" maxlength="2000" placeholder="Record inspection findings or damage"></textarea></label><div class="live-actions wide"><a class="live-button secondary" href="@staffPath/returns">Back to return queue</a><button class="live-button" type="submit">Record return</button></div></form>
         }
-        @if (!Model.CanReturn && record.Status != ReservationStatus.Approved && !Model.CanApprove && !Model.CanReject)
+        @if (admin || !Model.CanReturn && record.Status != ReservationStatus.Approved && !Model.CanApprove && !Model.CanReject)
         { <div class="live-actions"><a class="live-button secondary" href="@staffPath/history">View borrowing history</a></div> }
     </section>
     <div class="live-grid live-record-footer">
@@ -54,6 +64,6 @@
                 @if (loan.ReturnedAtUtc is { } returned) { <dt>Returned</dt><dd>@CustodianTime.Format(returned) by @(loan.ReceivedByUser?.FullName ?? "staff")</dd><dt>Return condition</dt><dd>@loan.ConditionAtReturn</dd><dt>Timeliness</dt><dd>@(returned > loan.DueAtUtc ? "Returned late" : "Returned on time")</dd><dt>Return notes</dt><dd class="custodian-preserve">@(loan.ReturnNotes ?? "—")</dd> }
             }
         </dl></section>
-        <section class="live-panel"><h2>Next step</h2><p class="live-muted">@(returning ? "Inspect the returned equipment before recording its condition. Damaged or unserviceable items enter maintenance; late returns are recorded independently." : record.Status == ReservationStatus.Approved ? "Inspect the item and record its condition at handoff. Release is available during the approved booking time." : "Check the borrower, purpose, and requested time. Approval checks availability again; rejection releases the pending hold.")</p><div class="live-actions"><a class="live-button secondary" href="@staffPath/calendar">Availability calendar</a><a class="live-button secondary" href="@staffPath/history">Borrowing history</a></div></section>
+        <section class="live-panel"><h2>@(admin ? "Read-only record" : "Next step")</h2><p class="live-muted">@(admin ? "Administrators can review reservation records but do not take part in approval, release, or return. The custodian handles every step of the borrowing flow." : returning ? "Inspect the returned equipment before recording its condition. Damaged or unserviceable items enter maintenance; late returns are recorded independently." : record.Status == ReservationStatus.Approved ? "Inspect the item and record its condition at handoff. Release is available during the approved booking time." : "Check the borrower, purpose, and requested time. Approval checks availability again; rejection releases the pending hold.")</p><div class="live-actions"><a class="live-button secondary" href="@staffPath/calendar">Availability calendar</a><a class="live-button secondary" href="@staffPath/history">Borrowing history</a></div></section>
     </div>
 </main>

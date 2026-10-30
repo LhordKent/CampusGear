@@ -23,6 +23,44 @@ public sealed class BorrowerController(
     // Upper bound on units in one request; each unit becomes its own reservation for staff to approve.
     internal const int MaxUnitsPerRequest = 10;
 
+    /// <summary>The borrower's homepage: a welcome, the newest equipment, and their own reservations at a glance.</summary>
+    [HttpGet("borrower/home")]
+    [HttpGet("borrower/dashboard")]
+    public async Task<IActionResult> Home(CancellationToken cancellationToken)
+    {
+        var profile = await OwnProfileAsync(cancellationToken);
+        if (profile is null) return Forbid();
+        var user = await users.GetUserAsync(User);
+
+        var now = clock.GetUtcNow().UtcDateTime;
+        var catalog = await BuildReservationPageAsync(profile, new ReservationInputModel(), cancellationToken);
+        var mine = db.Reservations.AsNoTracking().Where(x => x.BorrowerProfileId == profile.Id);
+        var upcoming = await mine.Include(x => x.EquipmentItem).Include(x => x.Loan)
+            .Where(x => x.Status == ReservationStatus.Approved || x.Status == ReservationStatus.Released ||
+                x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now)
+            .OrderBy(x => x.StartAtUtc).Take(4).ToListAsync(cancellationToken);
+
+        return View(new BorrowerHomeViewModel(
+            user?.FirstName is { Length: > 0 } first ? first : "there",
+            profile.IsEligible,
+            catalog.Items.OrderByDescending(x => x.AddedAtUtc).ThenBy(x => x.Name).Take(4).ToList(),
+            catalog.Items.Where(x => x.FreeNowUnits > 0).OrderByDescending(x => x.FreeNowUnits).ThenBy(x => x.Name).Take(6).ToList(),
+            catalog.Items.GroupBy(x => x.Category)
+                .Select(x => new HomeCategory(x.Key, x.Count(), x.Sum(item => item.FreeNowUnits)))
+                .OrderBy(x => x.Name).ToList(),
+            catalog.Items.Count,
+            catalog.Items.Sum(x => x.FreeNowUnits),
+            upcoming.Select(x => new HomeReservation(x.Id, x.EquipmentItem.Name, x.EquipmentItem.AssetCode,
+                FormatManila(x.StartAtUtc), FormatManila(x.EndAtUtc), HistoryStatus(x, now))).ToList(),
+            await mine.CountAsync(x => x.Status == ReservationStatus.Pending &&
+                x.HoldExpiresAtUtc > now && x.StartAtUtc > now, cancellationToken),
+            await mine.CountAsync(x => x.Status == ReservationStatus.Approved, cancellationToken),
+            await db.Loans.CountAsync(x => x.Reservation.BorrowerProfileId == profile.Id && x.ReturnedAtUtc == null, cancellationToken),
+            await db.Loans.CountAsync(x => x.Reservation.BorrowerProfileId == profile.Id && x.ReturnedAtUtc == null &&
+                x.DueAtUtc < now, cancellationToken),
+            await mine.CountAsync(x => x.Status == ReservationStatus.Completed, cancellationToken)));
+    }
+
     [HttpGet("borrower/reservation")]
     public async Task<IActionResult> Reservation(
         Guid? equipmentItemId, string? state, Guid[]? id, CancellationToken cancellationToken)
@@ -240,13 +278,15 @@ public sealed class BorrowerController(
 
     [HttpGet("borrower/history")]
     public async Task<IActionResult> History(
-        string? status, string? from, string? to, int page = 1,
+        string? status, string? from, string? to, string? q, int page = 1,
         CancellationToken cancellationToken = default)
     {
         var profile = await OwnProfileAsync(cancellationToken);
         if (profile is null) return Forbid();
 
         status = NormalizeStatus(status);
+        q = q?.Trim();
+        if (q?.Length > 100) q = q[..100];
         var query = db.Reservations.AsNoTracking()
             .Where(x => x.BorrowerProfileId == profile.Id);
         var now = clock.GetUtcNow().UtcDateTime;
@@ -262,6 +302,9 @@ public sealed class BorrowerController(
             "cancelled" => query.Where(x => x.Status == ReservationStatus.Cancelled),
             _ => query
         };
+        if (!string.IsNullOrEmpty(q))
+            query = query.Where(x => x.EquipmentItem.Name.Contains(q) || x.EquipmentItem.AssetCode.Contains(q) ||
+                x.Purpose.Contains(q));
 
         if (TryParseDate(from, out var fromDate))
         {
@@ -298,7 +341,7 @@ public sealed class BorrowerController(
             x.Loan?.ConditionAtReturn?.ToString())).ToList();
 
         return View(new HistoryPageViewModel(
-            rows, status, from ?? string.Empty, to ?? string.Empty,
+            rows, status, from ?? string.Empty, to ?? string.Empty, q ?? string.Empty,
             page, pageCount, count, TempData["BorrowerFeedback"] as string));
     }
 
@@ -372,7 +415,8 @@ public sealed class BorrowerController(
 
         return View(new CalendarPageViewModel(
             items, item, chosenYear, chosenMonth, first.ToString("MMMM yyyy", CultureInfo.InvariantCulture),
-            first.AddMonths(-1), first.AddMonths(1), days, selected, slots));
+            first.AddMonths(-1), first.AddMonths(1), days, selected, slots,
+            await EquipmentPicker.LoadAsync(db, clock.GetUtcNow().UtcDateTime, cancellationToken)));
     }
 
     private async Task<BorrowerProfile?> OwnProfileAsync(CancellationToken cancellationToken)
@@ -401,7 +445,7 @@ public sealed class BorrowerController(
             .Select(x => new
             {
                 x.Id, x.CategoryId, Category = x.Category.Name, x.Name, x.Description,
-                x.ImagePath, x.Location, x.Condition,
+                x.ImagePath, x.Location, x.Condition, x.CreatedAtUtc,
                 IsBookable = !x.IsMaintenanceHold &&
                     x.Condition != EquipmentCondition.Damaged &&
                     x.Condition != EquipmentCondition.Unserviceable
@@ -429,7 +473,8 @@ public sealed class BorrowerController(
                     bookable.Select(x => x.Condition).Distinct().Order().ToList(),
                     group.Select(x => x.Id).ToList(),
                     bookable.Select(x => x.Id).ToList(),
-                    bookable.Count(x => !inUse.Contains(x.Id)));
+                    bookable.Count(x => !inUse.Contains(x.Id)),
+                    group.Max(x => x.CreatedAtUtc));
             })
             .OrderByDescending(x => x.IsRequestable).ThenBy(x => x.Name).ThenBy(x => x.Category)
             .ToList();
@@ -613,7 +658,8 @@ public sealed class ReservationPageViewModel(
 public sealed record CatalogEquipment(
     Guid Id, string Name, string Category, string? Description, string? ImagePath,
     IReadOnlyList<string> Locations, IReadOnlyList<EquipmentCondition> Conditions,
-    IReadOnlyList<Guid> UnitIds, IReadOnlyList<Guid> BookableUnitIds, int FreeNowUnits)
+    IReadOnlyList<Guid> UnitIds, IReadOnlyList<Guid> BookableUnitIds, int FreeNowUnits,
+    DateTime AddedAtUtc)
 {
     public int TotalUnits => UnitIds.Count;
     public int BookableUnits => BookableUnitIds.Count;
@@ -634,6 +680,15 @@ public sealed record CatalogEquipment(
     };
 }
 
+public sealed record HomeCategory(string Name, int Products, int ReadyUnits);
+public sealed record HomeReservation(Guid Id, string EquipmentName, string AssetCode,
+    string StartManila, string EndManila, string Status);
+public sealed record BorrowerHomeViewModel(string FirstName, bool IsEligible,
+    IReadOnlyList<CatalogEquipment> RecentlyAdded, IReadOnlyList<CatalogEquipment> ReadyNow,
+    IReadOnlyList<HomeCategory> Categories, int ProductCount, int ReadyUnitCount,
+    IReadOnlyList<HomeReservation> Upcoming, int PendingCount, int ApprovedCount, int BorrowedCount,
+    int OverdueCount, int CompletedCount);
+
 public sealed record SubmittedReservation(Guid Id, string EquipmentName, string AssetCode,
     string StartManila, string EndManila, string? HoldExpiresManila, ReservationStatus Status);
 
@@ -642,7 +697,7 @@ public sealed record HistoryRow(Guid Id, string EquipmentName, string AssetCode,
     bool CanCancel, string? ReturnedManila, string? ReturnCondition);
 
 public sealed record HistoryPageViewModel(IReadOnlyList<HistoryRow> Rows,
-    string Status, string From, string To, int Page, int PageCount, int Total,
+    string Status, string From, string To, string Query, int Page, int PageCount, int Total,
     string? Feedback);
 
 public sealed record CalendarEquipment(Guid Id, string Name, string AssetCode, bool IsMaintenanceHold);
@@ -653,4 +708,18 @@ public sealed record CalendarPageViewModel(
     IReadOnlyList<CalendarEquipment> Items, CalendarEquipment? SelectedItem,
     int Year, int Month, string MonthTitle, DateOnly PreviousMonth, DateOnly NextMonth,
     IReadOnlyList<CalendarDay> Days, DateOnly SelectedDate,
-    IReadOnlyList<CalendarSlot> SelectedSlots);
+    IReadOnlyList<CalendarSlot> SelectedSlots, IReadOnlyList<EquipmentPickerItem> Picker);
+
+/// <summary>Picks the catalog placeholder icon (a symbol in the catalog sprite) from an item's name and category.</summary>
+public static class EquipmentIcon
+{
+    public static string For(string name, string category)
+    {
+        var text = $"{name} {category}".ToLowerInvariant();
+        if (new[] { "laptop", "computer", "notebook", "macbook", "chromebook" }.Any(text.Contains)) return "laptop";
+        if (new[] { "camera", "camcorder", "dslr", "lens", "tripod" }.Any(text.Contains)) return "camera";
+        if (text.Contains("projector")) return "projector";
+        if (new[] { "mic", "audio", "speaker", "sound", "headphone" }.Any(text.Contains)) return "audio";
+        return "box";
+    }
+}

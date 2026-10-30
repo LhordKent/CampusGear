@@ -1,0 +1,59 @@
+@model DirectoryBorrowersPage
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Borrower Profiles";
+}
+<main class="live-content">
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Directory · read-only</p>
+            <h1>Borrower Profiles</h1>
+            <p class="page-description">Check who a borrower is and whether they may borrow before approving or releasing. Profiles are edited by an administrator. Newest accounts first.</p>
+        </div>
+    </header>
+    <section class="live-panel" aria-label="Borrower profiles">
+        <form class="live-filters" method="get" action="/custodian/borrowers" role="search" aria-label="Find borrowers" data-live-search data-live-target="#borrower-results">
+            <label for="q" class="live-filter-search">Search borrowers<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name, email, Student ID, or department" autocomplete="off" /></span></label>
+            <label for="eligibility">Eligibility<select id="eligibility" name="eligibility">
+                <option value="all" selected="@(Model.Eligibility == "all")">All borrowers</option>
+                <option value="eligible" selected="@(Model.Eligibility == "eligible")">Eligible to borrow</option>
+                <option value="paused" selected="@(Model.Eligibility == "paused")">Borrowing paused</option>
+            </select></label>
+            <a class="live-button secondary live-filter-reset" href="/custodian/borrowers" data-live-reset>Clear</a>
+        </form>
+        <div id="borrower-results" class="live-results">
+        <p class="live-result-count" data-live-count>@Model.Total matching borrower@(Model.Total == 1 ? "" : "s")</p>
+        @if (Model.Rows.Count == 0)
+        {
+            <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><h3>No matching borrowers</h3><p>Try another name, Student ID Number, or eligibility filter.</p></div>
+        }
+        else
+        {
+            <div class="live-table-wrap" tabindex="0" role="region" aria-label="Borrower profiles table">
+                <table class="live-table">
+                    <thead><tr><th scope="col">Name</th><th scope="col">Student ID Number</th><th scope="col">Department</th><th scope="col">Contact</th><th scope="col">Eligibility</th></tr></thead>
+                    <tbody>
+                        @foreach (var row in Model.Rows)
+                        {
+                            var state = !row.IsActive ? "Inactive" : row.IsEligible ? "Active" : "Borrowing paused";
+                            <tr>
+                                <td><strong>@row.FullName</strong><small>@row.Email</small></td>
+                                <td>@(row.StudentNumber ?? "—")</td>
+                                <td>@(row.Department ?? "—")</td>
+                                <td>@(row.ContactNumber ?? "—")</td>
+                                <td><span class="live-badge" data-state="@(row.IsEligible && row.IsActive ? "active" : "overdue")">@state</span>
+                                    @if (!string.IsNullOrWhiteSpace(row.EligibilityNotes)) { <small>@row.EligibilityNotes</small> }</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <nav class="live-pager" aria-label="Borrower pages">
+                @if (Model.Page > 1) { <a class="live-button secondary" href="@ScreenUrls.Query("/custodian/borrowers", new { q = Model.Query, eligibility = Model.Eligibility, page = Model.Page - 1 })" data-live-page>Previous</a> }
+                <span>Page @Model.Page of @Model.PageCount</span>
+                @if (Model.Page < Model.PageCount) { <a class="live-button secondary" href="@ScreenUrls.Query("/custodian/borrowers", new { q = Model.Query, eligibility = Model.Eligibility, page = Model.Page + 1 })" data-live-page>Next</a> }
+            </nav>
+        }
+        </div>
+    </section>
+</main>

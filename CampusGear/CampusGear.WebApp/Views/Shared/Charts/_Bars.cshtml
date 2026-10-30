@@ -1,0 +1,25 @@
+@model CampusGear.Models.BarChart
+@using System.Globalization
+@{
+    var max = Math.Max(1, Model.Bars.Select(x => x.Value).DefaultIfEmpty(0).Max());
+    string Width(int value) => (value * 100.0 / max).ToString("0.##", CultureInfo.InvariantCulture) + "%";
+
+    void Bar(CampusGear.Models.ChartSlice bar)
+    {
+        <span class="chart-bar-label">@bar.Label</span>
+        <span class="chart-bar-track"><span class="chart-bar-fill series-@bar.Slot" style="width:@Width(bar.Value)"></span></span>
+        <span class="chart-bar-value">@bar.Value.ToString("N0")</span>
+    }
+}
+<div class="chart-head">
+    <div><h2>@Model.Title</h2>@if (Model.Subtitle is not null) { <p>@Model.Subtitle</p> }</div>
+</div>
+<ul class="chart-bars" aria-label="@Model.Title">
+    @foreach (var bar in Model.Bars)
+    {
+        <li>
+            @if (bar.Url is not null) { <a href="@bar.Url" data-tip="@bar.Label: @bar.Value.ToString("N0")">@{ Bar(bar); }</a> }
+            else { <span class="chart-bar-row" data-tip="@bar.Label: @bar.Value.ToString("N0")" tabindex="0">@{ Bar(bar); }</span> }
+        </li>
+    }
+</ul>

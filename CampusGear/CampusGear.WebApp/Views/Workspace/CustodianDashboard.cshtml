@@ -1,0 +1,68 @@
+@model CustodianDashboardViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Dashboard";
+    ViewData["WorkspaceRole"] = "Custodian";
+    var desk = Model.Desk;
+    string Count(int value, string one, string many) => $"{value} {(value == 1 ? one : many)}";
+    var tasks = new[] { desk.Pending > 0 ? Count(desk.Pending, "request to review", "requests to review") : null,
+        desk.ReadyToRelease > 0 ? Count(desk.ReadyToRelease, "booking ready for release", "bookings ready for release") : null,
+        desk.Overdue > 0 ? Count(desk.Overdue, "overdue return", "overdue returns") : null,
+        desk.DueToday > 0 ? Count(desk.DueToday, "return due today", "returns due today") : null }.OfType<string>().ToList();
+}
+<main class="live-content dashboard" data-figma-source="690:8">
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Equipment desk</p>
+            <h1>Good to see you, @Model.FirstName</h1>
+            <p class="page-description">@(tasks.Count == 0 ? "Nothing needs your attention right now. Requests, releases, and returns will appear here." : $"Waiting at the desk: {string.Join(", ", tasks)}.")</p>
+        </div>
+        <div class="page-header-actions">
+            <a class="live-button secondary" href="/custodian/calendar">Availability calendar</a>
+            <a class="live-button secondary" href="/custodian/returns?queue=release">Release desk @if (desk.ReadyToRelease > 0) { <span class="live-count">@desk.ReadyToRelease</span> }</a>
+            <a class="live-button" href="/custodian/approvals">Review requests @if (desk.Pending > 0) { <span class="live-count">@desk.Pending</span> }</a>
+        </div>
+    </header>
+
+    @* Charts lead; the queues follow. The sidebar already links to every list, so there are no headline-number tiles. *@
+    <div class="dash-grid dash-grid-wide">
+        <section class="dash-card dash-card-feature"><partial name="Charts/_Series" model="Model.DeskActivity" /></section>
+        <section class="dash-card"><partial name="Charts/_Donut" model="Model.Availability" /></section>
+    </div>
+
+    <div class="dash-grid dash-grid-split">
+        <section class="dash-card" aria-labelledby="pending-title">
+            <div class="chart-head">
+                <div><h2 id="pending-title">Requests awaiting review</h2><p>Newest requests first</p></div>
+                <a class="live-link dash-card-link" href="/custodian/approvals">Open queue<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
+            </div>
+            <partial name="_Activity" model="Model.PendingRequests" view-data='new ViewDataDictionary(ViewData) { ["Empty"] = "No requests are waiting for review." }' />
+        </section>
+        <section class="dash-card" aria-labelledby="late-title">
+            <div class="chart-head">
+                <div><h2 id="late-title">Overdue and due today</h2><p>Loans that should be back by tonight</p></div>
+                <a class="live-link dash-card-link" href="/custodian/returns">Return desk<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
+            </div>
+            <partial name="_Activity" model="Model.LateLoans" view-data='new ViewDataDictionary(ViewData) { ["Empty"] = "No loans are overdue or due today." }' />
+        </section>
+    </div>
+
+    <div class="dash-grid dash-grid-split">
+        <section class="dash-card">
+            <partial name="Charts/_Bars" model="Model.Condition" />
+            <p class="dash-card-foot">
+                <svg class="icon" aria-hidden="true"><use href="/icons.svg#wrench"></use></svg>
+                @Model.OpenMaintenanceCases open maintenance case@(Model.OpenMaintenanceCases == 1 ? "" : "s")
+                <a class="live-link" href="/admin/maintenance">Manage maintenance</a>
+            </p>
+        </section>
+        <section class="dash-card" aria-labelledby="loan-activity-title">
+            <div class="chart-head">
+                <div><h2 id="loan-activity-title">Recent releases and returns</h2><p>Latest desk transactions first</p></div>
+                <a class="live-link dash-card-link" href="/custodian/history">Full history<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
+            </div>
+            <partial name="_Activity" model="Model.RecentLoans" view-data='new ViewDataDictionary(ViewData) { ["Empty"] = "No equipment has been released yet." }' />
+        </section>
+    </div>
+</main>
+@section Scripts { <script src="~/js/charts.js" asp-append-version="true"></script> }

@@ -1,0 +1,46 @@
+@model CampusGear.Models.EquipmentPickerModel
+@using CampusGear.Models
+@{
+    // Searchable equipment cards for the availability calendars. Each card is a link to that unit's calendar, so the
+    // picker works without JavaScript; calendar.js loads the chosen unit in place and js/equipment-picker.js filters.
+    var filters = new[] { ItemStatus.Available, ItemStatus.Reserved, ItemStatus.Borrowed, ItemStatus.ForRepair }
+        .Select(status => (Status: status, Count: Model.Items.Count(x => x.Status == status))).Where(x => x.Count > 0).ToList();
+    string State(ItemStatus status) => ItemStatuses.Label(status).ToLowerInvariant();
+}
+<section class="equip-picker" aria-labelledby="equip-picker-title" data-equipment-picker>
+    <div class="equip-picker-head">
+        <h2 id="equip-picker-title">Equipment <span class="equip-picker-count" data-picker-count>@Model.Items.Count</span></h2>
+        <label class="live-search-input equip-picker-search">
+            <span class="visually-hidden">Search equipment</span>
+            <svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg>
+            <input type="search" placeholder="Search name, asset code, or category" autocomplete="off" data-picker-search />
+        </label>
+        @if (filters.Count > 1)
+        {
+            <div class="equip-picker-filters" role="group" aria-label="Filter by status now">
+                <button type="button" class="equip-chip" aria-pressed="true" data-picker-filter="">All</button>
+                @foreach (var (status, count) in filters)
+                { <button type="button" class="equip-chip" aria-pressed="false" data-picker-filter="@State(status)"><i class="equip-dot" data-state="@State(status)" aria-hidden="true"></i>@ItemStatuses.Label(status) <span>@count</span></button> }
+            </div>
+        }
+    </div>
+    <ul class="equip-picker-list" role="list" aria-label="Choose equipment to view its calendar">
+        @foreach (var item in Model.Items)
+        {
+            var selected = item.Id == Model.SelectedId;
+            <li data-picker-item data-search="@($"{item.Name} {item.AssetCode} {item.Category}".ToLowerInvariant())" data-status="@State(item.Status)">
+                <a class="equip-option @(selected ? "is-selected" : "")" href="@ScreenUrls.Query(Model.CalendarPath, new { year = Model.Year, month = Model.Month, equipmentItemId = item.Id })"
+                   aria-current="@(selected ? "true" : null)" data-picker-link data-id="@item.Id">
+                    <span class="equip-option-media" aria-hidden="true">
+                        @if (item.ImagePath is not null) { <img src="@item.ImagePath" alt="" loading="lazy" decoding="async" /> }
+                        else { <svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(item.Name, item.Category)" /></svg> }
+                    </span>
+                    <span class="equip-option-text"><strong>@item.Name</strong><small>@item.AssetCode · @item.Category</small></span>
+                    <span class="live-badge" data-state="@State(item.Status)">@ItemStatuses.Label(item.Status)</span>
+                </a>
+            </li>
+        }
+    </ul>
+    <p class="equip-picker-empty" data-picker-empty hidden>No equipment matches. Try another name or status.</p>
+</section>
+<partial name="~/Views/Borrower/_EquipmentIcons.cshtml" />

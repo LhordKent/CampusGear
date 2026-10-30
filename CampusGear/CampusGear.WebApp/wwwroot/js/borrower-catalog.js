@@ -291,6 +291,15 @@
     });
 
     /* ---------- Initial state ---------- */
+    // The homepage search and category links arrive as ?q=, ?category= and ?available=1.
+    const initial = new URLSearchParams(location.search);
+    if (initial.has('q')) search.value = initial.get('q');
+    if (initial.get('available') === '1') availableOnly.checked = true;
+    const initialChip = chips.find(chip => chip.dataset.category && chip.dataset.category === initial.get('category'));
+    if (initialChip) {
+        category = initialChip.dataset.category;
+        chips.forEach(chip => chip.setAttribute('aria-pressed', String(chip === initialChip)));
+    }
     applyFilters();
     if (current) {
         // Keep values posted back by the server, but refresh limits and availability.

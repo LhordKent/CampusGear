@@ -2,31 +2,37 @@ namespace CampusGear.Models;
 
 public sealed record FigmaEditorFooter(string FormId, string CancelUrl);
 
-public sealed record FigmaNavigation(string Path, string Label, string Icon);
+/// <summary>A workspace navigation link. Icon is a symbol id in wwwroot/icons.svg; Group starts a labelled section.</summary>
+public sealed record FigmaNavigation(string Path, string Label, string Icon, string? Group = null);
 
 public static class FigmaUi
 {
     public static IReadOnlyList<FigmaNavigation> Navigation(string role) => role switch
     {
         "Administrator" => [
-            new("/admin/dashboard", "Dashboard", "edd56.svg"),
-            new("/admin/categories", "Equipment Categories", "7e0b6.svg"),
-            new("/admin/equipment", "Equipment Items", "9177b.svg"),
-            new("/admin/borrowers", "Borrower Profiles", "a40a1.svg"),
-            new("/admin/users", "User & Role Management", "be9c1.svg"),
-            new("/admin/history", "Borrowing History", "e1db6.svg"),
-            new("/admin/calendar", "Availability Calendar", "9f767.svg")],
+            new("/admin/dashboard", "Dashboard", "grid", "Overview"),
+            new("/admin/equipment", "Equipment Items", "box", "Inventory"),
+            new("/admin/categories", "Equipment Categories", "tag"),
+            new("/admin/maintenance", "Maintenance", "wrench"),
+            new("/admin/history", "Borrowing History", "history", "Reservations"),
+            new("/admin/calendar", "Availability Calendar", "calendar"),
+            new("/admin/borrowers", "Borrower Profiles", "users", "People"),
+            new("/admin/users", "Users & Roles", "shield"),
+            new("/admin/audit", "Audit Log", "audit")],
         "Custodian" => [
-            new("/custodian/dashboard", "Dashboard", "edd56.svg"),
-            new("/custodian/approvals", "Approval & Release", "e7a8d.svg"),
-            new("/custodian/returns", "Return & Condition Check", "9970e.svg"),
-            new("/custodian/history", "Borrowing History", "e1db6.svg"),
-            new("/custodian/calendar", "Availability Calendar", "9f767.svg")],
+            new("/custodian/dashboard", "Dashboard", "grid", "Overview"),
+            new("/custodian/approvals", "Approval & Release", "check-circle", "Desk"),
+            new("/custodian/returns", "Return & Condition Check", "undo"),
+            new("/custodian/history", "Borrowing History", "history", "Records"),
+            new("/custodian/calendar", "Availability Calendar", "calendar"),
+            new("/admin/maintenance", "Maintenance", "wrench"),
+            new("/custodian/categories", "Equipment Categories", "tag", "Directory"),
+            new("/custodian/borrowers", "Borrower Profiles", "users")],
         _ => [
-            new("/borrower/dashboard", "Dashboard", "edd56.svg"),
-            new("/borrower/reservation", "Equipment Reservation", "399fa.svg"),
-            new("/borrower/history", "Borrowing History", "e1db6.svg"),
-            new("/borrower/calendar", "Availability Calendar", "9f767.svg")]
+            new("/borrower/home", "Home", "home"),
+            new("/borrower/reservation", "Browse Equipment", "box"),
+            new("/borrower/history", "My Reservations", "history"),
+            new("/borrower/calendar", "Availability", "calendar")]
     };
     public static string Atmosphere(string role) => role switch
     { "Administrator" => "e0141.svg", "Custodian" => "faa7e.svg", _ => "8fc42.svg" };
@@ -35,7 +41,7 @@ public static class FigmaUi
     public static string Signature(string role) => role == "Administrator" ? "44f3c.svg" : "35f2a.svg";
     public static string Frame(string path) => path.ToLowerInvariant() switch
     {
-        "/borrower/dashboard" => "689:2", "/borrower/reservation" => "695:2",
+        "/borrower/dashboard" or "/borrower/home" => "689:2", "/borrower/reservation" => "695:2",
         "/borrower/history" => "695:562", "/borrower/calendar" => "695:1234",
         "/custodian/dashboard" => "690:8", "/custodian/approvals" => "695:1499",
         "/custodian/returns" => "695:2032", "/custodian/calendar" => "695:2691",

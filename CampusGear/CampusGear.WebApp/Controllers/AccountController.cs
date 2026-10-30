@@ -492,7 +492,7 @@ public sealed class AccountController : Controller
     {
         if (await _users.IsInRoleAsync(user, "Administrator")) return "/admin/dashboard";
         if (await _users.IsInRoleAsync(user, "Custodian")) return "/custodian/dashboard";
-        if (await _users.IsInRoleAsync(user, "Borrower")) return "/borrower/dashboard";
+        if (await _users.IsInRoleAsync(user, "Borrower")) return "/borrower/home";
         return "/auth/access-denied";
     }
 
