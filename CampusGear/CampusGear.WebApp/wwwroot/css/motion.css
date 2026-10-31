@@ -103,7 +103,7 @@ summary { transition: color var(--motion-fast) var(--motion-ease-press), backgro
 }
 .motion-progress::before {
     content: ''; position: absolute; inset: 0; width: 40%;
-    background: linear-gradient(90deg, transparent, #2c8c8a, #c77833, transparent);
+    background: linear-gradient(90deg, transparent, var(--ws-teal), var(--ws-bronze), transparent);
     animation: motion-progress 1.1s var(--motion-ease-press) infinite;
 }
 .motion-navigating .motion-progress { opacity: 1; }

@@ -1,0 +1,47 @@
+@model CampusGear.Models.DonutChart
+@using System.Globalization
+@{
+    // A ring of 2πr circumference; each segment is a dash of the circle, separated by a 2-unit surface gap.
+    const double radius = 50;
+    var circumference = 2 * Math.PI * radius;
+    var total = Model.Total;
+    var drawn = Model.Slices.Where(x => x.Value > 0).ToList();
+    var gap = drawn.Count > 1 ? 2.0 : 0;
+    double offset = 0;
+    string Percent(int value) => total == 0 ? "0%" : (value * 100.0 / total).ToString("0", CultureInfo.InvariantCulture) + "%";
+    string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+
+    void Row(CampusGear.Models.ChartSlice slice)
+    {
+        <i class="chart-swatch series-@slice.Slot" aria-hidden="true"></i><span>@slice.Label</span><strong>@slice.Value.ToString("N0")</strong><small>@Percent(slice.Value)</small>
+    }
+}
+<div class="chart-head">
+    <div><h2>@Model.Title</h2>@if (Model.Subtitle is not null) { <p>@Model.Subtitle</p> }</div>
+</div>
+<div class="chart-donut">
+    <div class="chart-donut-ring">
+        <svg viewBox="0 0 120 120" role="img" aria-label="@Model.Title: @string.Join(", ", Model.Slices.Select(x => $"{x.Label} {x.Value}"))">
+            <circle class="chart-donut-track" cx="60" cy="60" r="@N(radius)" />
+            @foreach (var slice in drawn)
+            {
+                var length = circumference * slice.Value / total;
+                var dash = Math.Max(length - gap, 0.6);
+                <circle class="chart-donut-segment series-@slice.Slot" cx="60" cy="60" r="@N(radius)"
+                        stroke-dasharray="@N(dash) @N(circumference - dash)" stroke-dashoffset="@N(-offset)"
+                        transform="rotate(-90 60 60)" data-tip="@slice.Label: @slice.Value.ToString("N0") (@Percent(slice.Value))" tabindex="0" />
+                offset += length;
+            }
+        </svg>
+        <div class="chart-donut-center"><strong>@total.ToString("N0")</strong><span>@Model.CenterLabel</span></div>
+    </div>
+    <ul class="chart-legend chart-legend-stacked">
+        @foreach (var slice in Model.Slices)
+        {
+            <li>
+                @if (slice.Url is not null) { <a href="@slice.Url">@{ Row(slice); }</a> }
+                else { <span class="chart-legend-row">@{ Row(slice); }</span> }
+            </li>
+        }
+    </ul>
+</div>

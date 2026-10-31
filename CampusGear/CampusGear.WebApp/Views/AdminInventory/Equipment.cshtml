@@ -10,21 +10,31 @@
     <link rel="stylesheet" href="~/css/admin-equipment.css" asp-append-version="true" />
 }
 <main class="live-content admin-equipment-page" data-figma-source="@(editor ? Model.Input.Id is null ? "695:5882" : "695:6052" : "695:5691")">
-    <header class="live-heading">
-        <h1>@(editor ? Model.Input.Id is null ? "Add Equipment Item" : "Edit Equipment Item" : "Equipment Management")</h1>
-        @if (!editor)
-        {
-            <div class="equipment-heading-actions">
-                <a class="live-button secondary heading-action" href="/admin/maintenance">Maintenance</a>
-                <a class="live-button heading-action" href="/admin/equipment?form=add">Add Item</a>
-            </div>
-        }
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Inventory</p>
+            <h1>@(editor ? Model.Input.Id is null ? "Add Equipment Item" : "Edit Equipment Item" : "Equipment Management")</h1>
+            <p class="page-description">@(editor ? "Each item is one physical unit with its own asset code. Units with the same name and category appear together in the borrower catalog." : "Every unit the campus lends out, newest additions first.")</p>
+        </div>
+        <div class="page-header-actions">
+            @if (editor) { <a class="live-button secondary" href="/admin/equipment">Back to equipment</a> }
+            else
+            {
+                <a class="live-button secondary" href="/admin/maintenance"><svg class="icon" aria-hidden="true"><use href="/icons.svg#wrench"></use></svg>Maintenance</a>
+                <a class="live-button" href="/admin/equipment?form=add"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>Add item</a>
+            }
+        </div>
     </header>
-    @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
+    @if (Model.Feedback is not null) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
     @if (!editor) {
     <section class="live-panel" aria-labelledby="inventory-title">
-        <h2 id="inventory-title">Equipment inventory <span class="live-badge">@Model.Total items</span></h2>
-        <details class="live-search" open="@(!string.IsNullOrEmpty(Model.Query))"><summary>Search inventory</summary><form method="get" class="live-filters"><label>Search name or asset code<input name="q" value="@Model.Query" /></label><button class="live-button" type="submit">Search</button><a class="live-button secondary" href="/admin/equipment">Reset</a></form></details>
+        <h2 id="inventory-title">Equipment inventory</h2>
+        <form class="live-filters" method="get" action="/admin/equipment" role="search" aria-label="Find equipment" data-live-search data-live-target="#inventory-results">
+            <label for="inventory-q" class="live-filter-search">Search inventory<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="inventory-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name or asset code" autocomplete="off" /></span></label>
+            <a class="live-button secondary live-filter-reset" href="/admin/equipment" data-live-reset>Clear</a>
+        </form>
+        <div id="inventory-results" class="live-results">
+        <p class="live-result-count" data-live-count>@Model.Total item@(Model.Total == 1 ? "" : "s")@(string.IsNullOrEmpty(Model.Query) ? "" : " match")</p>
         @if (Model.Items.Count > 0)
         {
             <div class="equipment-card-grid">
@@ -59,7 +69,7 @@
                         </dl>
                     </div>
                     <footer class="equipment-card-footer">
-                        <span>Equipment details</span>
+                        <form method="post" action="/admin/equipment/@item.Id/delete" onsubmit="return confirm('Delete this item? Items with borrowing or repair history are deactivated instead.')">@Html.AntiForgeryToken()<button class="live-link equipment-card-delete" type="submit" aria-label="Delete @item.AssetCode">Delete</button></form>
                         <a class="live-link" href="/admin/equipment?id=@item.Id">Edit item</a>
                     </footer>
                 </article>
@@ -68,31 +78,36 @@
         }
         else
         {
-            <p class="equipment-empty">No equipment matches this search.</p>
+            <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/icons.svg#@(string.IsNullOrEmpty(Model.Query) ? "box" : "search")"></use></svg><h3>@(string.IsNullOrEmpty(Model.Query) ? "No equipment yet" : "No matching equipment")</h3><p>@(string.IsNullOrEmpty(Model.Query) ? "Add an item to start lending it out." : "Try another name or asset code.")</p></div>
         }
+        @if (Model.Pages > 1) {
         <nav class="live-pager" aria-label="Inventory pages">
-            @if (Model.Page > 1) { <a class="live-link" href="/admin/equipment?q=@Uri.EscapeDataString(Model.Query)&amp;page=@(Model.Page - 1)">Previous</a> }
+            @if (Model.Page > 1) { <a class="live-button secondary" href="/admin/equipment?q=@Uri.EscapeDataString(Model.Query)&amp;page=@(Model.Page - 1)" data-live-page>Previous</a> }
             <span>Page @Model.Page of @Model.Pages</span>
-            @if (Model.Page < Model.Pages) { <a class="live-link" href="/admin/equipment?q=@Uri.EscapeDataString(Model.Query)&amp;page=@(Model.Page + 1)">Next</a> }
+            @if (Model.Page < Model.Pages) { <a class="live-button secondary" href="/admin/equipment?q=@Uri.EscapeDataString(Model.Query)&amp;page=@(Model.Page + 1)" data-live-page>Next</a> }
         </nav>
+        }
+        </div>
     </section>
     }
     @if (editor)
     {
     <section class="live-panel live-editor-sheet" aria-labelledby="edit-title">
 
-        <h2 id="edit-title">ITEM INFORMATION</h2>
+        <h2 id="edit-title">Item information</h2>
         <div asp-validation-summary="All"></div>
-        <form id="equipment-editor-form" method="post" action="/admin/equipment/save" enctype="multipart/form-data" class="live-form live-form-three">
+        <form id="equipment-editor-form" method="post" action="/admin/equipment/save" enctype="multipart/form-data" class="live-form">
             @Html.AntiForgeryToken()
             <input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
-            <label class="live-field">Asset code<input asp-for="Input.AssetCode" required maxlength="64" /></label>
-            <label class="live-field">Equipment name<input asp-for="Input.Name" required maxlength="160" /></label>
-            <label class="live-field">Category<select asp-for="Input.CategoryId">@foreach (var category in Model.Categories) { <option value="@category.Id">@category.Name</option> }</select></label>
-            <label class="live-field">Condition<select asp-for="Input.Condition" asp-items="Html.GetEnumSelectList<EquipmentCondition>()"></select></label>
-            <label class="live-field">Serial number<input asp-for="Input.SerialNumber" maxlength="120" /></label>
-            <label class="live-field">Storage location<input asp-for="Input.Location" maxlength="160" /></label>
-            <label class="live-field wide">Description<textarea asp-for="Input.Description" maxlength="2000"></textarea></label>
+            <p class="form-section-title wide">Identity</p>
+            <label class="live-field span-4"><span>Equipment name</span><input asp-for="Input.Name" required maxlength="160" placeholder="e.g. Canon EOS R50 Camera" /></label>
+            <label class="live-field span-2"><span>Asset code</span><input asp-for="Input.AssetCode" required maxlength="64" placeholder="EQ-000" /></label>
+            <label class="live-field span-2"><span>Category</span><select asp-for="Input.CategoryId">@foreach (var category in Model.Categories) { <option value="@category.Id">@category.Name</option> }</select></label>
+            <label class="live-field span-2"><span>Condition</span><select asp-for="Input.Condition" asp-items="Html.GetEnumSelectList<EquipmentCondition>()"></select></label>
+            <label class="live-field span-2"><span>Serial number <small>Optional</small></span><input asp-for="Input.SerialNumber" maxlength="120" /></label>
+            <p class="form-section-title wide">Storage and details</p>
+            <label class="live-field span-4"><span>Storage location <small>Optional</small></span><input asp-for="Input.Location" maxlength="160" placeholder="e.g. Equipment Room A, Shelf 2" /></label>
+            <label class="live-field wide"><span>Description <small>Optional</small></span><textarea asp-for="Input.Description" maxlength="2000" rows="3"></textarea></label>
             <div class="live-field wide inventory-photo">
                 <label for="imageFile">Equipment photo <small class="live-muted">JPEG, PNG, WebP or GIF · up to 5 MB · shown to borrowers in the equipment catalog</small></label>
                 <div class="inventory-photo-row">
@@ -105,11 +120,13 @@
                     <label class="live-check"><input asp-for="Input.RemoveImage" /> Remove the current photo</label>
                 }
             </div>
-            <label class="live-check wide"><input asp-for="Input.IsActive" /> Active inventory item</label>
-            <p class="live-muted wide">Damaged or unserviceable items enter maintenance. Close their maintenance case after repair to restore availability. Equipment with an active loan cannot be edited.</p>
+            <div class="wide">
+                <label class="live-check"><input asp-for="Input.IsActive" /> Active inventory item</label>
+                <p class="live-help">Damaged or unserviceable items enter maintenance. Close their maintenance case after repair to restore availability. Equipment with an active loan cannot be edited.</p>
+            </div>
         </form>
+        <partial name="_EditorFooter" model='new FigmaEditorFooter("equipment-editor-form", "/admin/equipment")' />
     </section>
-    <partial name="_EditorFooter" model='new FigmaEditorFooter("equipment-editor-form", "/admin/equipment")' />
     <script>
     (() => {
         const input = document.getElementById('imageFile');

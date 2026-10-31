@@ -1,7 +1,7 @@
 @model HistoryPageViewModel
 @{
     Layout = "_WorkspaceLayout";
-    ViewData["Title"] = "Borrowing History";
+    ViewData["Title"] = "My Reservations";
     ViewData["WorkspaceRole"] = "Borrower";
     ViewData["BorrowerPage"] = "history";
     var statuses = new[] { ("all", "All statuses"), ("pending", "Pending"), ("approved", "Approved"), ("borrowed", "Borrowed"), ("returned", "Returned"), ("late", "Late / overdue"), ("cancelled", "Cancelled") };
@@ -9,18 +9,22 @@
 @* Figma sources: 695:562 history, 695:737 filtered, 695:1079 empty, 695:904 late monitoring. *@
 @section Styles { <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" /> }
 <main class="live-content borrower-page" data-figma-source="695:562">
-    <header class="live-heading borrower-heading">
-        <h1><img src="~/figma/assets/e1db6.svg" alt="" />Borrowing History Report</h1>
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">My account</p>
+            <h1>My Reservations</h1>
+            <p class="page-description">Every request you've made and every item you've borrowed, newest first. You can cancel a request until it is released.</p>
+        </div>
+        <div class="page-header-actions">
+            <a class="live-button" href="/borrower/reservation"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>New reservation</a>
+        </div>
     </header>
     @if (Model.Feedback is not null)
     {
-        <section class="borrower-feedback borrower-success" role="status"><p>@Model.Feedback</p></section>
+        <section class="borrower-feedback borrower-success" role="status" data-toast="success"><p>@Model.Feedback</p></section>
     }
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="borrower-validation" role="alert">@Html.ValidationSummary(false)</div>
-    }
-    <form method="get" action="/borrower/history" class="borrower-card borrower-filter" aria-label="Filter borrowing history">
+    <form method="get" action="/borrower/history" class="borrower-card borrower-filter" role="search" aria-label="Filter borrowing history" data-live-search data-live-target="#history-results">
+        <label class="borrower-field borrower-field-search" for="history-q"><span>Search</span><span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="history-q" name="q" type="search" value="@Model.Query" maxlength="100" placeholder="Equipment, asset code, or purpose" autocomplete="off" /></span></label>
         <label class="borrower-field" for="from"><span>From date</span><input id="from" name="from" type="date" value="@Model.From" /></label>
         <label class="borrower-field" for="to"><span>To date</span><input id="to" name="to" type="date" value="@Model.To" /></label>
         <label class="borrower-field" for="status"><span>Status</span><select id="status" name="status">
@@ -29,14 +33,20 @@
                 <option value="@value" selected="@(Model.Status == value)">@label</option>
             }
         </select></label>
-        <div class="borrower-filter-actions"><button class="borrower-button" type="submit">APPLY FILTER</button><a href="/borrower/history">Clear</a></div>
+        <div class="borrower-filter-actions"><a href="/borrower/history" data-live-reset>Clear</a></div>
     </form>
     <section class="borrower-card borrower-history" aria-labelledby="history-title">
-        <div class="borrower-section-heading"><h2 id="history-title">BORROWING RECORDS</h2><span class="borrower-muted">@Model.Total record@(Model.Total == 1 ? "" : "s") · Manila time</span></div>
+        <div id="history-results" class="live-results">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="borrower-validation" role="alert">@Html.ValidationSummary(false)</div>
+        }
+        <div class="borrower-section-heading"><h2 id="history-title">BORROWING RECORDS</h2><span class="borrower-muted" data-live-count>@Model.Total record@(Model.Total == 1 ? "" : "s") · Manila time</span></div>
         @if (Model.Rows.Count == 0)
         {
+            var filtered = !string.IsNullOrEmpty(Model.Query) || Model.Status != "all" || !string.IsNullOrEmpty(Model.From) || !string.IsNullOrEmpty(Model.To);
             <div class="borrower-empty" data-figma-source="695:1079">
-                <h3>No matching records</h3><p>Your requests will appear here after you submit a reservation.</p>
+                <h3>@(filtered ? "No matching records" : "No reservations yet")</h3><p>@(filtered ? "Try another search, status, or date range." : "Your requests will appear here after you submit a reservation.")</p>
                 <a class="borrower-button" href="/borrower/reservation">Reserve equipment</a>
             </div>
         }
@@ -71,14 +81,15 @@
             <nav class="borrower-pagination" aria-label="History pages">
                 @if (Model.Page > 1)
                 {
-                    <a class="borrower-button borrower-button-secondary" href="@ScreenUrls.Query("/borrower/history", new { status = Model.Status, from = Model.From, to = Model.To, page = Model.Page - 1 })">← Previous</a>
+                    <a class="borrower-button borrower-button-secondary" href="@ScreenUrls.Query("/borrower/history", new { q = Model.Query, status = Model.Status, from = Model.From, to = Model.To, page = Model.Page - 1 })" data-live-page>← Previous</a>
                 }
                 <span>Page @Model.Page of @Model.PageCount</span>
                 @if (Model.Page < Model.PageCount)
                 {
-                    <a class="borrower-button borrower-button-secondary" href="@ScreenUrls.Query("/borrower/history", new { status = Model.Status, from = Model.From, to = Model.To, page = Model.Page + 1 })">Next →</a>
+                    <a class="borrower-button borrower-button-secondary" href="@ScreenUrls.Query("/borrower/history", new { q = Model.Query, status = Model.Status, from = Model.From, to = Model.To, page = Model.Page + 1 })" data-live-page>Next →</a>
                 }
             </nav>
         }
+        </div>
     </section>
 </main>

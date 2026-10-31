@@ -58,7 +58,8 @@ public sealed class AdminUsersController(
         var pages = Math.Max(1, (int)Math.Ceiling(total / (double)UserPageSize));
         page = Math.Clamp(page, 1, pages);
         var accounts = await query.Include(x => x.BorrowerProfile)
-            .OrderBy(x => x.FullName).ThenBy(x => x.Email).ThenBy(x => x.Id)
+            // Newest registrations first, so the latest submissions are reviewed at the top.
+            .OrderByDescending(x => x.CreatedAtUtc).ThenBy(x => x.FullName).ThenBy(x => x.Id)
             .Skip((page - 1) * UserPageSize).Take(UserPageSize).ToListAsync(cancellationToken);
         var ids = accounts.Select(x => x.Id).ToArray();
         var roleRows = await db.UserRoles.AsNoTracking().Where(x => ids.Contains(x.UserId))
@@ -68,7 +69,7 @@ public sealed class AdminUsersController(
             x.Id, x.FullName, x.Email ?? string.Empty,
             string.Join(", ", roleRows.Where(r => r.UserId == x.Id).Select(r => r.Name).Order()),
             x.IsActive, x.ApprovalStatus, x.BorrowerProfile?.StudentNumber,
-            x.BorrowerProfile?.Department, x.BorrowerProfile?.IsEligible)).ToList();
+            x.BorrowerProfile?.Department, x.BorrowerProfile?.IsEligible, CustodianTime.Format(x.CreatedAtUtc))).ToList();
         return View("Index", new AdminUsersPage(rows, q, role, status, page, pages, total, pendingTotal,
             TempData["AdminUsersFeedback"] as string, TempData["AdminUsersError"] as string));
     }
@@ -272,6 +273,139 @@ public sealed class AdminUsersController(
         }
     }
 
+    /// <summary>User and Role Management · Administrator only: create an account with its role. Created accounts
+    /// are approved and verified at once; borrowers also get their profile.</summary>
+    [HttpGet("admin/users/new")]
+    public IActionResult Create(string? role) => View("Create", new AdminUserCreateInput
+    {
+        Role = PrimaryRoles.Contains(role) ? role! : "Borrower"
+    });
+
+    [HttpPost("admin/users/new")]
+    public async Task<IActionResult> Create(AdminUserCreateInput input, CancellationToken cancellationToken)
+    {
+        if (!PrimaryRoles.Contains(input.Role))
+            ModelState.AddModelError(nameof(input.Role), "Choose Borrower, Custodian, or Administrator.");
+        input.StudentNumber = Optional(input.StudentNumber);
+        input.Department = Optional(input.Department);
+        input.ContactNumber = Optional(input.ContactNumber);
+        if (input.Role != "Borrower" && (input.StudentNumber is not null || input.Department is not null))
+            ModelState.AddModelError(nameof(input.StudentNumber), "Student ID Number and department apply to borrowers only.");
+        var email = input.Email.Trim();
+        if (await users.FindByEmailAsync(email) is not null)
+            ModelState.AddModelError(nameof(input.Email), "An account already uses this email address.");
+        if (input.StudentNumber is not null &&
+            await db.BorrowerProfiles.AnyAsync(x => x.StudentNumber == input.StudentNumber, cancellationToken))
+            ModelState.AddModelError(nameof(input.StudentNumber), "This Student ID Number is already registered.");
+        if (!ModelState.IsValid) return View("Create", input);
+
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        var user = new ApplicationUser
+        {
+            UserName = email, Email = email, EmailConfirmed = true,
+            FirstName = input.FirstName.Trim(), LastName = input.LastName.Trim(),
+            PhoneNumber = input.ContactNumber,
+            ApprovalStatus = AccountApprovalStatus.Approved, IsActive = true
+        };
+        var created = await users.CreateAsync(user, input.Password);
+        if (!created.Succeeded)
+        {
+            foreach (var error in created.Errors)
+                ModelState.AddModelError(error.Code.Contains("Password") ? nameof(input.Password) : string.Empty, error.Description);
+            return View("Create", input);
+        }
+        if (!(await users.AddToRoleAsync(user, input.Role)).Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, "The role could not be assigned. Please try again.");
+            return View("Create", input);
+        }
+        if (input.Role == "Borrower")
+            db.BorrowerProfiles.Add(new BorrowerProfile
+            {
+                UserId = user.Id, StudentNumber = input.StudentNumber, Department = input.Department,
+                ContactNumber = input.ContactNumber, IsEligible = true
+            });
+        db.AuditEvents.Add(new AuditEvent
+        {
+            ActorUserId = users.GetUserId(User), Action = "Admin.UserCreated", EntityType = "ApplicationUser",
+            EntityId = user.Id, Outcome = "Succeeded",
+            AfterJson = JsonSerializer.Serialize(new { user.FirstName, user.LastName, user.Email, input.Role, input.StudentNumber, input.Department }),
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(), CorrelationId = HttpContext.TraceIdentifier
+        });
+        await db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        TempData["AdminUsersFeedback"] = $"{user.FullName} can now sign in as {input.Role}.";
+        return Redirect(input.Role == "Borrower" ? "/admin/borrowers" : "/admin/users");
+    }
+
+    /// <summary>
+    /// User and Borrower Profile Management · Administrator only. An account with no borrowing or desk history is
+    /// deleted outright (its audit entries are kept with the actor cleared). An account with history is deactivated
+    /// instead, so borrowing records stay complete.
+    /// </summary>
+    [HttpPost("admin/users/{id}/delete")]
+    public async Task<IActionResult> Delete(string id, string? returnUrl, CancellationToken cancellationToken)
+    {
+        var back = Url.IsLocalUrl(returnUrl) ? returnUrl! : "/admin/users";
+        await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+        try { await AcquireLockAsync("CampusGear:UserAdministration", cancellationToken); }
+        catch (AdminUserEditException exception) { TempData["AdminUsersError"] = exception.Message; return Redirect(back); }
+
+        var target = await db.Users.Include(x => x.BorrowerProfile).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (target is null) return NotFound();
+        if (target.Id == users.GetUserId(User))
+        {
+            TempData["AdminUsersError"] = "You cannot delete your own account.";
+            return Redirect(back);
+        }
+        var roles = await users.GetRolesAsync(target);
+        if (roles.Contains("Administrator") && target.IsActive && !await db.UserRoles.AnyAsync(ur => ur.UserId != target.Id &&
+                db.Roles.Any(r => r.Id == ur.RoleId && r.Name == "Administrator") &&
+                db.Users.Any(u => u.Id == ur.UserId && u.IsActive && u.EmailConfirmed), cancellationToken))
+        {
+            TempData["AdminUsersError"] = "Keep at least one active, verified Administrator account.";
+            return Redirect(back);
+        }
+
+        var hasHistory = await db.Reservations.AnyAsync(x => x.BorrowerProfile.UserId == target.Id || x.DecidedByUserId == target.Id, cancellationToken) ||
+            await db.Loans.AnyAsync(x => x.ReleasedByUserId == target.Id || x.ReceivedByUserId == target.Id, cancellationToken) ||
+            await db.MaintenanceCases.AnyAsync(x => x.OpenedByUserId == target.Id || x.ClosedByUserId == target.Id, cancellationToken);
+        var before = Snapshot(target, roles, target.BorrowerProfile);
+        if (hasHistory)
+        {
+            target.IsActive = false;
+            target.UpdatedAtUtc = DateTime.UtcNow;
+            await users.UpdateAsync(target);
+            await users.UpdateSecurityStampAsync(target);
+        }
+        else
+        {
+            await db.AuditEvents.Where(x => x.ActorUserId == target.Id)
+                .ExecuteUpdateAsync(x => x.SetProperty(e => e.ActorUserId, (string?)null), cancellationToken);
+            await db.EmailChallenges.Where(x => x.UserId == target.Id).ExecuteDeleteAsync(cancellationToken);
+            if (target.BorrowerProfile is not null) db.BorrowerProfiles.Remove(target.BorrowerProfile);
+            await db.SaveChangesAsync(cancellationToken);
+            var deleted = await users.DeleteAsync(target);
+            if (!deleted.Succeeded)
+            {
+                TempData["AdminUsersError"] = "The account could not be deleted. Please try again.";
+                return Redirect(back);
+            }
+        }
+        db.AuditEvents.Add(new AuditEvent
+        {
+            ActorUserId = users.GetUserId(User), Action = hasHistory ? "Admin.UserDeactivated" : "Admin.UserDeleted",
+            EntityType = "ApplicationUser", EntityId = id, Outcome = "Succeeded", BeforeJson = before,
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(), CorrelationId = HttpContext.TraceIdentifier
+        });
+        await db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        TempData["AdminUsersFeedback"] = hasHistory
+            ? $"{target.FullName} has borrowing history, so the account was deactivated instead of deleted. They can no longer sign in."
+            : $"{target.FullName}'s account was deleted.";
+        return Redirect(back);
+    }
+
     [HttpGet("admin/audit")]
     public async Task<IActionResult> Audit(string? q, int page = 1,
         CancellationToken cancellationToken = default)
@@ -385,7 +519,8 @@ public sealed class AdminUsersController(
 }
 
 public sealed record AdminUserRow(string Id, string FullName, string Email, string Role,
-    bool IsActive, AccountApprovalStatus ApprovalStatus, string? StudentNumber, string? Department, bool? IsEligible);
+    bool IsActive, AccountApprovalStatus ApprovalStatus, string? StudentNumber, string? Department, bool? IsEligible,
+    string RegisteredManila);
 public sealed record AdminUsersPage(IReadOnlyList<AdminUserRow> Rows, string Query, string Role,
     string Status, int Page, int PageCount, int Total, int PendingTotal, string? Feedback, string? Error);
 public sealed record AdminUserEditPage(string Id, string Email, AccountApprovalStatus ApprovalStatus,
@@ -410,6 +545,26 @@ public sealed class AdminUserEditInput
     [Required]
     public string ConcurrencyStamp { get; set; } = string.Empty;
     public string? ProfileRowVersion { get; set; }
+}
+
+public sealed class AdminUserCreateInput
+{
+    [Required, StringLength(100), Display(Name = "First name")]
+    public string FirstName { get; set; } = string.Empty;
+    [Required, StringLength(100), Display(Name = "Last name")]
+    public string LastName { get; set; } = string.Empty;
+    [Required, EmailAddress, StringLength(256)]
+    public string Email { get; set; } = string.Empty;
+    [Required]
+    public string Role { get; set; } = "Borrower";
+    [Required, StringLength(100, MinimumLength = 8), DataType(DataType.Password), Display(Name = "Temporary password")]
+    public string Password { get; set; } = string.Empty;
+    [StringLength(64), Display(Name = "Student ID Number")]
+    public string? StudentNumber { get; set; }
+    [StringLength(160)]
+    public string? Department { get; set; }
+    [StringLength(32), Display(Name = "Contact number")]
+    public string? ContactNumber { get; set; }
 }
 
 public sealed record AdminAuditRow(Guid Id, string TimeManila, string Action, string ActorName,

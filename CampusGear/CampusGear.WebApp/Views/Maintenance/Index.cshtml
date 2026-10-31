@@ -3,49 +3,156 @@
 @{
     Layout = "_WorkspaceLayout";
     ViewData["Title"] = "Equipment Maintenance";
-    var manila = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
-    string Local(DateTime value) => TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(value, DateTimeKind.Utc), manila).ToString("MMM d, yyyy h:mm tt");
+    var closed = Model.Status == "closed";
+    var available = Model.Items.Count(x => x.Blocked is null);
+    string Label(MaintenanceStatus status) => status switch
+    {
+        MaintenanceStatus.InProgress => "In progress",
+        _ => status.ToString()
+    };
+    string Url(object values) => ScreenUrls.Query("/admin/maintenance", values);
 }
-<main class="live-content">
-    <header class="live-heading"><h1>Equipment Maintenance</h1></header>
-    @if (Model.Feedback is not null) { <div class="live-feedback" role="status">@Model.Feedback</div> }
-    <section class="live-panel">
-        <h2>Maintenance cases</h2>
-        <div class="live-actions"><a class="live-button @(Model.Status == "open" ? "" : "secondary")" href="/admin/maintenance">Open cases</a><a class="live-button @(Model.Status == "closed" ? "" : "secondary")" href="/admin/maintenance?status=closed">Closed cases</a></div>
-        @if (Model.Cases.Count == 0) { <p class="live-empty">No @Model.Status maintenance cases.</p> }
-        @foreach (var item in Model.Cases)
-        {
-            <article class="live-panel">
-                <h2>@item.EquipmentItem.Name <span class="live-badge">@item.Status</span></h2>
-                <p class="live-muted">@item.EquipmentItem.AssetCode · Opened @Local(item.OpenedAtUtc) (Manila)</p>
-                <p>@item.Description</p>
-                @if (item.Status == MaintenanceStatus.Closed)
-                { <p>Resolution: @item.Resolution</p><p class="live-muted">Closed @(item.ClosedAtUtc is { } closed ? Local(closed) : "")</p> }
-                else
-                {
-                    <form method="post" action="/admin/maintenance/@item.Id/update" class="live-form">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(item.RowVersion)" />
-                        <label class="live-field">Status<select name="Status">@foreach (var status in Enum.GetValues<MaintenanceStatus>()) { <option value="@status" selected="@(status == item.Status)">@status</option> }</select></label>
-                        <label class="live-field">Condition after repair<select name="Condition">@foreach (var condition in new[] { EquipmentCondition.Excellent, EquipmentCondition.Good, EquipmentCondition.Fair }) { <option value="@condition" selected="@(condition == EquipmentCondition.Good)">@condition</option> }</select></label>
-                        <label class="live-field wide">Repair notes<textarea name="Resolution" maxlength="2000">@item.Resolution</textarea></label>
-                        <div class="live-actions wide"><button class="live-button" type="submit">Save maintenance</button></div>
-                    </form>
-                }
-            </article>
-        }
-        <nav class="live-pager" aria-label="Maintenance pages">
-            @if (Model.Page > 1) { <a class="live-link" href="/admin/maintenance?status=@Model.Status&amp;page=@(Model.Page - 1)">Previous</a> }
-            <span>Page @Model.Page of @Model.Pages</span>
-            @if (Model.Page < Model.Pages) { <a class="live-link" href="/admin/maintenance?status=@Model.Status&amp;page=@(Model.Page + 1)">Next</a> }
-        </nav>
-    </section>
-    <section class="live-panel"><h2>Open a maintenance case</h2><p class="live-muted">An open case blocks new reservations and release. Record an active loan's return first.</p>
-        <form method="post" action="/admin/maintenance/open" class="live-form">
-            @Html.AntiForgeryToken()
-            <label class="live-field wide">Equipment<select name="equipmentItemId" required><option value="">Choose equipment</option>@foreach (var item in Model.Items) { <option value="@item.Id">@item.Name · @item.AssetCode</option> }</select></label>
-            <label class="live-field wide">Issue description<textarea name="description" required maxlength="2000"></textarea></label>
-            <div class="live-actions wide"><button class="live-button" type="submit">Place in maintenance</button></div>
+<main class="live-content maintenance-page">
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Inventory</p>
+            <h1>Equipment Maintenance</h1>
+            <p class="page-description">Repairs and condition holds. Equipment in maintenance can't be reserved or released until its case is closed.</p>
+        </div>
+        <div class="page-header-actions">
+            @if (User.IsInRole("Administrator")) { <a class="live-button secondary" href="/admin/equipment">Back to equipment</a> }
+            <button class="live-button live-button-strong" type="button" data-modal-open="open-maintenance"><svg class="icon" aria-hidden="true"><use href="/icons.svg#wrench"></use></svg>Open maintenance</button>
+        </div>
+    </header>
+    @if (Model.Feedback is not null) { <div class="live-feedback @(Model.Tone == "error" ? "error" : "")" role="status" data-toast="@Model.Tone">@Model.Feedback</div> }
+
+    <section class="live-panel" aria-labelledby="maintenance-title">
+        <div class="custodian-panel-heading">
+            <h2 id="maintenance-title">Maintenance cases</h2>
+            <nav id="maintenance-tabs" class="segmented" aria-label="Case status" data-refresh-region>
+                <a class="@(closed ? "" : "is-selected")" href="/admin/maintenance" aria-current="@(closed ? null : "page")">Open <span class="live-count">@Model.OpenTotal</span></a>
+                <a class="@(closed ? "is-selected" : "")" href="/admin/maintenance?status=closed" aria-current="@(closed ? "page" : null)">Closed <span class="live-count">@Model.ClosedTotal</span></a>
+            </nav>
+        </div>
+        <form class="live-filters" method="get" action="/admin/maintenance" role="search" aria-label="Find maintenance cases" data-live-search data-live-target="#maintenance-results">
+            @if (closed) { <input type="hidden" name="status" value="closed" /> }
+            <label for="maintenance-q" class="live-filter-search">Search cases<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="maintenance-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Equipment, asset code, issue, or repair notes" autocomplete="off" /></span></label>
+            <a class="live-button secondary live-filter-reset" href="/admin/maintenance@(closed ? "?status=closed" : "")" data-live-reset>Clear</a>
         </form>
+
+        <div id="maintenance-results" class="live-results" data-refresh-region>
+            <p class="live-result-count" data-live-count>@Model.Total @(closed ? "closed" : "open") case@(Model.Total == 1 ? "" : "s")@(string.IsNullOrEmpty(Model.Query) ? "" : $" matching “{Model.Query}”") · newest first</p>
+            @if (Model.Cases.Count == 0)
+            {
+                <div class="live-empty">
+                    <svg class="icon" aria-hidden="true"><use href="/icons.svg#@(string.IsNullOrEmpty(Model.Query) ? "wrench" : "search")"></use></svg>
+                    @if (!string.IsNullOrEmpty(Model.Query))
+                    { <h3>No matching cases</h3><p>Try another equipment name, asset code, or issue.</p> }
+                    else if (closed)
+                    { <h3>No closed cases yet</h3><p>Cases appear here once a repair is recorded.</p> }
+                    else
+                    { <h3>No equipment is in maintenance</h3><p>Use <strong>Open maintenance</strong> when an item needs repair or inspection.</p> }
+                </div>
+            }
+            else
+            {
+                <div class="live-table-wrap" tabindex="0" role="region" aria-label="Maintenance cases">
+                    <table class="live-table maintenance-table">
+                        <thead><tr><th scope="col">Equipment</th><th scope="col">Issue</th><th scope="col">Status</th><th scope="col">@(closed ? "Closed" : "Opened")</th><th scope="col"><span class="visually-hidden">Action</span></th></tr></thead>
+                        <tbody>
+                        @foreach (var item in Model.Cases)
+                        {
+                            var dialogId = $"case-{item.Id:N}";
+                            <tr>
+                                <td><strong>@item.EquipmentItem.Name</strong><small>@item.EquipmentItem.AssetCode</small></td>
+                                <td class="maintenance-issue"><span class="line-clamp">@item.Description</span>@if (closed && item.Resolution is not null) { <small class="line-clamp">Repair: @item.Resolution</small> }</td>
+                                <td><span class="live-badge" data-state="@(item.Status == MaintenanceStatus.Closed ? "closed" : item.Status == MaintenanceStatus.InProgress ? "inprogress" : "maintenance")">@Label(item.Status)</span></td>
+                                <td class="live-nowrap">@CustodianTime.Format(closed && item.ClosedAtUtc is { } closedAt ? closedAt : item.OpenedAtUtc)<small>by @((closed ? item.ClosedByUser?.FullName : item.OpenedByUser?.FullName) ?? "staff")</small></td>
+                                <td class="live-table-action">
+                                    <button class="live-button @(closed ? "secondary" : "")" type="button" data-modal-open="@dialogId">@(closed ? "View" : "Update")</button>
+                                    <dialog id="@dialogId" class="live-modal" aria-labelledby="@dialogId-title">
+                                        <div class="live-modal-head">
+                                            <div><p class="page-eyebrow">@item.EquipmentItem.AssetCode</p><h2 id="@dialogId-title">@item.EquipmentItem.Name</h2></div>
+                                            <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/icons.svg#x"></use></svg></button>
+                                        </div>
+                                        <dl class="live-modal-facts">
+                                            <div><dt>Status</dt><dd><span class="live-badge" data-state="@(item.Status == MaintenanceStatus.Closed ? "closed" : item.Status == MaintenanceStatus.InProgress ? "inprogress" : "maintenance")">@Label(item.Status)</span></dd></div>
+                                            <div><dt>Opened</dt><dd>@CustodianTime.Format(item.OpenedAtUtc)<small>by @(item.OpenedByUser?.FullName ?? "staff")</small></dd></div>
+                                            @if (item.ClosedAtUtc is { } closedOn) { <div><dt>Closed</dt><dd>@CustodianTime.Format(closedOn)<small>by @(item.ClosedByUser?.FullName ?? "staff")</small></dd></div> }
+                                            <div class="wide"><dt>Reported issue</dt><dd class="custodian-preserve">@item.Description</dd></div>
+                                            @if (item.Status == MaintenanceStatus.Closed) { <div class="wide"><dt>Repair notes</dt><dd class="custodian-preserve">@(item.Resolution ?? "—")</dd></div> }
+                                        </dl>
+                                        @if (item.Status == MaintenanceStatus.Closed)
+                                        {
+                                            <div class="live-modal-actions"><button class="live-button secondary" type="button" data-modal-close>Close</button></div>
+                                        }
+                                        else
+                                        {
+                                            <form method="post" action="/admin/maintenance/@item.Id/update" class="live-form" data-modal-form novalidate>
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(item.RowVersion)" />
+                                                <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
+                                                <label class="live-field"><span>Status</span>
+                                                    <select name="Status" data-maintenance-status>
+                                                        @foreach (var status in Enum.GetValues<MaintenanceStatus>()) { <option value="@status" selected="@(status == item.Status)">@(status == MaintenanceStatus.Closed ? "Closed · repair complete" : Label(status))</option> }
+                                                    </select>
+                                                </label>
+                                                <label class="live-field"><span>Condition after repair</span>
+                                                    <select name="Condition">@foreach (var condition in new[] { EquipmentCondition.Excellent, EquipmentCondition.Good, EquipmentCondition.Fair }) { <option value="@condition" selected="@(condition == EquipmentCondition.Good)">@condition</option> }</select>
+                                                    <small class="live-help">Applied to the item when the case is closed.</small>
+                                                </label>
+                                                <label class="live-field wide"><span>Repair notes <small data-resolution-hint>Required to close the case</small></span>
+                                                    <textarea name="Resolution" maxlength="2000" rows="4" placeholder="What was checked or repaired, parts replaced, who did the work">@item.Resolution</textarea>
+                                                </label>
+                                                <div class="live-modal-actions wide">
+                                                    <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+                                                    <button class="live-button" type="submit">Save maintenance</button>
+                                                </div>
+                                            </form>
+                                        }
+                                    </dialog>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            @if (Model.Pages > 1)
+            {
+                <nav class="live-pager" aria-label="Maintenance pages">
+                    @if (Model.Page > 1) { <a class="live-button secondary" href="@Url(new { status = closed ? "closed" : null, q = Model.Query, page = Model.Page - 1 })" data-live-page>Previous</a> }
+                    <span>Page @Model.Page of @Model.Pages</span>
+                    @if (Model.Page < Model.Pages) { <a class="live-button secondary" href="@Url(new { status = closed ? "closed" : null, q = Model.Query, page = Model.Page + 1 })" data-live-page>Next</a> }
+                </nav>
+            }
+        </div>
     </section>
+
+    <dialog id="open-maintenance" class="live-modal" aria-labelledby="open-maintenance-title">
+        <div class="live-modal-head">
+            <div><p class="page-eyebrow">New case</p><h2 id="open-maintenance-title">Open maintenance</h2></div>
+            <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/icons.svg#x"></use></svg></button>
+        </div>
+        <p class="live-modal-lede">The item is held as soon as the case opens: new reservations and releases are blocked until the repair is recorded. Record an active loan's return first.</p>
+        <form method="post" action="/admin/maintenance/open" class="live-form" data-modal-form novalidate>
+            @Html.AntiForgeryToken()
+            <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
+            <label id="open-maintenance-item" class="live-field wide" data-refresh-region><span>Equipment <small>@available of @Model.Items.Count units can be placed in maintenance</small></span>
+                <select name="equipmentItemId" required>
+                    <option value="">Choose equipment…</option>
+                    @foreach (var item in Model.Items)
+                    { <option value="@item.Id" disabled="@(item.Blocked is not null)">@item.Name · @item.AssetCode · @item.Condition@(item.Blocked is null ? "" : $" ({item.Blocked})")</option> }
+                </select>
+            </label>
+            <label class="live-field wide"><span>Issue description</span>
+                <textarea name="description" required maxlength="2000" rows="4" placeholder="What is wrong, how it was found, and anything the repairer should know"></textarea>
+            </label>
+            <div class="live-modal-actions wide">
+                <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+                <button class="live-button" type="submit">Open maintenance case</button>
+            </div>
+        </form>
+    </dialog>
 </main>
+@section Scripts { <script src="~/js/modal-forms.js" asp-append-version="true"></script> }

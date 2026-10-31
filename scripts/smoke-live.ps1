@@ -96,13 +96,13 @@ try {
     foreach ($route in @('/borrower/dashboard','/borrower/reservation','/borrower/history','/borrower/calendar')) {
         Check ((Http $borrow $route).Status -eq 200) "Borrower route $route"
     }
-    foreach ($route in @('/admin/dashboard','/admin/equipment','/admin/categories','/admin/users','/admin/borrowers','/admin/audit','/admin/maintenance','/admin/reservations','/admin/approvals','/admin/returns','/admin/history','/admin/calendar')) {
+    foreach ($route in @('/admin/dashboard','/admin/equipment','/admin/categories','/admin/users','/admin/borrowers','/admin/audit','/admin/maintenance','/admin/history','/admin/calendar')) {
         $result = Http $staff $route
         Check ($result.Status -eq 200 -or ($route -eq '/admin/borrowers' -and $result.Status -eq 302)) "Administrator route $route ($($result.Status) $($result.Location))"
     }
-    Check ((Http $borrow '/admin/equipment').Location -match '/auth/access-denied') 'Borrower denied administrator route'
+    Check ((Http $borrow '/admin/equipment').Status -eq 403) 'Borrower denied administrator route with 403'
     Check ((Http $anonymous '/admin/users').Location -match '/auth/login') 'Anonymous denied protected route'
-    foreach ($spec in @(@($borrow,'/borrower/calendar'),@($borrow,'/borrower/history'),@($staff,'/admin/calendar'),@($staff,'/admin/audit'),@($staff,'/admin/users'),@($staff,'/admin/approvals'))) {
+    foreach ($spec in @(@($borrow,'/borrower/calendar'),@($borrow,'/borrower/history'),@($staff,'/admin/calendar'),@($staff,'/admin/audit'),@($staff,'/admin/users'),@($staff,'/admin/history'))) {
         $page = Http $spec[0] $spec[1]
         $links = [regex]::Matches($page.Body, '<a\b[^>]*\bhref="([^"]*)"') | ForEach-Object { [System.Net.WebUtility]::HtmlDecode($_.Groups[1].Value) } | Select-Object -Unique
         foreach ($link in $links) {
@@ -169,8 +169,9 @@ try {
     $borrow = Login $borrower
     Check ([int](Sql 'SELECT COUNT(*) FROM BorrowerProfiles WHERE UserId=@id' @{id=$borrower.Id}) -eq 1) 'Role changes retain borrower profile'
     $requestId=[Guid]::NewGuid(); $start=[DateTime]::UtcNow.AddHours(9); $end=$start.AddHours(1)
-    $result = Post $staff '/admin/reservations' @{'Input.RequestId'=$requestId;'Input.BorrowerUserId'=$borrower.Id;'Input.EquipmentItemId'=$itemId;'Input.StartLocal'=$start.ToString('yyyy-MM-ddTHH:mm');'Input.EndLocal'=$end.ToString('yyyy-MM-ddTHH:mm');'Input.Purpose'='Staff booking'}
-    Check ($result.Status -eq 302) 'Administrator booking for borrower'
+    # Administrators take no part in reservations; the borrower books for themselves.
+    $result = Post $borrow '/borrower/reservation' @{RequestId=$requestId;EquipmentItemId=$itemId;Quantity=1;StartLocal=$start.ToString('yyyy-MM-ddTHH:mm');EndLocal=$end.ToString('yyyy-MM-ddTHH:mm');Purpose='Smoke booking'} '/borrower/reservation'
+    Check ($result.Status -eq 302) 'Borrower booking'
     $id=[Guid](Sql 'SELECT Id FROM Reservations WHERE RequestId=@id' @{id=$requestId})
     $result=Post $borrow "/borrower/reservation/$id/cancel" @{} '/borrower/history'
     Check ((Sql 'SELECT Status FROM Reservations WHERE Id=@id' @{id=$id}) -eq 'Cancelled') 'Borrower cancellation'

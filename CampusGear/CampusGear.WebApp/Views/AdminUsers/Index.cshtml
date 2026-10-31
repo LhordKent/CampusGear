@@ -4,28 +4,38 @@
     Layout = "_WorkspaceLayout";
     var borrowers = Context.Request.Path == "/admin/borrowers";
     var basePath = borrowers ? "/admin/borrowers" : "/admin/users";
-    ViewData["Title"] = borrowers ? "Borrower Profiles" : "User & Role Management";
+    ViewData["Title"] = Model.Status == "pending" ? "Registration Verification" : borrowers ? "Borrower Profiles" : "User & Role Management";
     ViewData["WorkspaceRole"] = "Administrator";
     var roles = new[] { "Borrower", "Custodian", "Administrator" };
     var returnUrl = ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page });
 }
 <main class="live-content" data-figma-source="@(borrowers ? "695:6398" : "695:7067")">
-    <header class="live-heading">
-        <h1>@(borrowers ? "Borrower Profiles" : "User & Role Management")</h1>
-        @if (Model.PendingTotal > 0 && Model.Status != "pending")
-        { <a class="live-button heading-action" href="@basePath?status=pending">Review pending approvals (@Model.PendingTotal)</a> }
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">People</p>
+            <h1>@(Model.Status == "pending" ? "Registration Verification" : borrowers ? "Borrower Profiles" : "User & Role Management")</h1>
+            <p class="page-description">@(Model.Status == "pending"
+                ? "New sign-ups waiting for approval. The latest submissions are listed first."
+                : borrowers ? "Student borrowers, their department, and whether they can borrow. Newest accounts first."
+                : "Every account in CampusGear with its role and status. Newest accounts first.")</p>
+        </div>
+        <div class="page-header-actions">
+            @if (Model.Status == "pending") { <a class="live-button secondary" href="@basePath">Show all accounts</a> }
+            else if (Model.PendingTotal > 0) { <a class="live-button secondary" href="@basePath?status=pending">Verify registrations<span class="live-count">@Model.PendingTotal</span></a> }
+            <a class="live-button" href="/admin/users/new@(borrowers ? "?role=Borrower" : "")"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>@(borrowers ? "Add borrower" : "Create account")</a>
+        </div>
     </header>
     @if (Model.Feedback is not null)
     {
-        <div class="live-feedback" role="status">@Model.Feedback</div>
+        <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div>
     }
     @if (Model.Error is not null)
     {
-        <div class="live-feedback error" role="alert">@Model.Error</div>
+        <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div>
     }
     <section class="live-panel" aria-label="Accounts">
-        <form class="live-filters" method="get" action="@basePath" aria-label="Find user accounts">
-            <label for="q">Search name, email, Student ID Number, or department<input id="q" name="q" value="@Model.Query" maxlength="120" type="search" /></label>
+        <form class="live-filters" method="get" action="@basePath" role="search" aria-label="Find user accounts" data-live-search data-live-target="#user-results">
+            <label for="q" class="live-filter-search">Search accounts<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name, email, Student ID, or department" autocomplete="off" /></span></label>
             @if (!borrowers) { <label for="role">Role<select id="role" name="role"><option value="all" selected="@(Model.Role == "all")">All roles</option>
                 @foreach (var role in roles) { <option value="@role" selected="@(Model.Role == role)">@role</option> }
             </select></label> }
@@ -36,19 +46,19 @@
                 <option value="inactive" selected="@(Model.Status == "inactive")">Inactive</option>
                 <option value="rejected" selected="@(Model.Status == "rejected")">Rejected</option>
             </select></label>
-            <button class="live-button" type="submit">Search</button>
-            <a class="live-button secondary" href="@basePath">Clear</a>
+            <a class="live-button secondary live-filter-reset" href="@basePath" data-live-reset>Clear</a>
         </form>
-        <p class="live-muted">@Model.Total matching account@(Model.Total == 1 ? "" : "s")</p>
+        <div id="user-results" class="live-results">
+        <p class="live-result-count" data-live-count>@Model.Total matching account@(Model.Total == 1 ? "" : "s")</p>
         @if (Model.Rows.Count == 0)
         {
-            <p class="live-empty">@(Model.Status == "pending" ? "No registrations are waiting for approval." : "No accounts match these filters.")</p>
+            <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><h3>@(Model.Status == "pending" && string.IsNullOrEmpty(Model.Query) ? "No registrations are waiting" : "No matching accounts")</h3><p>@(Model.Status == "pending" && string.IsNullOrEmpty(Model.Query) ? "New sign-ups will appear here for approval." : "Try another name, email, or filter.")</p></div>
         }
         else
         {
             <div class="live-table-wrap" tabindex="0" aria-label="User accounts table">
                 <table class="live-table">
-                    <thead><tr><th scope="col">NAME</th><th scope="col">STUDENT ID NUMBER</th><th scope="col">EMAIL</th><th scope="col">@(borrowers ? "DEPARTMENT" : "ROLE")</th><th scope="col">STATUS</th><th scope="col">ACTION</th></tr></thead>
+                    <thead><tr><th scope="col">NAME</th><th scope="col">STUDENT ID NUMBER</th><th scope="col">EMAIL</th><th scope="col">@(borrowers ? "DEPARTMENT" : "ROLE")</th><th scope="col">STATUS</th><th scope="col">REGISTERED</th><th scope="col">ACTION</th></tr></thead>
                     <tbody>
                     @foreach (var row in Model.Rows)
                     {
@@ -66,6 +76,7 @@
                             <td><span class="live-badge">@status</span>
                                 @if (row.IsEligible is false) { <small>Borrowing access paused</small> }
                             </td>
+                            <td class="live-nowrap">@row.RegisteredManila</td>
                             <td><div class="admin-user-actions">
                                 @if (row.ApprovalStatus != AccountApprovalStatus.Approved)
                                 {
@@ -76,6 +87,7 @@
                                     <form method="post" action="/admin/users/@row.Id/reject">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button danger" type="submit" aria-label="Reject @row.FullName">Reject</button></form>
                                 }
                                 <a class="live-button secondary" href="/admin/users/@row.Id/edit">Edit</a>
+                                <form method="post" action="/admin/users/@row.Id/delete" onsubmit="return confirm('Delete this account? Accounts with borrowing history are deactivated instead.')">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button secondary" type="submit" aria-label="Delete @row.FullName">Delete</button></form>
                             </div></td>
                         </tr>
                     }
@@ -84,11 +96,12 @@
             </div>
             <nav class="live-pager" aria-label="User account pages">
                 @if (Model.Page > 1)
-                { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page - 1 })">Previous</a> }
+                { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page - 1 })" data-live-page>Previous</a> }
                 <span>Page @Model.Page of @Model.PageCount</span>
                 @if (Model.Page < Model.PageCount)
-                { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page + 1 })">Next</a> }
+                { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page + 1 })" data-live-page>Next</a> }
             </nav>
         }
+        </div>
     </section>
 </main>

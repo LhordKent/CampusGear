@@ -16,7 +16,7 @@ public sealed class AdminCategoriesController(ApplicationDbContext db, UserManag
     TimeProvider clock) : Controller
 {
     [HttpGet("admin/categories")]
-    public async Task<IActionResult> Index(Guid? id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(Guid? id, string? q, CancellationToken cancellationToken)
     {
         var input = new CategoryInput();
         if (id is not null)
@@ -26,7 +26,28 @@ public sealed class AdminCategoriesController(ApplicationDbContext db, UserManag
             input = new() { Id = category.Id, Name = category.Name, Description = category.Description,
                 IsActive = category.IsActive, RowVersion = Convert.ToBase64String(category.RowVersion) };
         }
-        return View(await PageAsync(input, cancellationToken));
+        return View(await PageAsync(input, cancellationToken, q));
+    }
+
+    /// <summary>Equipment Category Management · Administrator only. An empty category is deleted; one that still
+    /// holds equipment is deactivated so its items and their history keep their category.</summary>
+    [HttpPost("admin/categories/{id:guid}/delete")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var category = await db.EquipmentCategories.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (category is null) return NotFound();
+        var inUse = await db.EquipmentItems.AnyAsync(x => x.CategoryId == id, cancellationToken);
+        var before = JsonSerializer.Serialize(new { category.Name, category.Description, category.IsActive });
+        if (inUse) category.IsActive = false;
+        else db.EquipmentCategories.Remove(category);
+        db.AuditEvents.Add(SqlWorkflowLocks.Audit(HttpContext, users.GetUserId(User)!,
+            inUse ? "category.deactivated" : "category.deleted", nameof(EquipmentCategory), id,
+            clock.GetUtcNow().UtcDateTime, before, null));
+        await db.SaveChangesAsync(cancellationToken);
+        TempData["CategoryFeedback"] = inUse
+            ? $"{category.Name} still holds equipment, so it was deactivated instead of deleted."
+            : $"{category.Name} was deleted.";
+        return Redirect("/admin/categories");
     }
 
     [HttpPost("admin/categories/save")]
@@ -69,10 +90,17 @@ public sealed class AdminCategoriesController(ApplicationDbContext db, UserManag
         }
     }
 
-    private async Task<CategoriesPageModel> PageAsync(CategoryInput input, CancellationToken cancellationToken) => new(input,
-        await db.EquipmentCategories.AsNoTracking().OrderBy(x => x.Name)
+    private async Task<CategoriesPageModel> PageAsync(CategoryInput input, CancellationToken cancellationToken, string? q = null)
+    {
+        q = q?.Trim();
+        if (q?.Length > 120) q = q[..120];
+        var query = db.EquipmentCategories.AsNoTracking();
+        var total = await query.CountAsync(cancellationToken);
+        if (!string.IsNullOrEmpty(q)) query = query.Where(x => x.Name.Contains(q) || x.Description != null && x.Description.Contains(q));
+        return new(input, await query.OrderByDescending(x => x.CreatedAtUtc).ThenBy(x => x.Name)
             .Select(x => new CategoryRow(x.Id, x.Name, x.Description, x.IsActive, x.Items.Count))
-            .ToListAsync(cancellationToken), TempData["CategoryFeedback"] as string);
+            .ToListAsync(cancellationToken), TempData["CategoryFeedback"] as string, q ?? string.Empty, total);
+    }
 }
 public sealed class CategoryInput
 {
@@ -83,4 +111,5 @@ public sealed class CategoryInput
     public string? RowVersion { get; set; }
 }
 public sealed record CategoryRow(Guid Id, string Name, string? Description, bool IsActive, int Items);
-public sealed record CategoriesPageModel(CategoryInput Input, IReadOnlyList<CategoryRow> Categories, string? Feedback);
+public sealed record CategoriesPageModel(CategoryInput Input, IReadOnlyList<CategoryRow> Categories, string? Feedback,
+    string Query, int Total);

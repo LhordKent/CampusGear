@@ -1,0 +1,183 @@
+@model BorrowerHomeViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Home";
+    ViewData["WorkspaceRole"] = "Borrower";
+    static string StatusClass(string availability) => availability switch
+    {
+        "Available" => "is-available",
+        "In use" => "is-in-use",
+        _ => "is-unavailable"
+    };
+    var active = Model.PendingCount + Model.ApprovedCount + Model.BorrowedCount;
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/borrower.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/borrower-catalog.css" asp-append-version="true" />
+}
+<main class="home" data-figma-source="689:2">
+    <section class="home-hero" aria-labelledby="home-title">
+        <div class="home-hero-inner">
+            <div class="home-hero-copy">
+                <p class="home-kicker">Welcome, @Model.FirstName</p>
+                <h1 id="home-title">Borrow the gear your class needs, without the paperwork.</h1>
+                <p class="home-lede">CampusGear lists the equipment the campus lends out, from cameras and laptops to projectors and audio kits. Find what you need, pick a time, and the equipment desk confirms your request.</p>
+                <form class="home-search" method="get" action="/borrower/reservation" role="search">
+                    <label class="visually-hidden" for="home-search">Search equipment</label>
+                    <svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg>
+                    <input id="home-search" name="q" type="search" placeholder="Search cameras, laptops, projectors…" autocomplete="off" />
+                    <button class="live-button" type="submit">Search</button>
+                </form>
+                <p class="home-hero-facts">
+                    <span><strong>@Model.ProductCount</strong> equipment types</span>
+                    <span><strong>@Model.ReadyUnitCount</strong> units ready to borrow now</span>
+                    <span><strong>@Model.Categories.Count</strong> categories</span>
+                </p>
+            </div>
+            <aside class="home-hero-panel" aria-labelledby="my-title">
+                <div class="home-panel-head">
+                    <h2 id="my-title">My reservations</h2>
+                    <a class="live-link" href="/borrower/history">View all</a>
+                </div>
+                @if (Model.OverdueCount > 0)
+                {
+                    <a class="home-alert" href="/borrower/history?status=late">
+                        <svg class="icon" aria-hidden="true"><use href="/icons.svg#alert"></use></svg>
+                        <span><strong>@Model.OverdueCount overdue item@(Model.OverdueCount == 1 ? "" : "s")</strong> Please return @(Model.OverdueCount == 1 ? "it" : "them") to the equipment desk.</span>
+                    </a>
+                }
+                <div class="home-counts">
+                    <a href="/borrower/history?status=pending"><span>Pending</span><strong>@Model.PendingCount</strong></a>
+                    <a href="/borrower/history?status=approved"><span>Approved</span><strong>@Model.ApprovedCount</strong></a>
+                    <a href="/borrower/history?status=borrowed"><span>Borrowed</span><strong>@Model.BorrowedCount</strong></a>
+                    <a href="/borrower/history?status=returned"><span>Returned</span><strong>@Model.CompletedCount</strong></a>
+                </div>
+                @if (Model.Upcoming.Count == 0)
+                {
+                    <p class="home-panel-empty">@(active == 0 ? "No active reservations. Your next request will show up here." : "Your active requests are listed in your history.")</p>
+                }
+                else
+                {
+                    <p class="home-panel-label">Coming up next</p>
+                    <ul class="home-upcoming">
+                        @foreach (var item in Model.Upcoming)
+                        {
+                            <li>
+                                <div><strong>@item.EquipmentName</strong><small>@item.StartManila</small></div>
+                                <span class="borrower-badge status-@item.Status.ToLowerInvariant().Replace(" ", "-")">@item.Status</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </aside>
+        </div>
+    </section>
+
+    <div class="home-body">
+        @if (!Model.IsEligible)
+        {
+            <section class="borrower-feedback borrower-error" role="alert">
+                <h2>Borrowing access is paused</h2><p>You can browse equipment, but contact an administrator before making another reservation.</p>
+            </section>
+        }
+
+        <section class="home-section" aria-labelledby="categories-title">
+            <div class="home-section-head" data-reveal>
+                <div><h2 id="categories-title">Browse by category</h2><p>Jump straight to the kind of equipment you need.</p></div>
+                <a class="live-button secondary" href="/borrower/reservation">Browse all equipment</a>
+            </div>
+            @if (Model.Categories.Count == 0)
+            {
+                <div class="borrower-empty"><h3>No equipment yet</h3><p>Equipment will appear here once the equipment desk adds it.</p></div>
+            }
+            else
+            {
+                <ul class="home-categories" role="list" data-reveal-group>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <li>
+                            <a href="/borrower/reservation?category=@Uri.EscapeDataString(category.Name)">
+                                <span class="home-category-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(category.Name, category.Name)" /></svg></span>
+                                <strong>@category.Name</strong>
+                                <small>@category.Products type@(category.Products == 1 ? "" : "s") · @category.ReadyUnits ready now</small>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+
+        @if (Model.RecentlyAdded.Count > 0)
+        {
+            <section class="home-section" aria-labelledby="featured-title">
+                <div class="home-section-head" data-reveal>
+                    <div><h2 id="featured-title">Recently added</h2><p>The newest equipment in the catalog. Open one to see details and reserve it.</p></div>
+                    <a class="live-link" href="/borrower/reservation">See the full catalog<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
+                </div>
+                <ul class="catalog-grid home-featured" role="list" data-reveal-group>
+                    @foreach (var item in Model.RecentlyAdded)
+                    {
+                        <li class="catalog-card @StatusClass(item.Availability)">
+                            <a class="catalog-card-link" href="/borrower/reservation?equipmentItemId=@item.Id">
+                                <div class="catalog-media">
+                                    @if (item.ImagePath is not null) { <img src="@item.ImagePath" alt="" loading="lazy" decoding="async" /> }
+                                    else { <span class="catalog-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(item.Name, item.Category)" /></svg></span> }
+                                    <span class="catalog-status"><i aria-hidden="true"></i>@item.Availability</span>
+                                </div>
+                                <div class="catalog-body">
+                                    <p class="catalog-category">@item.Category</p>
+                                    <h3 class="catalog-name">@item.Name</h3>
+                                    <p class="catalog-description">@(item.Description ?? "No description provided yet.")</p>
+                                </div>
+                                <div class="catalog-footer">
+                                    <span class="catalog-detail">@item.AvailabilityDetail</span>
+                                    <span class="catalog-cta">@(item.IsRequestable ? "Reserve" : "View details")<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span>
+                                </div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+
+        @if (Model.ReadyNow.Count > 0)
+        {
+            <section class="home-section" aria-labelledby="ready-title">
+                <div class="home-section-head" data-reveal>
+                    <div><h2 id="ready-title">Ready to borrow now</h2><p>Equipment with units on the shelf at this moment.</p></div>
+                    <a class="live-link" href="/borrower/reservation?available=1">Show only available<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
+                </div>
+                <ul class="home-ready" role="list" data-reveal-group>
+                    @foreach (var item in Model.ReadyNow)
+                    {
+                        <li>
+                            <a href="/borrower/reservation?equipmentItemId=@item.Id">
+                                <span class="home-ready-icon" aria-hidden="true">
+                                    @if (item.ImagePath is not null) { <img src="@item.ImagePath" alt="" loading="lazy" /> }
+                                    else { <svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(item.Name, item.Category)" /></svg> }
+                                </span>
+                                <span class="home-ready-text"><strong>@item.Name</strong><small>@item.Category</small></span>
+                                <span class="home-ready-count"><strong>@item.FreeNowUnits</strong> of @item.TotalUnits ready</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+
+        <section class="home-section home-steps" aria-labelledby="steps-title">
+            <div class="home-section-head" data-reveal>
+                <div><h2 id="steps-title">How borrowing works</h2><p>Four steps from finding equipment to returning it.</p></div>
+                <a class="live-link" href="/borrower/calendar">Check the availability calendar<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
+            </div>
+            <ol class="home-step-list" data-reveal-group>
+                <li><span class="home-step-number">1</span><h3>Find equipment</h3><p>Search the catalog or browse a category. Each item shows how many units are free right now.</p></li>
+                <li><span class="home-step-number">2</span><h3>Request a time</h3><p>Pick when you'll collect and return it, then tell us what it's for. Your request holds the item for up to 24 hours.</p></li>
+                <li><span class="home-step-number">3</span><h3>Collect it</h3><p>After the custodian approves your request, collect the equipment from the desk at your start time.</p></li>
+                <li><span class="home-step-number">4</span><h3>Return on time</h3><p>Bring everything back by the return time. The desk checks its condition and closes the loan.</p></li>
+            </ol>
+        </section>
+    </div>
+    <partial name="_EquipmentIcons" />
+</main>
+@section Scripts { <script src="~/js/home-motion.js" asp-append-version="true"></script> }

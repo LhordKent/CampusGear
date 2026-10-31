@@ -1,0 +1,50 @@
+@model IReadOnlyList<DirectoryCategory>
+@using CampusGear.Models
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Equipment Categories";
+}
+<main class="live-content">
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Directory · read-only</p>
+            <h1>Equipment Categories</h1>
+            <p class="page-description">Every category and the units in it, with each unit's current status. Categories and items are managed by an administrator; report damage through maintenance.</p>
+        </div>
+        <div class="page-header-actions">
+            <a class="live-button secondary" href="/admin/maintenance"><svg class="icon" aria-hidden="true"><use href="/icons.svg#wrench"></use></svg>Maintenance</a>
+        </div>
+    </header>
+    @if (Model.Count == 0)
+    {
+        <section class="live-panel"><p class="live-empty">No equipment categories have been created yet.</p></section>
+    }
+    @foreach (var category in Model)
+    {
+        <section class="live-panel" aria-label="@category.Name">
+            <div class="chart-head">
+                <div><h2>@category.Name @if (!category.IsActive) { <span class="live-badge">Inactive</span> }</h2><p>@(category.Description ?? "No description.")</p></div>
+                <span class="live-muted">@category.Units.Count unit@(category.Units.Count == 1 ? "" : "s")</span>
+            </div>
+            @if (category.Units.Count == 0)
+            {
+                <p class="live-empty">No units in this category.</p>
+            }
+            else
+            {
+                <div class="live-table-wrap" tabindex="0" role="region" aria-label="@category.Name units">
+                    <table class="live-table">
+                        <thead><tr><th scope="col">Equipment</th><th scope="col">Asset code</th><th scope="col">Condition</th><th scope="col">Location</th><th scope="col">Status</th></tr></thead>
+                        <tbody>
+                            @foreach (var unit in category.Units)
+                            {
+                                <tr><td><strong>@unit.Name</strong></td><td>@unit.AssetCode</td><td>@unit.Condition</td><td>@(unit.Location ?? "—")</td>
+                                    <td><span class="live-badge" data-state="@ItemStatuses.Label(unit.Status).ToLowerInvariant()">@ItemStatuses.Label(unit.Status)</span></td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    }
+</main>

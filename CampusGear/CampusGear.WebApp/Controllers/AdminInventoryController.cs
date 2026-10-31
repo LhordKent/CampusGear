@@ -37,6 +37,30 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
         return View(await BuildPageAsync(input, q, page, cancellationToken));
     }
 
+    /// <summary>Equipment Item Management · Administrator only. A unit that was never reserved or repaired is deleted
+    /// with its photo; a unit with history is deactivated so borrowing records stay complete.</summary>
+    [HttpPost("admin/equipment/{id:guid}/delete")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var item = await db.EquipmentItems.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (item is null) return NotFound();
+        var hasHistory = await db.Reservations.AnyAsync(x => x.EquipmentItemId == id, cancellationToken) ||
+            await db.MaintenanceCases.AnyAsync(x => x.EquipmentItemId == id, cancellationToken);
+        var before = JsonSerializer.Serialize(new { item.AssetCode, item.Name, item.IsActive, item.Condition });
+        var photo = item.ImagePath;
+        if (hasHistory) item.IsActive = false;
+        else db.EquipmentItems.Remove(item);
+        db.AuditEvents.Add(SqlWorkflowLocks.Audit(HttpContext, users.GetUserId(User)!,
+            hasHistory ? "equipment.deactivated" : "equipment.deleted", nameof(EquipmentItem), id,
+            clock.GetUtcNow().UtcDateTime, before, null));
+        await db.SaveChangesAsync(cancellationToken);
+        if (!hasHistory) images.Delete(photo);
+        TempData["InventoryFeedback"] = hasHistory
+            ? $"{item.AssetCode} has borrowing or repair history, so it was deactivated instead of deleted."
+            : $"{item.AssetCode} was deleted.";
+        return Redirect("/admin/equipment");
+    }
+
     [HttpPost("admin/equipment/save")]
     [RequestSizeLimit(8 * 1024 * 1024)]
     public async Task<IActionResult> Save([Bind(Prefix = "Input")] EquipmentEditInput input,
@@ -165,7 +189,7 @@ public sealed class AdminInventoryController(ApplicationDbContext db, UserManage
         var total = await query.CountAsync(cancellationToken);
         var pages = Math.Max(1, (int)Math.Ceiling(total / 15d));
         page = Math.Clamp(page, 1, pages);
-        var items = await query.Include(x => x.Category).OrderBy(x => x.AssetCode).Skip((page - 1) * 15).Take(15).ToListAsync(cancellationToken);
+        var items = await query.Include(x => x.Category).OrderByDescending(x => x.CreatedAtUtc).ThenBy(x => x.AssetCode).Skip((page - 1) * 15).Take(15).ToListAsync(cancellationToken);
         var categories = await db.EquipmentCategories.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.Name).ToListAsync(cancellationToken);
         if (input.CategoryId == Guid.Empty) input.CategoryId = categories.FirstOrDefault()?.Id ?? Guid.Empty;
         if (input.Id is not null && input.ImagePath is null)

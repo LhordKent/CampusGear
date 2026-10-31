@@ -1,0 +1,48 @@
+@model AdminDashboardViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Dashboard";
+    ViewData["WorkspaceRole"] = "Administrator";
+}
+<main class="live-content dashboard" data-figma-source="690:212">
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">Overview</p>
+            <h1>Welcome back, @Model.FirstName</h1>
+            <p class="page-description">Inventory, reservations, and accounts across CampusGear at a glance.</p>
+        </div>
+        <div class="page-header-actions">
+            <a class="live-button secondary" href="/admin/users?status=pending">Verify registrations @if (Model.PendingRegistrationTotal > 0) { <span class="live-count">@Model.PendingRegistrationTotal</span> }</a>
+            <a class="live-button" href="/admin/equipment?form=add"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>Add equipment</a>
+        </div>
+    </header>
+
+    @* Charts lead; the sidebar already links to every list, so the dashboard carries no headline-number tiles. *@
+    <div class="dash-grid dash-grid-wide">
+        <section class="dash-card dash-card-feature"><partial name="Charts/_Series" model="Model.BorrowingTrend" /></section>
+        <section class="dash-card"><partial name="Charts/_Donut" model="Model.Availability" /></section>
+    </div>
+
+    <div class="dash-grid dash-grid-split">
+        <section class="dash-card"><partial name="Charts/_Bars" model="Model.ReservationStatus" /></section>
+        <section class="dash-card"><partial name="Charts/_Series" model="Model.Registrations" /></section>
+    </div>
+
+    <div class="dash-grid dash-grid-wide">
+        <section class="dash-card" aria-labelledby="recent-title">
+            <div class="chart-head">
+                <div><h2 id="recent-title">Latest transactions</h2><p>Reservations most recently created or updated</p></div>
+                <a class="live-link dash-card-link" href="/admin/history">View all<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
+            </div>
+            <partial name="_Activity" model="Model.RecentActivity" view-data='new ViewDataDictionary(ViewData) { ["Empty"] = "No reservations have been made yet." }' />
+        </section>
+        <section class="dash-card" aria-labelledby="registrations-title">
+            <div class="chart-head">
+                <div><h2 id="registrations-title">Registrations to verify</h2><p>Newest submissions first</p></div>
+                @if (Model.PendingRegistrationTotal > 0) { <a class="live-link dash-card-link" href="/admin/users?status=pending">Review all @Model.PendingRegistrationTotal<svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a> }
+            </div>
+            <partial name="_Activity" model="Model.PendingRegistrations" view-data='new ViewDataDictionary(ViewData) { ["Empty"] = "All registrations have been reviewed." }' />
+        </section>
+    </div>
+</main>
+@section Scripts { <script src="~/js/charts.js" asp-append-version="true"></script> }

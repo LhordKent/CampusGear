@@ -10,16 +10,25 @@
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
 <main class="live-content" data-figma-source="@source">
-    <header class="live-heading"><h1>@(history ? "Borrowing History Report" : returns ? "Return & Condition Check" : "Approval & Release")</h1></header>
-    <div class="live-metrics custodian-metrics">
-        <a class="live-metric" href="@staffPath/approvals"><strong>@Model.PendingCount</strong><span>Pending requests</span></a>
-        <a class="live-metric" href="@staffPath/returns?queue=release"><strong>@Model.ApprovedCount</strong><span>Approved for release</span></a>
-        <a class="live-metric" href="@staffPath/returns"><strong>@Model.ActiveCount</strong><span>Active loans</span></a>
-    </div>
-    @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status">@Model.Feedback</div> }
-    @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert">@Model.Error</div> }
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">@(history ? "Records" : "Equipment desk")</p>
+            <h1>@(history ? "Borrowing History" : returns ? "Return & Condition Check" : "Approval & Release")</h1>
+            <p class="page-description">@(history
+                ? "Every reservation and loan, newest first. Filter by status or booking date to build a report."
+                : returns ? "Release approved bookings and check equipment back in. The most recent loans are listed first."
+                : "Review reservation requests before their hold expires. The newest requests are listed first.")</p>
+        </div>
+        <div class="page-header-actions">
+            @if (history) { <a class="live-button secondary" href="@staffPath/calendar"><svg class="icon" aria-hidden="true"><use href="/icons.svg#calendar"></use></svg>Availability calendar</a> }
+            else if (returns) { <a class="live-button secondary" href="@staffPath/approvals">Pending requests<span class="live-count">@Model.PendingCount</span></a> }
+            else { <a class="live-button secondary" href="@staffPath/returns?queue=release">Ready for release<span class="live-count">@Model.ApprovedCount</span></a> }
+        </div>
+    </header>
+    @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
+    @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
     <section class="live-panel" aria-labelledby="queue-title">
-        <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? Model.Queue == "release" ? "Approved release queue" : "Active loans awaiting return" : history ? "Reservation and loan records" : "Request queue")</h2><span class="live-muted">@Model.Total record@(Model.Total == 1 ? "" : "s") · Manila time (UTC+8)</span></div>
+        <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? Model.Queue == "release" ? "Approved release queue" : "Active loans awaiting return" : history ? "Reservation and loan records" : "Request queue")</h2><span class="live-muted">Times in Manila (UTC+8)</span></div>
         @if (returns)
         {
             <nav class="custodian-tabs" aria-label="Desk queues">
@@ -27,9 +36,9 @@
                 <a class="@(Model.Queue == "release" ? "selected" : "")" href="@staffPath/returns?queue=release" aria-current="@(Model.Queue == "release" ? "page" : null)">Approved release queue</a>
             </nav>
         }
-        <form class="live-filters" method="get" action="@basePath">
+        <form class="live-filters" method="get" action="@basePath" role="search" aria-label="Filter records" data-live-search data-live-target="#queue-results">
             @if (returns) { <input type="hidden" name="queue" value="@Model.Queue" /> }
-            <label for="queue-search">Search borrower or equipment<input id="queue-search" name="q" type="search" value="@Model.Search" maxlength="100" placeholder="Name, email, or asset code" /></label>
+            <label for="queue-search" class="live-filter-search">Search borrower or equipment<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="queue-search" name="q" type="search" value="@Model.Search" maxlength="100" placeholder="Name, email, or asset code" autocomplete="off" /></span></label>
             @if (!returns)
             {
                 <label for="queue-status">Status<select id="queue-status" name="status">
@@ -47,11 +56,13 @@
             }
             <label for="queue-from">Booking from<input id="queue-from" name="from" type="date" value="@Model.From" /></label>
             <label for="queue-to">Booking through<input id="queue-to" name="to" type="date" value="@Model.To" /></label>
-            <button class="live-button" type="submit">Apply filters</button><a class="live-button secondary" href="@basePath">Reset</a>
+            <a class="live-button secondary live-filter-reset" href="@basePath@(returns ? $"?queue={Model.Queue}" : "")" data-live-reset>Reset</a>
         </form>
+        <div id="queue-results" class="live-results">
+        <p class="live-result-count" data-live-count>@Model.Total record@(Model.Total == 1 ? "" : "s")@(string.IsNullOrWhiteSpace(Model.Search) ? "" : $" matching “{Model.Search}”")</p>
         @if (Model.Rows.Count == 0)
         {
-            <div class="live-empty"><h3>No matching records</h3><p>Try another search or date range.</p></div>
+            <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><h3>No matching records</h3><p>Try another search term, status, or date range.</p></div>
         }
         else
         {
@@ -66,10 +77,13 @@
                 </table>
             </div>
         }
+        @if (Model.PageCount > 1) {
         <nav class="live-pager" aria-label="Record pages">
-            @if (Model.Page > 1) { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Search, status = Model.Status, from = Model.From, to = Model.To, queue = Model.Queue, page = Model.Page - 1 })">Previous</a> }
+            @if (Model.Page > 1) { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Search, status = Model.Status, from = Model.From, to = Model.To, queue = Model.Queue, page = Model.Page - 1 })" data-live-page>Previous</a> }
             <span>Page @Model.Page of @Model.PageCount</span>
-            @if (Model.Page < Model.PageCount) { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Search, status = Model.Status, from = Model.From, to = Model.To, queue = Model.Queue, page = Model.Page + 1 })">Next</a> }
+            @if (Model.Page < Model.PageCount) { <a class="live-button secondary" href="@ScreenUrls.Query(basePath, new { q = Model.Search, status = Model.Status, from = Model.From, to = Model.To, queue = Model.Queue, page = Model.Page + 1 })" data-live-page>Next</a> }
         </nav>
+        }
+        </div>
     </section>
 </main>

@@ -101,14 +101,25 @@ The bootstrap runs only when no administrator account exists. `--initialize-only
 
 New accounts start as Pending Approval; an administrator approves or rejects them in User & Role Management. Custodians and additional administrators register the same way, and an administrator assigns their role after approval. Account history is retained when roles change or access is paused.
 
+### Demo Mode
+
+`DemoMode:Enabled` (on in `appsettings.Development.json`) fills the app with sample data at startup so every dashboard, chart, queue, and calendar has something to show: 25 items in 6 categories (with Excellent through Unserviceable conditions and one retired unit), about three months of reservations in every status, open and overdue loans, returns (including late and damaged ones), open and closed maintenance cases, and the matching audit history.
+
+- It runs only in the Development environment; anywhere else the setting is ignored and a warning is logged.
+- It creates and changes no accounts. Reservations and staff actions are attached to accounts that already exist on the `@campusgear.local` demo domain (a borrower and a custodian are needed); without them only the catalog is added.
+- Demo items use asset codes starting with `DM-`. Seeding is skipped once any exist, so restarts never duplicate data.
+- To take it back out: `dotnet run --project CampusGear/CampusGear.WebApp -- --remove-demo-data`, then set `DemoMode:Enabled` to `false`.
+
 ## Live workflows
 
 | Role | Routes |
 | --- | --- |
 | Account | `/auth/login`, `/auth/signup`, `/auth/email-verification`, `/auth/two-factor`, password recovery screens |
-| Borrower | `/borrower/dashboard`, `/borrower/reservation`, `/borrower/history`, `/borrower/calendar` |
-| Custodian | `/custodian/dashboard`, `/custodian/approvals`, `/custodian/returns`, `/custodian/history`, `/custodian/calendar` |
-| Administrator | `/admin/dashboard`, `/admin/reservations`, `/admin/equipment`, `/admin/categories`, `/admin/users`, `/admin/borrowers`, `/admin/maintenance`, `/admin/audit`, `/admin/approvals`, `/admin/returns`, `/admin/calendar`, `/admin/history` |
+| Borrower | `/borrower/home` (homepage; `/borrower/dashboard` still works), `/borrower/reservation`, `/borrower/history`, `/borrower/calendar` |
+| Custodian | `/custodian/dashboard`, `/custodian/approvals`, `/custodian/returns`, `/custodian/history`, `/custodian/calendar`, `/custodian/categories` (read-only), `/custodian/borrowers` (read-only), `/admin/maintenance` |
+| Administrator | `/admin/dashboard`, `/admin/equipment`, `/admin/categories`, `/admin/users`, `/admin/users/new`, `/admin/borrowers`, `/admin/maintenance`, `/admin/audit`, `/admin/calendar` (read-only), `/admin/history` (read-only) |
+
+Who may do what is listed in [docs/PERMISSIONS.md](docs/PERMISSIONS.md); `CampusGear.IntegrationTests/RolePermissionTests.cs` checks every row over HTTP.
 
 Times displayed/entered in borrowing forms use Asia/Manila; database times are UTC. Pending requests hold a slot for 24 hours or until the requested start, whichever comes first. Rejection, cancellation, and expiration free the slot. Approved reservations can be released during the approved interval. Returns record condition and timeliness; damaged/unserviceable returns automatically open maintenance. Closing a repair restores availability.
 

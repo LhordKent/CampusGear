@@ -6,19 +6,22 @@
 }
 @section Styles { <link rel="stylesheet" href="~/css/admin-users.css" asp-append-version="true" /> }
 <main class="live-content" data-figma-source="945:195">
-    <header class="live-heading">
-        
-        <h1>System Audit Log</h1>
-        <p>Times are shown in Manila time.</p>
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">People</p>
+            <h1>System Audit Log</h1>
+            <p class="page-description">Every recorded change in CampusGear, newest first. Times are shown in Manila time.</p>
+        </div>
     </header>
     <section class="live-panel" aria-label="Audit history">
-        <form class="live-filters" method="get" action="/admin/audit" aria-label="Search audit history">
-            <label for="q">Search action, actor, record, result, or IP address<input id="q" name="q" type="search" value="@Model.Query" maxlength="120" /></label>
-            <button class="live-button" type="submit">Search</button><a class="live-button secondary" href="/admin/audit">Clear</a>
+        <form class="live-filters" method="get" action="/admin/audit" role="search" aria-label="Search audit history" data-live-search data-live-target="#audit-results">
+            <label for="q" class="live-filter-search">Search audit events<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Action, actor, record, result, or IP address" autocomplete="off" /></span></label>
+            <a class="live-button secondary live-filter-reset" href="/admin/audit" data-live-reset>Clear</a>
         </form>
-        <p class="live-muted">@Model.Total matching event@(Model.Total == 1 ? "" : "s")</p>
+        <div id="audit-results" class="live-results">
+        <p class="live-result-count" data-live-count>@Model.Total matching event@(Model.Total == 1 ? "" : "s")</p>
         @if (Model.Rows.Count == 0)
-        { <p class="live-empty">No audit events match this search.</p> }
+        { <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><h3>No matching audit events</h3><p>Try another action, person, or record.</p></div> }
         else
         {
             <div class="live-table-wrap" tabindex="0" aria-label="Audit events table">
@@ -44,11 +47,12 @@
             </div>
             <nav class="live-pager" aria-label="Audit history pages">
                 @if (Model.Page > 1)
-                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/audit", new { q = Model.Query, page = Model.Page - 1 })">Previous</a> }
+                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/audit", new { q = Model.Query, page = Model.Page - 1 })" data-live-page>Previous</a> }
                 <span>Page @Model.Page of @Model.PageCount</span>
                 @if (Model.Page < Model.PageCount)
-                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/audit", new { q = Model.Query, page = Model.Page + 1 })">Next</a> }
+                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/audit", new { q = Model.Query, page = Model.Page + 1 })" data-live-page>Next</a> }
             </nav>
         }
+        </div>
     </section>
 </main>

@@ -35,22 +35,13 @@ public sealed class ReservationService(
             throw Error(ReservationErrorCode.InvalidInput, "Choose an item and a future time range in UTC.");
         }
 
+        // Only a borrower may reserve, and only for themselves. Staff never take part in creating reservations.
         var actorUser = await RequireActiveVerifiedUserAsync(actor, cancellationToken);
-        var isSelf = actorUser.Id == command.BorrowerUserId;
-        if (isSelf)
-        {
-            if (!await users.IsInRoleAsync(actorUser, "Borrower"))
-                throw Error(ReservationErrorCode.Forbidden, "Only borrowers can request equipment for themselves.");
-        }
-        else if (!await users.IsInRoleAsync(actorUser, "Administrator"))
-        {
-            throw Error(ReservationErrorCode.Forbidden, "Only administrators can create requests for another borrower.");
-        }
+        if (actorUser.Id != command.BorrowerUserId || !await users.IsInRoleAsync(actorUser, "Borrower"))
+            throw Error(ReservationErrorCode.Forbidden, "Only borrowers can request equipment, and only for themselves.");
 
-        var borrower = isSelf
-            ? actorUser
-            : await users.FindByIdAsync(command.BorrowerUserId);
-        if (borrower is null || !borrower.IsActive || !borrower.EmailConfirmed ||
+        var borrower = actorUser;
+        if (!borrower.IsActive || !borrower.EmailConfirmed ||
             !await users.IsInRoleAsync(borrower, "Borrower"))
         {
             throw Error(ReservationErrorCode.IneligibleBorrower, "The borrower account is not eligible to reserve equipment.");
@@ -129,7 +120,7 @@ public sealed class ReservationService(
     public async Task<ReservationResult> ApproveAsync(
         ReservationActor actor, Guid reservationId, CancellationToken cancellationToken = default)
     {
-        await RequireStaffAsync(actor, cancellationToken);
+        await RequireCustodianAsync(actor, cancellationToken);
         var itemId = await GetItemIdAsync(reservationId, cancellationToken);
         await using var transaction = await BeginItemTransactionAsync(itemId, cancellationToken);
         var reservation = await GetLockedReservationAsync(reservationId, cancellationToken);
@@ -170,7 +161,7 @@ public sealed class ReservationService(
     public async Task<ReservationResult> RejectAsync(
         ReservationActor actor, Guid reservationId, string reason, CancellationToken cancellationToken = default)
     {
-        await RequireStaffAsync(actor, cancellationToken);
+        await RequireCustodianAsync(actor, cancellationToken);
         var decisionReason = RequiredText(reason, 1000, "A rejection reason is required.");
         var itemId = await GetItemIdAsync(reservationId, cancellationToken);
         await using var transaction = await BeginItemTransactionAsync(itemId, cancellationToken);
@@ -207,11 +198,9 @@ public sealed class ReservationService(
         var reservation = await GetLockedReservationAsync(reservationId, cancellationToken);
         var now = UtcNow();
 
-        if (reservation.BorrowerProfile.UserId != actorUser.Id &&
-            !await users.IsInRoleAsync(actorUser, "Administrator"))
-        {
+        // Only the borrower who made a request may cancel it; the automatic batch withdrawal also runs as that borrower.
+        if (reservation.BorrowerProfile.UserId != actorUser.Id)
             throw Error(ReservationErrorCode.Forbidden, "You cannot cancel this request.");
-        }
 
         if (reservation.Status == ReservationStatus.Cancelled)
             return ToResult(reservation);
@@ -236,7 +225,7 @@ public sealed class ReservationService(
         ReservationActor actor, Guid reservationId, EquipmentCondition conditionAtRelease,
         string? notes = null, CancellationToken cancellationToken = default)
     {
-        await RequireStaffAsync(actor, cancellationToken);
+        await RequireCustodianAsync(actor, cancellationToken);
         if (!Enum.IsDefined(conditionAtRelease) ||
             conditionAtRelease is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
             throw Error(ReservationErrorCode.UnavailableEquipment, "Damaged equipment cannot be released.");
@@ -296,7 +285,7 @@ public sealed class ReservationService(
         ReservationActor actor, Guid reservationId, EquipmentCondition conditionAtReturn,
         string? notes = null, CancellationToken cancellationToken = default)
     {
-        await RequireStaffAsync(actor, cancellationToken);
+        await RequireCustodianAsync(actor, cancellationToken);
         if (!Enum.IsDefined(conditionAtReturn))
             throw Error(ReservationErrorCode.InvalidInput, "Choose a valid return condition.");
         var returnNotes = OptionalText(notes, 2000);
@@ -501,14 +490,12 @@ public sealed class ReservationService(
         return user;
     }
 
-    private async Task RequireStaffAsync(ReservationActor actor, CancellationToken cancellationToken)
+    /// <summary>Approval, rejection, release and return belong to the custodian alone; administrators do not take part in the borrowing flow.</summary>
+    private async Task RequireCustodianAsync(ReservationActor actor, CancellationToken cancellationToken)
     {
         var user = await RequireActiveVerifiedUserAsync(actor, cancellationToken);
-        if (!await users.IsInRoleAsync(user, "Custodian") &&
-            !await users.IsInRoleAsync(user, "Administrator"))
-        {
-            throw Error(ReservationErrorCode.Forbidden, "Staff access is required.");
-        }
+        if (!await users.IsInRoleAsync(user, "Custodian"))
+            throw Error(ReservationErrorCode.Forbidden, "Only a custodian can do this.");
     }
 
     private async Task SaveAsync(CancellationToken cancellationToken)

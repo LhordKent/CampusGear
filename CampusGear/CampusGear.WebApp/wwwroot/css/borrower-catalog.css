@@ -3,15 +3,15 @@
    Timing reuses the --motion-* variables from motion.css, so reduced-motion is respected. */
 
 .catalog-page {
-    --catalog-ok-bg: var(--cg-teal-soft, #0f3436);
-    --catalog-ok-text: var(--cg-link, #8dd9d7);
-    --catalog-busy-bg: var(--cg-warn-bg, #3b281c);
-    --catalog-busy-border: var(--cg-warn-border, #c77833);
-    --catalog-busy-text: var(--cg-warn-text, #ffd2a6);
-    --catalog-off-bg: var(--cg-neutral-bg, #243a48);
-    --catalog-off-border: var(--cg-neutral-border, #48616f);
-    --catalog-off-text: #b5c5d0;
-    --catalog-inset: var(--cg-inset, #081e2e);
+    --catalog-ok-bg: var(--cg-teal-soft, var(--ws-teal-soft));
+    --catalog-ok-text: var(--cg-link, var(--ws-link));
+    --catalog-busy-bg: var(--cg-warn-bg, var(--ws-warn-bg));
+    --catalog-busy-border: var(--cg-warn-border, var(--ws-bronze));
+    --catalog-busy-text: var(--cg-warn-text, var(--ws-warn-text));
+    --catalog-off-bg: var(--cg-neutral-bg, var(--ws-neutral-bg));
+    --catalog-off-border: var(--cg-neutral-border, var(--ws-neutral-border));
+    --catalog-off-text: var(--ws-text-soft);
+    --catalog-inset: var(--cg-inset, var(--ws-input));
     --catalog-ease-out: cubic-bezier(.23, 1, .32, 1);
     margin: 16px 0 0 24px;
 }
@@ -37,7 +37,7 @@
 }
 .catalog-search input::placeholder { color: var(--cg-muted); font-weight: 400; }
 .catalog-search input:hover { border-color: var(--cg-teal); }
-.catalog-search input:focus { outline: none; border-color: var(--cg-teal); box-shadow: 0 0 0 3px rgb(44 140 138 / .25); }
+.catalog-search input:focus { outline: none; border-color: var(--cg-teal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ws-teal) 25%, transparent); }
 .catalog-search-icon {
     position: absolute; left: 12px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%);
     fill: none; stroke: var(--cg-muted); stroke-width: 2; stroke-linecap: round; pointer-events: none;
@@ -52,7 +52,7 @@
 }
 .catalog-chip:hover { border-color: var(--cg-teal); color: var(--cg-text); }
 .catalog-chip:active { transform: scale(.97); }
-.catalog-chip[aria-pressed='true'] { background: var(--cg-teal); border-color: var(--cg-teal); color: #fff; }
+.catalog-chip[aria-pressed='true'] { background: var(--cg-teal); border-color: var(--cg-teal); color: var(--ws-on-accent); }
 
 .catalog-toggle { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; font-size: 13px; color: var(--cg-muted); cursor: pointer; }
 .catalog-toggle input { width: 16px; height: 16px; margin: 0; accent-color: var(--cg-teal); cursor: pointer; }
@@ -73,18 +73,18 @@
         box-shadow var(--motion-fast, 200ms) ease;
 }
 @media (hover: hover) and (pointer: fine) {
-    .catalog-card-link:hover { transform: translateY(-3px); border-color: var(--cg-teal); box-shadow: 0 14px 30px -14px rgb(0 0 0 / .45); }
+    .catalog-card-link:hover { transform: translateY(-3px); border-color: var(--cg-teal); box-shadow: 0 14px 30px -14px rgb(0 0 0 / 0.45); }
     .catalog-card-link:hover .catalog-media img { transform: scale(1.04); }
     .catalog-card-link:hover .catalog-cta svg { transform: translateX(3px); }
 }
 .catalog-card-link:active { transform: scale(.985); transition-duration: 80ms; }
-.catalog-card-link:focus-visible { outline: 3px solid var(--cg-focus, #e6a565); outline-offset: 3px; }
+.catalog-card-link:focus-visible { outline: 3px solid var(--cg-focus, var(--ws-focus)); outline-offset: 3px; }
 
 .catalog-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--catalog-inset); border-bottom: 1px solid var(--cg-rule); }
 .catalog-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 500ms var(--catalog-ease-out), filter 300ms ease; }
 .catalog-placeholder {
     display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
-    background: radial-gradient(120% 90% at 30% 20%, rgb(44 140 138 / .22), transparent 60%),
+    background: radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(--ws-teal) 22%, transparent), transparent 60%),
         linear-gradient(160deg, var(--cg-raised), var(--catalog-inset));
 }
 .catalog-placeholder svg { width: 34%; max-width: 88px; height: auto; fill: none; stroke: var(--cg-teal); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
@@ -94,7 +94,7 @@
     font-size: 11px; font-weight: 700; line-height: 1.2; white-space: nowrap;
 }
 .catalog-status i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.catalog-media .catalog-status { position: absolute; top: 10px; left: 10px; backdrop-filter: blur(6px); box-shadow: 0 2px 8px rgb(0 0 0 / .25); }
+.catalog-media .catalog-status { position: absolute; top: 10px; left: 10px; backdrop-filter: blur(6px); box-shadow: 0 2px 8px rgb(0 0 0 / 0.25); }
 .is-available .catalog-status { background: var(--catalog-ok-bg); border-color: var(--cg-teal); color: var(--catalog-ok-text); }
 .is-in-use .catalog-status { background: var(--catalog-busy-bg); border-color: var(--catalog-busy-border); color: var(--catalog-busy-text); }
 .is-unavailable .catalog-status { background: var(--catalog-off-bg); border-color: var(--catalog-off-border); color: var(--catalog-off-text); }
@@ -121,7 +121,7 @@
 
 /* Unavailable equipment stays browsable but reads as inactive. */
 .is-unavailable .catalog-media img, .is-unavailable .catalog-placeholder svg { filter: grayscale(1); opacity: .55; }
-.is-unavailable .catalog-name { color: var(--cg-text-soft, #c3d2db); }
+.is-unavailable .catalog-name { color: var(--cg-text-soft, var(--ws-text-soft)); }
 .is-unavailable .catalog-cta { color: var(--cg-muted); }
 .catalog-no-results { margin-top: 4px; }
 .catalog-no-results[hidden] { display: none; }
@@ -130,12 +130,12 @@
 .reserve-dialog {
     width: min(860px, calc(100vw - 32px)); max-height: min(880px, calc(100dvh - 48px));
     padding: 0; border: 1px solid var(--cg-border); border-radius: 16px; overflow: hidden;
-    background: var(--cg-surface); color: var(--cg-text); box-shadow: 0 24px 60px -20px rgb(0 0 0 / .6);
+    background: var(--cg-surface); color: var(--cg-text); box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.60);
 }
 .reserve-dialog[open] { display: flex; flex-direction: column; }
 /* Without the script the server-rendered dialog appears inline below the catalog. */
 .reserve-dialog[open]:not(:modal) { position: static; width: auto; max-height: none; margin: 24px 0 0; }
-.reserve-dialog::backdrop { background: var(--cg-backdrop, #03111dba); backdrop-filter: blur(2px); }
+.reserve-dialog::backdrop { background: var(--cg-backdrop, var(--ws-backdrop)); backdrop-filter: blur(2px); }
 .reserve-dialog:modal { animation: reserve-in 260ms var(--catalog-ease-out) both; }
 .reserve-dialog:modal::backdrop { animation: reserve-fade 260ms ease both; }
 .reserve-dialog.is-closing { animation: reserve-out 160ms ease-in both; }
@@ -164,7 +164,7 @@ html:has(.reserve-dialog:modal) { overflow: hidden; }
 .reserve-info h2 { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
 .reserve-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0; }
 .reserve-status-detail { font-size: 13px; color: var(--cg-muted); }
-.reserve-description { margin: 0; font-size: 14px; line-height: 1.6; color: var(--cg-text-soft, #c3d2db); white-space: pre-line; overflow-wrap: anywhere; }
+.reserve-description { margin: 0; font-size: 14px; line-height: 1.6; color: var(--cg-text-soft, var(--ws-text-soft)); white-space: pre-line; overflow-wrap: anywhere; }
 .reserve-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 4px 0 0; }
 .reserve-facts div { min-width: 0; padding: 10px 12px; border: 1px solid var(--cg-border); border-radius: 10px; background: var(--catalog-inset); }
 .reserve-facts dt { font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--cg-muted); }
@@ -177,7 +177,7 @@ html:has(.reserve-dialog:modal) { overflow: hidden; }
 .reserve-grid { display: grid; grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 .reserve-request .borrower-field { margin: 14px 0 0; }
 .reserve-quantity > label { display: block; }
-.reserve-stepper { display: flex; align-items: stretch; height: 46px; border: 1px solid var(--cg-border); border-radius: 10px; background: var(--cg-input, #081e2e); overflow: hidden; transition: border-color var(--motion-fast, 200ms) ease; }
+.reserve-stepper { display: flex; align-items: stretch; height: 46px; border: 1px solid var(--cg-border); border-radius: 10px; background: var(--cg-input, var(--ws-input)); overflow: hidden; transition: border-color var(--motion-fast, 200ms) ease; }
 .reserve-stepper:hover, .reserve-stepper:focus-within { border-color: var(--cg-teal); }
 .reserve-stepper button {
     width: 42px; flex: none; border: 0; background: transparent; color: var(--cg-text); font: 600 18px Inter, Arial, sans-serif; cursor: pointer;
@@ -219,7 +219,7 @@ html:has(.reserve-dialog:modal) { overflow: hidden; }
 .reserve-alert-list ul { margin: 4px 0 0; padding-left: 18px; }
 .reserve-alert-list.validation-summary-valid, .reserve-alert-line:empty { display: none; }
 .reserve-alert-line { display: block; }
-.borrower-validation-inline ul { margin: 8px 0 0; padding-left: 20px; color: #ffccb7; font-size: 14px; line-height: 1.6; }
+.borrower-validation-inline ul { margin: 8px 0 0; padding-left: 20px; color: var(--ws-warn-text); font-size: 14px; line-height: 1.6; }
 .borrower-validation-inline .validation-summary-valid { display: none; }
 
 .reserve-actions {

@@ -1,0 +1,142 @@
+/* CampusGear color tokens: the single source of every color in the workspace and sign-in pages.
+   Dark is the original CampusGear look; light is selected by <html data-theme="light"> (see Views/Shared/_ThemeHead.cshtml
+   and js/theme.js). Stylesheets reference these roles only, so a theme is switched by changing this one attribute. */
+
+:root,
+:root[data-theme='dark'] {
+    color-scheme: dark;
+    /* Surfaces, from the page backdrop up to raised cards. */
+    --ws-canvas: #071b2b;
+    --ws-sidebar: #081b29;
+    --ws-card: #0c2030;
+    --ws-card-raised: #102a3c;
+    --ws-inset: #0b2233;
+    --ws-input: #081e2e;
+    --ws-row: #0a1d2c;
+    --ws-hover: #0f2a3d;
+    --ws-overlay: #04121e;
+    --ws-backdrop: rgb(3 17 29 / .73);
+    --ws-header: rgb(7 27 43 / .9);
+    /* Lines. */
+    --ws-border: #183a50;
+    --ws-border-strong: #21455c;
+    --ws-border-input: #315b72;
+    /* Text. */
+    --ws-text: #edf2f7;
+    --ws-text-soft: #c3d2db;
+    --ws-muted: #99b0bf;
+    --ws-faint: #6f8899;
+    /* Brand and interaction. */
+    --ws-teal: #2c8c8a;
+    --ws-teal-strong: #35a09d;
+    --ws-teal-soft: #0f3436;
+    --ws-teal-line: #2c6d6b;
+    --ws-link: #8dd9d7;
+    --ws-on-accent: #ffffff;
+    --ws-bronze: #c77833;
+    --ws-bronze-text: #f2b47c;
+    --ws-focus: #e6a565;
+    --ws-shadow: 0 10px 24px -10px rgb(0 0 0 / .6);
+    --ws-shadow-soft: none;
+    /* States: background, border, and text for each kind of badge, alert, and toast. */
+    --ws-danger-bg: #3a1c1f;     --ws-danger-border: #8f3437;   --ws-danger-text: #ffb3b3;   --ws-danger-icon: #ff8a8a;
+    --ws-warn-bg: #3b281c;       --ws-warn-border: #c77833;     --ws-warn-text: #ffd2a6;
+    --ws-pending-bg: #3b2e12;    --ws-pending-border: #8a6a1f;  --ws-pending-text: #ffd98a;
+    --ws-info-bg: #132e46;       --ws-info-border: #2f5f8f;     --ws-info-text: #b9d7fa;
+    --ws-success-bg: #10301a;    --ws-success-border: #1f6b2a;  --ws-success-text: #a6e8a6;
+    --ws-repair-bg: #3b2419;     --ws-repair-border: #9a5a3c;   --ws-repair-text: #ffc3a5;
+    --ws-neutral-bg: #1c2f3c;    --ws-neutral-border: #48616f;  --ws-neutral-text: #d3dee5;
+    /* Chart roles: categorical slots validated against the dark card surface. */
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --chart-grid: #1a3448;
+    --chart-axis: #2c4a60;
+    --chart-tip: #04121e;
+    /* Status roles: fixed in both themes, always paired with an icon or a label. */
+    --status-good: #0ca30c;
+    --status-warning: #fab219;
+    --status-serious: #ec835a;
+    --status-critical: #d03b3b;
+    /* Shape and rhythm (the same in both themes). */
+    --ws-radius: 14px;
+    --ws-gap: 20px;
+    /* Brand mark: the logo artwork is drawn for a dark ground. */
+    --ws-logo-ground: transparent;
+}
+
+:root[data-theme='light'] {
+    color-scheme: light;
+    --ws-canvas: #f3f6f8;
+    --ws-sidebar: #ffffff;
+    --ws-card: #ffffff;
+    --ws-card-raised: #f4f7f9;
+    --ws-inset: #eef3f6;
+    --ws-input: #ffffff;
+    --ws-row: #ffffff;
+    --ws-hover: #eef4f6;
+    --ws-overlay: #ffffff;
+    --ws-backdrop: rgb(19 41 58 / .42);
+    --ws-header: rgb(255 255 255 / .9);
+    --ws-border: #dde5eb;
+    --ws-border-strong: #c9d5de;
+    --ws-border-input: #b8c7d2;
+    --ws-text: #13293a;
+    --ws-text-soft: #34495a;
+    --ws-muted: #5a6f7f;
+    --ws-faint: #74889a;
+    --ws-teal: #1f7a78;
+    --ws-teal-strong: #186765;
+    --ws-teal-soft: #e2f2f1;
+    --ws-teal-line: #8cc7c4;
+    --ws-link: #17696a;
+    --ws-on-accent: #ffffff;
+    --ws-bronze: #a65d1f;
+    --ws-bronze-text: #9a5317;
+    --ws-focus: #c06a1f;
+    --ws-shadow: 0 12px 28px -12px rgb(16 35 49 / .28);
+    --ws-shadow-soft: 0 1px 2px rgb(16 35 49 / .05), 0 1px 3px rgb(16 35 49 / .04);
+    --ws-danger-bg: #fdecee;     --ws-danger-border: #eaa5ae;   --ws-danger-text: #9b2335;   --ws-danger-icon: #c4314b;
+    --ws-warn-bg: #fdf1e5;       --ws-warn-border: #e3a670;     --ws-warn-text: #874511;
+    --ws-pending-bg: #fdf6df;    --ws-pending-border: #e0c165;  --ws-pending-text: #765600;
+    --ws-info-bg: #e8f0fa;       --ws-info-border: #a3bfdf;     --ws-info-text: #1d4f86;
+    --ws-success-bg: #e7f5ea;    --ws-success-border: #9bd1a8;  --ws-success-text: #1d6a30;
+    --ws-repair-bg: #fcefe8;     --ws-repair-border: #e5b096;   --ws-repair-text: #8f3f1c;
+    --ws-neutral-bg: #eef2f5;    --ws-neutral-border: #c9d4dc;  --ws-neutral-text: #34495a;
+    /* Light slots validated against the white card surface; the two below 3:1 always carry labels and a table view. */
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --chart-grid: #e6ecf0;
+    --chart-axis: #c3cfd8;
+    --chart-tip: #ffffff;
+    --ws-logo-ground: #071b2b;
+}
+
+/* Older stylesheets name the same roles with a cg- prefix; they resolve to the tokens above. */
+:root {
+    --cg-canvas: var(--ws-canvas);
+    --cg-sidebar: var(--ws-sidebar);
+    --cg-surface: var(--ws-card);
+    --cg-raised: var(--ws-card-raised);
+    --cg-inset: var(--ws-inset);
+    --cg-input: var(--ws-input);
+    --cg-border: var(--ws-border-strong);
+    --cg-rule: var(--ws-border-strong);
+    --cg-teal: var(--ws-teal);
+    --cg-teal-soft: var(--ws-teal-soft);
+    --cg-link: var(--ws-link);
+    --cg-bronze: var(--ws-bronze);
+    --cg-text: var(--ws-text);
+    --cg-text-soft: var(--ws-text-soft);
+    --cg-muted: var(--ws-muted);
+    --cg-focus: var(--ws-focus);
+    --cg-backdrop: var(--ws-backdrop);
+    --cg-warn-bg: var(--ws-warn-bg);
+    --cg-warn-border: var(--ws-warn-border);
+    --cg-warn-text: var(--ws-warn-text);
+    --cg-neutral-bg: var(--ws-neutral-bg);
+    --cg-neutral-border: var(--ws-neutral-border);
+}
