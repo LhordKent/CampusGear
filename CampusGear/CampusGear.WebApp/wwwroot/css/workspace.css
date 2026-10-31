@@ -100,6 +100,9 @@ body { background: var(--ws-canvas); color: var(--ws-text); font-size: 14px; -we
 .page-header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; flex: 0 1 auto; }
 .page-header-actions > form { margin: 0; }
 .live-content > .live-heading .heading-action { position: static; min-width: 0; height: auto; }
+.live-content > .development-email-heading { flex-direction: row; align-items: center; }
+.development-email-heading-copy { flex: 1 1 360px; min-width: 0; display: grid; gap: 6px; }
+.live-content > .development-email-heading > .live-actions { flex: 0 1 auto; justify-content: flex-end; margin-top: 0; }
 
 /* ---------- Buttons, links, forms ---------- */
 .live-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 9px 16px; border-radius: 9px; font: 600 13px Inter, Arial, sans-serif; box-shadow: none; white-space: nowrap; text-decoration: none; }
@@ -371,6 +374,8 @@ body { background: var(--ws-canvas); color: var(--ws-text); font-size: 14px; -we
     .page-header h1, .live-content > .live-heading h1 { font-size: 22px; }
     .page-header-actions { width: 100%; justify-content: stretch; }
     .page-header-actions > .live-button, .page-header-actions > a { flex: 1 1 auto; }
+    .live-content > .development-email-heading { flex-direction: column; align-items: stretch; }
+    .live-content > .development-email-heading > .live-actions { justify-content: flex-start; }
     .chart-donut { flex-direction: column; align-items: stretch; }
     .chart-donut-ring { align-self: center; width: 150px; }
     .chart-bars li > * { grid-template-columns: 78px minmax(0, 1fr) 34px; }
