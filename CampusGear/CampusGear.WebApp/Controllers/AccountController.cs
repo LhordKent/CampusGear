@@ -638,7 +638,7 @@ public sealed class SignUpInput
     [Required, EmailAddress(ErrorMessage = "Enter a valid email address."), StringLength(256)]
     public string Email { get; set; } = string.Empty;
 
-    [Required, Phone(ErrorMessage = "Enter a valid mobile number."), StringLength(40), Display(Name = "Mobile number")]
+    [Required, RegularExpression(@"^[0-9]{11}$", ErrorMessage = "Mobile number must be exactly 11 digits (e.g. 09XXXXXXXXX)."), Display(Name = "Mobile number")]
     public string MobileNumber { get; set; } = string.Empty;
 
     [Required, StringLength(100, MinimumLength = 8, ErrorMessage = "Use at least 8 characters.")]

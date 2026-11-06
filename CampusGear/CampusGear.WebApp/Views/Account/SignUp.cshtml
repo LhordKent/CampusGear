@@ -32,7 +32,7 @@
             </label>
             <label class="auth-field" for="MobileNumber">
                 <span class="auth-field-label">Mobile number</span>
-                <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" value="@(ViewData["MobileNumber"] as string)" placeholder="09XX XXX XXXX" autocomplete="tel" required />
+                <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" inputmode="numeric" maxlength="11" minlength="11" pattern="[0-9]{11}" title="Enter exactly 11 digits, e.g. 09XXXXXXXXX" value="@(ViewData["MobileNumber"] as string)" placeholder="09XXXXXXXXX" autocomplete="tel" required />
                 @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
             </label>
         </div>
