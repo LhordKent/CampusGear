@@ -27,12 +27,12 @@
         <div class="auth-row">
             <label class="auth-field" for="StudentIdNumber">
                 <span class="auth-field-label">Student ID Number</span>
-                <input class="auth-input" id="StudentIdNumber" name="StudentIdNumber" type="text" value="@(ViewData["StudentIdNumber"] as string)" autocomplete="off" maxlength="64" required />
+                <input class="auth-input" id="StudentIdNumber" name="StudentIdNumber" type="text" inputmode="numeric" pattern="[0-9]+" title="Student ID Number must contain numbers only." value="@(ViewData["StudentIdNumber"] as string)" autocomplete="off" maxlength="64" required />
                 @Html.ValidationMessage("StudentIdNumber", null, new { @class = "auth-field-error" })
             </label>
             <label class="auth-field" for="MobileNumber">
                 <span class="auth-field-label">Mobile number</span>
-                <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" inputmode="numeric" maxlength="11" minlength="11" pattern="[0-9]{11}" title="Enter exactly 11 digits, e.g. 09XXXXXXXXX" value="@(ViewData["MobileNumber"] as string)" placeholder="09XXXXXXXXX" autocomplete="tel" required />
+                <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" inputmode="numeric" maxlength="11" minlength="11" pattern="[0-9]{11}" title="Mobile number must contain numbers only, exactly 11 digits (e.g. 09XXXXXXXXX)." value="@(ViewData["MobileNumber"] as string)" placeholder="09XXXXXXXXX" autocomplete="tel" required />
                 @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
             </label>
         </div>
