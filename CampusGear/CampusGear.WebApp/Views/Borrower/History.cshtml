@@ -66,7 +66,7 @@
                                 <td>
                                     @if (row.CanCancel)
                                     {
-                                        <form method="post" action="/borrower/reservation/@row.Id/cancel">
+                                        <form method="post" action="/borrower/reservation/@row.Id/cancel" onsubmit="return confirm('Cancel this reservation request? This cannot be undone.')">
                                             @Html.AntiForgeryToken()
                                             <button class="borrower-button borrower-button-danger" type="submit">Cancel request</button>
                                         </form>
