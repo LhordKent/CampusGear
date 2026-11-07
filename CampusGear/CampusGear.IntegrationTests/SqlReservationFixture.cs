@@ -35,6 +35,7 @@ public sealed class SqlReservationFixture : IAsyncLifetime
 
         var services = new ServiceCollection();
         services.AddLogging();
+        services.AddCampusGearData();
         services.AddDbContext<ApplicationDbContext>(options => options
             .UseSqlServer(_connectionString).AddInterceptors(LockObserver));
         services.AddIdentityCore<ApplicationUser>(options => options.Password.RequiredLength = 8)

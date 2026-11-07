@@ -11,6 +11,9 @@
 
 Each implementation commit records its completed boundary and focused verification here. The final handoff also contains feature traces and a complete maintained-source catalog.
 
+- Baseline characterization: stale category/equipment writes preserve saved values and add no audit; repeated multi-unit forms retain the same reservation IDs (query-string ID order is not stable in the pre-existing implementation). Three new HTTP checks passed.
+- Infrastructure/categories: shared scoped UnitOfWork, provider-independent persistence failures, transaction-owned workflow locks, and audit construction. Categories now use a thin controller → CategoryService → CategoryRepository. Build clean; 61 focused permission, characterization, and round-three HTTP tests passed. See `FEATURE_TRACES.md`.
+
 ## Known risks to preserve
 
 Identity stores and repositories must share one scoped context. Preserve per-item/profile/admin SQL locks, fresh post-lock reads, concurrency tokens, audit timing, image compensation, challenge send-after-commit, and multi-unit per-unit transactions with compensating cancellation. Unexpected pre-existing defects are documented separately instead of silently changed.
