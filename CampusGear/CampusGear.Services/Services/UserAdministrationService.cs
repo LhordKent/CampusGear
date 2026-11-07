@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Identity;
 namespace CampusGear.Services;
 public sealed class UserAdministrationService(IAccountRepository accounts, IAuditRepository audits, IUnitOfWork work, IWorkflowLockManager locks, UserManager<ApplicationUser> users) : IUserAdministrationService
 {
- private static readonly string[] PrimaryRoles = ["Borrower", "Custodian", "Administrator"];
- private static readonly TimeZoneInfo ManilaZone = ResolveManilaZone();
+    private static readonly string[] PrimaryRoles = ["Borrower", "Custodian", "Administrator"];
+    private static readonly TimeZoneInfo ManilaZone = ResolveManilaZone();
     public async Task<AdminUsersPage> GetPageAsync(string? q, string? role, string? status,
         int page = 1, CancellationToken cancellationToken = default)
     {
@@ -185,7 +185,7 @@ public sealed class UserAdministrationService(IAccountRepository accounts, IAudi
             work.ClearTracking();
             return OperationResult<string>.Invalid(exception.Message, reload: exception.IsStale);
         }
-        catch (PersistenceException exception)
+        catch (PersistenceException exception) when (exception.Failure is PersistenceFailure.StaleWrite or PersistenceFailure.Duplicate)
         {
             work.ClearTracking();
             return exception.Failure == PersistenceFailure.StaleWrite
@@ -215,10 +215,14 @@ public sealed class UserAdministrationService(IAccountRepository accounts, IAudi
         await using var transaction = await work.BeginAsync(cancellationToken);
         var user = new ApplicationUser
         {
-            UserName = email, Email = email, EmailConfirmed = true,
-            FirstName = input.FirstName.Trim(), LastName = input.LastName.Trim(),
+            UserName = email,
+            Email = email,
+            EmailConfirmed = true,
+            FirstName = input.FirstName.Trim(),
+            LastName = input.LastName.Trim(),
             PhoneNumber = input.ContactNumber,
-            ApprovalStatus = AccountApprovalStatus.Approved, IsActive = true
+            ApprovalStatus = AccountApprovalStatus.Approved,
+            IsActive = true
         };
         var created = await users.CreateAsync(user, input.Password);
         if (!created.Succeeded)
@@ -235,15 +239,22 @@ public sealed class UserAdministrationService(IAccountRepository accounts, IAudi
         if (input.Role == "Borrower")
             accounts.AddProfile(new BorrowerProfile
             {
-                UserId = user.Id, StudentNumber = input.StudentNumber, Department = input.Department,
-                ContactNumber = input.ContactNumber, IsEligible = true
+                UserId = user.Id,
+                StudentNumber = input.StudentNumber,
+                Department = input.Department,
+                ContactNumber = input.ContactNumber,
+                IsEligible = true
             });
         audits.Add(new AuditEvent
         {
-            ActorUserId = actor.UserId, Action = "Admin.UserCreated", EntityType = "ApplicationUser",
-            EntityId = user.Id, Outcome = "Succeeded",
+            ActorUserId = actor.UserId,
+            Action = "Admin.UserCreated",
+            EntityType = "ApplicationUser",
+            EntityId = user.Id,
+            Outcome = "Succeeded",
             AfterJson = JsonSerializer.Serialize(new { user.FirstName, user.LastName, user.Email, input.Role, input.StudentNumber, input.Department }),
-            IpAddress = actor.IpAddress, CorrelationId = actor.CorrelationId
+            IpAddress = actor.IpAddress,
+            CorrelationId = actor.CorrelationId
         });
         await work.SaveAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
@@ -289,9 +300,14 @@ public sealed class UserAdministrationService(IAccountRepository accounts, IAudi
         }
         audits.Add(new AuditEvent
         {
-            ActorUserId = actor.UserId, Action = hasHistory ? "Admin.UserDeactivated" : "Admin.UserDeleted",
-            EntityType = "ApplicationUser", EntityId = id, Outcome = "Succeeded", BeforeJson = before,
-            IpAddress = actor.IpAddress, CorrelationId = actor.CorrelationId
+            ActorUserId = actor.UserId,
+            Action = hasHistory ? "Admin.UserDeactivated" : "Admin.UserDeleted",
+            EntityType = "ApplicationUser",
+            EntityId = id,
+            Outcome = "Succeeded",
+            BeforeJson = before,
+            IpAddress = actor.IpAddress,
+            CorrelationId = actor.CorrelationId
         });
         await work.SaveAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
@@ -364,10 +380,18 @@ public sealed class UserAdministrationService(IAccountRepository accounts, IAudi
     private static string Snapshot(ApplicationUser user, IEnumerable<string> roles, BorrowerProfile? profile) =>
         JsonSerializer.Serialize(new
         {
-            user.FirstName, user.LastName, user.IsActive, user.ApprovalStatus, user.EmailConfirmed, Roles = roles.Order().ToArray(),
+            user.FirstName,
+            user.LastName,
+            user.IsActive,
+            user.ApprovalStatus,
+            user.EmailConfirmed,
+            Roles = roles.Order().ToArray(),
             Borrower = profile is null ? null : new
             {
-                profile.StudentNumber, profile.Department, profile.IsEligible, profile.EligibilityNotes
+                profile.StudentNumber,
+                profile.Department,
+                profile.IsEligible,
+                profile.EligibilityNotes
             }
         });
 

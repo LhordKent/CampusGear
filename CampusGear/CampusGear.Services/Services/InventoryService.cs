@@ -67,8 +67,8 @@ public sealed class InventoryService(IEquipmentRepository equipment, ICategoryRe
         await using var transaction = await work.BeginAsync(cancellationToken);
         try
         {
-            await locks.AcquireAsync( $"CampusGear:EquipmentItem:{itemId:N}", cancellationToken);
-            await locks.AcquireAsync( $"CampusGear:EquipmentCategory:{input.CategoryId:N}", cancellationToken);
+            await locks.AcquireAsync($"CampusGear:EquipmentItem:{itemId:N}", cancellationToken);
+            await locks.AcquireAsync($"CampusGear:EquipmentCategory:{input.CategoryId:N}", cancellationToken);
             if (!await categories.IsActiveAsync(input.CategoryId, cancellationToken))
                 throw new InvalidOperationException("This category is inactive. Choose another category.");
             var item = input.Id is null ? new EquipmentItem { Id = itemId } :
@@ -104,8 +104,10 @@ public sealed class InventoryService(IEquipmentRepository equipment, ICategoryRe
                 if (!await maintenance.HasOpenAsync(itemId, cancellationToken))
                     maintenance.Add(new MaintenanceCase
                     {
-                        EquipmentItemId = itemId, Description = $"Inventory condition recorded as {input.Condition}.",
-                        OpenedByUserId = actor.UserId!, OpenedAtUtc = now
+                        EquipmentItemId = itemId,
+                        Description = $"Inventory condition recorded as {input.Condition}.",
+                        OpenedByUserId = actor.UserId!,
+                        OpenedAtUtc = now
                     });
             }
             // Open maintenance can only be cleared by recording its resolution.
@@ -119,7 +121,8 @@ public sealed class InventoryService(IEquipmentRepository equipment, ICategoryRe
             images.Delete(replacedImagePath);
             return OperationResult<Guid>.Ok(itemId, input.Id is null ? "Equipment added." : "Equipment updated.");
         }
-        catch (Exception exception) when (exception is InvalidOperationException or PersistenceException)
+        catch (Exception exception) when (exception is InvalidOperationException or
+            PersistenceException { Failure: PersistenceFailure.StaleWrite or PersistenceFailure.Duplicate or PersistenceFailure.Busy })
         {
             await transaction.RollbackAsync(cancellationToken);
             work.ClearTracking();

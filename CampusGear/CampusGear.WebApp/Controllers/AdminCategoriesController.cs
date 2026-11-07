@@ -21,8 +21,14 @@ public sealed class AdminCategoriesController(ICategoryService categories) : Con
         {
             var x = await categories.GetEditAsync(id.Value, cancellationToken);
             if (x is null) return NotFound();
-            input = new() { Id = x.Id, Name = x.Name, Description = x.Description,
-                IsActive = x.IsActive, RowVersion = x.RowVersion };
+            input = new()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+                IsActive = x.IsActive,
+                RowVersion = x.RowVersion
+            };
         }
         return View(await PageAsync(input, cancellationToken, q));
     }

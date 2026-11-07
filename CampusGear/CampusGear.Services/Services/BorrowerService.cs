@@ -22,7 +22,7 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
         var user = await users.FindByIdAsync(actor.UserId!);
 
         var now = clock.GetUtcNow().UtcDateTime;
-        var catalog = await BuildReservationPageAsync(profile, new ReservationInputModel(), cancellationToken);
+        var catalog = await BuildReservationPageAsync(profile, new ReservationCommand(), cancellationToken);
         var home = await reads.HomeAsync(profile.Id, now, cancellationToken);
         var upcoming = home.Upcoming;
 
@@ -45,7 +45,7 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
             home.Completed));
     }
 
-    public async Task<OperationResult<ReservationPageViewModel>> ReservationAsync(RequestContext actor, 
+    public async Task<OperationResult<ReservationPageViewModel>> ReservationAsync(RequestContext actor,
         Guid? equipmentItemId, string? state, Guid[]? id, CancellationToken cancellationToken)
     {
         var profile = await OwnProfileAsync(actor, cancellationToken);
@@ -54,7 +54,7 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
         var localNow = Manila(clock.GetUtcNow().UtcDateTime);
         var start = new DateTime(localNow.Year, localNow.Month, localNow.Day,
             localNow.Hour, 0, 0).AddHours(1);
-        var input = new ReservationInputModel
+        var input = new ReservationCommand
         {
             RequestId = Guid.NewGuid(),
             EquipmentItemId = equipmentItemId ?? Guid.Empty,
@@ -80,7 +80,7 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
         return OperationResult<ReservationPageViewModel>.Ok(model);
     }
 
-    public async Task<OperationResult<AvailabilityResult>> AvailabilityAsync(RequestContext actor, 
+    public async Task<OperationResult<AvailabilityResult>> AvailabilityAsync(RequestContext actor,
         Guid equipmentItemId, string? start, string? end, CancellationToken cancellationToken)
     {
         var profile = await OwnProfileAsync(actor, cancellationToken);
@@ -101,8 +101,8 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
         return OperationResult<AvailabilityResult>.Ok(new(bookable.Count, free.Count, Math.Min(free.Count, MaxUnitsPerRequest)));
     }
 
-    public async Task<OperationResult<ReservationPageViewModel>> CreateReservationAsync(RequestContext actor, 
-        ReservationInputModel input, CancellationToken cancellationToken)
+    public async Task<OperationResult<ReservationPageViewModel>> CreateReservationAsync(RequestContext actor,
+        ReservationCommand input, CancellationToken cancellationToken)
     {
         var profile = await OwnProfileAsync(actor, cancellationToken);
         if (profile is null) return new(OperationOutcome.Forbidden);
@@ -219,7 +219,7 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
     }
 
 
-    public async Task<OperationResult<HistoryPageViewModel>> HistoryAsync(RequestContext actor, 
+    public async Task<OperationResult<HistoryPageViewModel>> HistoryAsync(RequestContext actor,
         string? status, string? from, string? to, string? q, int page = 1,
         CancellationToken cancellationToken = default)
     {
@@ -264,10 +264,11 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
 
         return OperationResult<HistoryPageViewModel>.Ok(new HistoryPageViewModel(
             rows, status, from ?? string.Empty, to ?? string.Empty, q ?? string.Empty,
-            page, pageCount, count, null)) with { Errors = errors };
+            page, pageCount, count, null)) with
+        { Errors = errors };
     }
 
-    public async Task<OperationResult<CalendarPageViewModel>> CalendarAsync(RequestContext actor, 
+    public async Task<OperationResult<CalendarPageViewModel>> CalendarAsync(RequestContext actor,
         int? year, int? month, Guid? equipmentItemId, string? day,
         CancellationToken cancellationToken)
     {
@@ -334,7 +335,7 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
     /// are shown as one product whose quantity is the number of units that can be borrowed.
     /// </summary>
     private async Task<ReservationPageViewModel> BuildReservationPageAsync(
-        BorrowerProfile profile, ReservationInputModel input, CancellationToken cancellationToken)
+        BorrowerProfile profile, ReservationCommand input, CancellationToken cancellationToken)
     {
         var now = clock.GetUtcNow().UtcDateTime;
         var units = await reads.CatalogAsync(cancellationToken);

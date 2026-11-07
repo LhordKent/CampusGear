@@ -31,7 +31,17 @@ public sealed class BorrowerController(IBorrowerService borrower, IReservationSe
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateReservation(ReservationInputModel input, CancellationToken cancellationToken)
     {
-        var result = await borrower.CreateReservationAsync(ContextActor(), input, cancellationToken);
+        var command = new ReservationCommand
+        {
+            RequestId = input.RequestId,
+            EquipmentItemId = input.EquipmentItemId,
+            Quantity = input.Quantity,
+            StartLocal = input.StartLocal,
+            EndLocal = input.EndLocal,
+            Purpose = input.Purpose,
+            Notes = input.Notes
+        };
+        var result = await borrower.CreateReservationAsync(ContextActor(), command, cancellationToken);
         if (result.Succeeded && result.Value?.CompletedIds.Count > 0)
             return Redirect($"/borrower/reservation?equipmentItemId={input.EquipmentItemId:D}&state=submitted" +
                 string.Concat(result.Value.CompletedIds.Select(x => $"&id={x:D}")));

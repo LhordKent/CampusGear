@@ -45,7 +45,7 @@ public sealed class CategoryService(ICategoryRepository categories, IUnitOfWork 
             await transaction.CommitAsync(ct);
             return OperationResult<Guid>.Ok(id, "Category saved.");
         }
-        catch (PersistenceException exception)
+        catch (PersistenceException exception) when (exception.Failure is PersistenceFailure.StaleWrite or PersistenceFailure.Duplicate or PersistenceFailure.Busy)
         {
             await transaction.RollbackAsync(ct);
             work.ClearTracking();

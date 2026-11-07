@@ -1,6 +1,5 @@
 using System.Data;
 using CampusGear.Data.Interfaces;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -17,12 +16,7 @@ public sealed class UnitOfWork(ApplicationDbContext db) : IUnitOfWork
     public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
     {
         try { return await db.SaveChangesAsync(cancellationToken); }
-        catch (DbUpdateConcurrencyException) { throw new PersistenceException(PersistenceFailure.StaleWrite); }
-        catch (DbUpdateException e) when (e.InnerException is SqlException { Number: 2601 or 2627 } sql)
-        {
-            throw new PersistenceException(PersistenceFailure.Duplicate,
-                sql.Message.Contains("StudentNumber", StringComparison.OrdinalIgnoreCase) ? "StudentNumber" : null);
-        }
+        catch (DbUpdateException error) { throw PersistenceErrors.Translate(error); }
     }
 
     public void ClearTracking() => db.ChangeTracker.Clear();

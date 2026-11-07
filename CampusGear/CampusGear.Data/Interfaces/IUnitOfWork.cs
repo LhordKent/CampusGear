@@ -17,7 +17,7 @@ public interface IDataTransaction : IAsyncDisposable
     Task RollbackAsync(CancellationToken cancellationToken = default);
 }
 
-public enum PersistenceFailure { StaleWrite, Duplicate, Busy }
+public enum PersistenceFailure { StaleWrite, Duplicate, Busy, Constraint, Failed }
 
 /// <summary>Provider-independent persistence failure; never includes connection strings or SQL text.</summary>
 public sealed class PersistenceException(PersistenceFailure failure, string? constraint = null) : Exception(failure.ToString())

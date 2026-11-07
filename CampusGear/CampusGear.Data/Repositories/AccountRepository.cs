@@ -13,9 +13,14 @@ public sealed class AccountRepository(ApplicationDbContext db) : IAccountReposit
         if (search.Length > 0) query = query.Where(x => x.FullName.Contains(search) || x.Email!.Contains(search) || x.BorrowerProfile != null &&
             (x.BorrowerProfile.StudentNumber != null && x.BorrowerProfile.StudentNumber.Contains(search) || x.BorrowerProfile.Department != null && x.BorrowerProfile.Department.Contains(search)));
         if (role != "all") query = query.Where(x => db.UserRoles.Any(ur => ur.UserId == x.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.Name == role)));
-        query = status switch { "active" => query.Where(x => x.IsActive && x.ApprovalStatus == AccountApprovalStatus.Approved),
-            "inactive" => query.Where(x => !x.IsActive), "pending" => query.Where(x => x.ApprovalStatus == AccountApprovalStatus.PendingApproval),
-            "rejected" => query.Where(x => x.ApprovalStatus == AccountApprovalStatus.Rejected), _ => query };
+        query = status switch
+        {
+            "active" => query.Where(x => x.IsActive && x.ApprovalStatus == AccountApprovalStatus.Approved),
+            "inactive" => query.Where(x => !x.IsActive),
+            "pending" => query.Where(x => x.ApprovalStatus == AccountApprovalStatus.PendingApproval),
+            "rejected" => query.Where(x => x.ApprovalStatus == AccountApprovalStatus.Rejected),
+            _ => query
+        };
         var total = await query.CountAsync(ct); var pending = await db.Users.CountAsync(x => x.ApprovalStatus == AccountApprovalStatus.PendingApproval, ct);
         var pages = Math.Max(1, (int)Math.Ceiling(total / 15d)); page = Math.Clamp(page, 1, pages);
         var accounts = await query.Include(x => x.BorrowerProfile).OrderByDescending(x => x.CreatedAtUtc).ThenBy(x => x.FullName).ThenBy(x => x.Id)

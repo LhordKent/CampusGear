@@ -44,7 +44,8 @@ public sealed class BorrowerReadRepository(ApplicationDbContext db) : IBorrowerR
             "borrowed" => query.Where(x => x.Status == ReservationStatus.Released),
             "returned" => query.Where(x => x.Status == ReservationStatus.Completed),
             "late" => query.Where(x => x.Loan != null && (x.Loan.ReturnedAtUtc == null && x.Loan.DueAtUtc < now || x.Loan.ReturnedAtUtc > x.Loan.DueAtUtc)),
-            "cancelled" => query.Where(x => x.Status == ReservationStatus.Cancelled), _ => query
+            "cancelled" => query.Where(x => x.Status == ReservationStatus.Cancelled),
+            _ => query
         };
         if (!string.IsNullOrEmpty(search)) query = query.Where(x => x.EquipmentItem.Name.Contains(search) || x.EquipmentItem.AssetCode.Contains(search) || x.Purpose.Contains(search));
         if (fromUtc is not null) query = query.Where(x => x.StartAtUtc >= fromUtc);

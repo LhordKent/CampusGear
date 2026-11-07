@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 namespace CampusGear.Services;
-public sealed class AccountService(IAccountRepository accounts,IAuditRepository audits,IUnitOfWork work,
- UserManager<ApplicationUser> _users,SignInManager<ApplicationUser> _signIn,IEmailChallengeService _challenges,
- IHostEnvironment _environment,IConfiguration _configuration,IAccountFlowStore flow) : IAccountService
+public sealed class AccountService(IAccountRepository accounts, IAuditRepository audits, IUnitOfWork work,
+ UserManager<ApplicationUser> _users, SignInManager<ApplicationUser> _signIn, IEmailChallengeService _challenges,
+ IHostEnvironment _environment, IConfiguration _configuration, IAccountFlowStore flow) : IAccountService
 {
     private const string PendingAdministratorUserId = "CampusGear.PendingAdministratorUserId";
     private const string PendingAdministratorStamp = "CampusGear.PendingAdministratorStamp";
@@ -29,14 +29,14 @@ public sealed class AccountService(IAccountRepository accounts,IAuditRepository 
             await _signIn.SignOutAsync();
         }
 
-        
+
         return feedback.Result(AccountStep.Login);
     }
 
     public async Task<OperationResult<AccountFlow>> LoginAsync(RequestContext actor, LoginCommand input, CancellationToken ct = default)
     {
         var feedback = new FlowFeedback();
-        
+
 
         ClearPendingAdministrator();
 
@@ -108,7 +108,7 @@ public sealed class AccountService(IAccountRepository accounts,IAuditRepository 
     public async Task<OperationResult<AccountFlow>> SignUpAsync(RequestContext actor, SignUpCommand input, CancellationToken ct = default)
     {
         var feedback = new FlowFeedback();
-        
+
 
         var email = input.Email.Trim();
         var studentId = input.StudentIdNumber.Trim();
@@ -184,7 +184,7 @@ public sealed class AccountService(IAccountRepository accounts,IAuditRepository 
         var feedback = new FlowFeedback();
         if (await PendingAdministratorAsync(feedback) is null)
             return feedback.Result(AccountStep.Login, transition: true);
-        
+
         return feedback.Result(AccountStep.TwoFactor);
     }
 
@@ -334,7 +334,7 @@ public sealed class AccountService(IAccountRepository accounts,IAuditRepository 
         var feedback = new FlowFeedback();
         if (await AuthorizedResetUserAsync(feedback) is null)
             return feedback.Result(AccountStep.PasswordResetRequest, transition: true);
-        
+
         return feedback.Result(AccountStep.PasswordResetNew);
     }
 
@@ -351,7 +351,7 @@ public sealed class AccountService(IAccountRepository accounts,IAuditRepository 
         {
             await AuditAsync(actor, "Auth.PasswordReset", "Rejected", user.Id, ct);
             foreach (var error in result.Errors)
-                    feedback.AddError("Password", error.Description);
+                feedback.AddError("Password", error.Description);
             return feedback.Result(AccountStep.PasswordResetNew);
         }
 
@@ -489,13 +489,13 @@ public sealed class AccountService(IAccountRepository accounts,IAuditRepository 
         });
         await work.SaveAsync(ct);
     }
- private sealed class FlowFeedback
- {
- public string? Error {get;set;}
- public string? Notice {get;set;}
- public List<FieldError> Errors {get;}=[];
- public void AddError(string field,string message)=>Errors.Add(new(field,message));
- public OperationResult<AccountFlow> Result(AccountStep step,bool transition=false,string?path=null)=>
- new(Error is null && Errors.Count==0?OperationOutcome.Success:OperationOutcome.Invalid,new(step,transition,path,Notice),Error,Errors);
- }
+    private sealed class FlowFeedback
+    {
+        public string? Error { get; set; }
+        public string? Notice { get; set; }
+        public List<FieldError> Errors { get; } = [];
+        public void AddError(string field, string message) => Errors.Add(new(field, message));
+        public OperationResult<AccountFlow> Result(AccountStep step, bool transition = false, string? path = null) =>
+        new(Error is null && Errors.Count == 0 ? OperationOutcome.Success : OperationOutcome.Invalid, new(step, transition, path, Notice), Error, Errors);
+    }
 }

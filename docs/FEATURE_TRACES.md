@@ -1,6 +1,6 @@
 # Feature tracing index
 
-## User administration
+Use the [complete URL/action/service/repository map](ROUTE_MIGRATION_MAP.md) and [file catalog](SOURCE_CATALOG.md) alongside these worked traces. The [beginner guide](CODEBASE_CHEATSHEET.md) explains inputs, outputs, tables, failure handling, and where to change code.
 
 ## Account and email flows
 

@@ -25,7 +25,7 @@ public sealed class MaintenanceService(IMaintenanceRepository cases, IEquipmentR
         await using var transaction = await work.BeginAsync(cancellationToken);
         try
         {
-            await locks.AcquireAsync( $"CampusGear:EquipmentItem:{equipmentItemId:N}", cancellationToken);
+            await locks.AcquireAsync($"CampusGear:EquipmentItem:{equipmentItemId:N}", cancellationToken);
             var item = await equipment.FindAsync(equipmentItemId, cancellationToken);
             if (item is null || !item.IsActive) return Outcome(false, "That equipment no longer exists or is inactive. Reload and choose another item.", "equipmentItemId");
             if (await equipment.HasOutstandingLoanAsync(item.Id, cancellationToken))
@@ -35,7 +35,9 @@ public sealed class MaintenanceService(IMaintenanceRepository cases, IEquipmentR
             var now = clock.GetUtcNow().UtcDateTime;
             var maintenance = new MaintenanceCase
             {
-                EquipmentItemId = item.Id, Description = description, OpenedAtUtc = now,
+                EquipmentItemId = item.Id,
+                Description = description,
+                OpenedAtUtc = now,
                 OpenedByUserId = actor.UserId!
             };
             item.IsMaintenanceHold = true;
@@ -47,7 +49,8 @@ public sealed class MaintenanceService(IMaintenanceRepository cases, IEquipmentR
             await transaction.CommitAsync(cancellationToken);
             return Outcome(true, $"{item.Name} ({item.AssetCode}) is now in maintenance. New reservations and releases are blocked until the case is closed.");
         }
-        catch (Exception exception) when (exception is PersistenceException or InvalidOperationException)
+        catch (Exception exception) when (exception is InvalidOperationException or
+            PersistenceException { Failure: PersistenceFailure.StaleWrite or PersistenceFailure.Duplicate or PersistenceFailure.Busy })
         { return Outcome(false, exception is PersistenceException p ? p.Failure == PersistenceFailure.Busy ? "This record is busy. Please retry." : "This record changed. Reload and retry." : exception.Message); }
     }
 
@@ -64,7 +67,7 @@ public sealed class MaintenanceService(IMaintenanceRepository cases, IEquipmentR
         await using var transaction = await work.BeginAsync(cancellationToken);
         try
         {
-            await locks.AcquireAsync( $"CampusGear:EquipmentItem:{itemId.Value:N}", cancellationToken);
+            await locks.AcquireAsync($"CampusGear:EquipmentItem:{itemId.Value:N}", cancellationToken);
             var maintenance = await cases.FindWithItemAsync(id, cancellationToken);
             if (!WorkflowRecords.MatchesVersion(input.RowVersion, maintenance.RowVersion))
                 return Outcome(false, "Someone else changed this case while you were editing. Close this dialog to see the latest details, then try again.");
@@ -91,7 +94,8 @@ public sealed class MaintenanceService(IMaintenanceRepository cases, IEquipmentR
                 ? $"Repair recorded. {item.Name} ({item.AssetCode}) is back in service in {item.Condition} condition."
                 : $"Maintenance saved for {item.Name} ({item.AssetCode}). Status: {(input.Status == MaintenanceStatus.InProgress ? "In progress" : "Open")}.");
         }
-        catch (Exception exception) when (exception is PersistenceException or InvalidOperationException)
+        catch (Exception exception) when (exception is InvalidOperationException or
+            PersistenceException { Failure: PersistenceFailure.StaleWrite or PersistenceFailure.Duplicate or PersistenceFailure.Busy })
         { return Outcome(false, exception is PersistenceException p ? p.Failure == PersistenceFailure.Busy ? "This record is busy. Please retry." : "This record changed. Reload and retry." : exception.Message); }
     }
     private static OperationResult<bool> Outcome(bool ok, string message, string? field = null, OperationOutcome? status = null) =>

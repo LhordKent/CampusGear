@@ -1,170 +1,95 @@
 # CampusGear
 
-.NET 8 ASP.NET Core MVC application with Entity Framework Core 8, ASP.NET Core Identity, and Microsoft SQL Server. The original 70-frame Figma UI demo remains available under `/demo`.
+Campus equipment borrowing on .NET 8, ASP.NET Core MVC/Identity, EF Core, and SQL Server.
 
-## Developer cheatsheet: start here
+**Registration requires administrator approval. Custodians approve/reject reservations, release equipment, and record returns. Administrators have read-only borrowing reports/details.** Signup sends no verification code.
 
-New to the project? Read the [complete codebase cheatsheet](docs/CODEBASE_CHEATSHEET.md). It explains the folder structure, every controller's responsibilities, routes, database relationships, signup/email flows, reservation lifecycle, UI files, configuration, debugging, and common changes. The [teacher base-code alignment](docs/TEACHER_BASECODE_ALIGNMENT.md) records what was adopted from the provided reference and what remains to be extracted.
+## Find the code
 
-| What you want to understand or change | Start with | What it controls |
-| --- | --- | --- |
-| Application startup and registered services | [Program.cs](CampusGear/CampusGear.WebApp/Program.cs) | Database, Identity, email provider, sessions, permissions, middleware, and startup initialization |
-| Signup, login, email codes, password recovery | [AccountController.cs](CampusGear/CampusGear.WebApp/Controllers/AccountController.cs) | Account forms, pending verification sessions, role redirects, and authentication |
-| Code generation and verification | [EmailChallengeService.cs](CampusGear/CampusGear.Services/Services/EmailChallengeService.cs) | Code lifetime, resend cooldown, attempts, invalidation, and consumption |
-| Real email delivery and local settings | [SmtpEmailSender.cs](CampusGear/CampusGear.Services/Services/SmtpEmailSender.cs), [DevelopmentConfiguration.cs](CampusGear/CampusGear.WebApp/Configuration/DevelopmentConfiguration.cs) | SMTP sends and Development configuration loading |
-| Reservation rules and equipment loans | [ReservationService.cs](CampusGear/CampusGear.Services/Services/Reservations/ReservationService.cs) | Availability, approval, cancellation, release, return, concurrency, and audit events |
-| Borrower screens | [BorrowerController.cs](CampusGear/CampusGear.WebApp/Controllers/BorrowerController.cs), [Views/Borrower](CampusGear/CampusGear.WebApp/Views/Borrower) | Booking form, own history, and calendar |
-| Custodian operations | [CustodianController.cs](CampusGear/CampusGear.WebApp/Controllers/CustodianController.cs), [Views/Custodian](CampusGear/CampusGear.WebApp/Views/Custodian) | Approval queue, releases, returns, details, and calendars |
-| Administrator management | [Controllers](CampusGear/CampusGear.WebApp/Controllers) | Inventory, categories, accounts, borrower eligibility, maintenance, reservations, and audit log |
-| Database shape and first-run data | [ApplicationDbContext.cs](CampusGear/CampusGear.Data/ApplicationDbContext.cs), [DbInitializer.cs](CampusGear/CampusGear.Data/DbInitializer.cs) | Tables, relationships, constraints, migrations, roles, sample equipment, and initial administrator |
-| Shared constants and enums | [Constants](CampusGear/CampusGear.Resources/Constants) | Cross-layer workflow states and static application vocabulary |
-| Shared screen layout and navigation | [Views/Shared](CampusGear/CampusGear.WebApp/Views/Shared), [FigmaUi.cs](CampusGear/CampusGear.WebApp/Models/FigmaUi.cs) | Account/workspace shells, shared partials, role navigation, and Figma assets |
-| Styles and browser interactions | [wwwroot/css](CampusGear/CampusGear.WebApp/wwwroot/css), [wwwroot/js](CampusGear/CampusGear.WebApp/wwwroot/js) | Responsive layouts, forms, navigation, and presentation |
-| Automated checks | [CampusGear.IntegrationTests](CampusGear/CampusGear.IntegrationTests), [scripts](scripts) | SQL lifecycle tests, email regressions, and local HTTP smoke checks |
+Browser → WebApp controller → Services workflow → Data repository → EF Core → SQL Server.
 
-The solution follows the teacher base-code layout: `CampusGear.WebApp` contains controllers/views and startup, `CampusGear.Services` contains processing and workflows, `CampusGear.Data` contains EF/database code and entities, and `CampusGear.Resources` contains shared constants. The solution is `CampusGear/CampusGear.sln`. The saved Figma reference screens remain under WebApp at `/demo`; editing a demo frame does not change the live workflow.
+| Project | Owns |
+|---|---|
+| [WebApp](CampusGear/CampusGear.WebApp) | Routes, form binding, authorization, HTTP/views, session adapter, UI assets |
+| [Services](CampusGear/CampusGear.Services) | Business rules, workflows, DTOs, transaction decisions, Identity coordination |
+| [Data](CampusGear/CampusGear.Data) | Focused repository interfaces/implementations, SQL queries, unit of work, locks, entities, migrations |
+| [Resources](CampusGear/CampusGear.Resources) | Shared enums and limits |
+| [IntegrationTests](CampusGear/CampusGear.IntegrationTests) | Real HTTP/SQL behavior, concurrency, architecture, uploads, account flows |
 
-### README navigation
-
-- [Run locally](#run-locally)
-- [Gmail setup](#send-real-email-with-gmail-locally)
-- [First administrator](#create-the-first-administrator)
-- [Live workflows](#live-workflows)
-- [Database and deployment](#database-and-deployment-configuration)
-- [Figma reference](#figma-sources-and-ui-reference)
-- [Verification commands](#verification)
-- [Detailed code map and troubleshooting](docs/CODEBASE_CHEATSHEET.md)
+Start with the [beginner cheatsheet](docs/CODEBASE_CHEATSHEET.md), [feature traces](docs/FEATURE_TRACES.md), [complete source catalog](docs/SOURCE_CATALOG.md), [permissions](docs/PERMISSIONS.md), and [refactor report](docs/SERVICE_REPOSITORY_REFACTOR_REPORT.md). The [teacher alignment report](docs/TEACHER_BASECODE_ALIGNMENT.md) explains the project structure.
 
 ## Run locally
 
-SQL Server Express is configured as `.\SQLEXPRESS` in `appsettings.Development.json`, using Windows authentication. The application creates/migrates only the `CampusGear` database in Development. A different instance can be configured with `ConnectionStrings__CampusGear`.
-
-From `C:\CampusGear`:
+Requires .NET 8 SDK and SQL Server Express. Development defaults to `.\SQLEXPRESS` / database `CampusGear` with Windows authentication. Starting Development applies existing migrations and seeds basic equipment; this is normal startup, **not a test command**.
 
 ```powershell
 dotnet tool restore
 dotnet restore .\CampusGear\CampusGear.sln
-dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http
+dotnet run --project .\CampusGear\CampusGear.WebApp --launch-profile http
 ```
 
-Open `http://localhost:5264/auth/login`. Self-registration creates a Borrower account; after verifying any email, the borrower can reserve immediately. Passwords require at least 8 characters including upper/lower case, a number, and a non-alphanumeric character.
+Open `http://localhost:5264/auth/login`. Select the matching launch profile in Visual Studio. Configure another SQL server through `ConnectionStrings__CampusGear`. Never use the live database for automated fixtures.
 
-SMTP is the default email provider, including in Development. The startup log identifies the selected provider. An in-memory inbox requires explicitly selecting `Email:Provider=Development`; this provider does not send real email. With it selected, open `/development/email` to read a signup, administrator login, or password recovery code. Refresh the inbox after requesting a code. It is available only in Development over a loopback connection and only with the Development email provider. `/auth/development-inbox` exposes the same messages as JSON for smoke tests. Codes expire after 10 minutes, allow five attempts, and have a 60-second resend cooldown.
+## Initial administrator
 
-Development startup loads an optional shared fallback at `%USERPROFILE%\.campusgear\email-secrets.json`, then CampusGear's standard User Secrets. This handles packaged tools whose private AppData store is invisible to Visual Studio. `Email:DevelopmentSettingsFile` can override the fallback path. Keep this file outside the repository and restrict access to your Windows account. Standard User Secrets, environment variables, and command-line arguments take precedence in that order. Startup diagnostics report file presence and whether Host/From are configured, without showing their values. Production does not load this fallback or local User Secrets.
-
-Retrying signup with an active, unconfirmed account and its original password resumes verification without replacing account details. Confirmed accounts still use sign-in. Delivery failures invalidate the unsent code and permit an immediate retry. Logs record the sender, challenge ID, purpose, exception type, and SMTP status without logging codes, credentials, or message bodies. SMTP acceptance does not confirm inbox receipt; check Spam as well as Inbox. Asynchronous SMTP sends have a 45-second timeout.
-
-If a previously opened account form becomes invalid after a restart or sign-in change, the rejected submission returns to a fresh form with a retry message. Re-enter your details; the rejected request does not create an account or send a code.
-
-### Send real email with Gmail locally
-
-1. Enable [Google 2-Step Verification](https://myaccount.google.com/security).
-2. Open [Google App Passwords](https://myaccount.google.com/apppasswords), create one named `CampusGear`, and keep the generated password on your computer. App Passwords may be unavailable for some managed accounts or Advanced Protection accounts; see [Google's instructions](https://support.google.com/accounts/answer/185833).
-3. From `C:\CampusGear`, run the interactive setup. It prompts for your sender address and hides the App Password input:
-
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-gmail.ps1
-   ```
-
-4. Stop the app if it is running, then restart it:
-
-   ```powershell
-   dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http
-   ```
-
-5. Open `http://localhost:5264/auth/signup` and register using an email you control. Check Inbox and Spam for the verification code, then enter it in CampusGear. Password recovery and administrator login codes use the same sender.
-
-The script selects `Email:Provider=Smtp` and configures `smtp.gmail.com`, port `587`, and STARTTLS (`EnableSsl=true`), as documented in [Gmail's SMTP settings](https://support.google.com/mail/answer/7104828). It saves the App Password in [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-8.0), outside the repository. This development store is not encrypted. It passes the password through standard input, so it is not included in command arguments. No password belongs in `appsettings.json`, GitHub, or chat.
-
-Real email delivery can run in Development without changing the local SQL Server or authentication setup. The development inbox is disabled when SMTP is selected. Test signup and password recovery with addresses you control; the automated live smoke script requires the Development provider and must not run against real email delivery. Local Gmail signup delivery was confirmed by the recipient on September 26, 2026.
-
-To switch back to the local inbox for smoke tests, run this and restart the app:
-
-```powershell
-dotnet user-secrets set "Email:Provider" "Development" --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj
-```
-
-### Create the first administrator
-
-Set these process environment variables before starting the app. Use an email you control and choose your own strong password:
+There is no committed default password. This operator procedure creates the initial administrator only when none exists; it does not replace an existing account.
 
 ```powershell
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_EMAIL = 'your-email@example.com'
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_NAME = 'Your Name'
 $setupPassword = Read-Host 'Initial administrator password' -AsSecureString
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD = [System.Net.NetworkCredential]::new('', $setupPassword).Password
-dotnet run --project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj --launch-profile http -- --initialize-only
+dotnet run --project .\CampusGear\CampusGear.WebApp --launch-profile http -- --initialize-only
+Remove-Item Env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD
 ```
 
-The bootstrap runs only when no administrator account exists. `--initialize-only` creates the account and exits without starting the web server. Account creation and role assignment commit together. The initial account is confirmed by this local operator setup and requires an email code at login. Remove the password environment variable afterward with `Remove-Item Env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD`. No default administrator password is checked into the project.
+New borrowers register at `/auth/signup`, land on `/auth/registration-submitted`, and wait for approval in `/admin/users?status=pending`. An administrator can also create accounts at `/admin/users/new`, assign staff roles, or pause eligibility. Passwords use Identity's configured upper/lowercase, digit, symbol, and minimum-eight-character rules.
 
-New accounts start as Pending Approval; an administrator approves or rejects them in User & Role Management. Custodians and additional administrators register the same way, and an administrator assigns their role after approval. Account history is retained when roles change or access is paused.
+## Email and session configuration
 
-### Demo Mode
+SMTP is the default. Configure `Email:Smtp:Host`, `From`, `Port` (587), `EnableSsl` (true), `Username`, and `Password` in local User Secrets or the deployment secret store. For local Gmail setup, run [setup-gmail.ps1](scripts/setup-gmail.ps1); it prompts privately for an App Password. Email is used for administrator sign-in and password recovery, **not signup**.
 
-`DemoMode:Enabled` (on in `appsettings.Development.json`) fills the app with sample data at startup so every dashboard, chart, queue, and calendar has something to show: 25 items in 6 categories (with Excellent through Unserviceable conditions and one retired unit), about three months of reservations in every status, open and overdue loans, returns (including late and damaged ones), open and closed maintenance cases, and the matching audit history.
+Development configuration precedence is: optional `%USERPROFILE%\.campusgear\email-secrets.json` → project User Secrets → environment → command line. The fallback path can be changed with `Email:DevelopmentSettingsFile`. The User Secrets ID remains `CampusGear-d27882c0-7d71-4d0d-97da-548b14740355`. Production loads neither local fallback nor Development User Secrets.
 
-- It runs only in the Development environment; anywhere else the setting is ignored and a warning is logged.
-- It creates and changes no accounts. Reservations and staff actions are attached to accounts that already exist on the `@campusgear.local` demo domain (a borrower and a custodian are needed); without them only the catalog is added.
-- Demo items use asset codes starting with `DM-`. Seeding is skipped once any exist, so restarts never duplicate data.
-- To take it back out: `dotnet run --project CampusGear/CampusGear.WebApp -- --remove-demo-data`, then set `DemoMode:Enabled` to `false`.
-
-## Live workflows
-
-| Role | Routes |
-| --- | --- |
-| Account | `/auth/login`, `/auth/signup`, `/auth/email-verification`, `/auth/two-factor`, password recovery screens |
-| Borrower | `/borrower/home` (homepage; `/borrower/dashboard` still works), `/borrower/reservation`, `/borrower/history`, `/borrower/calendar` |
-| Custodian | `/custodian/dashboard`, `/custodian/approvals`, `/custodian/returns`, `/custodian/history`, `/custodian/calendar`, `/custodian/categories` (read-only), `/custodian/borrowers` (read-only), `/admin/maintenance` |
-| Administrator | `/admin/dashboard`, `/admin/equipment`, `/admin/categories`, `/admin/users`, `/admin/users/new`, `/admin/borrowers`, `/admin/maintenance`, `/admin/audit`, `/admin/calendar` (read-only), `/admin/history` (read-only) |
-
-Who may do what is listed in [docs/PERMISSIONS.md](docs/PERMISSIONS.md); `CampusGear.IntegrationTests/RolePermissionTests.cs` checks every row over HTTP.
-
-Times displayed/entered in borrowing forms use Asia/Manila; database times are UTC. Pending requests hold a slot for 24 hours or until the requested start, whichever comes first. Rejection, cancellation, and expiration free the slot. Approved reservations can be released during the approved interval. Returns record condition and timeliness; damaged/unserviceable returns automatically open maintenance. Closing a repair restores availability.
-
-Reservations use a transaction-owned SQL Server application lock per item to serialize overlapping submissions and staff changes. Borrower access checks use a separate profile lock. Unique request IDs make retries idempotent. Row versions prevent stale inventory, maintenance, and borrower-profile edits. All mutations use role checks and anti-forgery validation; important account and equipment changes are audited.
-
-## Database and deployment configuration
-
-The repository includes the initial migration. Apply migrations explicitly outside Development:
+Select the in-memory mailbox explicitly for local testing:
 
 ```powershell
-dotnet ef database update --project .\CampusGear\CampusGear.Data\CampusGear.Data.csproj --startup-project .\CampusGear\CampusGear.WebApp\CampusGear.WebApp.csproj
+dotnet user-secrets set "Email:Provider" "Development" --project .\CampusGear\CampusGear.WebApp
 ```
 
-For a deployment, configure `ConnectionStrings__CampusGear` and these SMTP environment variables through the host's secret store:
+Restart after changing providers. `Development` never sends real mail and is forbidden outside Development. With SMTP in Development, `DevelopmentMirrorEmailSender` also copies messages into the local mailbox; a mirror entry is not proof of SMTP delivery. `/development/email` and `/auth/development-inbox` are Development-only, loopback-only, and no-store.
 
-- `Email__Smtp__Host`, `Email__Smtp__From`
-- `Email__Smtp__Port` (default 587), `Email__Smtp__EnableSsl` (default true)
-- `Email__Smtp__Username`, `Email__Smtp__Password` when required by the mail server
-- `Email__Provider=Smtp` (the default in every environment)
+Administrator codes are required except for the existing local Development bypass when provider is SMTP and Host is blank. Codes expire after ten minutes, permit five attempts, and impose a sixty-second resend cooldown. Failed delivery invalidates that code and permits retry. Startup/log diagnostics omit passwords and codes.
 
-Use HTTPS and a valid SQL Server certificate in deployment. `TrustServerCertificate=True` is only in the local Development connection. User Secrets are loaded only in Development; deployed SMTP credentials must be configured through the host's secret store. Gmail SMTP is configured locally; STARTTLS, account authentication, and receipt of a real signup verification email were verified. Authentication flow sessions and the development inbox are in memory, so restarting clears them. A deployment across multiple app instances also needs shared session storage and persistent/shared Data Protection keys.
+Session/cookies remain `CampusGear.Flow` (15-minute idle flow) and `CampusGear.Auth` (8-hour cookie). A reset grant lasts ten minutes and is tied to the account security stamp. Multiple deployment instances need shared session storage and persistent/shared Data Protection keys.
 
-## Figma sources and UI reference
+## Workflows
 
-- `figma-reference/frames.json`: all 70 visible application frames with node IDs.
-- `figma-reference/live-screen-manifest.json`: source frame mappings for the database-backed MVC screens and management forms.
-- `figma-reference/generated/`: generated React/Tailwind code returned by Figma for every frame, foundations, and component boards. These are source snapshots, with no runtime React or Tailwind dependency.
-- `CampusGear/CampusGear.WebApp/wwwroot/figma/catalog.json`: each frame's stable `/demo/{workspace}/{screen}?state=...` URL.
-- `CampusGear/CampusGear.WebApp/Pages/Figma/Frames/`: Razor partials converted from those snapshots.
-- `CampusGear/CampusGear.WebApp/wwwroot/figma/`: local SVG/images and self-hosted fonts. Temporary Figma URLs are retained only in offline source snapshots.
+- Borrower: `/borrower/home`, `/borrower/reservation`, own `/borrower/history`, `/borrower/calendar`.
+- Custodian: dashboard, approvals/releases/returns, history/calendar, read-only category/borrower directories, and maintenance.
+- Administrator: dashboard, equipment/categories, users/borrowers, maintenance/audit, read-only history/calendar/reservation details.
 
-The live MVC screens translate the saved Figma-generated markup into shared workspace shells, dashboard panels, rounded table rows, request decision panels, full-page add/edit forms, and summary/action strips. Original navigation icons, background graphics, and fonts are served locally. Dashboard totals and rows come from SQL Server, including empty states. Search, booking end time, maintenance information, and account eligibility controls accommodate the real backend. Borrower Profiles has its own live listing. The complete visual state catalog remains available in the reference demo. `/demo/auth/login` retains optional empty-field sign-in and role selection as a sample-only interaction; live sign-in verifies credentials and administrator email codes.
+Manila input/display times map to UTC records. Each physical unit has its own reservation; a quantity form requests up to ten units. Pending holds expire after 24 hours or at the start, whichever comes first. Half-open adjacent slots are allowed. Release rechecks eligibility and outstanding loans. Damaged/unserviceable returns create a repair hold.
 
-Desktop layouts support the Figma 1440×900 view and 1920×1080. Tablet/phone layouts scroll vertically rather than being trapped in a fixed 900-pixel canvas.
+Category/item/account deletion retains history by deactivating records where required. SQL application locks, rowversion/concurrency-stamp checks, audits, upload compensation, and per-unit batch compensation are documented in the tracing guide.
 
 ## Verification
 
 ```powershell
 dotnet build .\CampusGear\CampusGear.sln
+.\scripts\smoke-live.ps1
+# Or run the suite directly:
+dotnet test .\CampusGear\CampusGear.IntegrationTests
 node .\figma-reference\verify.cjs
-dotnet test .\CampusGear\CampusGear.IntegrationTests\CampusGear.IntegrationTests.csproj
-# Start the Development app before the HTTP check:
-.\scripts\smoke-live.ps1 -BaseUrl http://localhost:5264
+dotnet ef migrations has-pending-model-changes --project .\CampusGear\CampusGear.Data --startup-project .\CampusGear\CampusGear.WebApp --no-build
 ```
 
-Stop the running app before building/testing to release its output files. The SQL tests create and remove a uniquely named test database; see `CampusGear/CampusGear.IntegrationTests/README.md`. The HTTP smoke script uses disposable accounts/items in the Development CampusGear database and removes them after the run. It supports `-KeepFixtures` for local browser inspection; that option retains synthetic credentials in a temporary file until the fixtures are removed.
+The smoke wrapper runs the current approval/permissions flow through the integration suite, plus Figma reference checks. It does not attach to a running app. Fixtures create/drop uniquely named disposable databases, force Development email, and disable Demo Mode. `CAMPUSGEAR_TEST_SQLSERVER` selects a test server; fixtures always replace its database name. Stop a running app before building if it locks output files.
 
-Previous full checks passed with zero build warnings, 13 SQL integration tests, 594 HTTP/data assertions, all 70 reference states and 127 local images, responsive layouts, and keyboard access. The signup email investigation passed focused email/configuration tests and real HTTP signups; the recipient confirmed receiving a verification email. The shared settings fix still requires a normal Visual Studio signup/resend check. Verification results are recorded in `scripts/verification.md`.
+See [verification evidence](scripts/verification.md). This structural refactor adds no migration or schema change. Production migration application remains an explicit deployment operation.
+
+## Demo and visual references
+
+`DemoMode:Enabled` adds synthetic catalog/history only in Development. It creates/changes no accounts. Existing demo-domain accounts are required for synthetic borrowing records. `DM-` asset codes make seeding idempotent. To remove demo data, use `--remove-demo-data` deliberately against the intended Development database, then disable Demo Mode.
+
+[figma-reference](figma-reference) contains saved design snapshots and live screen mappings. [catalog.json](CampusGear/CampusGear.WebApp/wwwroot/figma/catalog.json) indexes 70 generated Razor frames under `/demo`; these are references, not working account/booking endpoints. Local assets/fonts live under `wwwroot/figma`. Edit live MVC views for live behavior.

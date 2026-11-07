@@ -25,9 +25,16 @@ public static class WorkflowRecords
 
     public static AuditEvent Audit(RequestContext actor, string action, string type, string id,
         DateTime now, string? before, string? after, string outcome = "Succeeded") => new()
-    {
-        ActorUserId = actor.UserId, Action = action, EntityType = type, EntityId = id, Outcome = outcome,
-        BeforeJson = before, AfterJson = after, IpAddress = actor.IpAddress,
-        CorrelationId = actor.CorrelationId, CreatedAtUtc = now
-    };
+        {
+            ActorUserId = actor.UserId,
+            Action = action,
+            EntityType = type,
+            EntityId = id,
+            Outcome = outcome,
+            BeforeJson = before,
+            AfterJson = after,
+            IpAddress = actor.IpAddress,
+            CorrelationId = actor.CorrelationId,
+            CreatedAtUtc = now
+        };
 }

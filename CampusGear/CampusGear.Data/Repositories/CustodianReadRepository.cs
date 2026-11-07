@@ -29,7 +29,8 @@ public sealed class CustodianReadRepository(ApplicationDbContext db) : ICustodia
             "rejected" => query.Where(x => x.Status == ReservationStatus.Rejected),
             "cancelled" => query.Where(x => x.Status == ReservationStatus.Cancelled),
             "expired" => query.Where(x => x.Status == ReservationStatus.Expired || x.Status == ReservationStatus.Pending && (x.HoldExpiresAtUtc == null || x.HoldExpiresAtUtc <= now || x.StartAtUtc <= now)),
-            "late" => query.Where(x => x.Loan != null && (x.Loan.ReturnedAtUtc == null && x.Loan.DueAtUtc < now || x.Loan.ReturnedAtUtc > x.Loan.DueAtUtc)), _ => query
+            "late" => query.Where(x => x.Loan != null && (x.Loan.ReturnedAtUtc == null && x.Loan.DueAtUtc < now || x.Loan.ReturnedAtUtc > x.Loan.DueAtUtc)),
+            _ => query
         };
         if (!string.IsNullOrWhiteSpace(search)) query = query.Where(x => x.EquipmentItem.Name.Contains(search) || x.EquipmentItem.AssetCode.Contains(search) ||
             x.BorrowerProfile.User.FullName.Contains(search) || x.BorrowerProfile.User.Email!.Contains(search));
@@ -37,9 +38,12 @@ public sealed class CustodianReadRepository(ApplicationDbContext db) : ICustodia
         if (to is not null) query = query.Where(x => x.StartAtUtc < to);
         var total = await query.CountAsync(ct); var pages = Math.Max(1, (int)Math.Ceiling(total / 12d)); page = Math.Clamp(page, 1, pages);
         var included = query.Include(x => x.BorrowerProfile).ThenInclude(x => x.User).Include(x => x.EquipmentItem).Include(x => x.Loan);
-        var ordered = queue switch { "active" => included.OrderByDescending(x => x.Loan!.ReleasedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
+        var ordered = queue switch
+        {
+            "active" => included.OrderByDescending(x => x.Loan!.ReleasedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
             "release" => included.OrderByDescending(x => x.DecidedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
-            _ => included.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id) };
+            _ => included.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id)
+        };
         return new(await ordered.Skip((page - 1) * 12).Take(12).ToListAsync(ct), page, pages, total,
             await db.Reservations.CountAsync(x => x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now, ct),
             await db.Reservations.CountAsync(x => x.Status == ReservationStatus.Approved, ct), await db.Loans.CountAsync(x => x.ReturnedAtUtc == null, ct));

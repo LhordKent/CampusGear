@@ -63,8 +63,16 @@ public sealed class InventoryCompensationTests(WebAppFixture app)
     private static async Task<EquipmentCommand> Command(ApplicationDbContext db, Guid id)
     {
         var item = await db.EquipmentItems.AsNoTracking().SingleAsync(x => x.Id == id);
-        return new() { Id = id, CategoryId = item.CategoryId, AssetCode = item.AssetCode, Name = item.Name,
-            Condition = item.Condition, IsActive = item.IsActive, RowVersion = Convert.ToBase64String(item.RowVersion) };
+        return new()
+        {
+            Id = id,
+            CategoryId = item.CategoryId,
+            AssetCode = item.AssetCode,
+            Name = item.Name,
+            Condition = item.Condition,
+            IsActive = item.IsActive,
+            RowVersion = Convert.ToBase64String(item.RowVersion)
+        };
     }
     private sealed class RecordingImages : IEquipmentImageStore
     {

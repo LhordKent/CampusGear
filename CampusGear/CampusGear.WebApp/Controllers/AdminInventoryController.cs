@@ -18,9 +18,20 @@ public sealed class AdminInventoryController(IInventoryService inventory, ICateg
         {
             var item = await inventory.GetEditAsync(id.Value, cancellationToken);
             if (item is null) return NotFound();
-            input = new() { Id = item.Id, CategoryId = item.CategoryId, AssetCode = item.AssetCode, Name = item.Name,
-                SerialNumber = item.SerialNumber, Location = item.Location, Description = item.Description,
-                Condition = item.Condition, IsActive = item.IsActive, RowVersion = Convert.ToBase64String(item.RowVersion), ImagePath = item.ImagePath };
+            input = new()
+            {
+                Id = item.Id,
+                CategoryId = item.CategoryId,
+                AssetCode = item.AssetCode,
+                Name = item.Name,
+                SerialNumber = item.SerialNumber,
+                Location = item.Location,
+                Description = item.Description,
+                Condition = item.Condition,
+                IsActive = item.IsActive,
+                RowVersion = Convert.ToBase64String(item.RowVersion),
+                ImagePath = item.ImagePath
+            };
         }
         return View(await PageAsync(input, q, page, cancellationToken));
     }
@@ -38,10 +49,20 @@ public sealed class AdminInventoryController(IInventoryService inventory, ICateg
     {
         if (!ModelState.IsValid) return View("Equipment", await PageAsync(input, null, 1, cancellationToken));
         await using var stream = imageFile is { Length: > 0 } ? imageFile.OpenReadStream() : null;
-        var result = await inventory.SaveAsync(Actor(), new EquipmentCommand { Id = input.Id, CategoryId = input.CategoryId,
-            AssetCode = input.AssetCode, Name = input.Name, SerialNumber = input.SerialNumber, Location = input.Location,
-            Description = input.Description, Condition = input.Condition, IsActive = input.IsActive, RowVersion = input.RowVersion,
-            RemoveImage = input.RemoveImage }, stream is null ? null : new(stream, imageFile!.Length), cancellationToken);
+        var result = await inventory.SaveAsync(Actor(), new EquipmentCommand
+        {
+            Id = input.Id,
+            CategoryId = input.CategoryId,
+            AssetCode = input.AssetCode,
+            Name = input.Name,
+            SerialNumber = input.SerialNumber,
+            Location = input.Location,
+            Description = input.Description,
+            Condition = input.Condition,
+            IsActive = input.IsActive,
+            RowVersion = input.RowVersion,
+            RemoveImage = input.RemoveImage
+        }, stream is null ? null : new(stream, imageFile!.Length), cancellationToken);
         if (result.Outcome == OperationOutcome.NotFound) return NotFound();
         if (!result.Succeeded)
         {

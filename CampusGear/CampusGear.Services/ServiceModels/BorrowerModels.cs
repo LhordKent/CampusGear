@@ -1,20 +1,11 @@
 using CampusGear.Models;
+using CampusGear.Services.ServiceModels;
 namespace CampusGear.Controllers;
-public sealed class ReservationInputModel
-{
-    public Guid RequestId { get; set; }
-    public Guid EquipmentItemId { get; set; }
-    public int Quantity { get; set; } = 1;
-    public string? StartLocal { get; set; }
-    public string? EndLocal { get; set; }
-    public string? Purpose { get; set; }
-    public string? Notes { get; set; }
-}
 
 public sealed class ReservationPageViewModel(
-    ReservationInputModel input, IReadOnlyList<CatalogEquipment> items, bool isEligible)
+    ReservationCommand input, IReadOnlyList<CatalogEquipment> items, bool isEligible)
 {
-    public ReservationInputModel Input { get; } = input;
+    public ReservationCommand Input { get; } = input;
     public IReadOnlyList<CatalogEquipment> Items { get; } = items;
     public bool IsEligible { get; } = isEligible;
     public IReadOnlyList<string> Categories => Items.Select(x => x.Category).Distinct().Order().ToList();

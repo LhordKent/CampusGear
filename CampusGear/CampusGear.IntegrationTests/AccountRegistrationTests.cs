@@ -159,9 +159,13 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
         var unique = Guid.NewGuid().ToString("N");
         return new SignUpInput
         {
-            FirstName = " Maria ", LastName = "Dela Cruz", StudentIdNumber = "SID-" + unique[..12].ToUpperInvariant(),
-            Email = $"{unique}@integration.test", MobileNumber = "09123456789",
-            Password = Password, ConfirmPassword = Password
+            FirstName = " Maria ",
+            LastName = "Dela Cruz",
+            StudentIdNumber = "SID-" + unique[..12].ToUpperInvariant(),
+            Email = $"{unique}@integration.test",
+            MobileNumber = "09123456789",
+            Password = Password,
+            ConfirmPassword = Password
         };
     }
 
