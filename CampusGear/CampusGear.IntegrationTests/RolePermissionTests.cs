@@ -321,7 +321,7 @@ public sealed class RolePermissionTests(WebAppFixture app)
         app.DbAsync(db => db.Reservations.Where(x => x.Id == id).Select(x => x.Status).SingleAsync());
 
     private Task<ItemStatus> ItemStatusAsync(Guid itemId) =>
-        app.DbAsync(async db => (await ItemStatuses.ForAllAsync(db, DateTime.UtcNow, CancellationToken.None))[itemId]);
+        app.DbAsync(async db => (await new CampusGear.Services.EquipmentAvailabilityService(new CampusGear.Data.Repositories.BorrowerReadRepository(db)).GetStatesAsync(DateTime.UtcNow, CancellationToken.None))[itemId]);
 
     private static TimeZoneInfo ResolveManila()
     {

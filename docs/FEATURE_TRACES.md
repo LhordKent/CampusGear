@@ -37,3 +37,15 @@ Start with the URL, put a breakpoint in the action, step into the service, then 
 `IReservationService` retains its original command/result/error contract. `ReservationService` decides transitions and owns transactions; ReservationRepository loads reservations/conflicts/expiry candidates, BorrowerProfileRepository reloads eligibility after the profile lock, AccountRepository checks current role membership, and Loan/Equipment/Maintenance/Audit repositories share the same context. The expiry worker still creates a scope per batch. `ReservationServiceSqlTests` verifies concurrency, duplicate IDs, half-open intervals, fresh eligibility, release/return and outstanding-loan restrictions.
 
 `EmailChallengeService.IssueAsync` → EmailChallengeRepository.UnconsumedAsync → serializable transaction → invalidate previous codes/add challenge/save/commit → IEmailSender. A failed send invalidates the new code and permits immediate retry. `VerifyAsync` loads LatestValidAsync, verifies protected content and attempts, then saves through UnitOfWork; a stale write detaches pending challenge changes and refuses duplicate consumption. No verification code or credentials are logged.
+
+## Borrower catalog, requests, history and calendar
+
+`BorrowerController` maps HTTP to `IBorrowerService`. `BorrowerReadRepository` performs catalog projections, profile-scoped history with SQL paging, submitted-ID ownership checks, conflict reads and calendar ranges. `BorrowerService.CreateReservationAsync` validates the request, derives stable request IDs for each unit, selects free candidates, calls the existing reservation core for each unit, and compensates partial failures by cancellation. The controller only builds the existing submitted URL from the returned IDs. Free-now catalog counts and interval availability remain distinct calculations.
+
+`EquipmentAvailabilityService` computes status priority from repository facts and supplies the calendar picker; WebApp's former `ItemStatuses.ForAllAsync` and `EquipmentPicker.LoadAsync` database helpers are removed. `ItemStatuses.Label`, `EquipmentIcon`, and `ChartGeometry` remain presentation helpers.
+
+## Staff reads and dashboards
+
+`CustodianController` → `CustodianService` → CustodianReadRepository for queues/reports/details, and BorrowerReadRepository for calendar facts. Details are mapped to detached `ReservationRecord` including safe borrower/staff display data; the view never receives a tracked reservation. Administrator aliases retain read-only permissions. Report date validation and query ordering retain their existing differences from borrower history.
+
+`CustodianDirectoryController` → `DirectoryService` → DirectoryReadRepository; `WorkspaceController` → `DashboardService` → DashboardReadRepository. Dates, counts and chart series come from current database records. Axis geometry stays in WebApp's ChartGeometry. Shared, EF-free read DTOs retain their original namespaces for Razor/source compatibility and are grouped in Services/ServiceModels, while web-only form/display adapters remain under WebApp/Models.

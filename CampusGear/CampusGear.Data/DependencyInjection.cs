@@ -20,6 +20,10 @@ public static class DependencyInjection
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ILoanRepository, LoanRepository>();
         services.AddScoped<IEmailChallengeRepository, EmailChallengeRepository>();
+        services.AddScoped<IBorrowerReadRepository, BorrowerReadRepository>();
+        services.AddScoped<IDirectoryReadRepository, DirectoryReadRepository>();
+        services.AddScoped<ICustodianReadRepository, CustodianReadRepository>();
+        services.AddScoped<IDashboardReadRepository, DashboardReadRepository>();
         return services;
     }
 }

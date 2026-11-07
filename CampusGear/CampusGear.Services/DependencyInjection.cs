@@ -8,6 +8,11 @@ public static class DependencyInjection
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IMaintenanceService, MaintenanceService>();
         services.AddScoped<IEmailChallengeService, EmailChallengeService>();
+        services.AddScoped<IEquipmentAvailabilityService, EquipmentAvailabilityService>();
+        services.AddScoped<IBorrowerService, BorrowerService>();
+        services.AddScoped<IDirectoryService, DirectoryService>();
+        services.AddScoped<ICustodianService, CustodianService>();
+        services.AddScoped<IDashboardService, DashboardService>();
         return services;
     }
 }
