@@ -3,7 +3,7 @@
 ## Baseline and delivery
 
 - Branch: codex/service-repository-refactor. Main baseline: f5dc69b; clean checkout and 132 passing tests were recorded before extraction.
-- Final implementation: the boundary-enforcement/handoff commit on this branch; its exact hash is pinned below by the following evidence-only documentation commit.
+- Final implementation commit: ec7b2e2 (boundary enforcement, tests and developer tracing handoff). This following documentation-only update pins that validated source reference.
 - Main is not merged or rewritten. No account recreation, credential change, schema migration, or live-database fixture operation was part of this refactor.
 - Completed paths and code ownership are indexed by [FEATURE_TRACES](FEATURE_TRACES.md), [64 route/action entries](ROUTE_MIGRATION_MAP.md), [the beginner cheatsheet](CODEBASE_CHEATSHEET.md), and [the maintained source catalog](SOURCE_CATALOG.md).
 - [baseline-http-contracts.json](baseline-http-contracts.json) freezes original MVC route spelling and role-attribute inventory from f5dc69b. HTTP tests separately enforce effective permissions and responses.
@@ -36,7 +36,7 @@ There is no generic CRUD repository or AutoMapper. Existing entity namespaces an
 | 8fbae29 | Borrower quantity/read orchestration, custodian queues/details/reports, directories, availability, dashboards; 137 full-suite tests |
 | 2aca123 | User administration, account/profile/role/history/audit persistence and Identity constraint adapter; focused account/admin gate |
 | 3e193ef | Account/session workflows, current-account header component, four stale/expired/unknown-flow checks; 26 account/password checks |
-| Final stage | Boundary enforcement, frozen route inventory, remaining characterizations, plain borrower command mapping, formatting, corrected smoke/docs/catalog, final full gate |
+| ec7b2e2 | Boundary enforcement, frozen route inventory, remaining characterizations, plain borrower command mapping, formatting, corrected smoke/docs/catalog, final full gate |
 
 Dependency ordering was adjusted where safe: core reservation/challenge persistence was extracted before remaining read models. Closely coupled inventory/maintenance scaffolding was committed together. Extra characterization was expanded after the initial frozen baseline while retaining all original assertions. Constructor wiring changed mechanically; two existing UI-status tests now call the extracted availability service with unchanged assertions.
 
