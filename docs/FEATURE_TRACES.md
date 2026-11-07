@@ -1,5 +1,15 @@
 # Feature tracing index
 
+## User administration
+
+GET /admin/users and /admin/borrowers → AdminUsersController.Index/Borrowers → UserAdministrationService.GetPageAsync → AccountRepository.ListAsync → AspNetUsers/UserRoles/Roles and BorrowerProfiles → AdminUsersPage → AdminUsers/Index. Search/paging run in SQL.
+
+Approve/Reject POST /admin/users/{id}/approve or reject → DecideRegistrationAsync → DecideAsync → AccountRepository.FindAsync and Identity.UpdateAsync → approval flags plus AuditRepository.Add → safe local redirect. Approval confirms the account without a signup code.
+
+Edit POST /admin/users/{id}/edit → AdminUserEditInput → UserEditCommand → EditAsync → global administration lock, fresh actor, profile lock/reload, concurrency checks → Identity roles/stamps and profile → save/audit/commit. Stale outcomes clear old ModelState and reload current details.
+
+Delete POST /admin/users/{id}/delete → DeleteAsync → HasHistoryAsync → deactivate when history exists, otherwise clear audit actors/challenges/profile and let Identity delete → audit/commit. Self-access and last-admin protection remain service rules. GET /admin/audit → GetAuditAsync → AuditRepository.ListAsync → immutable rows → AdminUsers/Audit.
+
 ## Read a feature from the browser down
 
 The controller binds and returns HTTP. The service chooses business outcomes. The repository executes SQL through EF. `IUnitOfWork` decides when the shared context saves/commits; repository `Add`/`Remove` methods do not commit.

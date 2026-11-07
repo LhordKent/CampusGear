@@ -10,6 +10,7 @@ public static class DependencyInjection
     public static IServiceCollection AddCampusGearData(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<Microsoft.AspNetCore.Identity.IUserStore<CampusGear.Models.ApplicationUser>, AccountUserStore>();
         services.AddScoped<IWorkflowLockManager, WorkflowLockManager>();
         services.AddScoped<IAuditRepository, AuditRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();

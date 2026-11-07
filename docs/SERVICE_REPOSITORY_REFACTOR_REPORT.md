@@ -19,4 +19,6 @@ Each implementation commit records its completed boundary and focused verificati
 
 ## Known risks to preserve
 
+User administration: queries, approval, Identity coordination, profile editing, account deletion/deactivation, and audits moved to UserAdministrationService. AccountRepository keeps post-lock reload and history queries in Data. Built-in Identity EF stores remain responsible for password/role/stamp persistence; AccountUserStore adds only constraint-error translation. The 19 focused account/admin tests passed; the integrated suite subsequently passed all 137 tests. Browser inputs remain annotated in WebApp and are explicitly mapped to plain commands.
+
 Identity stores and repositories must share one scoped context. Preserve per-item/profile/admin SQL locks, fresh post-lock reads, concurrency tokens, audit timing, image compensation, challenge send-after-commit, and multi-unit per-unit transactions with compensating cancellation. Unexpected pre-existing defects are documented separately instead of silently changed.

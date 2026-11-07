@@ -188,8 +188,11 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
             User = new ClaimsPrincipal(new ClaimsIdentity(
                 [new Claim(ClaimTypes.NameIdentifier, fixture.AdminUserId), new Claim(ClaimTypes.Role, "Administrator")], "Test"))
         };
-        var controller = new AdminUsersController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(),
-            scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>())
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var controller = new AdminUsersController(new UserAdministrationService(
+            new CampusGear.Data.Repositories.AccountRepository(db), new CampusGear.Data.Repositories.AuditRepository(db),
+            new CampusGear.Data.UnitOfWork(db), new CampusGear.Data.WorkflowLockManager(db),
+            scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>()))
         {
             ControllerContext = new ControllerContext { HttpContext = context, RouteData = new(), ActionDescriptor = new() },
             TempData = new TempDataDictionary(context, new TestTempDataProvider())
