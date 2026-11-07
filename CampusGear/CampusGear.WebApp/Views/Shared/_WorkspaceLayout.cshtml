@@ -1,13 +1,9 @@
 @using CampusGear.Models
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@inject Microsoft.AspNetCore.Identity.UserManager<CampusGear.Models.ApplicationUser> WorkspaceUsers
 @{
     var role = (string?)ViewData["WorkspaceRole"] ?? "Borrower";
     var slug = role == "Administrator" ? "admin" : role.ToLowerInvariant();
     var path = Context.Request.Path.Value ?? "";
-    var account = await WorkspaceUsers.GetUserAsync(User);
-    var name = account?.FullName ?? role;
-    var initial = name.Length > 0 ? name[..1].ToUpperInvariant() : "C";
     var title = ViewData["Title"] as string ?? "Campus equipment workspace";
     var borrower = role == "Borrower";
     var home = borrower ? "/borrower/home" : $"/{slug}/dashboard";
@@ -54,8 +50,7 @@
                     </details>
                     <div class="site-account">
                         <partial name="_ThemeToggle" />
-                        <span class="site-avatar" aria-hidden="true">@initial</span>
-                        <span class="site-account-name">@name</span>
+                        @await Component.InvokeAsync("WorkspaceIdentity", new { role, borrower = true })
                         <form method="post" action="/auth/logout">@Html.AntiForgeryToken()<button type="submit" class="site-logout">Log out</button></form>
                     </div>
                 </div>
@@ -86,7 +81,7 @@
                     </nav>
                 </details>
                 <div class="live-sidebar-footer">
-                    <div class="live-sidebar-user"><span class="live-avatar-initial" aria-hidden="true">@initial</span><div><strong>@name</strong><small>@role</small></div></div>
+                    @await Component.InvokeAsync("WorkspaceIdentity", new { role, borrower = false })
                     <form method="post" action="/auth/logout" class="live-logout">@Html.AntiForgeryToken()<button type="submit"><svg class="icon" aria-hidden="true"><use href="/icons.svg#logout"></use></svg>Log out</button></form>
                 </div>
             </aside>

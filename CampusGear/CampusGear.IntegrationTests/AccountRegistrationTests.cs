@@ -171,7 +171,11 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var context = new DefaultHttpContext { Session = new TestSession(), RequestServices = scope.ServiceProvider };
-        var controller = new AccountController(db, users, null!, Challenges(db, sender, new TestLogger()), null!, scope.ServiceProvider)
+        var accountService = new AccountService(new CampusGear.Data.Repositories.AccountRepository(db),
+            new CampusGear.Data.Repositories.AuditRepository(db), new CampusGear.Data.UnitOfWork(db), users,
+            null!, Challenges(db, sender, new TestLogger()), null!, null!,
+            new CampusGear.Infrastructure.AccountFlowStore(new HttpContextAccessor { HttpContext = context }));
+        var controller = new AccountController(accountService, null!, scope.ServiceProvider)
         {
             ControllerContext = new ControllerContext { HttpContext = context, RouteData = new(), ActionDescriptor = new() },
             TempData = new TempDataDictionary(context, new TestTempDataProvider())

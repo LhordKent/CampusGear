@@ -17,6 +17,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // The Figma reference demo remains under /demo.
 builder.Services.AddCampusGearData();
 builder.Services.AddCampusGearServices();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAccountFlowStore, CampusGear.Infrastructure.AccountFlowStore>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CampusGear")
         ?? throw new InvalidOperationException("ConnectionStrings:CampusGear is required.")));

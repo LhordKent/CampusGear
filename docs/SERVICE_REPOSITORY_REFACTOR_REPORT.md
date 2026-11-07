@@ -19,6 +19,8 @@ Each implementation commit records its completed boundary and focused verificati
 
 ## Known risks to preserve
 
+Account/email extraction: AccountService owns password/status decisions, administrator code and reset orchestration, session-flow decisions, and audit content. WebApp AccountFlowStore preserves every session key and the missing/empty distinction. WorkspaceIdentityViewComponent supplies safe display strings. All 137 existing/previously added tests passed; four additional stale/expired/unknown-flow cases passed in a 26-test account/password run. Identity hashing, lockout, EF stores, cookies, token generation, sender selection, secrets ID, and challenge serializable/send-after-commit timing are retained.
+
 User administration: queries, approval, Identity coordination, profile editing, account deletion/deactivation, and audits moved to UserAdministrationService. AccountRepository keeps post-lock reload and history queries in Data. Built-in Identity EF stores remain responsible for password/role/stamp persistence; AccountUserStore adds only constraint-error translation. The 19 focused account/admin tests passed; the integrated suite subsequently passed all 137 tests. Browser inputs remain annotated in WebApp and are explicitly mapped to plain commands.
 
 Identity stores and repositories must share one scoped context. Preserve per-item/profile/admin SQL locks, fresh post-lock reads, concurrency tokens, audit timing, image compensation, challenge send-after-commit, and multi-unit per-unit transactions with compensating cancellation. Unexpected pre-existing defects are documented separately instead of silently changed.

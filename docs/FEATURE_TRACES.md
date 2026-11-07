@@ -2,6 +2,18 @@
 
 ## User administration
 
+## Account and email flows
+
+Signup form POST /auth/signup → SignUpInput → AccountController.SignUp → AccountService.SignUpAsync(SignUpCommand) → AccountRepository.StudentExistsAsync, Identity.CreateAsync/AddToRoleAsync, AddProfile and UnitOfWork → AspNetUsers/UserRoles and BorrowerProfiles → commit, then audit → /auth/registration-submitted. No signup code is issued. Administrator approval is the next step (see User administration below).
+
+Login POST /auth/login → LoginInput → LoginAsync → Identity password/lockout/status decisions → either existing workspace path or administrator challenge. Pending/rejected state is revealed only after the password matches. TwoFactorAsync rechecks the stored security stamp before and after verification/reload, then Identity creates the cookie.
+
+Password recovery POST /auth/password-reset-request → EmailInput → PasswordResetRequestAsync → Identity lookup → session pending ID/stamp (empty marker for unknown addresses) → EmailChallengeService.IssueAsync → EmailChallengeRepository → serializable commit, then email send → same public notice and /auth/password-reset-code for known/unknown addresses. POST Code → PasswordResetCodeAsync → VerifyAsync → consumed challenge, fresh account/stamp check → ten-minute authorized session grant → /auth/password-reset-new. POST Password/ConfirmPassword → PasswordResetNewAsync → Identity reset token and ResetPasswordAsync → audit, clear grant, sign out → /auth/success. Missing/stale/expired state returns to the request screen.
+
+AccountFlowStore is WebApp's session adapter; AccountFlow returns a step/outcome, never an MVC result. The controller retains redirects, ModelState, TempData, rate limits, antiforgery, and mailbox loopback checks. WorkspaceIdentityViewComponent → CurrentAccountService.GetAsync → Identity.FindByIdAsync → CurrentAccountDisplay → component Razor; the layout no longer receives an Identity entity or manager.
+
+## Account administration trace
+
 GET /admin/users and /admin/borrowers → AdminUsersController.Index/Borrowers → UserAdministrationService.GetPageAsync → AccountRepository.ListAsync → AspNetUsers/UserRoles/Roles and BorrowerProfiles → AdminUsersPage → AdminUsers/Index. Search/paging run in SQL.
 
 Approve/Reject POST /admin/users/{id}/approve or reject → DecideRegistrationAsync → DecideAsync → AccountRepository.FindAsync and Identity.UpdateAsync → approval flags plus AuditRepository.Add → safe local redirect. Approval confirms the account without a signup code.
