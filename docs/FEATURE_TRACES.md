@@ -17,3 +17,17 @@ The controller binds and returns HTTP. The service chooses business outcomes. Th
 ### How to debug
 
 Start with the URL, put a breakpoint in the action, step into the service, then the repository. A field validation error returns before persistence. A stale editor returns a service error. A duplicate SQL name becomes `PersistenceFailure.Duplicate` in Data, then the existing message in Services. A cancelled or failed transaction rolls back on disposal. Never remove the lock or version check to make a save succeed.
+
+## Equipment and images
+
+`GET /admin/equipment` → `AdminInventoryController.Equipment` → `InventoryService.GetPageAsync` → `EquipmentRepository.InventoryAsync` → EquipmentItems + categories → Equipment view. `EquipmentEditInput` is the posted form; `EquipmentCommand` is the service input. `EquipmentRecord` is an immutable display projection, not a tracked EF entity.
+
+`POST /admin/equipment/save` → controller opens the upload stream → `InventoryService.SaveAsync` → category/equipment/maintenance repositories + transaction/locks/audit → existing redirect or form errors. The service validates the category again after taking the item/category locks. A new photo is removed if persistence fails; the replaced photo is removed after commit. `InventoryCompensationTests` verifies these side effects using a fake store and disposable SQL database.
+
+`POST /admin/equipment/{id}/delete` → `InventoryService.DeleteAsync`: equipment with borrowing/repair history is deactivated; unused equipment is deleted and its photo removed after saving.
+
+## Maintenance
+
+`GET /admin/maintenance` → `MaintenanceController.Index` → `MaintenanceService.GetPageAsync` → `MaintenanceRepository.ListAsync` → case rows and equipment choices. The view receives detached `MaintenanceRecord` projections.
+
+`POST /admin/maintenance/open` and `/{id}/update` → controller binds form → `MaintenanceService.OpenAsync` / `UpdateAsync` → equipment/maintenance repositories under the same item lock → case, item hold, audit, commit. Services validate outstanding loans, duplicate open cases, stale rowversions, and usable repair conditions. The controller alone chooses fetch JSON (200/422/404) versus a plain-form redirect. `Round3BehaviourTests` freezes that transport contract.

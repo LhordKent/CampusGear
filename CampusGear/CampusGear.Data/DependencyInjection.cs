@@ -13,6 +13,8 @@ public static class DependencyInjection
         services.AddScoped<IWorkflowLockManager, WorkflowLockManager>();
         services.AddScoped<IAuditRepository, AuditRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IEquipmentRepository, EquipmentRepository>();
+        services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
         return services;
     }
 }

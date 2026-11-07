@@ -13,6 +13,7 @@ Each implementation commit records its completed boundary and focused verificati
 
 - Baseline characterization: stale category/equipment writes preserve saved values and add no audit; repeated multi-unit forms retain the same reservation IDs (query-string ID order is not stable in the pre-existing implementation). Three new HTTP checks passed.
 - Infrastructure/categories: shared scoped UnitOfWork, provider-independent persistence failures, transaction-owned workflow locks, and audit construction. Categories now use a thin controller → CategoryService → CategoryRepository. Build clean; 61 focused permission, characterization, and round-three HTTP tests passed. See `FEATURE_TRACES.md`.
+- Inventory/maintenance: business rules, upload/database compensation, item/category locks, and audits now live in feature services; controllers retain binding and response mapping. Display models contain immutable query records rather than tracked equipment/maintenance entities. All 61 focused HTTP checks and two additional real-SQL image-compensation tests passed.
 
 ## Known risks to preserve
 
