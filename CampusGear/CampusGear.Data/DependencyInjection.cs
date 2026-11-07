@@ -15,6 +15,11 @@ public static class DependencyInjection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
         services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
+        services.AddScoped<IReservationRepository, ReservationRepository>();
+        services.AddScoped<IBorrowerProfileRepository, BorrowerProfileRepository>();
+        services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<ILoanRepository, LoanRepository>();
+        services.AddScoped<IEmailChallengeRepository, EmailChallengeRepository>();
         return services;
     }
 }

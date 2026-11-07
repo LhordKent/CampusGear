@@ -199,7 +199,7 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
     }
 
     private static EmailChallengeService Challenges(ApplicationDbContext db, IEmailSender sender, TestLogger logger) =>
-        new(db, sender, new EphemeralDataProtectionProvider(), logger);
+        new(new CampusGear.Data.Repositories.EmailChallengeRepository(db), new CampusGear.Data.UnitOfWork(db), sender, new EphemeralDataProtectionProvider(), logger);
 
     private sealed class TestSender : IEmailSender
     {

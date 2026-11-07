@@ -7,6 +7,7 @@ public static class DependencyInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IMaintenanceService, MaintenanceService>();
+        services.AddScoped<IEmailChallengeService, EmailChallengeService>();
         return services;
     }
 }
