@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e4df"/><stop offset="1" stop-color="#eac4ba"/></linearGradient><radialGradient id="glow" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="300" fill="url(#bg)"/><rect width="400" height="300" fill="url(#glow)"/>
+<ellipse cx="200" cy="254" rx="135" ry="13" fill="#000" opacity=".13"/>
+<defs><pattern id="mesh" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0 H7 M0 0 V7" stroke="#8d929a" stroke-width="1.4"/></pattern></defs>
+<g transform="rotate(-28 200 160)">
+<path d="M176 128 H224 L212 262 Q200 270 188 262 Z" fill="#2b2d31"/>
+<rect x="186" y="244" width="28" height="22" rx="4" fill="#1b1c1f"/>
+<rect x="172" y="120" width="56" height="14" rx="4" fill="#9ea3aa"/>
+<circle cx="200" cy="84" r="44" fill="#c3c7cd"/><circle cx="200" cy="84" r="44" fill="url(#mesh)"/>
+<circle cx="186" cy="68" r="12" fill="#fff" opacity=".35"/>
+</g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dff1e9"/><stop offset="1" stop-color="#bfe0d2"/></linearGradient><radialGradient id="glow" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="300" fill="url(#bg)"/><rect width="400" height="300" fill="url(#glow)"/>
+<ellipse cx="200" cy="254" rx="135" ry="13" fill="#000" opacity=".13"/>
+<rect x="66" y="74" width="268" height="160" rx="12" fill="#e8eaed" stroke="#c4c8ce" stroke-width="2"/>
+<rect x="80" y="88" width="156" height="110" rx="3" fill="#0c1a26"/>
+<path d="M80 115.5H236M80 143H236M80 170.5H236M119 88V198M158 88V198M197 88V198" stroke="#28465c" stroke-width="1"/>
+<path d="M80 130 C93 100 106 100 119 130 S145 160 158 130 S184 100 197 130 S223 160 236 130" fill="none" stroke="#ffd54a" stroke-width="2.5"/>
+<path d="M80 176 H98 V156 H128 V176 H158 V156 H188 V176 H218 V156 H236" fill="none" stroke="#4dd0e1" stroke-width="2"/>
+<g fill="#4a4d53"><circle cx="268" cy="108" r="12"/><circle cx="304" cy="108" r="12"/><circle cx="268" cy="148" r="9"/><circle cx="304" cy="148" r="9"/></g>
+<rect x="254" y="176" width="20" height="10" rx="2" fill="#fdd835"/><rect x="282" y="176" width="20" height="10" rx="2" fill="#4dd0e1"/>
+<g fill="#9aa0a7"><rect x="254" y="194" width="20" height="10" rx="2"/><rect x="282" y="194" width="20" height="10" rx="2"/><rect x="86" y="208" width="18" height="8" rx="2"/><rect x="110" y="208" width="18" height="8" rx="2"/><rect x="134" y="208" width="18" height="8" rx="2"/><rect x="158" y="208" width="18" height="8" rx="2"/></g>
+<rect x="84" y="234" width="24" height="10" rx="3" fill="#8d9198"/><rect x="292" y="234" width="24" height="10" rx="3" fill="#8d9198"/>
+</svg>

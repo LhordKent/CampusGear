@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dff1e9"/><stop offset="1" stop-color="#bfe0d2"/></linearGradient><radialGradient id="glow" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="300" fill="url(#bg)"/><rect width="400" height="300" fill="url(#glow)"/>
+<ellipse cx="200" cy="254" rx="135" ry="13" fill="#000" opacity=".13"/>
+<path d="M178 236 C150 262 110 250 82 268" fill="none" stroke="#c62828" stroke-width="6" stroke-linecap="round"/>
+<path d="M222 236 C250 262 290 250 318 268" fill="none" stroke="#1b1c1f" stroke-width="6" stroke-linecap="round"/>
+<rect x="140" y="40" width="120" height="208" rx="20" fill="#f2c318"/>
+<rect x="152" y="52" width="96" height="184" rx="10" fill="#3a3d42"/>
+<rect x="162" y="64" width="76" height="42" rx="3" fill="#c9d8b6"/>
+<text x="200" y="95" text-anchor="middle" font-family="Consolas,monospace" font-size="24" font-weight="700" fill="#2b3a22">1.234</text>
+<circle cx="200" cy="160" r="32" fill="#25272b"/><circle cx="200" cy="160" r="22" fill="#4a4d53"/>
+<rect x="196" y="132" width="8" height="26" rx="3" fill="#f2c318"/>
+<g fill="#25272b"><circle cx="170" cy="216" r="8"/><circle cx="200" cy="216" r="8"/><circle cx="230" cy="216" r="8"/></g>
+<circle cx="170" cy="216" r="4" fill="#c62828"/><circle cx="230" cy="216" r="4" fill="#111"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4e9da"/><stop offset="1" stop-color="#e3cdb0"/></linearGradient><radialGradient id="glow" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="300" fill="url(#bg)"/><rect width="400" height="300" fill="url(#glow)"/>
+<ellipse cx="200" cy="254" rx="135" ry="13" fill="#000" opacity=".13"/>
+<defs><pattern id="led" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="2" fill="#ffd36a"/></pattern></defs>
+<g stroke="#4a4c52" stroke-width="4" stroke-linecap="round"><line x1="128" y1="150" x2="128" y2="236"/><line x1="128" y1="236" x2="104" y2="252"/><line x1="128" y1="236" x2="152" y2="252"/><line x1="272" y1="150" x2="272" y2="236"/><line x1="272" y1="236" x2="248" y2="252"/><line x1="272" y1="236" x2="296" y2="252"/></g>
+<g transform="rotate(-8 128 110)"><rect x="80" y="62" width="96" height="88" rx="8" fill="#2b2d31"/><rect x="88" y="70" width="80" height="72" rx="3" fill="#fff6dc"/><rect x="88" y="70" width="80" height="72" rx="3" fill="url(#led)"/></g>
+<g transform="rotate(8 272 110)"><rect x="224" y="62" width="96" height="88" rx="8" fill="#2b2d31"/><rect x="232" y="70" width="80" height="72" rx="3" fill="#fff6dc"/><rect x="232" y="70" width="80" height="72" rx="3" fill="url(#led)"/></g>
+</svg>

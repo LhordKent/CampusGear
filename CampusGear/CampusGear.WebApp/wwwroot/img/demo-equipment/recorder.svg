@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7e4df"/><stop offset="1" stop-color="#eac4ba"/></linearGradient><radialGradient id="glow" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="300" fill="url(#bg)"/><rect width="400" height="300" fill="url(#glow)"/>
+<ellipse cx="200" cy="254" rx="135" ry="13" fill="#000" opacity=".13"/>
+<defs><pattern id="mesh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0 H6 M0 0 V6" stroke="#8d929a" stroke-width="1.2"/></pattern></defs>
+<g transform="rotate(-30 184 88)"><rect x="168" y="44" width="32" height="62" rx="14" fill="#c3c7cd"/><rect x="168" y="44" width="32" height="62" rx="14" fill="url(#mesh)"/></g>
+<g transform="rotate(30 216 88)"><rect x="200" y="44" width="32" height="62" rx="14" fill="#c3c7cd"/><rect x="200" y="44" width="32" height="62" rx="14" fill="url(#mesh)"/></g>
+<rect x="166" y="96" width="68" height="24" rx="6" fill="#3a3c41"/>
+<path d="M150 118 H250 L242 254 Q240 260 232 260 H168 Q160 260 158 254 Z" fill="#2d2f33"/>
+<rect x="166" y="132" width="68" height="44" rx="4" fill="#a8dba5"/>
+<path d="M172 160 l8 -10 l6 14 l8 -18 l8 20 l8 -12 l6 6 l8 -4" fill="none" stroke="#2e6b33" stroke-width="2"/>
+<circle cx="200" cy="208" r="16" fill="#3c3f45"/><circle cx="200" cy="208" r="6" fill="#d33"/>
+<g fill="#45484e"><rect x="170" y="234" width="16" height="10" rx="3"/><rect x="192" y="234" width="16" height="10" rx="3"/><rect x="214" y="234" width="16" height="10" rx="3"/></g>
+</svg>

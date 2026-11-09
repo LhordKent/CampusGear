@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3ecf7"/><stop offset="1" stop-color="#c6d6ec"/></linearGradient><radialGradient id="glow" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="400" height="300" fill="url(#bg)"/><rect width="400" height="300" fill="url(#glow)"/>
+<ellipse cx="200" cy="254" rx="135" ry="13" fill="#000" opacity=".13"/>
+<defs><linearGradient id="scr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6a4bd8"/><stop offset="1" stop-color="#f08ab8"/></linearGradient></defs>
+<rect x="106" y="62" width="188" height="132" rx="10" fill="#202124"/>
+<rect x="113" y="69" width="174" height="118" rx="4" fill="url(#scr)"/>
+<rect x="188" y="69" width="24" height="6" rx="3" fill="#202124"/>
+<rect x="128" y="150" width="144" height="22" rx="11" fill="#fff" opacity=".35"/>
+<path d="M78 196 H322 Q336 196 336 210 V214 Q336 226 322 226 H78 Q64 226 64 214 V210 Q64 196 78 196 Z" fill="#cdd1d6"/>
+<rect x="64" y="216" width="272" height="10" rx="5" fill="#aeb3ba"/>
+<rect x="176" y="196" width="48" height="5" rx="2" fill="#aeb3ba"/>
+</svg>

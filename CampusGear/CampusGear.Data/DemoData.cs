@@ -65,11 +65,37 @@ public static class DemoData
         new("DM-ACC-03", "25 m Extension Cord Reel", "Networking & Accessories", "Equipment Room B, Floor", EquipmentCondition.Fair, "Four-outlet reel with overload breaker. Retired from lending.", 300, Active: false),
     ];
 
+    // Illustrations shipped with the app (wwwroot/img/demo-equipment), not uploads: the image store only ever deletes
+    // files under /uploads/equipment, so removing or re-photographing a demo item leaves these shared pictures in place.
+    private const string ImageFolder = "/img/demo-equipment/";
+    private static readonly Dictionary<string, string> Images = new(StringComparer.Ordinal)
+    {
+        ["DM-CAM-01"] = "camera", ["DM-CAM-02"] = "camera", ["DM-CAM-03"] = "vlog-camera", ["DM-CAM-04"] = "tripod",
+        ["DM-CAM-05"] = "led-panel", ["DM-LAP-01"] = "laptop", ["DM-LAP-02"] = "laptop", ["DM-LAP-03"] = "laptop",
+        ["DM-LAP-04"] = "macbook", ["DM-TAB-01"] = "tablet", ["DM-PRJ-01"] = "projector", ["DM-PRJ-02"] = "projector",
+        ["DM-PRJ-03"] = "mini-projector", ["DM-SCR-01"] = "screen", ["DM-AUD-01"] = "microphone", ["DM-AUD-02"] = "wireless-mic",
+        ["DM-AUD-03"] = "recorder", ["DM-AUD-04"] = "speaker", ["DM-LAB-01"] = "multimeter", ["DM-LAB-02"] = "oscilloscope",
+        ["DM-LAB-03"] = "arduino", ["DM-NET-01"] = "router", ["DM-ACC-01"] = "clicker", ["DM-ACC-02"] = "adapters",
+        ["DM-ACC-03"] = "extension-reel",
+    };
+
+    private static string? ImageFor(string assetCode) => Images.TryGetValue(assetCode, out var name) ? $"{ImageFolder}{name}.svg" : null;
+
     /// <summary>Adds the demo catalog and activity if they are not there yet. Returns what was added.</summary>
     public static async Task<string> SeedAsync(ApplicationDbContext db, DateTime nowUtc, CancellationToken cancellationToken = default)
     {
         if (await db.EquipmentItems.AnyAsync(x => x.AssetCode.StartsWith(AssetPrefix), cancellationToken))
+        {
+            // Demo items seeded before they had pictures get one now; a photo someone uploaded is never replaced.
+            var unpictured = await db.EquipmentItems.Where(x => x.AssetCode.StartsWith(AssetPrefix) && x.ImagePath == null).ToListAsync(cancellationToken);
+            foreach (var existing in unpictured) existing.ImagePath = ImageFor(existing.AssetCode);
+            if (unpictured.Any(x => x.ImagePath is not null))
+            {
+                await db.SaveChangesAsync(cancellationToken);
+                return $"Demo data is already present; added pictures to {unpictured.Count(x => x.ImagePath is not null)} demo items.";
+            }
             return "Demo data is already present.";
+        }
 
         var demoUsers = await db.Users.AsNoTracking()
             .Where(x => x.Email != null && x.Email.EndsWith(AccountDomain) && x.IsActive && x.ApprovalStatus == AccountApprovalStatus.Approved)
@@ -112,7 +138,7 @@ public static class DemoData
             {
                 Category = categories[spec.Category], AssetCode = spec.Code, Name = spec.Name, Description = spec.Description,
                 SerialNumber = SerialPrefix + spec.Code[AssetPrefix.Length..], Location = spec.Location, Condition = spec.Condition,
-                IsActive = spec.Active, CreatedAtUtc = added, UpdatedAtUtc = added,
+                IsActive = spec.Active, CreatedAtUtc = added, UpdatedAtUtc = added, ImagePath = ImageFor(spec.Code),
                 // Damaged and unserviceable units are held until a repair is recorded, as a return in that condition would do.
                 IsMaintenanceHold = spec.Condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable
             };
