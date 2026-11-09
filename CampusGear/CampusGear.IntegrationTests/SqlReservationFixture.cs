@@ -35,6 +35,7 @@ public sealed class SqlReservationFixture : IAsyncLifetime
 
         var services = new ServiceCollection();
         services.AddLogging();
+        services.AddCampusGearData();
         services.AddDbContext<ApplicationDbContext>(options => options
             .UseSqlServer(_connectionString).AddInterceptors(LockObserver));
         services.AddIdentityCore<ApplicationUser>(options => options.Password.RequiredLength = 8)
@@ -118,8 +119,12 @@ public sealed class SqlReservationFixture : IAsyncLifetime
         var email = $"{Guid.NewGuid():N}@integration.test";
         var user = new ApplicationUser
         {
-            UserName = email, Email = email, FirstName = "Integration", LastName = "Test " + role,
-            EmailConfirmed = true, IsActive = true
+            UserName = email,
+            Email = email,
+            FirstName = "Integration",
+            LastName = "Test " + role,
+            EmailConfirmed = true,
+            IsActive = true
         };
         var result = await users.CreateAsync(user, "Integration-Pass!42");
         Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(x => x.Description)));

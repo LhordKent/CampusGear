@@ -1,11 +1,8 @@
 using System.Data;
 using System.Text.Json;
-using CampusGear.Data;
+using CampusGear.Data.Interfaces;
 using CampusGear.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CampusGear.Services.Reservations;
 
@@ -14,7 +11,9 @@ namespace CampusGear.Services.Reservations;
 /// availability takes the same transaction-owned SQL Server application lock.
 /// </summary>
 public sealed class ReservationService(
-    ApplicationDbContext db,
+    IReservationRepository records, IEquipmentRepository equipment, IBorrowerProfileRepository profiles,
+    IAccountRepository accounts, ILoanRepository loans, IMaintenanceRepository maintenance, IAuditRepository audits,
+    IUnitOfWork work, IWorkflowLockManager locks,
     UserManager<ApplicationUser> users,
     TimeProvider clock) : IReservationService
 {
@@ -47,9 +46,7 @@ public sealed class ReservationService(
             throw Error(ReservationErrorCode.IneligibleBorrower, "The borrower account is not eligible to reserve equipment.");
         }
 
-        var existing = await db.Reservations.AsNoTracking()
-            .Include(x => x.BorrowerProfile).Include(x => x.Loan)
-            .SingleOrDefaultAsync(x => x.RequestId == command.RequestId, cancellationToken);
+        var existing = await records.FindByRequestIdAsync(command.RequestId, cancellationToken);
         if (existing is not null)
             return ExistingRequestResult(existing, borrower.Id, command, purpose, notes);
 
@@ -59,15 +56,11 @@ public sealed class ReservationService(
             throw Error(ReservationErrorCode.InvalidInput, "The requested start time has passed.");
 
         // The second lookup is essential: another request may have committed while we waited for the item lock.
-        existing = await db.Reservations.AsNoTracking()
-            .Include(x => x.BorrowerProfile).Include(x => x.Loan)
-            .SingleOrDefaultAsync(x => x.RequestId == command.RequestId, cancellationToken);
+        existing = await records.FindByRequestIdAsync(command.RequestId, cancellationToken);
         if (existing is not null)
             return ExistingRequestResult(existing, borrower.Id, command, purpose, notes);
 
-        var profileId = await db.BorrowerProfiles.AsNoTracking()
-            .Where(x => x.UserId == borrower.Id).Select(x => (Guid?)x.Id)
-            .SingleOrDefaultAsync(cancellationToken);
+        var profileId = await profiles.GetIdAsync(borrower.Id, cancellationToken);
         if (profileId is null)
             throw Error(ReservationErrorCode.IneligibleBorrower, "The borrower has no borrowing profile.");
         await AcquireBorrowerLockAsync(profileId.Value, cancellationToken);
@@ -76,8 +69,7 @@ public sealed class ReservationService(
         if (command.StartAtUtc <= now)
             throw Error(ReservationErrorCode.InvalidInput, "The requested start time has passed.");
 
-        var item = await db.EquipmentItems.SingleOrDefaultAsync(
-            x => x.Id == command.EquipmentItemId, cancellationToken);
+        var item = await equipment.FindAsync(command.EquipmentItemId, cancellationToken);
         EnsureUsable(item);
 
         if (await HasConflictAsync(command.EquipmentItemId, command.StartAtUtc,
@@ -101,14 +93,14 @@ public sealed class ReservationService(
             CreatedAtUtc = now,
             UpdatedAtUtc = now
         };
-        db.Reservations.Add(reservation);
+        records.Add(reservation);
         AddAudit(actor, "reservation.created", reservation, null, now);
 
         try
         {
             await SaveAsync(cancellationToken);
         }
-        catch (DbUpdateException exception) when (IsUniqueKeyViolation(exception))
+        catch (PersistenceException exception) when (exception.Failure == PersistenceFailure.Duplicate)
         {
             throw Error(ReservationErrorCode.DuplicateRequest, "This request was already submitted.");
         }
@@ -251,8 +243,7 @@ public sealed class ReservationService(
         EnsureUsable(reservation.EquipmentItem);
         if (await HasConflictAsync(itemId, reservation.StartAtUtc, reservation.EndAtUtc,
                 now, reservation.Id, cancellationToken) ||
-            await db.Loans.AnyAsync(x => x.Reservation.EquipmentItemId == itemId &&
-                    x.ReservationId != reservation.Id && x.ReturnedAtUtc == null, cancellationToken))
+            await loans.HasOutstandingExceptAsync(itemId, reservation.Id, cancellationToken))
         {
             throw Error(ReservationErrorCode.ScheduleConflict, "The equipment is currently unavailable.");
         }
@@ -274,7 +265,7 @@ public sealed class ReservationService(
         reservation.EquipmentItem.Condition = conditionAtRelease;
         TouchItem(reservation.EquipmentItem, now);
         reservation.Loan = loan;
-        db.Loans.Add(loan);
+        loans.Add(loan);
         AddAudit(actor, "reservation.released", reservation, before, now);
         await SaveAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
@@ -317,7 +308,7 @@ public sealed class ReservationService(
         if (conditionAtReturn is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
         {
             item.IsMaintenanceHold = true;
-            db.MaintenanceCases.Add(new MaintenanceCase
+            maintenance.Add(new MaintenanceCase
             {
                 EquipmentItemId = item.Id,
                 LoanId = loan.Id,
@@ -343,19 +334,13 @@ public sealed class ReservationService(
             throw Error(ReservationErrorCode.InvalidInput, "Batch size must be between 1 and 1000.");
 
         var now = UtcNow();
-        var candidateIds = await db.Reservations.AsNoTracking()
-            .Where(x => x.Status == ReservationStatus.Pending &&
-                (x.HoldExpiresAtUtc == null || x.HoldExpiresAtUtc <= now || x.StartAtUtc <= now))
-            .OrderBy(x => x.HoldExpiresAtUtc)
-            .Select(x => new { x.Id, x.EquipmentItemId })
-            .Take(batchSize)
-            .ToListAsync(cancellationToken);
+        var candidateIds = await records.ExpiryCandidatesAsync(now, batchSize, cancellationToken);
 
         var expired = 0;
         foreach (var candidate in candidateIds)
         {
             await using var transaction = await BeginItemTransactionAsync(candidate.EquipmentItemId, cancellationToken);
-            var reservation = await db.Reservations.SingleOrDefaultAsync(x => x.Id == candidate.Id, cancellationToken);
+            var reservation = await records.FindAsync(candidate.Id, cancellationToken);
             if (reservation is null || !IsDueToExpire(reservation, now))
                 continue;
 
@@ -370,7 +355,7 @@ public sealed class ReservationService(
 
     private async Task<bool> ExpireIfDueAsync(
         Reservation reservation, ReservationActor actor, DateTime now,
-        IDbContextTransaction transaction, CancellationToken cancellationToken)
+        IDataTransaction transaction, CancellationToken cancellationToken)
     {
         if (!IsDueToExpire(reservation, now))
             return false;
@@ -395,23 +380,14 @@ public sealed class ReservationService(
         (reservation.HoldExpiresAtUtc is null || reservation.HoldExpiresAtUtc <= now ||
          reservation.StartAtUtc <= now);
 
-    private async Task<bool> HasConflictAsync(
-        Guid itemId, DateTime startAtUtc, DateTime endAtUtc, DateTime now,
+    private Task<bool> HasConflictAsync(Guid itemId, DateTime startAtUtc, DateTime endAtUtc, DateTime now,
         Guid? excludingReservationId, CancellationToken cancellationToken) =>
-        await db.Reservations.AnyAsync(x =>
-            x.EquipmentItemId == itemId &&
-            (excludingReservationId == null || x.Id != excludingReservationId) &&
-            x.StartAtUtc < endAtUtc && x.EndAtUtc > startAtUtc &&
-            (x.Status == ReservationStatus.Approved ||
-             x.Status == ReservationStatus.Released ||
-             x.Status == ReservationStatus.Pending &&
-                 x.HoldExpiresAtUtc != null && x.HoldExpiresAtUtc > now && x.StartAtUtc > now),
-            cancellationToken);
+        records.HasConflictAsync(itemId, startAtUtc, endAtUtc, now, excludingReservationId, cancellationToken);
 
-    private async Task<IDbContextTransaction> BeginItemTransactionAsync(
+    private async Task<IDataTransaction> BeginItemTransactionAsync(
         Guid itemId, CancellationToken cancellationToken)
     {
-        var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+        var transaction = await work.BeginAsync(IsolationLevel.ReadCommitted, cancellationToken);
         try
         {
             await AcquireTransactionLockAsync($"CampusGear:EquipmentItem:{itemId:N}", cancellationToken);
@@ -429,17 +405,9 @@ public sealed class ReservationService(
 
     private async Task AcquireTransactionLockAsync(string lockResource, CancellationToken cancellationToken)
     {
-        // The transaction owns both locks. Every reservation path takes item before borrower
-        // so staff eligibility edits and availability changes have a consistent lock order.
-        var result = new SqlParameter("@lockResult", SqlDbType.Int) { Direction = ParameterDirection.Output };
-        var resource = new SqlParameter("@resource", SqlDbType.NVarChar, 255) { Value = lockResource };
-        await db.Database.ExecuteSqlRawAsync(
-            "EXEC @lockResult = sp_getapplock @Resource = @resource, " +
-            "@LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = " +
-            ItemLockTimeoutMilliseconds,
-            new object[] { result, resource }, cancellationToken);
-        if (result.Value is not int code || code < 0)
-            throw Error(ReservationErrorCode.Busy, "This record is busy. Please retry the action.");
+        try { await locks.AcquireAsync(lockResource, cancellationToken); }
+        catch (PersistenceException e) when (e.Failure == PersistenceFailure.Busy)
+        { throw Error(ReservationErrorCode.Busy, "This record is busy. Please retry the action."); }
     }
 
     private async Task<BorrowerProfile> RequireEligibleBorrowerAsync(
@@ -447,14 +415,10 @@ public sealed class ReservationService(
     {
         // UserManager may already track a user from before the lock wait. This query must
         // read fresh profile/account data and role membership after acquiring the lock.
-        var profile = await db.BorrowerProfiles.AsNoTracking().Include(x => x.User)
-            .SingleOrDefaultAsync(x => x.Id == profileId, cancellationToken);
+        var profile = await profiles.FindFreshAsync(profileId, cancellationToken);
         if (profile is null || !profile.IsEligible || !profile.User.IsActive || !profile.User.EmailConfirmed)
             throw Error(ReservationErrorCode.IneligibleBorrower, "The borrower is no longer eligible to borrow equipment.");
-        var isBorrower = await db.UserRoles.AsNoTracking().Join(db.Roles.AsNoTracking(),
-                userRole => userRole.RoleId, role => role.Id, (userRole, role) => new { userRole, role })
-            .AnyAsync(x => x.userRole.UserId == profile.UserId && x.role.NormalizedName == "BORROWER",
-                cancellationToken);
+        var isBorrower = await accounts.HasBorrowerRoleAsync(profile.UserId, cancellationToken);
         if (!isBorrower)
             throw Error(ReservationErrorCode.IneligibleBorrower, "The account no longer has borrower access.");
         return profile;
@@ -464,18 +428,13 @@ public sealed class ReservationService(
     {
         if (reservationId == Guid.Empty)
             throw Error(ReservationErrorCode.InvalidInput, "A reservation ID is required.");
-        var itemId = await db.Reservations.AsNoTracking()
-            .Where(x => x.Id == reservationId)
-            .Select(x => (Guid?)x.EquipmentItemId)
-            .SingleOrDefaultAsync(cancellationToken);
+        var itemId = await records.GetItemIdAsync(reservationId, cancellationToken);
         return itemId ?? throw Error(ReservationErrorCode.NotFound, "Reservation was not found.");
     }
 
     private async Task<Reservation> GetLockedReservationAsync(
         Guid reservationId, CancellationToken cancellationToken) =>
-        await db.Reservations.Include(x => x.Loan).Include(x => x.EquipmentItem)
-            .Include(x => x.BorrowerProfile)
-            .SingleOrDefaultAsync(x => x.Id == reservationId, cancellationToken)
+        await records.FindWorkflowAsync(reservationId, cancellationToken)
         ?? throw Error(ReservationErrorCode.NotFound, "Reservation was not found.");
 
     private async Task<ApplicationUser> RequireActiveVerifiedUserAsync(
@@ -502,9 +461,9 @@ public sealed class ReservationService(
     {
         try
         {
-            await db.SaveChangesAsync(cancellationToken);
+            await work.SaveAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (PersistenceException e) when (e.Failure == PersistenceFailure.StaleWrite)
         {
             throw Error(ReservationErrorCode.StaleWrite, "This record changed. Reload and retry.");
         }
@@ -514,7 +473,7 @@ public sealed class ReservationService(
         ReservationActor? actor, string action, Reservation reservation,
         ReservationStatus? before, DateTime now)
     {
-        db.AuditEvents.Add(new AuditEvent
+        audits.Add(new AuditEvent
         {
             ActorUserId = actor?.UserId,
             Action = action,
@@ -583,7 +542,7 @@ public sealed class ReservationService(
         // Its rowversion detects an inventory/maintenance edit made concurrently by a path
         // that does not yet participate in the per-item application lock.
         item.UpdatedAtUtc = now;
-        db.Entry(item).Property(x => x.UpdatedAtUtc).IsModified = true;
+        equipment.MarkUpdated(item);
     }
 
     private static string RequiredText(string? value, int maxLength, string emptyMessage)
@@ -605,9 +564,6 @@ public sealed class ReservationService(
             throw Error(ReservationErrorCode.InvalidInput, $"Text must be {maxLength} characters or fewer.");
         return text;
     }
-
-    private static bool IsUniqueKeyViolation(DbUpdateException exception) =>
-        exception.InnerException is SqlException sql && sql.Number is 2601 or 2627;
 
     private static DateTime Earlier(DateTime first, DateTime second) => first <= second ? first : second;
 

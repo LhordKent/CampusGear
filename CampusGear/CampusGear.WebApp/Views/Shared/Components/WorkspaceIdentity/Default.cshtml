@@ -1,0 +1,10 @@
+@model CampusGear.Models.WorkspaceIdentityModel
+@if(Model.Borrower)
+{
+<span class="site-avatar" aria-hidden="true">@Model.Initial</span>
+<span class="site-account-name">@Model.Name</span>
+}
+else
+{
+<div class="live-sidebar-user"><span class="live-avatar-initial" aria-hidden="true">@Model.Initial</span><div><strong>@Model.Name</strong><small>@Model.Role</small></div></div>
+}

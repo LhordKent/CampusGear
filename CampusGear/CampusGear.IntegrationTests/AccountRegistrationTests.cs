@@ -159,9 +159,13 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
         var unique = Guid.NewGuid().ToString("N");
         return new SignUpInput
         {
-            FirstName = " Maria ", LastName = "Dela Cruz", StudentIdNumber = "SID-" + unique[..12].ToUpperInvariant(),
-            Email = $"{unique}@integration.test", MobileNumber = "09123456789",
-            Password = Password, ConfirmPassword = Password
+            FirstName = " Maria ",
+            LastName = "Dela Cruz",
+            StudentIdNumber = "SID-" + unique[..12].ToUpperInvariant(),
+            Email = $"{unique}@integration.test",
+            MobileNumber = "09123456789",
+            Password = Password,
+            ConfirmPassword = Password
         };
     }
 
@@ -171,7 +175,11 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var context = new DefaultHttpContext { Session = new TestSession(), RequestServices = scope.ServiceProvider };
-        var controller = new AccountController(db, users, null!, Challenges(db, sender, new TestLogger()), null!, scope.ServiceProvider)
+        var accountService = new AccountService(new CampusGear.Data.Repositories.AccountRepository(db),
+            new CampusGear.Data.Repositories.AuditRepository(db), new CampusGear.Data.UnitOfWork(db), users,
+            null!, Challenges(db, sender, new TestLogger()), null!, null!,
+            new CampusGear.Infrastructure.AccountFlowStore(new HttpContextAccessor { HttpContext = context }));
+        var controller = new AccountController(accountService, null!, scope.ServiceProvider)
         {
             ControllerContext = new ControllerContext { HttpContext = context, RouteData = new(), ActionDescriptor = new() },
             TempData = new TempDataDictionary(context, new TestTempDataProvider())
@@ -188,8 +196,11 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
             User = new ClaimsPrincipal(new ClaimsIdentity(
                 [new Claim(ClaimTypes.NameIdentifier, fixture.AdminUserId), new Claim(ClaimTypes.Role, "Administrator")], "Test"))
         };
-        var controller = new AdminUsersController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(),
-            scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>())
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var controller = new AdminUsersController(new UserAdministrationService(
+            new CampusGear.Data.Repositories.AccountRepository(db), new CampusGear.Data.Repositories.AuditRepository(db),
+            new CampusGear.Data.UnitOfWork(db), new CampusGear.Data.WorkflowLockManager(db),
+            scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>()))
         {
             ControllerContext = new ControllerContext { HttpContext = context, RouteData = new(), ActionDescriptor = new() },
             TempData = new TempDataDictionary(context, new TestTempDataProvider())
@@ -199,7 +210,7 @@ public sealed class AccountRegistrationTests(SqlReservationFixture fixture)
     }
 
     private static EmailChallengeService Challenges(ApplicationDbContext db, IEmailSender sender, TestLogger logger) =>
-        new(db, sender, new EphemeralDataProtectionProvider(), logger);
+        new(new CampusGear.Data.Repositories.EmailChallengeRepository(db), new CampusGear.Data.UnitOfWork(db), sender, new EphemeralDataProtectionProvider(), logger);
 
     private sealed class TestSender : IEmailSender
     {

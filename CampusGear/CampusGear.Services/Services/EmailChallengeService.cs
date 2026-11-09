@@ -2,10 +2,9 @@ using System.Data;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using CampusGear.Data;
+using CampusGear.Data.Interfaces;
 using CampusGear.Models;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CampusGear.Services;
@@ -16,24 +15,27 @@ public sealed record ChallengeIssueResult(ChallengeIssueStatus Status, TimeSpan?
 public enum ChallengeVerifyStatus { Verified, Invalid, Expired, TooManyAttempts }
 
 /// <summary>Creates and consumes one-time, email-delivered challenges.</summary>
-public sealed class EmailChallengeService
+public sealed class EmailChallengeService : IEmailChallengeService
 {
     private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan ResendCooldown = TimeSpan.FromSeconds(60);
     private const int MaxAttempts = 5;
 
-    private readonly ApplicationDbContext _db;
+    private readonly IEmailChallengeRepository _records;
+    private readonly IUnitOfWork _work;
     private readonly IEmailSender _emailSender;
     private readonly IDataProtector _protector;
     private readonly ILogger<EmailChallengeService> _logger;
 
     public EmailChallengeService(
-        ApplicationDbContext db,
+        IEmailChallengeRepository records,
+        IUnitOfWork work,
         IEmailSender emailSender,
         IDataProtectionProvider dataProtectionProvider,
         ILogger<EmailChallengeService> logger)
     {
-        _db = db;
+        _records = records;
+        _work = work;
         _emailSender = emailSender;
         _logger = logger;
         _protector = dataProtectionProvider.CreateProtector("CampusGear.EmailChallenge.v1");
@@ -55,14 +57,10 @@ public sealed class EmailChallengeService
         EmailChallenge challenge;
 
         // The serializable transaction prevents two concurrent resends from creating valid codes.
-        await using (var transaction = await _db.Database.BeginTransactionAsync(
+        await using (var transaction = await _work.BeginAsync(
                          IsolationLevel.Serializable, cancellationToken))
         {
-            var previous = await _db.EmailChallenges
-                .Where(x => x.UserId == user.Id && x.Purpose == purpose &&
-                            x.ConsumedAtUtc == null)
-                .OrderByDescending(x => x.CreatedAtUtc)
-                .ToListAsync(cancellationToken);
+            var previous = await _records.UnconsumedAsync(user.Id, purpose, cancellationToken);
 
             var latest = previous.FirstOrDefault();
             if (latest is not null && latest.LastSentAtUtc.Add(ResendCooldown) > now)
@@ -88,8 +86,8 @@ public sealed class EmailChallengeService
                 MaxAttempts = MaxAttempts
             };
             challenge.CodeHash = _protector.Protect($"{challenge.Id:N}:{code}");
-            _db.EmailChallenges.Add(challenge);
-            await _db.SaveChangesAsync(cancellationToken);
+            _records.Add(challenge);
+            await _work.SaveAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         }
 
@@ -114,7 +112,7 @@ public sealed class EmailChallengeService
             // An unsent challenge must not keep the user in the resend cooldown.
             challenge.InvalidatedAtUtc = DateTime.UtcNow;
             challenge.LastSentAtUtc = challenge.InvalidatedAtUtc.Value.Subtract(ResendCooldown);
-            await _db.SaveChangesAsync(cancellationToken);
+            await _work.SaveAsync(cancellationToken);
             return new ChallengeIssueResult(ChallengeIssueStatus.DeliveryUnavailable);
         }
     }
@@ -126,11 +124,7 @@ public sealed class EmailChallengeService
         CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
-        var challenge = await _db.EmailChallenges
-            .Where(x => x.UserId == userId && x.Purpose == purpose &&
-                        x.ConsumedAtUtc == null && x.InvalidatedAtUtc == null)
-            .OrderByDescending(x => x.CreatedAtUtc)
-            .FirstOrDefaultAsync(cancellationToken);
+        var challenge = await _records.LatestValidAsync(userId, purpose, cancellationToken);
 
         if (challenge is null)
         {
@@ -193,12 +187,12 @@ public sealed class EmailChallengeService
     {
         try
         {
-            await _db.SaveChangesAsync(cancellationToken);
+            await _work.SaveAsync(cancellationToken);
             return true;
         }
-        catch (DbUpdateConcurrencyException exception)
+        catch (PersistenceException exception) when (exception.Failure == PersistenceFailure.StaleWrite)
         {
-            foreach (var entry in exception.Entries) entry.State = EntityState.Detached;
+            _records.DetachWrites();
             return false;
         }
     }

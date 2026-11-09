@@ -3,7 +3,7 @@
 @{
     // Geometry is in percent of the plot box, so the chart reflows with its card. Lines are drawn in a
     // 100×100 SVG stretched to the plot (strokes stay 2px via vector-effect); text and dots stay HTML.
-    var axisMax = Model.AxisMax;
+    var axisMax = CampusGear.Models.ChartGeometry.AxisMax(Model);
     var count = Model.Labels.Count;
     var line = Model.Kind == "line";
     string P(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);

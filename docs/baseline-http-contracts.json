@@ -1,0 +1,157 @@
+[
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/AccountController.cs",
+    "Routes": [
+      "GET /auth/access-denied",
+      "GET /auth/development-inbox",
+      "GET /auth/login",
+      "GET /auth/password-reset-code",
+      "GET /auth/password-reset-new",
+      "GET /auth/password-reset-request",
+      "GET /auth/registration-submitted",
+      "GET /auth/signup",
+      "GET /auth/success",
+      "GET /auth/two-factor",
+      "POST /auth/login",
+      "POST /auth/logout",
+      "POST /auth/password-reset-code",
+      "POST /auth/password-reset-new",
+      "POST /auth/password-reset-request",
+      "POST /auth/resend-password-reset-code",
+      "POST /auth/resend-two-factor",
+      "POST /auth/signup",
+      "POST /auth/two-factor"
+    ],
+    "Roles": []
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/AdminCategoriesController.cs",
+    "Routes": [
+      "GET /admin/categories",
+      "POST /admin/categories/save",
+      "POST /admin/categories/{id:guid}/delete"
+    ],
+    "Roles": [
+      "Administrator"
+    ]
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/AdminInventoryController.cs",
+    "Routes": [
+      "GET /admin/equipment",
+      "POST /admin/categories",
+      "POST /admin/equipment/save",
+      "POST /admin/equipment/{id:guid}/delete"
+    ],
+    "Roles": [
+      "Administrator"
+    ]
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/AdminUsersController.cs",
+    "Routes": [
+      "GET /admin/audit",
+      "GET /admin/borrowers",
+      "GET /admin/users",
+      "GET /admin/users/new",
+      "GET /admin/users/{id}/edit",
+      "POST /admin/users/new",
+      "POST /admin/users/{id}/approve",
+      "POST /admin/users/{id}/delete",
+      "POST /admin/users/{id}/edit",
+      "POST /admin/users/{id}/reject"
+    ],
+    "Roles": [
+      "Administrator"
+    ]
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/BorrowerController.cs",
+    "Routes": [
+      "GET /borrower/calendar",
+      "GET /borrower/dashboard",
+      "GET /borrower/history",
+      "GET /borrower/home",
+      "GET /borrower/reservation",
+      "GET /borrower/reservation/availability",
+      "POST /borrower/reservation",
+      "POST /borrower/reservation/{id:guid}/cancel"
+    ],
+    "Roles": [
+      "Borrower"
+    ]
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/CustodianController.cs",
+    "Routes": [
+      "GET /admin/calendar",
+      "GET /admin/history",
+      "GET /custodian/approvals",
+      "GET /custodian/calendar",
+      "GET /custodian/history",
+      "GET /custodian/reservations/{id:guid}",
+      "GET /custodian/returns",
+      "POST /custodian/reservations/{id:guid}/approve",
+      "POST /custodian/reservations/{id:guid}/reject",
+      "POST /custodian/reservations/{id:guid}/release",
+      "POST /custodian/reservations/{id:guid}/return"
+    ],
+    "Roles": [
+      "Administrator",
+      "Administrator",
+      "Custodian",
+      "Custodian",
+      "Custodian",
+      "Custodian",
+      "Custodian",
+      "Custodian",
+      "Custodian",
+      "Custodian",
+      "Custodian,Administrator"
+    ]
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/CustodianDirectoryController.cs",
+    "Routes": [
+      "GET /custodian/borrowers",
+      "GET /custodian/categories"
+    ],
+    "Roles": [
+      "Custodian"
+    ]
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/DevelopmentController.cs",
+    "Routes": [
+      "GET /development/email"
+    ],
+    "Roles": []
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/MaintenanceController.cs",
+    "Routes": [
+      "GET /admin/maintenance",
+      "POST /admin/maintenance/open",
+      "POST /admin/maintenance/{id:guid}/update"
+    ],
+    "Roles": [
+      "Administrator,Custodian"
+    ]
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/StatusController.cs",
+    "Routes": [],
+    "Roles": []
+  },
+  {
+    "File": "CampusGear/CampusGear.WebApp/Controllers/WorkspaceController.cs",
+    "Routes": [
+      "GET /admin/dashboard",
+      "GET /custodian/dashboard"
+    ],
+    "Roles": [
+      "Administrator",
+      "Custodian"
+    ]
+  }
+]
