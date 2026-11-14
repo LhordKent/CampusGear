@@ -166,7 +166,32 @@ public sealed class ReturnConditionCheckTests(WebAppFixture app)
         var page = await app.Client("Custodian").GetStringAsync($"/custodian/reservations/{reservationId}");
 
         Assert.Contains("Early return: this loan is due", page);
-        Assert.Contains("Record return", page);
+        Assert.Contains("Record early return", page);
+    }
+
+    [Fact]
+    public async Task ReturnDesk_ListsOnlyLoans_AndSendsReleaseToApprovals()
+    {
+        var client = app.Client("Custodian");
+
+        var page = await client.GetStringAsync("/custodian/returns");
+        var oldReleaseLink = await client.GetAsync("/custodian/returns?queue=release");
+
+        Assert.DoesNotContain("Approved release queue", page);
+        Assert.Equal(HttpStatusCode.Redirect, oldReleaseLink.StatusCode);
+        Assert.Equal("/custodian/approvals?status=approved", oldReleaseLink.Headers.Location!.OriginalString);
+    }
+
+    [Fact]
+    public async Task ReturnQueue_LabelsLoansNotYetDueAsEarlyReturns()
+    {
+        var (earlyId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(1));
+        var (overdueId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddMinutes(-30));
+
+        var page = await app.Client("Custodian").GetStringAsync("/custodian/returns?queue=active");
+
+        Assert.Contains($"href=\"/custodian/reservations/{earlyId}\">Record early return<", page);
+        Assert.Contains($"href=\"/custodian/reservations/{overdueId}\">Record return<", page);
     }
 
     [Fact]

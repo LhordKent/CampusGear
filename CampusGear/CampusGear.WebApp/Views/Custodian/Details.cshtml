@@ -225,7 +225,7 @@
                 </label>
                 <label class="live-field span-4" for="ReleaseNotes"><span>Release notes <small>Optional</small></span><textarea rows="3" id="ReleaseNotes" name="Notes" maxlength="2000" disabled="@(!Model.CanRelease)"></textarea></label>
                 <div class="live-actions wide">
-                    <a class="live-button secondary" href="@staffPath/returns?queue=release">Back to release queue</a>
+                    <a class="live-button secondary" href="@staffPath/approvals?status=approved">Back to approved bookings</a>
                     <button class="live-button" type="submit" disabled="@(!Model.CanRelease)">Record release</button>
                 </div>
             </form>
@@ -252,7 +252,7 @@
                 <label class="live-field span-4" for="ReturnNotes"><span>Damage or inspection notes <small>Optional</small></span><textarea rows="4" id="ReturnNotes" name="Notes" maxlength="2000" placeholder="Describe damage, missing parts, or other inspection findings"></textarea></label>
                 <div class="live-actions wide">
                     <a class="live-button secondary" href="@staffPath/returns">Back to return queue</a>
-                    <button class="live-button" type="submit">Record return</button>
+                    <button class="live-button" type="submit">@(Model.Status == "Borrowed" ? "Record early return" : "Record return")</button>
                 </div>
             </form>
         }

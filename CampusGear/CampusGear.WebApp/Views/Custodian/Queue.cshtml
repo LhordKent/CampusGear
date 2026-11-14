@@ -16,28 +16,20 @@
             <h1>@(history ? "Borrowing History" : returns ? "Return & Condition Check" : "Approval & Release")</h1>
             <p class="page-description">@(history
                 ? "Every reservation and loan, newest first. Filter by status or booking date to build a report."
-                : returns ? "Release approved bookings and check equipment back in. The most recent loans are listed first."
+                : returns ? "Check borrowed equipment back in and record its condition. The most recent loans are listed first."
                 : "Review reservation requests before their hold expires. The newest requests are listed first.")</p>
         </div>
         <div class="page-header-actions">
             @if (history) { <a class="live-button secondary" href="@staffPath/calendar"><svg class="icon" aria-hidden="true"><use href="/icons.svg#calendar"></use></svg>Availability calendar</a> }
             else if (returns) { <a class="live-button secondary" href="@staffPath/approvals">Pending requests<span class="live-count">@Model.PendingCount</span></a> }
-            else { <a class="live-button secondary" href="@staffPath/returns?queue=release">Ready for release<span class="live-count">@Model.ApprovedCount</span></a> }
+            else { <a class="live-button secondary" href="@staffPath/approvals?status=approved">Ready for release<span class="live-count">@Model.ApprovedCount</span></a> }
         </div>
     </header>
     @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
     @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
     <section class="live-panel" aria-labelledby="queue-title">
-        <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? Model.Queue == "release" ? "Approved release queue" : "Active loans awaiting return" : history ? "Reservation and loan records" : "Request queue")</h2><span class="live-muted">Times in Manila (UTC+8)</span></div>
-        @if (returns)
-        {
-            <nav class="custodian-tabs" aria-label="Desk queues">
-                <a class="@(Model.Queue == "active" ? "selected" : "")" href="@staffPath/returns" aria-current="@(Model.Queue == "active" ? "page" : null)">Active loans</a>
-                <a class="@(Model.Queue == "release" ? "selected" : "")" href="@staffPath/returns?queue=release" aria-current="@(Model.Queue == "release" ? "page" : null)">Approved release queue</a>
-            </nav>
-        }
+        <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? "Active loans awaiting return" : history ? "Reservation and loan records" : "Request queue")</h2><span class="live-muted">Times in Manila (UTC+8)</span></div>
         <form class="live-filters" method="get" action="@basePath" role="search" aria-label="Filter records" data-live-search data-live-target="#queue-results">
-            @if (returns) { <input type="hidden" name="queue" value="@Model.Queue" /> }
             <label for="queue-search" class="live-filter-search">Search borrower or equipment<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg><input id="queue-search" name="q" type="search" value="@Model.Search" maxlength="100" placeholder="Name, email, or asset code" autocomplete="off" /></span></label>
             @if (!returns)
             {
@@ -56,7 +48,7 @@
             }
             <label for="queue-from">Booking from<input id="queue-from" name="from" type="date" value="@Model.From" /></label>
             <label for="queue-to">Booking through<input id="queue-to" name="to" type="date" value="@Model.To" /></label>
-            <a class="live-button secondary live-filter-reset" href="@basePath@(returns ? $"?queue={Model.Queue}" : "")" data-live-reset>Reset</a>
+            <a class="live-button secondary live-filter-reset" href="@basePath" data-live-reset>Reset</a>
         </form>
         <div id="queue-results" class="live-results">
         <p class="live-result-count" data-live-count>@Model.Total record@(Model.Total == 1 ? "" : "s")@(string.IsNullOrWhiteSpace(Model.Search) ? "" : $" matching “{Model.Search}”")</p>
@@ -72,7 +64,7 @@
                     {
                         <tr><td><strong>@row.BorrowerName</strong><small>@row.BorrowerEmail</small></td><td>@row.EquipmentName<small>@row.AssetCode</small></td><td>@row.StartManila<small>Until @row.EndManila</small></td><td><span class="live-badge custodian-status @(row.Status is "Overdue" or "Returned late" ? "late" : "")">@row.Status</span></td>
                             @if (history) { <td>@(row.ReturnCondition ?? "—")<small>@row.ReturnedManila</small></td> }
-                            <td><a class="live-button secondary" href="/custodian/reservations/@row.Id">@(returns ? Model.Queue == "release" ? "Release details" : "Record return" : "Review details")</a></td></tr>
+                            <td><a class="live-button secondary" href="/custodian/reservations/@row.Id">@(returns ? row.Status == "Borrowed" ? "Record early return" : "Record return" : "Review details")</a></td></tr>
                     }</tbody>
                 </table>
             </div>

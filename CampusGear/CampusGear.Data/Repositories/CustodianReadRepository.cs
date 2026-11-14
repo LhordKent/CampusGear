@@ -18,7 +18,6 @@ public sealed class CustodianReadRepository(ApplicationDbContext db) : ICustodia
             if (status == "pending") query = query.Where(x => x.Status == ReservationStatus.Pending);
             if (status == "approved") query = query.Where(x => x.Status == ReservationStatus.Approved);
         }
-        else if (queue == "release") query = query.Where(x => x.Status == ReservationStatus.Approved);
         else if (queue == "active") query = query.Where(x => x.Status == ReservationStatus.Released && x.Loan != null && x.Loan.ReturnedAtUtc == null);
         else query = status switch
         {
@@ -41,7 +40,6 @@ public sealed class CustodianReadRepository(ApplicationDbContext db) : ICustodia
         var ordered = queue switch
         {
             "active" => included.OrderByDescending(x => x.Loan!.ReleasedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
-            "release" => included.OrderByDescending(x => x.DecidedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
             _ => included.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id)
         };
         return new(await ordered.Skip((page - 1) * 12).Take(12).ToListAsync(ct), page, pages, total,
