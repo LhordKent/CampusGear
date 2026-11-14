@@ -175,6 +175,10 @@
         </section>
     }
 
+    @* The workflow card only exists to hold actions. A read-only record (cancelled, rejected, expired, or any record seen by an
+       administrator) has none, and the page header already links back to the borrowing history, so the card is left out. *@
+    @if (Model.CanApprove || Model.CanReject || (record.Status == ReservationStatus.Approved && !admin) || Model.CanReturn)
+    {
     <section class="reservation-workflow" aria-labelledby="reservation-workflow-heading">
         <div class="reservation-section-heading">
             <div>
@@ -254,13 +258,8 @@
             </form>
         }
 
-        @if (admin || !Model.CanReturn && record.Status != ReservationStatus.Approved && !Model.CanApprove && !Model.CanReject)
-        {
-            <div class="reservation-history-link">
-                <a class="live-button secondary" href="@staffPath/history">View borrowing history</a>
-            </div>
-        }
     </section>
+    }
 
     <details class="reservation-history">
         <summary>View processing history and decision notes</summary>
