@@ -260,23 +260,4 @@
 
     </section>
     }
-
-    <details class="reservation-history">
-        <summary>View processing history and decision notes</summary>
-        <dl class="live-details">
-            <dt>Submitted</dt><dd>@CustodianTime.Format(record.CreatedAtUtc)</dd>
-            @if (record.HoldExpiresAtUtc is { } expiry) { <dt>Pending hold expires</dt><dd>@CustodianTime.Format(expiry)</dd> }
-            @if (record.DecidedAtUtc is { } decided) { <dt>Decision recorded</dt><dd>@CustodianTime.Format(decided) by @(record.DecidedByUser?.FullName ?? "staff")</dd> }
-            @if (record.DecisionReason is { } reason) { <dt>Decision reason</dt><dd class="custodian-preserve">@reason</dd> }
-            @if (loan is not null)
-            {
-                <dt>Released</dt><dd>@CustodianTime.Format(loan.ReleasedAtUtc) by @loan.ReleasedByUser.FullName</dd>
-                <dt>Return due</dt><dd>@CustodianTime.Format(loan.DueAtUtc)</dd>
-                @if (returnedAt is { } returnedOn)
-                {
-                    <dt>Returned</dt><dd>@CustodianTime.Format(returnedOn) by @(loan.ReceivedByUser?.FullName ?? "staff")</dd>
-                }
-            }
-        </dl>
-    </details>
 </main>
