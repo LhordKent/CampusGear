@@ -1,15 +1,77 @@
 using CampusGear.Data.Interfaces;
-using CampusGear.Models;
-namespace CampusGear.Services;
-public sealed class EquipmentAvailabilityService(IBorrowerReadRepository reads) : IEquipmentAvailabilityService
+using CampusGear.Data.QueryModels;
+using CampusGear.Resources.Constants;
+using CampusGear.Services.Interfaces;
+using CampusGear.Services.ServiceModels;
+
+namespace CampusGear.Services.Services
 {
-    public async Task<Dictionary<Guid, ItemStatus>> GetStatesAsync(DateTime nowUtc, CancellationToken ct) =>
-        (await reads.EquipmentStatesAsync(nowUtc, ct)).ToDictionary(x => x.Id, x => !x.IsActive ? ItemStatus.Inactive :
-            x.Borrowed ? ItemStatus.Borrowed : x.Unusable ? ItemStatus.ForRepair : x.Reserved ? ItemStatus.Reserved : ItemStatus.Available);
-    public async Task<IReadOnlyList<EquipmentPickerItem>> GetPickerAsync(DateTime nowUtc, CancellationToken ct)
+    public sealed class EquipmentAvailabilityService : IEquipmentAvailabilityService
     {
-        var states = await GetStatesAsync(nowUtc, ct);
-        return (await reads.CalendarItemsAsync(ct)).Select(x => new EquipmentPickerItem(x.Id, x.Name, x.AssetCode, x.Category, x.ImagePath,
-            states.GetValueOrDefault(x.Id, ItemStatus.Available))).ToList();
+        private readonly IEquipmentAvailabilityRepository _reads;
+
+        public EquipmentAvailabilityService(IEquipmentAvailabilityRepository reads)
+        {
+            _reads = reads;
+        }
+
+        public async Task<Dictionary<Guid, ItemStatus>> GetStatesAsync(DateTime nowUtc, CancellationToken ct)
+        {
+            var items = await _reads.EquipmentStatesAsync(nowUtc, ct);
+            return items.ToDictionary(item => item.Id, GetStatus);
+        }
+
+        private static ItemStatus GetStatus(EquipmentStateData item)
+        {
+            if (!item.IsActive)
+            {
+                return ItemStatus.Inactive;
+            }
+
+            if (item.Borrowed)
+            {
+                return ItemStatus.Borrowed;
+            }
+
+            if (item.Unusable)
+            {
+                return ItemStatus.ForRepair;
+            }
+
+            return item.Reserved ? ItemStatus.Reserved : ItemStatus.Available;
+        }
+
+        public async Task<IReadOnlyList<EquipmentPickerItem>> GetPickerAsync(DateTime nowUtc, CancellationToken ct)
+        {
+            var states = await GetStatesAsync(nowUtc, ct);
+            return (await _reads.CalendarItemsAsync(ct))
+                .Select(x => new EquipmentPickerItem(
+                    x.Id,
+                    x.Name,
+                    x.AssetCode,
+                    x.Category,
+                    x.ImagePath,
+                    states.GetValueOrDefault(x.Id, ItemStatus.Available)
+                ))
+                .ToList();
+        }
+
+        public async Task<List<Guid>> FindFreeUnitsAsync(
+            IReadOnlyList<Guid> unitIds,
+            DateTime startUtc,
+            DateTime endUtc,
+            DateTime now,
+            Guid preferredUnitId,
+            CancellationToken cancellationToken
+        )
+        {
+            if (unitIds.Count == 0)
+            {
+                return [];
+            }
+
+            var blocked = await _reads.BlockedAsync(unitIds, startUtc, endUtc, now, cancellationToken);
+            return unitIds.Where(id => !blocked.Contains(id)).OrderByDescending(id => id == preferredUnitId).ToList();
+        }
     }
 }

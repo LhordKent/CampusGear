@@ -1,3 +1,5 @@
+> Historical snapshot: this document describes the pre-refactor implementation/UI. For current code use [the code guide](CODEBASE_CHEATSHEET.md) and [feature traces](FEATURE_TRACES.md). Existing PDFs are preserved.
+
 # Service–Repository refactor report
 
 ## Baseline and delivery

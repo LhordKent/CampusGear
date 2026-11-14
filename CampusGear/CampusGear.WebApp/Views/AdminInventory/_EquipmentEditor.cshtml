@@ -1,4 +1,6 @@
-@using CampusGear.Models
+@using CampusGear.WebApp.Models
+@using CampusGear.Resources.Constants
+@using CampusGear.Services.ServiceModels
 @model InventoryPageModel
 @{
     var adding = Model.Input.Id is null;
@@ -26,10 +28,10 @@
         <div class="live-field wide inventory-photo">
             <label for="imageFile">Equipment photo <small class="live-muted">JPEG, PNG, WebP or GIF · up to 5 MB · shown to borrowers in the equipment catalog</small></label>
             <div class="inventory-photo-row">
-                <img id="inventory-photo-preview" class="inventory-photo-preview" src="@Model.Input.ImagePath" alt="" hidden="@(Model.Input.ImagePath is null)" />
+                <img id="inventory-photo-preview" class="inventory-photo-preview" src="@Model.ImagePath" alt="" hidden="@(Model.ImagePath is null)" />
                 <input id="imageFile" name="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-image-preview="inventory-photo-preview" />
             </div>
-            @if (Model.Input.ImagePath is not null)
+            @if (Model.ImagePath is not null)
             {
                 <label class="live-check"><input asp-for="Input.RemoveImage" /> Remove the current photo</label>
             }

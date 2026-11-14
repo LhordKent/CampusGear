@@ -1,0 +1,203 @@
+using System.Globalization;
+using CampusGear.Data.Interfaces;
+using CampusGear.Data.Models;
+using CampusGear.Data.QueryModels;
+using CampusGear.Resources.Constants;
+using CampusGear.Resources.Messages;
+using CampusGear.Services.Helpers;
+using CampusGear.Services.Interfaces;
+using CampusGear.Services.ServiceModels;
+
+namespace CampusGear.Services.Services
+{
+    public sealed class CustodianQueueService : ICustodianQueueService
+    {
+        private readonly ICustodianReadRepository _reads;
+        private readonly TimeProvider _timeProvider;
+
+        public CustodianQueueService(ICustodianReadRepository reads, TimeProvider clock)
+        {
+            _reads = reads;
+            _timeProvider = clock;
+        }
+
+        public async Task<CustodianDetailViewModel?> GetDetailsAsync(Guid id, bool custodian, CancellationToken cancellationToken)
+        {
+            var reservation = await _reads.DetailsAsync(id, cancellationToken);
+            if (reservation is null)
+            {
+                return null;
+            }
+
+            var now = _timeProvider.GetUtcNow().UtcDateTime;
+            var pending =
+                reservation.Status == ReservationStatus.Pending && reservation.HoldExpiresAtUtc > now && reservation.StartAtUtc > now;
+            var item = reservation.EquipmentItem;
+            var usable =
+                item.IsActive
+                && !item.IsMaintenanceHold
+                && item.Condition is not (EquipmentCondition.Damaged or EquipmentCondition.Unserviceable);
+            var releaseOpen =
+                reservation.Status == ReservationStatus.Approved && usable && now >= reservation.StartAtUtc && now < reservation.EndAtUtc;
+
+            // Administrators inspect the same record; only custodians receive action controls.
+            return new CustodianDetailViewModel(
+                Record: ReservationRecord.From(reservation),
+                Status: ReservationDisplay.Status(reservation, now),
+                CanApprove: custodian && pending && usable,
+                CanReject: custodian && pending,
+                CanRelease: custodian && releaseOpen,
+                CanReturn: custodian && reservation.Status == ReservationStatus.Released && reservation.Loan is { ReturnedAtUtc: null },
+                AvailabilityNote: GetAvailabilityNote(reservation, usable, pending, now),
+                Feedback: null,
+                Error: null
+            );
+        }
+
+        private static string? GetAvailabilityNote(Reservation reservation, bool usable, bool pending, DateTime now)
+        {
+            // An unusable item takes precedence over its booking-time message.
+            if (!usable)
+            {
+                return CustodianQueueMessages.ItemUnavailable;
+            }
+            if (reservation.Status == ReservationStatus.Approved && now < reservation.StartAtUtc)
+            {
+                return CustodianQueueMessages.ReleaseNotStarted;
+            }
+            if (reservation.Status == ReservationStatus.Approved && now >= reservation.EndAtUtc)
+            {
+                return CustodianQueueMessages.BookingEnded;
+            }
+            if (reservation.Status == ReservationStatus.Pending && !pending)
+            {
+                return CustodianQueueMessages.HoldExpired;
+            }
+            return null;
+        }
+
+        private async Task<CustodianListViewModel> BuildQueueAsync(
+            CustodianQueueFilter filter,
+            string queue,
+            CancellationToken cancellationToken
+        )
+        {
+            var search = filter.Search?.Trim();
+            var status = filter.Status;
+            var from = filter.From;
+            var to = filter.To;
+            var page = filter.Page;
+            if (search?.Length > 100)
+            {
+                search = search[..100];
+            }
+
+            status = status?.ToLowerInvariant() ?? "all";
+            if (queue == "approvals")
+            {
+                status = status is "approved" or "all" ? status : "pending";
+            }
+            else if (
+                status is not ("pending" or "approved" or "borrowed" or "returned" or "rejected" or "cancelled" or "expired" or "late")
+            )
+            {
+                status = "all";
+            }
+
+            DateTime? beginUtc = null,
+                endUtc = null;
+            string? filterError = null;
+            var fromValid =
+                string.IsNullOrWhiteSpace(from)
+                || DateOnly.TryParseExact(from, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+            var toValid =
+                string.IsNullOrWhiteSpace(to)
+                || DateOnly.TryParseExact(to, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+            if (!fromValid || !toValid)
+            {
+                filterError = CustodianQueueMessages.InvalidFilterDates;
+            }
+            else
+            {
+                DateOnly? fromDate = string.IsNullOrWhiteSpace(from)
+                    ? null
+                    : DateOnly.ParseExact(from, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                DateOnly? toDate = string.IsNullOrWhiteSpace(to)
+                    ? null
+                    : DateOnly.ParseExact(to, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                if (fromDate is { Year: < 2000 or > 2100 } || toDate is { Year: < 2000 or > 2100 })
+                {
+                    filterError = CustodianQueueMessages.FilterDatesOutOfRange;
+                }
+                else if (fromDate > toDate)
+                {
+                    filterError = CustodianQueueMessages.InvalidDateRange;
+                }
+                else
+                {
+                    if (fromDate is { } begin)
+                    {
+                        beginUtc = ManilaTime.Utc(begin.ToDateTime(TimeOnly.MinValue));
+                    }
+
+                    if (toDate is { } end)
+                    {
+                        endUtc = ManilaTime.Utc(end.AddDays(1).ToDateTime(TimeOnly.MinValue));
+                    }
+                }
+            }
+
+            var now = _timeProvider.GetUtcNow().UtcDateTime;
+            var result = await _reads.ListAsync(queue, status, search, beginUtc, endUtc, now, page, cancellationToken);
+            var records = result.Rows;
+            var total = result.Total;
+            var pages = result.Pages;
+            page = result.Page;
+            var rows = records
+                .Select(x => new CustodianListRow(
+                    x.Id,
+                    x.BorrowerProfile.User.FullName,
+                    x.BorrowerProfile.User.Email ?? string.Empty,
+                    x.EquipmentItem.Name,
+                    x.EquipmentItem.AssetCode,
+                    ManilaTime.Format(x.StartAtUtc),
+                    ManilaTime.Format(x.EndAtUtc),
+                    ReservationDisplay.Status(x, now),
+                    x.Loan?.ConditionAtReturn?.ToString(),
+                    x.Loan?.ReturnedAtUtc is { } returned ? ManilaTime.Format(returned) : null
+                ))
+                .ToList();
+            return new(
+                search ?? string.Empty,
+                status,
+                from ?? string.Empty,
+                to ?? string.Empty,
+                queue,
+                page,
+                pages,
+                total,
+                rows,
+                result.Pending,
+                result.Approved,
+                result.Active,
+                null,
+                filterError
+            );
+        }
+
+        public Task<CustodianListViewModel> GetApprovalQueueAsync(CustodianQueueFilter filter, CancellationToken cancellationToken)
+        {
+            return BuildQueueAsync(filter, "approvals", cancellationToken);
+        }
+
+        public Task<CustodianListViewModel> GetReturnQueueAsync(CustodianQueueFilter filter, CancellationToken cancellationToken)
+        {
+            return BuildQueueAsync(filter, "active", cancellationToken);
+        }
+
+        public Task<CustodianListViewModel> GetHistoryAsync(CustodianQueueFilter filter, CancellationToken cancellationToken)
+        {
+            return BuildQueueAsync(filter, "history", cancellationToken);
+        }
+    }
+}

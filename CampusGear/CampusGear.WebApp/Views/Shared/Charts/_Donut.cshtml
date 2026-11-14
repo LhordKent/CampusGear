@@ -1,4 +1,4 @@
-@model CampusGear.Models.DonutChart
+@model CampusGear.Services.ServiceModels.DonutChart
 @using System.Globalization
 @{
     // A ring of 2πr circumference; each segment is a dash of the circle, separated by a 2-unit surface gap.
@@ -11,7 +11,7 @@
     string Percent(int value) => total == 0 ? "0%" : (value * 100.0 / total).ToString("0", CultureInfo.InvariantCulture) + "%";
     string N(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
-    void Row(CampusGear.Models.ChartSlice slice)
+    void Row(CampusGear.Services.ServiceModels.ChartSlice slice)
     {
         <i class="chart-swatch series-@slice.Slot" aria-hidden="true"></i><span>@slice.Label</span><strong>@slice.Value.ToString("N0")</strong><small>@Percent(slice.Value)</small>
     }

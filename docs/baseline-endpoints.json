@@ -1,0 +1,655 @@
+[
+  {
+    "Method": "GET",
+    "Path": "/auth/login",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/login",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/signup",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/signup",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/registration-submitted",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/two-factor",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/two-factor",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/resend-two-factor",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/password-reset-request",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/password-reset-request",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/password-reset-code",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/password-reset-code",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/resend-password-reset-code",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/password-reset-new",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/password-reset-new",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/success",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/access-denied",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/auth/logout",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [],
+    "Antiforgery": true,
+    "RateLimit": "auth-post"
+  },
+  {
+    "Method": "GET",
+    "Path": "/auth/development-inbox",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/categories",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/categories/{id:guid}/delete",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/categories/save",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/equipment",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/equipment/{id:guid}/delete",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/equipment/save",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/categories",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/borrowers",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/users",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/users/{id}/approve",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/users/{id}/reject",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/users/{id}/edit",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/users/{id}/edit",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/users/new",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/users/new",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/users/{id}/delete",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/audit",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/borrower/home",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/borrower/dashboard",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/borrower/reservation",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/borrower/reservation/availability",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/borrower/reservation",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/borrower/reservation/{id:guid}/cancel",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/borrower/history",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/borrower/calendar",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Borrower"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/approvals",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/returns",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/history",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/reservations/{id:guid}",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator,Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/custodian/reservations/{id:guid}/approve",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/custodian/reservations/{id:guid}/reject",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/custodian/reservations/{id:guid}/release",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/custodian/reservations/{id:guid}/return",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/calendar",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/history",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/calendar",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/categories",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/borrowers",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/development/email",
+    "RequireAuthenticated": false,
+    "AllowAnonymous": true,
+    "Roles": [],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/maintenance",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator,Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/maintenance/open",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator,Custodian"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "POST",
+    "Path": "/admin/maintenance/{id:guid}/update",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator,Custodian"
+    ],
+    "Antiforgery": true,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/custodian/dashboard",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Custodian"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  },
+  {
+    "Method": "GET",
+    "Path": "/admin/dashboard",
+    "RequireAuthenticated": true,
+    "AllowAnonymous": false,
+    "Roles": [
+      "Administrator"
+    ],
+    "Antiforgery": false,
+    "RateLimit": null
+  }
+]

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="AutoMapper" Version="15.1.4" />
     <ProjectReference Include="..\CampusGear.Data\CampusGear.Data.csproj" />
     <ProjectReference Include="..\CampusGear.Resources\CampusGear.Resources.csproj" />
   </ItemGroup>

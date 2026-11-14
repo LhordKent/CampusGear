@@ -1,11 +1,22 @@
 using System.Globalization;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace CampusGear;
-
-public static class ScreenUrls
+namespace CampusGear.WebApp.Models
 {
-    public static string Query(string path, object values) => QueryHelpers.AddQueryString(path,
-        values.GetType().GetProperties().ToDictionary(property => property.Name,
-            property => Convert.ToString(property.GetValue(values), CultureInfo.InvariantCulture)));
+    public static class ScreenUrls
+    {
+        public static string Query(string path, object values)
+        {
+            return QueryHelpers.AddQueryString(
+                path,
+                values
+                    .GetType()
+                    .GetProperties()
+                    .ToDictionary(
+                        property => property.Name,
+                        property => Convert.ToString(property.GetValue(values), CultureInfo.InvariantCulture)
+                    )
+            );
+        }
+    }
 }

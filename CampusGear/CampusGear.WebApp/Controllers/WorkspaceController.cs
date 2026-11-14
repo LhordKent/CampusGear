@@ -1,16 +1,46 @@
 using System.Security.Claims;
-using CampusGear.Services;
+using AutoMapper;
+using CampusGear.Resources.Constants;
+using CampusGear.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-namespace CampusGear.Controllers;
-public sealed class WorkspaceController(IDashboardService dashboards) : Controller
+
+namespace CampusGear.WebApp.Controllers
 {
-    [Authorize(Roles = "Custodian")]
-    [HttpGet("custodian/dashboard")]
-    public async Task<IActionResult> Custodian(CancellationToken cancellationToken) =>
-        View("CustodianDashboard", await dashboards.GetCustodianAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!, cancellationToken));
-    [Authorize(Roles = "Administrator")]
-    [HttpGet("admin/dashboard")]
-    public async Task<IActionResult> Administrator(CancellationToken cancellationToken) =>
-        View("AdminDashboard", await dashboards.GetAdministratorAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!, cancellationToken));
+    public sealed class WorkspaceController : Mvc.ControllerBase<WorkspaceController>
+    {
+        private readonly IDashboardService _dashboards;
+
+        public WorkspaceController(
+            IHttpContextAccessor httpContextAccessor,
+            ILoggerFactory loggerFactory,
+            IConfiguration configuration,
+            IMapper mapper,
+            IDashboardService dashboards
+        )
+            : base(httpContextAccessor, loggerFactory, configuration, mapper)
+        {
+            _dashboards = dashboards;
+        }
+
+        [Authorize(Roles = RoleNames.Custodian)]
+        [HttpGet("custodian/dashboard")]
+        public async Task<IActionResult> Custodian(CancellationToken cancellationToken)
+        {
+            return View(
+                "CustodianDashboard",
+                await _dashboards.GetCustodianAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!, cancellationToken)
+            );
+        }
+
+        [Authorize(Roles = RoleNames.Administrator)]
+        [HttpGet("admin/dashboard")]
+        public async Task<IActionResult> Administrator(CancellationToken cancellationToken)
+        {
+            return View(
+                "AdminDashboard",
+                await _dashboards.GetAdministratorAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!, cancellationToken)
+            );
+        }
+    }
 }

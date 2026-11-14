@@ -1,5 +1,12 @@
-namespace CampusGear.Models;
-public static class ItemStatuses
+using CampusGear.Resources.Constants;
+
+namespace CampusGear.WebApp.Models
 {
-    public static string Label(ItemStatus status) => status == ItemStatus.ForRepair ? "For repair" : status.ToString();
+    public static class ItemStatuses
+    {
+        public static string Label(ItemStatus status)
+        {
+            return status == ItemStatus.ForRepair ? "For repair" : status.ToString();
+        }
+    }
 }

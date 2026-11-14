@@ -1,9 +1,9 @@
-@model CampusGear.Models.SeriesChart
+@model CampusGear.Services.ServiceModels.SeriesChart
 @using System.Globalization
 @{
     // Geometry is in percent of the plot box, so the chart reflows with its card. Lines are drawn in a
     // 100×100 SVG stretched to the plot (strokes stay 2px via vector-effect); text and dots stay HTML.
-    var axisMax = CampusGear.Models.ChartGeometry.AxisMax(Model);
+    var axisMax = CampusGear.WebApp.Models.ChartGeometry.AxisMax(Model);
     var count = Model.Labels.Count;
     var line = Model.Kind == "line";
     string P(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);

@@ -3,28 +3,55 @@ using CampusGear.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace CampusGear.Data;
-
-public sealed class UnitOfWork(ApplicationDbContext db) : IUnitOfWork
+namespace CampusGear.Data
 {
-    public Task<IDataTransaction> BeginAsync(CancellationToken cancellationToken = default) =>
-        BeginAsync(IsolationLevel.ReadCommitted, cancellationToken);
-
-    public async Task<IDataTransaction> BeginAsync(IsolationLevel isolation, CancellationToken cancellationToken = default) =>
-        new DataTransaction(await db.Database.BeginTransactionAsync(isolation, cancellationToken));
-
-    public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
+    public sealed class UnitOfWork : IUnitOfWork
     {
-        try { return await db.SaveChangesAsync(cancellationToken); }
-        catch (DbUpdateException error) { throw PersistenceErrors.Translate(error); }
-    }
+        private readonly ApplicationDbContext _db;
 
-    public void ClearTracking() => db.ChangeTracker.Clear();
+        public UnitOfWork(ApplicationDbContext db)
+        {
+            _db = db;
+        }
 
-    private sealed class DataTransaction(IDbContextTransaction transaction) : IDataTransaction
-    {
-        public Task CommitAsync(CancellationToken cancellationToken = default) => transaction.CommitAsync(cancellationToken);
-        public Task RollbackAsync(CancellationToken cancellationToken = default) => transaction.RollbackAsync(cancellationToken);
-        public ValueTask DisposeAsync() => transaction.DisposeAsync();
+        public Task<IDataTransaction> BeginAsync(CancellationToken cancellationToken = default)
+        {
+            return BeginAsync(IsolationLevel.ReadCommitted, cancellationToken);
+        }
+
+        public async Task<IDataTransaction> BeginAsync(IsolationLevel isolation, CancellationToken cancellationToken = default)
+        {
+            return new DataTransaction(await _db.Database.BeginTransactionAsync(isolation, cancellationToken));
+        }
+
+        public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await _db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException error)
+            {
+                throw PersistenceErrors.Translate(error);
+            }
+        }
+
+        public void ClearTracking() => _db.ChangeTracker.Clear();
+
+        private sealed class DataTransaction : IDataTransaction
+        {
+            private readonly IDbContextTransaction _transaction;
+
+            public DataTransaction(IDbContextTransaction transaction)
+            {
+                _transaction = transaction;
+            }
+
+            public Task CommitAsync(CancellationToken cancellationToken = default) => _transaction.CommitAsync(cancellationToken);
+
+            public Task RollbackAsync(CancellationToken cancellationToken = default) => _transaction.RollbackAsync(cancellationToken);
+
+            public ValueTask DisposeAsync() => _transaction.DisposeAsync();
+        }
     }
 }

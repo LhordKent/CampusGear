@@ -1,11 +1,22 @@
 using CampusGear.Data.Interfaces;
-using CampusGear.Models;
+using CampusGear.Data.Models;
 using Microsoft.EntityFrameworkCore;
-namespace CampusGear.Data.Repositories;
-public sealed class BorrowerProfileRepository(ApplicationDbContext db) : IBorrowerProfileRepository
+
+namespace CampusGear.Data.Repositories
 {
-    public Task<Guid?> GetIdAsync(string userId, CancellationToken ct) => db.BorrowerProfiles.AsNoTracking()
-        .Where(x => x.UserId == userId).Select(x => (Guid?)x.Id).SingleOrDefaultAsync(ct);
-    public Task<BorrowerProfile?> FindFreshAsync(Guid id, CancellationToken ct) => db.BorrowerProfiles.AsNoTracking()
-        .Include(x => x.User).SingleOrDefaultAsync(x => x.Id == id, ct);
+    public sealed class BorrowerProfileRepository : BaseRepository, IBorrowerProfileRepository
+    {
+        public BorrowerProfileRepository(IUnitOfWork unitOfWork, ApplicationDbContext db)
+            : base(unitOfWork, db) { }
+
+        public Task<Guid?> GetIdAsync(string userId, CancellationToken ct)
+        {
+            return Context.BorrowerProfiles.AsNoTracking().Where(x => x.UserId == userId).Select(x => (Guid?)x.Id).SingleOrDefaultAsync(ct);
+        }
+
+        public Task<BorrowerProfile?> FindFreshAsync(Guid id, CancellationToken ct)
+        {
+            return Context.BorrowerProfiles.AsNoTracking().Include(x => x.User).SingleOrDefaultAsync(x => x.Id == id, ct);
+        }
+    }
 }

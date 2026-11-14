@@ -13,10 +13,12 @@ Browser → WebApp controller → Services workflow → Data repository → EF C
 | [WebApp](CampusGear/CampusGear.WebApp) | Routes, form binding, authorization, HTTP/views, session adapter, UI assets |
 | [Services](CampusGear/CampusGear.Services) | Business rules, workflows, DTOs, transaction decisions, Identity coordination |
 | [Data](CampusGear/CampusGear.Data) | Focused repository interfaces/implementations, SQL queries, unit of work, locks, entities, migrations |
-| [Resources](CampusGear/CampusGear.Resources) | Shared enums and limits |
+| [Resources](CampusGear/CampusGear.Resources) | Shared roles/enums/limits, feature messages and workspace labels |
 | [IntegrationTests](CampusGear/CampusGear.IntegrationTests) | Real HTTP/SQL behavior, concurrency, architecture, uploads, account flows |
 
-Start with the [beginner cheatsheet](docs/CODEBASE_CHEATSHEET.md), [feature traces](docs/FEATURE_TRACES.md), [complete source catalog](docs/SOURCE_CATALOG.md), [permissions](docs/PERMISSIONS.md), and [refactor report](docs/SERVICE_REPOSITORY_REFACTOR_REPORT.md). The [teacher alignment report](docs/TEACHER_BASECODE_ALIGNMENT.md) explains the project structure.
+Start with the [beginner cheatsheet](docs/CODEBASE_CHEATSHEET.md), [defense code walkthrough](docs/DEFENSE_CODE_WALKTHROUGH.md), [feature traces](docs/FEATURE_TRACES.md), [complete source catalog](docs/SOURCE_CATALOG.md), [permissions](docs/PERMISSIONS.md), and [current refactor report](docs/BASECODE_REFACTOR_PROGRESS.md). The [teacher alignment report](docs/TEACHER_BASECODE_ALIGNMENT.md) explains the shared base/DI conventions. Earlier refactor reports are historical.
+
+Application EF repositories inherit BaseRepository; business MVC controllers inherit ControllerBase<T>. Application dependencies are listed explicitly in WebApp/Startup.DI.cs. Authentication, registration and password reset have separate services/controllers with typed outcomes. Annotated inputs/results share ten feature files in Services/ServiceModels; public contracts are grouped in IServices.cs and IRepositories.cs. WebApp/Models contains Web-only composition. There is one authoritative ReservationService for booking/loan transitions. See [coding style and the current folder layout](docs/CODE_STYLE.md).
 
 ## Run locally
 

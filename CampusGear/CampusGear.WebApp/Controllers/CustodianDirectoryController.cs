@@ -1,20 +1,45 @@
-using CampusGear.Services;
+using AutoMapper;
+using CampusGear.Resources.Constants;
+using CampusGear.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-namespace CampusGear.Controllers;
-[Authorize(Roles = "Custodian")]
-public sealed class CustodianDirectoryController(IDirectoryService directory) : Controller
+
+namespace CampusGear.WebApp.Controllers
 {
-    [HttpGet("custodian/categories")]
-    public async Task<IActionResult> Categories(CancellationToken cancellationToken)
+    [Authorize(Roles = RoleNames.Custodian)]
+    public sealed class CustodianDirectoryController : Mvc.ControllerBase<CustodianDirectoryController>
     {
-        ViewData["WorkspaceRole"] = "Custodian";
-        return View(await directory.GetCategoriesAsync(cancellationToken));
-    }
-    [HttpGet("custodian/borrowers")]
-    public async Task<IActionResult> Borrowers(string? q, string? eligibility, int page = 1, CancellationToken cancellationToken = default)
-    {
-        ViewData["WorkspaceRole"] = "Custodian";
-        return View(await directory.GetBorrowersAsync(q, eligibility, page, cancellationToken));
+        private readonly IDirectoryService _directory;
+
+        public CustodianDirectoryController(
+            IHttpContextAccessor httpContextAccessor,
+            ILoggerFactory loggerFactory,
+            IConfiguration configuration,
+            IMapper mapper,
+            IDirectoryService directory
+        )
+            : base(httpContextAccessor, loggerFactory, configuration, mapper)
+        {
+            _directory = directory;
+        }
+
+        [HttpGet("custodian/categories")]
+        public async Task<IActionResult> Categories(CancellationToken cancellationToken)
+        {
+            ViewData["WorkspaceRole"] = RoleNames.Custodian;
+            return View(await _directory.GetCategoriesAsync(cancellationToken));
+        }
+
+        [HttpGet("custodian/borrowers")]
+        public async Task<IActionResult> Borrowers(
+            string? q,
+            string? eligibility,
+            int page = 1,
+            CancellationToken cancellationToken = default
+        )
+        {
+            ViewData["WorkspaceRole"] = RoleNames.Custodian;
+            return View(await _directory.GetBorrowersAsync(q, eligibility, page, cancellationToken));
+        }
     }
 }

@@ -1,29 +1,28 @@
+using System.Threading.RateLimiting;
 using CampusGear.Data;
-using CampusGear.Models;
-using CampusGear.Services;
-using CampusGear.Services.Reservations;
+using CampusGear.Data.Models;
+using CampusGear.Resources.Constants;
+using CampusGear.WebApp;
 using CampusGear.WebApp.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var developmentSecrets = DevelopmentConfiguration.LoadProjectSecrets(builder.Configuration, builder.Environment, args);
-
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // The Figma reference demo remains under /demo.
-builder.Services.AddCampusGearData();
-builder.Services.AddCampusGearServices();
+builder.Services.AddCampusGearDependencies();
+builder.Services.AddCampusGearMapping();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IAccountFlowStore, CampusGear.Infrastructure.AccountFlowStore>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CampusGear")
-        ?? throw new InvalidOperationException("ConnectionStrings:CampusGear is required.")));
-
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("CampusGear")
+            ?? throw new InvalidOperationException("ConnectionStrings:CampusGear is required.")
+    )
+);
+builder
+    .Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.User.RequireUniqueEmail = true;
         options.SignIn.RequireConfirmedEmail = true;
@@ -34,7 +33,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/auth/login";
@@ -42,18 +40,21 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.Name = "CampusGear.Auth";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
-        ? CookieSecurePolicy.SameAsRequest
-        : CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     // Not signed in: a browser page visit goes to the login page; fetch calls and form posts get 401.
     // Signed in with the wrong role: always 403 (StatusController renders the access-denied page for browsers).
     options.Events.OnRedirectToLogin = context =>
     {
-        if (CampusGear.Controllers.AuthResponses.IsPageNavigation(context.Request))
+        if (CampusGear.WebApp.Infrastructure.AuthResponses.IsPageNavigation(context.Request))
+        {
             context.Response.Redirect(context.RedirectUri);
+        }
         else
+        {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        }
+
         return Task.CompletedTask;
     };
     options.Events.OnRedirectToAccessDenied = context =>
@@ -70,67 +71,49 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
-        ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
     options.IdleTimeout = TimeSpan.FromMinutes(15);
 });
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.AddPolicy("auth-post", context => RateLimitPartition.GetFixedWindowLimiter(
-        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-        _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 20,
-            Window = TimeSpan.FromMinutes(1),
-            QueueLimit = 0
-        }));
+    options.AddPolicy(
+        "auth-post",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 20,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                }
+            )
+    );
 });
-builder.Services.AddScoped<EmailChallengeService>();
-builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddSingleton<IEquipmentImageStore, EquipmentImageStore>();
-builder.Services.AddHostedService<ReservationExpiryWorker>();
-// The in-memory mailbox must be explicitly selected; it never delivers to an inbox.
-var emailProvider = builder.Configuration["Email:Provider"] ?? "Smtp";
-if (emailProvider.Equals("Development", StringComparison.OrdinalIgnoreCase))
-{
-    if (!builder.Environment.IsDevelopment())
-        throw new InvalidOperationException("The Development email provider is available only in Development.");
-    builder.Services.AddSingleton<DevelopmentEmailSender>();
-    builder.Services.AddSingleton<IEmailSender>(sp => sp.GetRequiredService<DevelopmentEmailSender>());
-}
-else if (emailProvider.Equals("Smtp", StringComparison.OrdinalIgnoreCase))
-{
-    if (builder.Environment.IsDevelopment())
-    {
-        // Temporary: Development also copies every message to /development/email.
-        builder.Services.AddSingleton<DevelopmentEmailSender>();
-        builder.Services.AddSingleton<SmtpEmailSender>();
-        builder.Services.AddSingleton<IEmailSender, DevelopmentMirrorEmailSender>();
-    }
-    else
-    {
-        builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
-    }
-}
-else
-{
-    throw new InvalidOperationException("Email:Provider must be Development or Smtp.");
-}
-
+var emailProvider = builder.Services.AddCampusGearEmail(builder.Configuration, builder.Environment);
 var app = builder.Build();
-
-app.Logger.LogInformation("Email provider: {EmailProvider}; environment: {Environment}",
-    emailProvider, app.Environment.EnvironmentName);
+app.Logger.LogInformation("Email provider: {EmailProvider}; environment: {Environment}", emailProvider, app.Environment.EnvironmentName);
 if (emailProvider.Equals("Smtp", StringComparison.OrdinalIgnoreCase))
-    app.Logger.LogInformation("SMTP startup configuration: Host configured={HostConfigured}; From configured={FromConfigured}.",
+{
+    app.Logger.LogInformation(
+        "SMTP startup configuration: Host configured={HostConfigured}; From configured={FromConfigured}.",
         !string.IsNullOrWhiteSpace(builder.Configuration["Email:Smtp:Host"]),
-        !string.IsNullOrWhiteSpace(builder.Configuration["Email:Smtp:From"]));
+        !string.IsNullOrWhiteSpace(builder.Configuration["Email:Smtp:From"])
+    );
+}
+
 if (app.Environment.IsDevelopment())
+{
     app.Logger.LogInformation("Shared Development email settings: file found={FileFound}.", developmentSecrets.FileFound);
+}
+
 if (emailProvider.Equals("Development", StringComparison.OrdinalIgnoreCase))
-    app.Logger.LogWarning("The Development email provider stores messages in memory and does not send email. Select Smtp for inbox delivery.");
+{
+    app.Logger.LogWarning(
+        "The Development email provider stores messages in memory and does not send email. Select Smtp for inbox delivery."
+    );
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -143,51 +126,68 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/status/{0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseRateLimiter();
 app.UseSession();
 app.UseAuthentication();
-app.Use(async (context, next) =>
-{
-    if (context.User.Identity?.IsAuthenticated == true)
+app.Use(
+    async (context, next) =>
     {
-        var users = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
-        var user = await users.GetUserAsync(context.User);
-        if (user is null || !user.IsActive || user.ApprovalStatus != AccountApprovalStatus.Approved)
+        if (context.User.Identity?.IsAuthenticated == true)
         {
-            await context.SignOutAsync(IdentityConstants.ApplicationScheme);
-            context.User = new System.Security.Claims.ClaimsPrincipal();
+            var users = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await users.GetUserAsync(context.User);
+            if (user is null || !user.IsActive || user.ApprovalStatus != AccountApprovalStatus.Approved)
+            {
+                await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+                context.User = new System.Security.Claims.ClaimsPrincipal();
+            }
         }
-    }
-    await next();
-});
-app.UseAuthorization();
 
+        await next();
+    }
+);
+app.UseAuthorization();
 app.MapControllers();
 app.MapRazorPages();
-
 await DbInitializer.InitializeAsync(app.Services, app.Environment.IsDevelopment());
+
 // Demo Mode (DemoMode:Enabled, on in appsettings.Development.json) adds sample records for the demo accounts. It is
 // refused outside Development so a real deployment can never receive demo data; see CampusGear.Data/DemoData.cs.
 if (app.Environment.IsDevelopment() && args.Contains("--remove-demo-data", StringComparer.OrdinalIgnoreCase))
 {
     await using var scope = app.Services.CreateAsyncScope();
-    app.Logger.LogInformation("Demo Mode: {Result}", await DemoData.RemoveAsync(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()));
+    app.Logger.LogInformation(
+        "Demo Mode: {Result}",
+        await DemoData.RemoveAsync(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
+    );
     return;
 }
+
 if (app.Configuration.GetValue<bool>("DemoMode:Enabled"))
 {
     if (!app.Environment.IsDevelopment())
+    {
         app.Logger.LogWarning("DemoMode:Enabled is ignored outside the Development environment; no demo data was added.");
+    }
     else
     {
         await using var scope = app.Services.CreateAsyncScope();
-        app.Logger.LogInformation("Demo Mode: {Result}", await DemoData.SeedAsync(
-            scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), TimeProvider.System.GetUtcNow().UtcDateTime));
+        app.Logger.LogInformation(
+            "Demo Mode: {Result}",
+            await DemoData.SeedAsync(
+                scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(),
+                TimeProvider.System.GetUtcNow().UtcDateTime
+            )
+        );
     }
 }
-if (args.Contains("--initialize-only", StringComparer.OrdinalIgnoreCase)) return;
+
+if (args.Contains("--initialize-only", StringComparer.OrdinalIgnoreCase))
+{
+    return;
+}
+
 app.Run();
+
 public partial class Program;

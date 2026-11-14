@@ -1,0 +1,26 @@
+root = true
+
+[*.cs]
+charset = utf-8
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+insert_final_newline = true
+max_line_length = 160
+
+# Match Apilan's conventional C# layout and explicit statement blocks.
+csharp_style_namespace_declarations = block_scoped:warning
+csharp_prefer_braces = true:warning
+csharp_style_qualification_for_field = false:warning
+csharp_style_qualification_for_property = false:warning
+csharp_style_qualification_for_method = false:warning
+csharp_style_qualification_for_event = false:warning
+csharp_preserve_single_line_blocks = false
+csharp_preserve_single_line_statements = false
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+dotnet_diagnostic.IDE0005.severity = warning
+
+# Historical EF migration source is kept as generated at the time.
+[**/Migrations/*.cs]
+dotnet_diagnostic.IDE0005.severity = none

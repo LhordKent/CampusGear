@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="BorrowingPaused" xml:space="preserve"><value>Your borrowing access is currently paused. Contact an administrator.</value></data>
+  <data name="InvalidRequestId" xml:space="preserve"><value>Reload the form and try again.</value></data>
+  <data name="EquipmentRequired" xml:space="preserve"><value>Choose available equipment.</value></data>
+  <data name="SingleUnitOnly" xml:space="preserve"><value>Only 1 unit of this equipment can be requested.</value></data>
+  <data name="PurposeRequired" xml:space="preserve"><value>Enter the purpose of your request.</value></data>
+  <data name="PurposeTooLong" xml:space="preserve"><value>Use 500 characters or fewer.</value></data>
+  <data name="NotesTooLong" xml:space="preserve"><value>Use 2000 characters or fewer.</value></data>
+  <data name="InvalidDateRange" xml:space="preserve"><value>The end time must be after the start time.</value></data>
+  <data name="FutureStartRequired" xml:space="preserve"><value>Choose a future start time.</value></data>
+  <data name="ReusedRequestForm" xml:space="preserve"><value>This request form was already used. Review the details and submit again.</value></data>
+  <data name="ScheduleUnavailable" xml:space="preserve"><value>This equipment is unavailable for the requested time.</value></data>
+  <data name="ConcurrentBooking" xml:space="preserve"><value>Another borrower just reserved this equipment for the requested time. Lower the quantity or choose another time.</value></data>
+  <data name="BatchWithdrawn" xml:space="preserve"><value>Withdrawn automatically: the full requested quantity was not available.</value></data>
+  <data name="InvalidManilaDate" xml:space="preserve"><value>Choose a valid date and time in Manila time.</value></data>
+</root>

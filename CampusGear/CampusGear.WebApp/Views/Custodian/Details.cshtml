@@ -1,5 +1,8 @@
+@using CampusGear.Services.Helpers
 @model CustodianDetailViewModel
-@using CampusGear.Models
+@using CampusGear.WebApp.Models
+@using CampusGear.Resources.Constants
+@using CampusGear.Services.ServiceModels
 @{
     Layout = "_WorkspaceLayout";
     var record = Model.Record;
@@ -100,14 +103,14 @@
             </section>
 
             <section class="borrowing-id-dates" aria-label="Reservation dates">
-                <div><span>RESERVATION DATE</span><strong>@CustodianTime.Format(record.CreatedAtUtc)</strong></div>
-                <div><span>BOOKING START</span><strong>@CustodianTime.Format(record.StartAtUtc)</strong></div>
-                <div><span>EXPECTED RETURN</span><strong>@CustodianTime.Format(dueAt)</strong></div>
+                <div><span>RESERVATION DATE</span><strong>@ManilaTime.Format(record.CreatedAtUtc)</strong></div>
+                <div><span>BOOKING START</span><strong>@ManilaTime.Format(record.StartAtUtc)</strong></div>
+                <div><span>EXPECTED RETURN</span><strong>@ManilaTime.Format(dueAt)</strong></div>
                 <div>
                     <span>ACTUAL RETURN</span>
                     @if (returnedAt is { } returned)
                     {
-                        <strong>@CustodianTime.Format(returned)</strong>
+                        <strong>@ManilaTime.Format(returned)</strong>
                     }
                     else
                     {
@@ -236,7 +239,7 @@
             <p class="reservation-workflow-intro">Compare the returned item with its release condition. Record any damage or issue in the inspection notes.</p>
             @if (Model.Status == "Borrowed")
             {
-                <p class="live-feedback" role="note">Early return: this loan is due @CustodianTime.Format(dueAt). It can be returned now; the item becomes available for the rest of the booking.</p>
+                <p class="live-feedback" role="note">Early return: this loan is due @ManilaTime.Format(dueAt). It can be returned now; the item becomes available for the rest of the booking.</p>
             }
             <form class="live-form live-release-form reservation-action-form" method="post" action="@route/return">
                 @Html.AntiForgeryToken()

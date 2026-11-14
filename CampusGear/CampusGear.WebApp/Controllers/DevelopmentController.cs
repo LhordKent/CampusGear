@@ -1,21 +1,52 @@
 using System.Net;
-using CampusGear.Services;
+using CampusGear.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CampusGear.Controllers;
-
-public sealed class DevelopmentController(IWebHostEnvironment environment, IServiceProvider services) : Controller
+namespace CampusGear.WebApp.Controllers
 {
-    [AllowAnonymous]
-    [HttpGet("development/email")]
-    public IActionResult Email()
+    public sealed class DevelopmentController : Controller
     {
-        var address = HttpContext.Connection.RemoteIpAddress;
-        if (!environment.IsDevelopment() || address is null || !IPAddress.IsLoopback(address)) return NotFound();
-        Response.Headers.CacheControl = "no-store";
-        var mailbox = services.GetService<DevelopmentEmailSender>();
-        if (mailbox is null) return NotFound();
-        return View(mailbox.GetRecent());
+        private readonly IWebHostEnvironment _environment;
+        private readonly DevelopmentEmailSender? _mailbox;
+
+        public DevelopmentController(IWebHostEnvironment environment, DevelopmentEmailSender? mailbox = null)
+        {
+            _environment = environment;
+            _mailbox = mailbox;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("development/email")]
+        public IActionResult Email()
+        {
+            var address = HttpContext.Connection.RemoteIpAddress;
+            if (!_environment.IsDevelopment() || address is null || !IPAddress.IsLoopback(address))
+            {
+                return NotFound();
+            }
+
+            Response.Headers.CacheControl = "no-store";
+            var mailbox = _mailbox;
+            if (mailbox is null)
+            {
+                return NotFound();
+            }
+
+            return View(mailbox.GetRecent());
+        }
+
+        [AllowAnonymous, HttpGet("auth/development-inbox")]
+        public IActionResult DevelopmentInbox()
+        {
+            var address = HttpContext.Connection.RemoteIpAddress;
+            if (!_environment.IsDevelopment() || address is null || !IPAddress.IsLoopback(address) || _mailbox is null)
+            {
+                return NotFound();
+            }
+
+            Response.Headers.CacheControl = "no-store";
+            return Json(_mailbox.GetRecent());
+        }
     }
 }

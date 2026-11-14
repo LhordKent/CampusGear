@@ -1,42 +1,43 @@
-namespace CampusGear.Models;
-
-public enum EquipmentCondition
+namespace CampusGear.Resources.Constants
 {
-    Excellent,
-    Good,
-    Fair,
-    Damaged,
-    Unserviceable
-}
+    public enum EquipmentCondition
+    {
+        Excellent,
+        Good,
+        Fair,
+        Damaged,
+        Unserviceable,
+    }
 
-public enum ReservationStatus
-{
-    Pending,
-    Approved,
-    Rejected,
-    Cancelled,
-    Expired,
-    Released,
-    Completed
-}
+    public enum ReservationStatus
+    {
+        Pending,
+        Approved,
+        Rejected,
+        Cancelled,
+        Expired,
+        Released,
+        Completed,
+    }
 
-public enum MaintenanceStatus
-{
-    Open,
-    InProgress,
-    Closed
-}
+    public enum MaintenanceStatus
+    {
+        Open,
+        InProgress,
+        Closed,
+    }
 
-public enum EmailChallengePurpose
-{
-    SignupVerification,
-    AdministratorLogin,
-    PasswordReset
-}
+    public enum EmailChallengePurpose
+    {
+        SignupVerification,
+        AdministratorLogin,
+        PasswordReset,
+    }
 
-public enum AccountApprovalStatus
-{
-    Approved,
-    PendingApproval,
-    Rejected
+    public enum AccountApprovalStatus
+    {
+        Approved,
+        PendingApproval,
+        Rejected,
+    }
 }

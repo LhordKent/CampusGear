@@ -21,7 +21,7 @@
         </div>
     </header>
     <div class="calendar-with-picker" data-calendar>
-        <partial name="_EquipmentPicker" model='new CampusGear.Models.EquipmentPickerModel(Model.Picker, Model.SelectedItem?.Id, staffPath + "/calendar", Model.Month.Year, Model.Month.Month)' />
+        <partial name="_EquipmentPicker" model='new CampusGear.WebApp.Models.EquipmentPickerModel(Model.Picker, Model.SelectedItem?.Id, staffPath + "/calendar", Model.Month.Year, Model.Month.Month)' />
         <div class="calendar-main">
         <section class="live-panel">
             <form class="calendar-selection" method="get" action="@staffPath/calendar" data-calendar-form>

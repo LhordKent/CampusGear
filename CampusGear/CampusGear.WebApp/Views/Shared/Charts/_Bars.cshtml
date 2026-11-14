@@ -1,10 +1,10 @@
-@model CampusGear.Models.BarChart
+@model CampusGear.Services.ServiceModels.BarChart
 @using System.Globalization
 @{
     var max = Math.Max(1, Model.Bars.Select(x => x.Value).DefaultIfEmpty(0).Max());
     string Width(int value) => (value * 100.0 / max).ToString("0.##", CultureInfo.InvariantCulture) + "%";
 
-    void Bar(CampusGear.Models.ChartSlice bar)
+    void Bar(CampusGear.Services.ServiceModels.ChartSlice bar)
     {
         <span class="chart-bar-label">@bar.Label</span>
         <span class="chart-bar-track"><span class="chart-bar-fill series-@bar.Slot" style="width:@Width(bar.Value)"></span></span>

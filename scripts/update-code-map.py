@@ -12,7 +12,7 @@ def collect():
         dirs[:]=[d for d in dirs if d not in {"bin","obj","lib","Migrations","Frames"}]
         for name in files:
             p=Path(folder)/name
-            if p.suffix in {".cs",".cshtml",".js",".css"} and name!="figma-generated.css":
+            if p.suffix in {".cs",".cshtml",".js",".css",".resx",".csproj"} and name!="figma-generated.css":
                 found.append(p)
     return sorted(found)
 files=collect()
@@ -23,6 +23,22 @@ for p,s in sources.items():
     for name in re.findall(declaration,s):
         types.setdefault(name,[]).append(p)
 purpose={
+"IServices":"Public business-service contracts, grouped together for an Apilan-style feature overview; implementations remain separate.",
+"IRepositories":"Public repository contracts, grouped together; Data implementations own materialized queries and stage writes.",
+"AuthenticationService":"Password/approval/lockout decisions, administrator challenge and logout; returns typed outcomes, never view paths.",
+"RegistrationService":"Pending borrower registration, unique email/student checks, Identity/profile transaction and account audit.",
+"PasswordResetService":"Unknown-email privacy, protected code/reset permission, stamps/expiry and Identity password reset.",
+"UserService":"Administrator account approval, create/edit, roles/eligibility, protected users, concurrent edits and history retention.",
+"AuditService":"Materialized audit browsing and shared account audit recording; formats safe before/after data.",
+"EquipmentCatalogService":"Borrower catalog/grouped products, home/form reads and advisory availability; owned submission links are verified.",
+"ReservationRequestService":"Quantity validation, deterministic request IDs, per-unit retries and compensating cancellation; delegates authoritative transitions.",
+"BorrowingHistoryService":"Borrower-owned history with status/date/search/paging; retains early-return display.",
+"AvailabilityCalendarService":"Separate borrower/staff calendar projections, shared neutral calendar reads and actual early-return end times.",
+"CustodianQueueService":"Named approval/return/history queries and read-only detail capabilities; typed filters, no transition mutations.",
+"BaseRepository":"Shared scoped context/unit-of-work access. Repositories stage changes; business services decide commit boundaries.",
+"ControllerBase":"Generic MVC infrastructure for trusted actor and feedback handling; no business queries or screen-routing engine.",
+"WorkspaceNavigation":"Actual role menus with resource labels; unknown roles receive no menu.",
+"FigmaReference":"Saved Figma frame/decorative asset metadata, separated from actual role navigation.",
 "AccountService":"Password/status decisions; registration/approval handoff; administrator and password-reset session workflows. Change authentication decisions here.",
 "UserAdministrationService":"Approval, roles/access/eligibility, account creation and history-preserving deletion; global/profile locks and audits.",
 "BorrowerService":"Own-profile privacy, catalog grouping, quantity allocation, deterministic request IDs, retry/compensation, borrower reports/calendar.",
@@ -69,7 +85,7 @@ purpose={
 "figma-live.js":"Live form/dialog/navigation interactions mapped to saved design controls.",
 "home-motion.js":"Borrower home visual motion, respecting browser preferences.",
 "live-search.js":"Debounced URL-driven server search and partial-result swapping.",
-"modal-forms.js":"Progressive fetch form submission and field feedback for maintenance dialogs.",
+"modal-forms.js":"Progressive admin/maintenance modal form submission, field feedback and successful refresh; server owns decisions.",
 "motion.js":"Shared progressive motion and reduced-motion behavior.",
 "site.js":"Template site script placeholder; inspect usages before adding behavior."
 }
@@ -161,10 +177,20 @@ out+=["## Generated and vendor catalogs","","- [Data/Migrations](../CampusGear/C
 print(str(len(files))+" maintained files cataloged.")
 
 # Route migration table from current controller declarations. This does not execute the app.
-service_names={"service":"UserAdministrationService","categories":"CategoryService","inventory":"InventoryService",
+service_names={"service":"UserService","categories":"CategoryService","inventory":"InventoryService",
 "maintenance":"MaintenanceService","borrower":"BorrowerService","reservations":"ReservationService",
 "dashboards":"DashboardService","desk":"CustodianService","directory":"DirectoryService"}
 repository_paths={
+"AuthenticationService":"AccountRepository; EmailChallengeRepository through EmailChallengeService; Identity sign-in/store; AuditRepository",
+"RegistrationService":"AccountRepository.StudentExistsAsync/AddProfile; Identity store; shared UnitOfWork; AuditRepository",
+"PasswordResetService":"AccountRepository.ReloadUserAsync; EmailChallengeRepository; Identity token/password operations; AuditRepository",
+"UserService":"AccountRepository and BorrowerProfileRepository; Identity store; shared locks/unit of work/audit",
+"AuditService":"AuditRepository.ListAsync/Add; shared UnitOfWork for writes",
+"EquipmentCatalogService":"BorrowerReadRepository.CatalogAsync/HomeAsync/SubmittedAsync; EquipmentAvailabilityRepository through availability service",
+"ReservationRequestService":"BorrowerReadRepository.FindProfileAsync/FindRequestsAsync; catalog/availability services; ReservationService for all writes",
+"BorrowingHistoryService":"BorrowerReadRepository.FindProfileAsync/HistoryAsync; own profile enforced before reading",
+"AvailabilityCalendarService":"BorrowerReadRepository.FindProfileAsync; EquipmentAvailabilityRepository.CalendarItemsAsync/CalendarBookingsAsync; role-specific projection",
+"CustodianQueueService":"CustodianReadRepository.ListAsync/DetailsAsync; dates/status normalized before materialized reads",
 "AccountService":"AccountRepository.StudentExistsAsync/AddProfile/ReloadUserAsync; Identity EF store; EmailChallengeRepository; AuditRepository",
 "UserAdministrationService":"AccountRepository.ListAsync/FindAsync/FindWithProfileAsync/HasHistoryAsync/PrepareDeletionAsync; Identity EF store; AuditRepository.ListAsync/Add",
 "CategoryService":"CategoryRepository.ListAsync/FindAsync/HasItemsAsync/IsActiveAsync/Add/Remove; AuditRepository",
@@ -180,27 +206,28 @@ route_count=0
 for p in files:
     if "Controllers" not in p.parts or not p.stem.endswith("Controller"):continue
     s=sources[p]
+    injected={field:contract for contract,field in re.findall(r"private readonly I(\w+Service)\s+(_\w+)\s*;",s)}
     declarations=list(re.finditer(r"(?m)^\s*public\s+(?:async\s+)?(?:Task<IActionResult>|IActionResult)\s+(\w+)\s*\(",s))
     previous=0
     for i,m in enumerate(declarations):
         attributes=s[previous:m.start()]
         routes=re.findall(r'Http(Get|Post)\("([^"]+)"',attributes)
         if p.stem=="StatusController":routes=[("ANY","status/{code:int}")]
-        prefix="auth/" if p.stem=="AccountController" else ""
+        class_route=re.search(r'\[Route\("([^\"]+)"\)\]',s)
+        prefix=class_route[1].rstrip('/')+'/' if class_route else ''
         end=declarations[i+1].start() if i+1<len(declarations) else len(s)
         body=s[m.start():end]
         direct=[]
-        for owner,method in re.findall(r"\b(service|categories|inventory|maintenance|borrower|reservations|dashboards|desk|directory)\.(\w+)\(",body):
-            target="AccountService" if p.stem=="AccountController" and owner=="service" else service_names[owner]
-            direct.append(target+"."+method)
+        for owner,method in re.findall(r"\b(_\w+)\.(\w+)\(",body):
+            if owner in injected:direct.append(injected[owner]+"."+method)
         key=(p.stem,m[1])
         if not direct:
             special={
-                ("AdminUsersController","Borrowers"):["UserAdministrationService.GetPageAsync"],
-                ("AdminUsersController","Approve"):["UserAdministrationService.DecideAsync"],
-                ("AdminUsersController","Reject"):["UserAdministrationService.DecideAsync"],
-                ("CustodianController","AdminHistory"):["CustodianService.GetListAsync"],
-                ("CustodianController","AdminCalendar"):["CustodianService.GetCalendarAsync"]}
+                ("AdminUsersController","Borrowers"):["UserService.GetPageAsync"],
+                ("AdminUsersController","Approve"):["UserService.DecideAsync"],
+                ("AdminUsersController","Reject"):["UserService.DecideAsync"],
+                ("CustodianController","AdminHistory"):["CustodianQueueService.GetHistoryAsync"],
+                ("CustodianController","AdminCalendar"):["AvailabilityCalendarService.GetStaffCalendarAsync"]}
             direct=special.get(key,[])
         direct=list(dict.fromkeys(direct))
         persistence=list(dict.fromkeys(repository_paths[x.split(".")[0]] for x in direct if x.split(".")[0] in repository_paths))
@@ -214,8 +241,8 @@ for p in files:
         for verb,path in routes:
             route_count+=1
             if verb=="Get" and p.stem=="AdminUsersController" and m[1]=="Edit":
-                direct=["UserAdministrationService.GetEditAsync"]
-                persistence=[repository_paths["UserAdministrationService"]]
+                direct=["UserService.GetEditAsync"]
+                persistence=[repository_paths["UserService"]]
             route_doc.append("| "+code(verb.upper()+" /"+prefix+path)+" | ["+p.stem+"."+m[1]+"](../"+str(p.relative_to(root)).replace("\\","/")+") — "+signature.replace("|","/")+" | "+(", ".join(code(x) for x in direct) or "Form/status/mailbox HTTP presentation; no business database workflow.")+" | "+("; ".join(persistence) or "No direct database access.")+" |")
         previous=m.start()
 route_doc+=["","Repository method clusters list the feature's entry points; open the named application method to see the exact subset and save/lock order. All writes share UnitOfWork/WorkflowLockManager/AuditRepository where the original workflow used them. StatusController accepts any method at its status route. Razor Pages /Error and /demo routes remain outside these MVC controllers.",""]

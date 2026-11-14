@@ -1,5 +1,19 @@
 # Refactor verification — November 7, 2026 (Asia/Manila)
 
+## Readability delivery — November 15, 2026 (current)
+
+Delivery branch: `codex/readability-refactor`, containing the complete ASI implementation plus the requested style cleanup. Final build: zero warnings/errors. Full suite after final source edit: **221 passed, zero failed/skipped**; evidence is `CampusGear/CampusGear.IntegrationTests/TestResults/readability-refactor-full.trx`. Formatter check passed; all maintained production C# lines are within 160 characters. Source/route catalogs now contain 276 files/64 entries following model/contract grouping. No pending EF model changes; 70 Figma frames/127 images passed; historical migrations retained.
+
+The restarted normal app passed focused post-style browser checks for borrower history/calendar and custodian sign-in/dashboard/reservation details, with no captured console warnings/errors. Existing data and demo credentials preserved. See [coding style](../docs/CODE_STYLE.md) and [full evidence/remaining limits](../docs/BASECODE_REFACTOR_PROGRESS.md). Sections below record earlier checkpoints.
+
+## ASI basecode refactor — November 14, 2026 (current)
+
+Branch: `codex/basecode-traceability-refactor`, based on `79baba6`. Final solution build: zero warnings/errors. Full isolated suite: **221 passed, zero failed/skipped**, including endpoint compatibility against 63 original HTTP contracts and new inheritance/DI/mapping checks. Final EF check: no pending model changes. Figma: 70 frames, 127 image references, zero failures. Source/route maps: 374 files/64 entries. Final `git diff --check` passed.
+
+Normal local app restarted on port 5264 with Development email. All three demo roles passed browser smoke; category create/duplicate validation and populated admin edit/borrower request dialogs were verified. Existing database preserved; checksum backup was verified and actually restored to a disposable database containing nine users/42 reservations. The full [current report](../docs/BASECODE_REFACTOR_PROGRESS.md) records exact scope, backup and limits. [Defense walkthrough](../docs/DEFENSE_CODE_WALKTHROUGH.md) uses the new source. Earlier sections below describe earlier revisions and are historical.
+
+No vulnerable packages were reported in production projects. AutoMapper 15.1.4 licensing requires owner review before distribution; two old test-only transitive dependency alerts remain. Real SMTP, production deployment, exhaustive visual parity and human defense rehearsal were not established.
+
 ## Main integration — November 9, 2026
 
 Merged the refactor branch at 8d16ad7 with updated main at 5881b87. Retained main's three added test files, DemoData image improvements, demo SVG assets and Word screen guide. Resolved the Markdown screen-guide conflict by keeping its detailed screen behavior alongside the refactor route/tracing reference. Regenerated the source catalog: 242 maintained files, 64 route/action entries.

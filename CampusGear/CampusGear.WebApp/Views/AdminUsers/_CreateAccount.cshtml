@@ -1,4 +1,4 @@
-@model AdminUserCreateInput
+@model UserCreateModel
 @{
     var roles = new[] { "Borrower", "Custodian", "Administrator" };
     var errors = ViewData.ModelState.TryGetValue("", out var summary) ? summary.Errors.Select(x => x.ErrorMessage).Distinct().ToList() : [];

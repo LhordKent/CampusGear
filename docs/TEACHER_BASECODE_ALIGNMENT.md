@@ -1,20 +1,26 @@
-# Teacher base-code alignment
+# ASI basecode and supplemental-guide alignment
 
-Structural reference previously inspected: [ASIBasecodeCsharp](https://github.com/keder-asi/ASIBasecodeCsharp.git), commit 2df3206 (Init commit). CampusGear retains .NET 8 and its established Identity authentication rather than copying sample password/JWT logic.
+Updated for implementation on 14 November 2026. References: [ASIBasecodeCsharp at the inspected revision](https://github.com/keder-asi/ASIBasecodeCsharp/tree/2df3206f3a520bd55e759b1c3e70d1bbb608e6e5) and the user's five-page supplemental short guide. The guide constructs repository -> service -> controller; requests execute controller -> service -> repository.
 
-| Reference project | CampusGear | Ownership |
-|---|---|---|
-| ASI.Basecode.WebApp | [CampusGear.WebApp](../CampusGear/CampusGear.WebApp) | HTTP, forms, views, browser assets and composition root |
-| ASI.Basecode.Services | [CampusGear.Services](../CampusGear/CampusGear.Services) | Interfaces, business workflows and plain application models |
-| ASI.Basecode.Data | [CampusGear.Data](../CampusGear/CampusGear.Data) | Interfaces, Repositories, QueryModels, EF entities, UnitOfWork, locks, migrations |
-| ASI.Basecode.Resources | [CampusGear.Resources](../CampusGear/CampusGear.Resources) | Stable shared enums and limits |
+| Convention | Implemented location |
+|---|---|
+| Four application layers | CampusGear.Data, Services, Resources and WebApp; IntegrationTests is separate verification. |
+| Public I...Repository / ...Repository | Data/Interfaces and Data/Repositories; every application EF repository inherits BaseRepository. |
+| Public I...Service / ...Service | Services/Interfaces and Services/Services, ordinary constructors/private readonly fields. |
+| Generic MVC base | WebApp/Mvc/ControllerBase.cs; every business controller derives from its own closed ControllerBase<T>. |
+| Central application DI | WebApp/Startup.DI.cs; modern Program calls it; no old Data/Services registration containers. |
+| Mapping infrastructure | Startup.AutoMapper.cs and Services/Mapping/ServiceMappingProfile.cs; validated read mapping only. |
+| Models in their owning layer | Data entities, Services annotated inputs/results, Web-only page composition; misleading controller/model namespaces removed. |
+| Resources | Constants, feature Messages .resx and workspace-label Views .resx, actually consumed. |
 
-Live dependency path: browser → controller → feature service → focused repository → EF Core → SQL Server. Controller constructors accept application/transport dependencies, not repositories, DbContext or Identity managers. Business services use repository/unit-of-work/locking abstractions and established Identity managers without EF/SQL/MVC APIs.
+## Explicit adaptations
 
-Repositories express operations such as HasOutstandingLoanAsync and FindByRequestIdAsync rather than a generic CRUD rename of DbSet. They materialize queries and keep search/order/paging in SQL. Services choose transaction boundaries and coordinate audits/files/email; repositories do not commit after each call.
+1. BaseRepository receives the same scoped ApplicationDbContext plus IUnitOfWork, rather than leaking EF context APIs through the service-facing unit-of-work contract or downcasting it.
+2. Repositories stage changes; services save/commit complete workflows so audits, loans and maintenance do not commit independently.
+3. Existing Identity hashes/stamps/cookies/roles are retained. Sample dummy-login/reversible-password code is not used.
+4. Existing model mappings/migrations are preserved. The short guide's force-scaffold example for a new database is not run over the working Identity context.
+5. Framework persistence stores, expiry hosting, SMTP/image boundaries, status rendering and Development mailbox have their actual infrastructure responsibilities; no fake repository chain is created for code that does not query a database.
 
-The same scoped ApplicationDbContext is shared by repositories, UnitOfWork and Identity stores. AccountUserStore retains the built-in Identity EF behavior and only translates duplicate persistence failures. Data references neither Services nor WebApp. Existing entity namespaces and EF migration metadata stay unchanged; some read DTO namespaces remain compatible with existing Razor imports.
+There is no generic CRUD engine, mediator layer, extra architecture project or reflection-based service registration. Calendar/queue reads do not own reservation mutations. Source-level boundaries, actual endpoint policies, inheritance and DI are enforced by tests.
 
-Minimal-host Program.cs registers both shared layer extensions. Database initialization, migrations, explicit Development demo operations, framework account/cookie middleware and Identity stores are documented infrastructure exceptions. They are not permission for live controllers/views/helpers to query SQL.
-
-All live feature extraction is implemented; this document no longer recommends direct controller queries. [ArchitectureBoundaryTests](../CampusGear/CampusGear.IntegrationTests/ArchitectureBoundaryTests.cs) guard the boundaries. See the [refactor report](SERVICE_REPOSITORY_REFACTOR_REPORT.md), [beginner guide](CODEBASE_CHEATSHEET.md) and [source catalog](SOURCE_CATALOG.md).
+See [current report/evidence](BASECODE_REFACTOR_PROGRESS.md), [feature traces](FEATURE_TRACES.md), [source catalog](SOURCE_CATALOG.md) and [dependency/licensing notes](DEPENDENCIES.md).

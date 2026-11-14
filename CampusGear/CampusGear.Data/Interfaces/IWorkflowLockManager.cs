@@ -1,6 +1,7 @@
-namespace CampusGear.Data.Interfaces;
-
-public interface IWorkflowLockManager
+namespace CampusGear.Data.Interfaces
 {
-    Task AcquireAsync(string resource, CancellationToken cancellationToken = default);
+    public interface IWorkflowLockManager
+    {
+        Task AcquireAsync(string resource, CancellationToken cancellationToken = default);
+    }
 }

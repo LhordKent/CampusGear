@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="InvalidCredentials" xml:space="preserve"><value>The email or password is incorrect.</value></data>
+  <data name="PendingApproval" xml:space="preserve"><value>Your account is pending administrator approval.</value></data>
+  <data name="RegistrationRejected" xml:space="preserve"><value>Your registration was not approved. Please contact the administrator.</value></data>
+  <data name="AccountLocked" xml:space="preserve"><value>This account is temporarily locked. Try again later.</value></data>
+  <data name="AdministratorCodeDeliveryFailed" xml:space="preserve"><value>We could not send the administrator code. Please try again.</value></data>
+  <data name="CodeCooldown" xml:space="preserve"><value>A code was requested recently. Please wait before requesting a new one.</value></data>
+  <data name="AdministratorCodeSent" xml:space="preserve"><value>We sent an administrator sign-in code to your email.</value></data>
+  <data name="CodeResent" xml:space="preserve"><value>A new code was sent to your email address.</value></data>
+  <data name="ResendCooldown" xml:space="preserve"><value>Please wait before requesting another code.</value></data>
+  <data name="CodeDeliveryFailed" xml:space="preserve"><value>We could not send a code. Please try again.</value></data>
+  <data name="CodeExpired" xml:space="preserve"><value>The code expired. Request a new one.</value></data>
+  <data name="CodeAttemptsExceeded" xml:space="preserve"><value>Too many incorrect attempts. Request a new code.</value></data>
+  <data name="CodeInvalid" xml:space="preserve"><value>The code is invalid or has already been used.</value></data>
+  <data name="SignInExpired" xml:space="preserve"><value>This sign-in request is no longer valid. Sign in again.</value></data>
+</root>

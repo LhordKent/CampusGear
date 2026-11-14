@@ -1,19 +1,41 @@
 using CampusGear.Data.Interfaces;
-using CampusGear.Models;
+using CampusGear.Data.Models;
+using CampusGear.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
-namespace CampusGear.Data.Repositories;
-public sealed class EmailChallengeRepository(ApplicationDbContext db) : IEmailChallengeRepository
+
+namespace CampusGear.Data.Repositories
 {
-    public async Task<IReadOnlyList<EmailChallenge>> UnconsumedAsync(string userId, EmailChallengePurpose purpose, CancellationToken ct) =>
-        await db.EmailChallenges.Where(x => x.UserId == userId && x.Purpose == purpose && x.ConsumedAtUtc == null)
-            .OrderByDescending(x => x.CreatedAtUtc).ToListAsync(ct);
-    public Task<EmailChallenge?> LatestValidAsync(string userId, EmailChallengePurpose purpose, CancellationToken ct) =>
-        db.EmailChallenges.Where(x => x.UserId == userId && x.Purpose == purpose && x.ConsumedAtUtc == null && x.InvalidatedAtUtc == null)
-            .OrderByDescending(x => x.CreatedAtUtc).FirstOrDefaultAsync(ct);
-    public void Add(EmailChallenge challenge) => db.EmailChallenges.Add(challenge);
-    public void DetachWrites()
+    public sealed class EmailChallengeRepository : BaseRepository, IEmailChallengeRepository
     {
-        foreach (var entry in db.ChangeTracker.Entries<EmailChallenge>().Where(x => x.State == EntityState.Modified).ToList())
-            entry.State = EntityState.Detached;
+        public EmailChallengeRepository(IUnitOfWork unitOfWork, ApplicationDbContext db)
+            : base(unitOfWork, db) { }
+
+        public async Task<IReadOnlyList<EmailChallenge>> UnconsumedAsync(string userId, EmailChallengePurpose purpose, CancellationToken ct)
+        {
+            return await Context
+                .EmailChallenges.Where(x => x.UserId == userId && x.Purpose == purpose && x.ConsumedAtUtc == null)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .ToListAsync(ct);
+        }
+
+        public Task<EmailChallenge?> LatestValidAsync(string userId, EmailChallengePurpose purpose, CancellationToken ct)
+        {
+            return Context
+                .EmailChallenges.Where(x =>
+                    x.UserId == userId && x.Purpose == purpose && x.ConsumedAtUtc == null && x.InvalidatedAtUtc == null
+                )
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .FirstOrDefaultAsync(ct);
+        }
+
+        public void Add(EmailChallenge challenge) => Context.EmailChallenges.Add(challenge);
+
+        public void DetachWrites()
+        {
+            foreach (var entry in Context.ChangeTracker.Entries<EmailChallenge>().Where(x => x.State == EntityState.Modified).ToList())
+            {
+                entry.State = EntityState.Detached;
+            }
+        }
     }
 }

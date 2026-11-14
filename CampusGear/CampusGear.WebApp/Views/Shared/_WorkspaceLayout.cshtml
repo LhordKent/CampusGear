@@ -1,4 +1,7 @@
-@using CampusGear.Models
+@using CampusGear.Services.Helpers
+@using CampusGear.WebApp.Models
+@using CampusGear.Resources.Constants
+@using CampusGear.Services.ServiceModels
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     var role = (string?)ViewData["WorkspaceRole"] ?? "Borrower";
@@ -9,8 +12,8 @@
     var home = borrower ? "/borrower/home" : $"/{slug}/dashboard";
     var dashboard = path.EndsWith("/dashboard", StringComparison.OrdinalIgnoreCase) ||
         path.Equals("/borrower/home", StringComparison.OrdinalIgnoreCase);
-    var navigation = FigmaUi.Navigation(role);
-    bool IsActive(FigmaNavigation item) =>
+    var navigation = WorkspaceNavigation.ForRole(role);
+    bool IsActive(WorkspaceNavigationItem item) =>
         path.Equals(item.Path, StringComparison.OrdinalIgnoreCase) ||
         path.StartsWith(item.Path + "/", StringComparison.OrdinalIgnoreCase) ||
         item.Path == "/borrower/home" && path.Equals("/borrower/dashboard", StringComparison.OrdinalIgnoreCase);
@@ -29,7 +32,7 @@
     <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
 </head>
-<body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaUi.Frame(path)">
+<body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaReference.Frame(path)">
     <a class="live-skip" href="#workspace-content">Skip to content</a>
     @if (borrower)
     {
@@ -89,7 +92,7 @@
                 <header class="live-topbar">
                     <p class="live-topbar-context"><span>@(role == "Administrator" ? "Administrator" : "Custodian") workspace</span><span aria-hidden="true">/</span><strong>@title</strong></p>
                     <div class="live-topbar-tools">
-                    <time class="live-topbar-date" datetime="@CustodianTime.Local(DateTime.UtcNow).ToString("yyyy-MM-dd")">@CustodianTime.Local(DateTime.UtcNow).ToString("dddd, MMMM d, yyyy")</time>
+                    <time class="live-topbar-date" datetime="@ManilaTime.Local(DateTime.UtcNow).ToString("yyyy-MM-dd")">@ManilaTime.Local(DateTime.UtcNow).ToString("dddd, MMMM d, yyyy")</time>
                     <partial name="_ThemeToggle" />
                     </div>
                 </header>

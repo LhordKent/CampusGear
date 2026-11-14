@@ -1,257 +1,259 @@
 using System.Net;
-using CampusGear.Models;
+using CampusGear.Data.Models;
+using CampusGear.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
-namespace CampusGear.IntegrationTests;
-
-/// <summary>
-/// WBS 31.0 Return Recording, 32.0 Late Return and 33.0 Condition Check: the custodian records a return through the
-/// reservation page, and the loan, the equipment and its maintenance record are updated to match.
-/// </summary>
-[Collection("Web app permissions")]
-public sealed class ReturnConditionCheckTests(WebAppFixture app)
+namespace CampusGear.IntegrationTests
 {
     /// <summary>
-    /// An item that is out on loan: a released reservation with its loan record, released an hour ago and due back at
-    /// <paramref name="dueUtc"/>.
+    /// WBS 31.0 Return Recording, 32.0 Late Return and 33.0 Condition Check: the custodian records a return through the
+    /// reservation page, and the loan, the equipment and its maintenance record are updated to match.
     /// </summary>
-    private async Task<(Guid ReservationId, Guid ItemId, Guid LoanId)> OnLoanAsync(DateTime dueUtc)
+    [Collection("Web app permissions")]
+    public sealed class ReturnConditionCheckTests(WebAppFixture app)
     {
-        var releasedUtc = DateTime.UtcNow.AddHours(-1);
-        var itemId = await app.NewItemAsync();
-        var reservationId = await app.NewReservationAsync(app.BorrowerA.ProfileId!.Value, itemId,
-            ReservationStatus.Released, releasedUtc, dueUtc);
-        var loanId = await app.DbAsync(async db =>
+        /// <summary>
+        /// An item that is out on loan: a released reservation with its loan record, released an hour ago and due back at
+        /// <paramref name = "dueUtc"/>.
+        /// </summary>
+        private async Task<(Guid ReservationId, Guid ItemId, Guid LoanId)> OnLoanAsync(DateTime dueUtc)
         {
-            var loan = new Loan
+            var releasedUtc = DateTime.UtcNow.AddHours(-1);
+            var itemId = await app.NewItemAsync();
+            var reservationId = await app.NewReservationAsync(
+                app.BorrowerA.ProfileId!.Value,
+                itemId,
+                ReservationStatus.Released,
+                releasedUtc,
+                dueUtc
+            );
+            var loanId = await app.DbAsync(async db =>
             {
-                ReservationId = reservationId, ReleasedAtUtc = releasedUtc, DueAtUtc = dueUtc,
-                ReleasedByUserId = app.Custodian.UserId, ConditionAtRelease = EquipmentCondition.Good
-            };
-            db.Loans.Add(loan);
-            await db.SaveChangesAsync();
-            return loan.Id;
-        });
-        return (reservationId, itemId, loanId);
-    }
+                var loan = new Loan
+                {
+                    ReservationId = reservationId,
+                    ReleasedAtUtc = releasedUtc,
+                    DueAtUtc = dueUtc,
+                    ReleasedByUserId = app.Custodian.UserId,
+                    ConditionAtRelease = EquipmentCondition.Good,
+                };
+                db.Loans.Add(loan);
+                await db.SaveChangesAsync();
+                return loan.Id;
+            });
+            return (reservationId, itemId, loanId);
+        }
 
-    private Task<HttpResponseMessage> ReturnAsync(Guid reservationId, string condition, string? notes = null)
-    {
-        var fields = new List<(string, string)> { ("condition", condition) };
-        if (notes is not null) fields.Add(("notes", notes));
-        return WebAppFixture.PostFormAsync(app.Client("Custodian"), $"/custodian/reservations/{reservationId}/return",
-            $"/custodian/reservations/{reservationId}", [.. fields]);
-    }
+        private Task<HttpResponseMessage> ReturnAsync(Guid reservationId, string condition, string? notes = null)
+        {
+            var fields = new List<(string, string)> { ("condition", condition) };
+            if (notes is not null)
+            {
+                fields.Add(("notes", notes));
+            }
 
-    /// <summary>The reservation page the custodian is sent back to, with the success or error message on it.</summary>
-    private Task<string> FollowAsync(HttpResponseMessage response) =>
-        app.Client("Custodian").GetStringAsync(response.Headers.Location!.OriginalString);
+            return WebAppFixture.PostFormAsync(
+                app.Client(RoleNames.Custodian),
+                $"/custodian/reservations/{reservationId}/return",
+                $"/custodian/reservations/{reservationId}",
+                [.. fields]
+            );
+        }
 
-    private Task<Loan> LoanAsync(Guid loanId) =>
-        app.DbAsync(db => db.Loans.AsNoTracking().SingleAsync(x => x.Id == loanId));
+        /// <summary>The reservation page the custodian is sent back to, with the success or error message on it.</summary>
+        private Task<string> FollowAsync(HttpResponseMessage response)
+        {
+            return app.Client(RoleNames.Custodian).GetStringAsync(response.Headers.Location!.OriginalString);
+        }
 
-    // WBS 31.0 — Return Recording
+        private Task<Loan> LoanAsync(Guid loanId)
+        {
+            return app.DbAsync(db => db.Loans.AsNoTracking().SingleAsync(x => x.Id == loanId));
+        }
 
-    [Fact]
-    public async Task Return_InGoodCondition_CompletesTheLoan()
-    {
-        var (reservationId, itemId, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+        // WBS 31.0 — Return Recording
+        [Fact]
+        public async Task Return_InGoodCondition_CompletesTheLoan()
+        {
+            var (reservationId, itemId, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            var response = await ReturnAsync(reservationId, "Good", "All parts present.");
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Contains("Return recorded. The equipment condition and borrowing history are updated.", await FollowAsync(response));
+            var loan = await LoanAsync(loanId);
+            Assert.NotNull(loan.ReturnedAtUtc);
+            Assert.Equal(app.Custodian.UserId, loan.ReceivedByUserId);
+            Assert.Equal(EquipmentCondition.Good, loan.ConditionAtReturn);
+            Assert.Equal("All parts present.", loan.ReturnNotes);
+            var (status, onHold, anyCase) = await app.DbAsync(async db =>
+                (
+                    await db.Reservations.Where(x => x.Id == reservationId).Select(x => x.Status).SingleAsync(),
+                    await db.EquipmentItems.Where(x => x.Id == itemId).Select(x => x.IsMaintenanceHold).SingleAsync(),
+                    await db.MaintenanceCases.AnyAsync(x => x.EquipmentItemId == itemId)
+                )
+            );
+            Assert.Equal(ReservationStatus.Completed, status);
+            Assert.False(onHold);
+            Assert.False(anyCase);
+        }
 
-        var response = await ReturnAsync(reservationId, "Good", "All parts present.");
+        [Fact]
+        public async Task Return_WithUnknownCondition_IsRefused()
+        {
+            var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            var response = await ReturnAsync(reservationId, "Broken");
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Contains("Choose a valid return condition.", await FollowAsync(response));
+            Assert.Null((await LoanAsync(loanId)).ReturnedAtUtc);
+        }
 
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("Return recorded. The equipment condition and borrowing history are updated.", await FollowAsync(response));
-        var loan = await LoanAsync(loanId);
-        Assert.NotNull(loan.ReturnedAtUtc);
-        Assert.Equal(app.Custodian.UserId, loan.ReceivedByUserId);
-        Assert.Equal(EquipmentCondition.Good, loan.ConditionAtReturn);
-        Assert.Equal("All parts present.", loan.ReturnNotes);
-        var (status, onHold, anyCase) = await app.DbAsync(async db => (
-            await db.Reservations.Where(x => x.Id == reservationId).Select(x => x.Status).SingleAsync(),
-            await db.EquipmentItems.Where(x => x.Id == itemId).Select(x => x.IsMaintenanceHold).SingleAsync(),
-            await db.MaintenanceCases.AnyAsync(x => x.EquipmentItemId == itemId)));
-        Assert.Equal(ReservationStatus.Completed, status);
-        Assert.False(onHold);
-        Assert.False(anyCase);
-    }
+        [Fact]
+        public async Task Return_WithNotesOver2000Characters_IsRefused()
+        {
+            var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            var response = await ReturnAsync(reservationId, "Good", new string('x', 2001));
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Contains("Return notes must use 2000 characters or fewer.", await FollowAsync(response));
+            var loan = await LoanAsync(loanId);
+            Assert.Null(loan.ReturnedAtUtc);
+            Assert.Null(loan.ReturnNotes);
+        }
 
-    [Fact]
-    public async Task Return_WithUnknownCondition_IsRefused()
-    {
-        var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+        [Fact]
+        public async Task Return_WithNotesOfExactly2000Characters_IsAccepted()
+        {
+            var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            var notes = new string('x', 2000);
+            var response = await ReturnAsync(reservationId, "Good", notes);
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Equal(notes, (await LoanAsync(loanId)).ReturnNotes);
+        }
 
-        var response = await ReturnAsync(reservationId, "Broken");
+        [Fact]
+        public async Task Return_OfALoanAlreadyReturned_DoesNotChangeIt()
+        {
+            var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            await ReturnAsync(reservationId, "Good", "First return.");
+            var first = await LoanAsync(loanId);
+            // A second submission, e.g. the custodian pressing the button twice, must not overwrite the first record.
+            var response = await ReturnAsync(reservationId, "Damaged", "Second return.");
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            var loan = await LoanAsync(loanId);
+            Assert.Equal(first.ReturnedAtUtc, loan.ReturnedAtUtc);
+            Assert.Equal(EquipmentCondition.Good, loan.ConditionAtReturn);
+            Assert.Equal("First return.", loan.ReturnNotes);
+        }
 
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("Choose a valid return condition.", await FollowAsync(response));
-        Assert.Null((await LoanAsync(loanId)).ReturnedAtUtc);
-    }
+        // WBS 32.0 — Late Return
+        [Fact]
+        public async Task Return_AfterTheDueTime_IsMarkedReturnedLate()
+        {
+            var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddMinutes(-30));
+            var response = await ReturnAsync(reservationId, "Good");
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            var loan = await LoanAsync(loanId);
+            Assert.True(loan.ReturnedAtUtc > loan.DueAtUtc);
+            Assert.Contains("Returned late", await FollowAsync(response));
+        }
 
-    [Fact]
-    public async Task Return_WithNotesOver2000Characters_IsRefused()
-    {
-        var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+        [Fact]
+        public async Task Return_BeforeTheDueTime_IsNotMarkedLate()
+        {
+            var (reservationId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            var response = await ReturnAsync(reservationId, "Good");
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            var page = await FollowAsync(response);
+            Assert.DoesNotContain("Returned late", page);
+            Assert.Contains("Returned early", page);
+        }
 
-        var response = await ReturnAsync(reservationId, "Good", new string('x', 2001));
+        [Fact]
+        public async Task Return_Early_IsOfferedBeforeTheDueTime()
+        {
+            var (reservationId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(1));
+            var page = await app.Client(RoleNames.Custodian).GetStringAsync($"/custodian/reservations/{reservationId}");
+            Assert.Contains("Early return: this loan is due", page);
+            Assert.Contains("Record early return", page);
+        }
 
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("Return notes must use 2000 characters or fewer.", await FollowAsync(response));
-        var loan = await LoanAsync(loanId);
-        Assert.Null(loan.ReturnedAtUtc);
-        Assert.Null(loan.ReturnNotes);
-    }
+        [Fact]
+        public async Task ReturnDesk_ListsOnlyLoans_AndSendsReleaseToApprovals()
+        {
+            var client = app.Client(RoleNames.Custodian);
+            var page = await client.GetStringAsync("/custodian/returns");
+            var oldReleaseLink = await client.GetAsync("/custodian/returns?queue=release");
+            Assert.DoesNotContain("Approved release queue", page);
+            Assert.Equal(HttpStatusCode.Redirect, oldReleaseLink.StatusCode);
+            Assert.Equal("/custodian/approvals?status=approved", oldReleaseLink.Headers.Location!.OriginalString);
+        }
 
-    [Fact]
-    public async Task Return_WithNotesOfExactly2000Characters_IsAccepted()
-    {
-        var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
-        var notes = new string('x', 2000);
+        [Fact]
+        public async Task ReturnQueue_LabelsLoansNotYetDueAsEarlyReturns()
+        {
+            var (earlyId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(1));
+            var (overdueId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddMinutes(-30));
+            var page = await app.Client(RoleNames.Custodian).GetStringAsync("/custodian/returns?queue=active");
+            Assert.Contains($"href=\"/custodian/reservations/{earlyId}\">Record early return<", page);
+            Assert.Contains($"href=\"/custodian/reservations/{overdueId}\">Record return<", page);
+        }
 
-        var response = await ReturnAsync(reservationId, "Good", notes);
+        [Fact]
+        public async Task Return_Early_FreesTheRestOfTheBookingOnTheCalendar()
+        {
+            var (reservationId, itemId, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(3));
+            // A day in the middle of the booking, as a Manila calendar date (UTC+8).
+            var day = DateTime.UtcNow.AddDays(2).AddHours(8).Date;
+            var calendar = $"/custodian/calendar?year={day.Year}&month={day.Month}&equipmentItemId={itemId}&day={day:yyyy-MM-dd}";
+            var before = await app.Client(RoleNames.Custodian).GetStringAsync(calendar);
+            await ReturnAsync(reservationId, "Good");
+            var after = await app.Client(RoleNames.Custodian).GetStringAsync(calendar);
+            var label = day.ToString("MMMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            Assert.Contains($"{label} — Reserved — 1 booking\"", before);
+            Assert.Contains($"{label} — Available — 0 bookings\"", after);
+            Assert.Contains("No reservations overlap this day", after);
+        }
 
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Equal(notes, (await LoanAsync(loanId)).ReturnNotes);
-    }
+        // WBS 33.0 — Condition Check
+        [Theory]
+        [InlineData("Damaged")]
+        [InlineData("Unserviceable")]
+        public async Task Return_DamagedOrUnserviceable_CreatesMaintenanceHold(string condition)
+        {
+            var (reservationId, itemId, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            var response = await ReturnAsync(reservationId, condition, "Cracked casing.");
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Contains("A maintenance hold was created for this equipment.", await FollowAsync(response));
+            var (item, cases) = await app.DbAsync(async db =>
+                (
+                    await db.EquipmentItems.AsNoTracking().SingleAsync(x => x.Id == itemId),
+                    await db.MaintenanceCases.Where(x => x.EquipmentItemId == itemId).ToListAsync()
+                )
+            );
+            Assert.True(item.IsMaintenanceHold);
+            Assert.Equal(Enum.Parse<EquipmentCondition>(condition), item.Condition);
+            var maintenance = Assert.Single(cases);
+            Assert.Equal(MaintenanceStatus.Open, maintenance.Status);
+            Assert.Equal(loanId, maintenance.LoanId);
+        }
 
-    [Fact]
-    public async Task Return_OfALoanAlreadyReturned_DoesNotChangeIt()
-    {
-        var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
-        await ReturnAsync(reservationId, "Good", "First return.");
-        var first = await LoanAsync(loanId);
-
-        // A second submission, e.g. the custodian pressing the button twice, must not overwrite the first record.
-        var response = await ReturnAsync(reservationId, "Damaged", "Second return.");
-
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        var loan = await LoanAsync(loanId);
-        Assert.Equal(first.ReturnedAtUtc, loan.ReturnedAtUtc);
-        Assert.Equal(EquipmentCondition.Good, loan.ConditionAtReturn);
-        Assert.Equal("First return.", loan.ReturnNotes);
-    }
-
-    // WBS 32.0 — Late Return
-
-    [Fact]
-    public async Task Return_AfterTheDueTime_IsMarkedReturnedLate()
-    {
-        var (reservationId, _, loanId) = await OnLoanAsync(DateTime.UtcNow.AddMinutes(-30));
-
-        var response = await ReturnAsync(reservationId, "Good");
-
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        var loan = await LoanAsync(loanId);
-        Assert.True(loan.ReturnedAtUtc > loan.DueAtUtc);
-        Assert.Contains("Returned late", await FollowAsync(response));
-    }
-
-    [Fact]
-    public async Task Return_BeforeTheDueTime_IsNotMarkedLate()
-    {
-        var (reservationId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
-
-        var response = await ReturnAsync(reservationId, "Good");
-
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        var page = await FollowAsync(response);
-        Assert.DoesNotContain("Returned late", page);
-        Assert.Contains("Returned early", page);
-    }
-
-    [Fact]
-    public async Task Return_Early_IsOfferedBeforeTheDueTime()
-    {
-        var (reservationId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(1));
-
-        var page = await app.Client("Custodian").GetStringAsync($"/custodian/reservations/{reservationId}");
-
-        Assert.Contains("Early return: this loan is due", page);
-        Assert.Contains("Record early return", page);
-    }
-
-    [Fact]
-    public async Task ReturnDesk_ListsOnlyLoans_AndSendsReleaseToApprovals()
-    {
-        var client = app.Client("Custodian");
-
-        var page = await client.GetStringAsync("/custodian/returns");
-        var oldReleaseLink = await client.GetAsync("/custodian/returns?queue=release");
-
-        Assert.DoesNotContain("Approved release queue", page);
-        Assert.Equal(HttpStatusCode.Redirect, oldReleaseLink.StatusCode);
-        Assert.Equal("/custodian/approvals?status=approved", oldReleaseLink.Headers.Location!.OriginalString);
-    }
-
-    [Fact]
-    public async Task ReturnQueue_LabelsLoansNotYetDueAsEarlyReturns()
-    {
-        var (earlyId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(1));
-        var (overdueId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddMinutes(-30));
-
-        var page = await app.Client("Custodian").GetStringAsync("/custodian/returns?queue=active");
-
-        Assert.Contains($"href=\"/custodian/reservations/{earlyId}\">Record early return<", page);
-        Assert.Contains($"href=\"/custodian/reservations/{overdueId}\">Record return<", page);
-    }
-
-    [Fact]
-    public async Task Return_Early_FreesTheRestOfTheBookingOnTheCalendar()
-    {
-        var (reservationId, itemId, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(3));
-        // A day in the middle of the booking, as a Manila calendar date (UTC+8).
-        var day = DateTime.UtcNow.AddDays(2).AddHours(8).Date;
-        var calendar = $"/custodian/calendar?year={day.Year}&month={day.Month}&equipmentItemId={itemId}&day={day:yyyy-MM-dd}";
-
-        var before = await app.Client("Custodian").GetStringAsync(calendar);
-        await ReturnAsync(reservationId, "Good");
-        var after = await app.Client("Custodian").GetStringAsync(calendar);
-
-        var label = day.ToString("MMMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture);
-        Assert.Contains($"{label} — Reserved — 1 booking\"", before);
-        Assert.Contains($"{label} — Available — 0 bookings\"", after);
-        Assert.Contains("No reservations overlap this day", after);
-    }
-
-    // WBS 33.0 — Condition Check
-
-    [Theory]
-    [InlineData("Damaged")]
-    [InlineData("Unserviceable")]
-    public async Task Return_DamagedOrUnserviceable_CreatesMaintenanceHold(string condition)
-    {
-        var (reservationId, itemId, loanId) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
-
-        var response = await ReturnAsync(reservationId, condition, "Cracked casing.");
-
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("A maintenance hold was created for this equipment.", await FollowAsync(response));
-        var (item, cases) = await app.DbAsync(async db => (
-            await db.EquipmentItems.AsNoTracking().SingleAsync(x => x.Id == itemId),
-            await db.MaintenanceCases.Where(x => x.EquipmentItemId == itemId).ToListAsync()));
-        Assert.True(item.IsMaintenanceHold);
-        Assert.Equal(Enum.Parse<EquipmentCondition>(condition), item.Condition);
-        var maintenance = Assert.Single(cases);
-        Assert.Equal(MaintenanceStatus.Open, maintenance.Status);
-        Assert.Equal(loanId, maintenance.LoanId);
-    }
-
-    [Theory]
-    [InlineData("Excellent")]
-    [InlineData("Good")]
-    [InlineData("Fair")]
-    public async Task Return_InUsableCondition_CreatesNoMaintenanceHold(string condition)
-    {
-        var (reservationId, itemId, _) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
-
-        var response = await ReturnAsync(reservationId, condition);
-
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.DoesNotContain("A maintenance hold was created", await FollowAsync(response));
-        var (item, anyCase) = await app.DbAsync(async db => (
-            await db.EquipmentItems.AsNoTracking().SingleAsync(x => x.Id == itemId),
-            await db.MaintenanceCases.AnyAsync(x => x.EquipmentItemId == itemId)));
-        Assert.False(item.IsMaintenanceHold);
-        Assert.Equal(Enum.Parse<EquipmentCondition>(condition), item.Condition);
-        Assert.False(anyCase);
+        [Theory]
+        [InlineData("Excellent")]
+        [InlineData("Good")]
+        [InlineData("Fair")]
+        public async Task Return_InUsableCondition_CreatesNoMaintenanceHold(string condition)
+        {
+            var (reservationId, itemId, _) = await OnLoanAsync(DateTime.UtcNow.AddHours(2));
+            var response = await ReturnAsync(reservationId, condition);
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.DoesNotContain("A maintenance hold was created", await FollowAsync(response));
+            var (item, anyCase) = await app.DbAsync(async db =>
+                (
+                    await db.EquipmentItems.AsNoTracking().SingleAsync(x => x.Id == itemId),
+                    await db.MaintenanceCases.AnyAsync(x => x.EquipmentItemId == itemId)
+                )
+            );
+            Assert.False(item.IsMaintenanceHold);
+            Assert.Equal(Enum.Parse<EquipmentCondition>(condition), item.Condition);
+            Assert.False(anyCase);
+        }
     }
 }

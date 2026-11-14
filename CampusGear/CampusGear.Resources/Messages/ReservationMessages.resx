@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="PurposeRequired" xml:space="preserve"><value>Purpose is required.</value></data>
+  <data name="InvalidBookingInput" xml:space="preserve"><value>Choose an item and a future time range in UTC.</value></data>
+  <data name="BorrowerOwnershipRequired" xml:space="preserve"><value>Only borrowers can request equipment, and only for themselves.</value></data>
+  <data name="IneligibleBorrower" xml:space="preserve"><value>The borrower account is not eligible to reserve equipment.</value></data>
+  <data name="StartTimePassed" xml:space="preserve"><value>The requested start time has passed.</value></data>
+  <data name="BorrowerProfileRequired" xml:space="preserve"><value>The borrower has no borrowing profile.</value></data>
+  <data name="ScheduleUnavailable" xml:space="preserve"><value>This equipment is unavailable for the requested time.</value></data>
+  <data name="AlreadySubmitted" xml:space="preserve"><value>This request was already submitted.</value></data>
+  <data name="PendingApprovalRequired" xml:space="preserve"><value>Only pending requests can be approved.</value></data>
+  <data name="ScheduleConflict" xml:space="preserve"><value>The equipment is no longer available for this time.</value></data>
+  <data name="RejectionReasonRequired" xml:space="preserve"><value>A rejection reason is required.</value></data>
+  <data name="PendingRejectionRequired" xml:space="preserve"><value>Only pending requests can be rejected.</value></data>
+  <data name="CancellationForbidden" xml:space="preserve"><value>You cannot cancel this request.</value></data>
+  <data name="CancellationUnavailable" xml:space="preserve"><value>This request can no longer be cancelled.</value></data>
+  <data name="DamagedReleaseForbidden" xml:space="preserve"><value>Damaged equipment cannot be released.</value></data>
+  <data name="ApprovalRequired" xml:space="preserve"><value>Only approved requests can be released.</value></data>
+  <data name="ReleaseOutsideBooking" xml:space="preserve"><value>Release must occur during the approved booking time.</value></data>
+  <data name="EquipmentUnavailable" xml:space="preserve"><value>The equipment is currently unavailable.</value></data>
+  <data name="InvalidReturnCondition" xml:space="preserve"><value>Choose a valid return condition.</value></data>
+  <data name="ActiveLoanRequired" xml:space="preserve"><value>Only an active loan can be returned.</value></data>
+  <data name="ReturnBeforeRelease" xml:space="preserve"><value>Return time cannot precede release.</value></data>
+  <data name="InvalidBatchSize" xml:space="preserve"><value>Batch size must be between 1 and 1000.</value></data>
+  <data name="RecordBusy" xml:space="preserve"><value>This record is busy. Please retry the action.</value></data>
+  <data name="BorrowerNoLongerEligible" xml:space="preserve"><value>The borrower is no longer eligible to borrow equipment.</value></data>
+  <data name="BorrowerRoleRequired" xml:space="preserve"><value>The account no longer has borrower access.</value></data>
+  <data name="ReservationIdRequired" xml:space="preserve"><value>A reservation ID is required.</value></data>
+  <data name="ReservationNotFound" xml:space="preserve"><value>Reservation was not found.</value></data>
+  <data name="SignInRequired" xml:space="preserve"><value>Sign in is required.</value></data>
+  <data name="VerifiedAccountRequired" xml:space="preserve"><value>An active, verified account is required.</value></data>
+  <data name="CustodianRequired" xml:space="preserve"><value>Only a custodian can do this.</value></data>
+  <data name="StaleRecord" xml:space="preserve"><value>This record changed. Reload and retry.</value></data>
+  <data name="DuplicateRequestId" xml:space="preserve"><value>This request ID is already in use.</value></data>
+  <data name="ItemNotBookable" xml:space="preserve"><value>This equipment is not available for borrowing.</value></data>
+</root>

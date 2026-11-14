@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="NameRequired" xml:space="preserve"><value>Enter a category name.</value></data>
+  <data name="StaleCategory" xml:space="preserve"><value>This category changed. Reload before saving.</value></data>
+  <data name="ActiveEquipmentPreventsDeactivation" xml:space="preserve"><value>Move or deactivate this category&apos;s active equipment before deactivating the category.</value></data>
+  <data name="CategorySaved" xml:space="preserve"><value>Category saved.</value></data>
+  <data name="RecordBusy" xml:space="preserve"><value>This record is busy. Please retry.</value></data>
+  <data name="DuplicateOrStaleCategory" xml:space="preserve"><value>That category name already exists, or the record changed.</value></data>
+  <data name="InvalidNameLength" xml:space="preserve"><value>Enter a category name using 120 characters or fewer.</value></data>
+  <data name="CategoryAdded" xml:space="preserve"><value>Category added.</value></data>
+  <data name="DuplicateCategory" xml:space="preserve"><value>That category already exists.</value></data>
+</root>

@@ -1,10 +1,90 @@
-using CampusGear.Services;
-namespace CampusGear.Infrastructure;
-public sealed class AccountFlowStore(IHttpContextAccessor accessor) : IAccountFlowStore
+using CampusGear.Services.Interfaces;
+using CampusGear.Services.ServiceModels;
+
+namespace CampusGear.WebApp.Infrastructure
 {
-    private ISession Session => accessor.HttpContext?.Session ?? throw new InvalidOperationException("An account flow requires an HTTP session.");
-    public string? GetString(string key) => Session.GetString(key);
-    public void SetString(string key, string value) => Session.SetString(key, value);
-    public void Remove(string key) => Session.Remove(key);
-    public void Clear() => Session.Clear();
+    public sealed class AccountFlowStore : IAccountFlowStore
+    {
+        private readonly IHttpContextAccessor _accessor;
+
+        public AccountFlowStore(IHttpContextAccessor accessor)
+        {
+            _accessor = accessor;
+        }
+
+        private ISession Session =>
+            _accessor.HttpContext?.Session ?? throw new InvalidOperationException("An account flow requires an HTTP session.");
+
+        public AccountChallengeState? PendingAdministrator
+        {
+            get { return ReadChallenge("CampusGear.PendingAdministratorUserId", "CampusGear.PendingAdministratorStamp"); }
+            set { WriteChallenge("CampusGear.PendingAdministratorUserId", "CampusGear.PendingAdministratorStamp", value); }
+        }
+
+        public AccountChallengeState? PendingPasswordReset
+        {
+            get { return ReadChallenge("CampusGear.PendingResetUserId", "CampusGear.PendingResetStamp"); }
+            set { WriteChallenge("CampusGear.PendingResetUserId", "CampusGear.PendingResetStamp", value); }
+        }
+
+        public PasswordResetAuthorization? AuthorizedPasswordReset
+        {
+            get
+            {
+                var id = Session.GetString("CampusGear.AuthorizedResetUserId");
+                if (id is null)
+                {
+                    return null;
+                }
+
+                long.TryParse(
+                    Session.GetString("CampusGear.AuthorizedResetExpiresAt"),
+                    System.Globalization.NumberStyles.None,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out var expiresAt
+                );
+                return new(id, Session.GetString("CampusGear.AuthorizedResetStamp") ?? "", expiresAt);
+            }
+            set
+            {
+                WriteChallenge(
+                    "CampusGear.AuthorizedResetUserId",
+                    "CampusGear.AuthorizedResetStamp",
+                    value is null ? null : new(value.UserId, value.SecurityStamp)
+                );
+                if (value is null)
+                {
+                    Session.Remove("CampusGear.AuthorizedResetExpiresAt");
+                }
+                else
+                {
+                    Session.SetString(
+                        "CampusGear.AuthorizedResetExpiresAt",
+                        value.ExpiresAtUnixSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                    );
+                }
+            }
+        }
+
+        private AccountChallengeState? ReadChallenge(string userKey, string stampKey)
+        {
+            var id = Session.GetString(userKey);
+            return id is null ? null : new(id, Session.GetString(stampKey) ?? "");
+        }
+
+        private void WriteChallenge(string userKey, string stampKey, AccountChallengeState? value)
+        {
+            if (value is null)
+            {
+                Session.Remove(userKey);
+                Session.Remove(stampKey);
+                return;
+            }
+
+            Session.SetString(userKey, value.UserId);
+            Session.SetString(stampKey, value.SecurityStamp);
+        }
+
+        public void Clear() => Session.Clear();
+    }
 }

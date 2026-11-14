@@ -1,4 +1,7 @@
-@using CampusGear.Models
+@using CampusGear.Services.Helpers
+@using CampusGear.WebApp.Models
+@using CampusGear.Resources.Constants
+@using CampusGear.Services.ServiceModels
 @model MaintenancePageModel
 @{
     Layout = "_WorkspaceLayout";
@@ -67,7 +70,7 @@
                                 <td><strong>@item.EquipmentItem.Name</strong><small>@item.EquipmentItem.AssetCode</small></td>
                                 <td class="maintenance-issue"><span class="line-clamp">@item.Description</span>@if (closed && item.Resolution is not null) { <small class="line-clamp">Repair: @item.Resolution</small> }</td>
                                 <td><span class="live-badge" data-state="@(item.Status == MaintenanceStatus.Closed ? "closed" : item.Status == MaintenanceStatus.InProgress ? "inprogress" : "maintenance")">@Label(item.Status)</span></td>
-                                <td class="live-nowrap">@CustodianTime.Format(closed && item.ClosedAtUtc is { } closedAt ? closedAt : item.OpenedAtUtc)<small>by @((closed ? item.ClosedByUser?.FullName : item.OpenedByUser?.FullName) ?? "staff")</small></td>
+                                <td class="live-nowrap">@ManilaTime.Format(closed && item.ClosedAtUtc is { } closedAt ? closedAt : item.OpenedAtUtc)<small>by @((closed ? item.ClosedByUser?.FullName : item.OpenedByUser?.FullName) ?? "staff")</small></td>
                                 <td class="live-table-action">
                                     <button class="live-button @(closed ? "secondary" : "")" type="button" data-modal-open="@dialogId">@(closed ? "View" : "Update")</button>
                                     <dialog id="@dialogId" class="live-modal" aria-labelledby="@dialogId-title">
@@ -77,8 +80,8 @@
                                         </div>
                                         <dl class="live-modal-facts">
                                             <div><dt>Status</dt><dd><span class="live-badge" data-state="@(item.Status == MaintenanceStatus.Closed ? "closed" : item.Status == MaintenanceStatus.InProgress ? "inprogress" : "maintenance")">@Label(item.Status)</span></dd></div>
-                                            <div><dt>Opened</dt><dd>@CustodianTime.Format(item.OpenedAtUtc)<small>by @(item.OpenedByUser?.FullName ?? "staff")</small></dd></div>
-                                            @if (item.ClosedAtUtc is { } closedOn) { <div><dt>Closed</dt><dd>@CustodianTime.Format(closedOn)<small>by @(item.ClosedByUser?.FullName ?? "staff")</small></dd></div> }
+                                            <div><dt>Opened</dt><dd>@ManilaTime.Format(item.OpenedAtUtc)<small>by @(item.OpenedByUser?.FullName ?? "staff")</small></dd></div>
+                                            @if (item.ClosedAtUtc is { } closedOn) { <div><dt>Closed</dt><dd>@ManilaTime.Format(closedOn)<small>by @(item.ClosedByUser?.FullName ?? "staff")</small></dd></div> }
                                             <div class="wide"><dt>Reported issue</dt><dd class="custodian-preserve">@item.Description</dd></div>
                                             @if (item.Status == MaintenanceStatus.Closed) { <div class="wide"><dt>Repair notes</dt><dd class="custodian-preserve">@(item.Resolution ?? "—")</dd></div> }
                                         </dl>

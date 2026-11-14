@@ -1,5 +1,7 @@
-@using CampusGear.Models
-@model AdminUserEditPage
+@using CampusGear.WebApp.Models
+@using CampusGear.Resources.Constants
+@using CampusGear.Services.ServiceModels
+@model UserEditPage
 @{
     var roles = new[] { "Borrower", "Custodian", "Administrator" };
     var approved = Model.ApprovalStatus == AccountApprovalStatus.Approved;
