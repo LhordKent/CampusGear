@@ -1,0 +1,26 @@
+@model CategoriesPageModel
+@{
+    var adding = Model.Input.Id is null;
+    var errors = ViewData.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).Distinct().ToList();
+}
+<dialog id="category-editor" class="live-modal" aria-labelledby="category-editor-title" data-modal-autoshow data-modal-return="/admin/categories" data-figma-source="@(adding ? "695:5184" : "695:5347")">
+    <div class="live-modal-head">
+        <div><p class="page-eyebrow">Inventory</p><h2 id="category-editor-title">@(adding ? "Add Equipment Category" : "Edit Equipment Category")</h2></div>
+        <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/icons.svg#x"></use></svg></button>
+    </div>
+    <p class="live-modal-lede">Categories group equipment in the borrower catalog and on reports.</p>
+    <form id="category-editor-form" method="post" action="/admin/categories/save" class="live-form" data-modal-form novalidate>
+        @Html.AntiForgeryToken()<input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
+        <div class="live-modal-alert wide" role="alert" data-modal-alert hidden="@(errors.Count == 0)">@string.Join(" ", errors)</div>
+        <label class="live-field wide"><span>Category name</span><input asp-for="Input.Name" required maxlength="120" placeholder="e.g. Cameras" /></label>
+        <label class="live-field wide"><span>Description <small>Optional · shown to staff and borrowers</small></span><textarea asp-for="Input.Description" maxlength="1000" rows="3" placeholder="What kind of equipment belongs here?"></textarea></label>
+        <div class="wide">
+            <label class="live-check"><input asp-for="Input.IsActive" /> Active category</label>
+            <p class="live-help">A category with active equipment must stay active.</p>
+        </div>
+        <div class="live-modal-actions wide">
+            <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+            <button class="live-button" type="submit">@(adding ? "Add category" : "Save changes")</button>
+        </div>
+    </form>
+</dialog>

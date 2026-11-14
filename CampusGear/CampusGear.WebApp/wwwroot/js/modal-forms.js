@@ -3,9 +3,45 @@
 // with fetch and expects JSON { ok, message, field }: on success the dialog closes, a toast confirms, and every
 // [data-refresh-region] on the page is reloaded in place; on failure the dialog stays open with the message shown
 // above the fields, the named field marked, and everything the user typed intact.
+// An editor link marked [data-modal-load] asks the server for just its dialog (header X-Modal: 1) and opens it over
+// the list. Opening the same link directly renders the list with the dialog marked data-modal-autoshow, which opens
+// on load; closing it puts the address back to data-modal-return. Loaded and auto-shown dialogs are discarded on close.
 (() => {
     const parser = new DOMParser();
     const toast = (message, type) => window.CampusGear?.toast?.(message, type);
+
+    const openDialog = (dialog, opener) => {
+        dialog._opener = opener;
+        dialog.showModal();
+        dialog.querySelector('select, textarea, input:not([type="hidden"])')?.focus();
+    };
+
+    async function loadDialog(link) {
+        if (link._loading) return;
+        link._loading = true;
+        try {
+            const response = await fetch(link.href, { headers: { 'X-Modal': '1', Accept: 'text/html' }, credentials: 'same-origin' });
+            const dialog = response.ok && !response.redirected
+                ? parser.parseFromString(await response.text(), 'text/html').querySelector('dialog')
+                : null;
+            // Anything unexpected (signed out, missing record, offline) falls back to opening the page itself.
+            if (!dialog) { location.href = link.href; return; }
+            document.querySelectorAll('dialog[data-modal-discard]').forEach(x => x.remove());
+            dialog.dataset.modalDiscard = '';
+            (document.querySelector('main') ?? document.body).append(dialog);
+            openDialog(dialog, link);
+        } catch {
+            location.href = link.href;
+        } finally {
+            link._loading = false;
+        }
+    }
+
+    document.querySelectorAll('dialog[data-modal-autoshow]').forEach(dialog => {
+        dialog.dataset.modalDiscard = '';
+        dialog._returnUrl = dialog.dataset.modalReturn;
+        openDialog(dialog, null);
+    });
 
     const resetForm = dialog => {
         dialog.querySelectorAll('form[data-modal-form]').forEach(form => {
@@ -17,13 +53,17 @@
     };
 
     document.addEventListener('click', event => {
+        const loader = event.target.closest('a[data-modal-load]');
+        // Ctrl/Cmd/Shift-click and middle-click still open the editor in its own tab.
+        if (loader && event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+            event.preventDefault();
+            loadDialog(loader);
+            return;
+        }
         const opener = event.target.closest('[data-modal-open]');
         if (opener) {
             const dialog = document.getElementById(opener.dataset.modalOpen);
-            if (!dialog) return;
-            dialog._opener = opener;
-            dialog.showModal();
-            dialog.querySelector('select, textarea, input:not([type="hidden"])')?.focus();
+            if (dialog) openDialog(dialog, opener);
             return;
         }
         const closer = event.target.closest('[data-modal-close]');
@@ -40,9 +80,22 @@
     document.addEventListener('close', event => {
         const dialog = event.target;
         if (!(dialog instanceof HTMLDialogElement)) return;
-        resetForm(dialog);
+        if (dialog._returnUrl) history.replaceState(history.state, '', dialog._returnUrl);
+        if (dialog.hasAttribute('data-modal-discard')) dialog.remove();
+        else resetForm(dialog);
         if (dialog._opener?.isConnected) dialog._opener.focus();
     }, true);
+
+    // A chosen photo is previewed in the <img> named by data-image-preview before it is uploaded.
+    document.addEventListener('change', event => {
+        const input = event.target.closest('input[type="file"][data-image-preview]');
+        const preview = input && document.getElementById(input.dataset.imagePreview);
+        const file = input?.files[0];
+        if (!preview || !file) return;
+        if (preview.src.startsWith('blob:')) URL.revokeObjectURL(preview.src);
+        preview.src = URL.createObjectURL(file);
+        preview.hidden = false;
+    });
 
     async function refreshRegions() {
         const response = await fetch(location.href, { headers: { 'X-Requested-With': 'fetch', Accept: 'text/html' }, credentials: 'same-origin' });

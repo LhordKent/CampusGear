@@ -214,6 +214,66 @@ public sealed partial class CategoryItemEditorTests(WebAppFixture app)
         Assert.False(anyCase);
     }
 
+    // Modal editors: the dialog is loaded on its own and saves with fetch, answering in JSON.
+
+    [Theory]
+    [InlineData("/admin/categories?form=add", "category-editor")]
+    [InlineData("/admin/equipment?form=add", "equipment-editor")]
+    [InlineData("/admin/users/new", "account-create")]
+    public async Task Editor_requested_by_a_dialog_returns_only_the_dialog(string path, string dialogId)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+        request.Headers.Add("X-Modal", "1");
+
+        var response = await app.Client("Administrator").SendAsync(request);
+        var html = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.StartsWith("<dialog id=\"" + dialogId + "\"", html.TrimStart());
+        Assert.DoesNotContain("<main", html);
+    }
+
+    [Fact]
+    public async Task Editor_opened_directly_shows_the_list_with_the_dialog_over_it()
+    {
+        var html = await app.Client("Administrator").GetStringAsync("/admin/categories?form=add");
+
+        Assert.Contains("id=\"category-results\"", html);
+        Assert.Contains("<dialog id=\"category-editor\"", html);
+    }
+
+    [Fact]
+    public async Task AddCategory_FromDialog_AnswersJson()
+    {
+        var name = Unique("DialogCategory");
+
+        var saved = await PostCategoryWithFetchAsync(name);
+        var duplicate = await PostCategoryWithFetchAsync(name);
+
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        using (var json = System.Text.Json.JsonDocument.Parse(await saved.Content.ReadAsStringAsync()))
+            Assert.True(json.RootElement.GetProperty("ok").GetBoolean());
+        Assert.Equal((HttpStatusCode)422, duplicate.StatusCode);
+        using (var json = System.Text.Json.JsonDocument.Parse(await duplicate.Content.ReadAsStringAsync()))
+        {
+            Assert.False(json.RootElement.GetProperty("ok").GetBoolean());
+            Assert.Contains("That category name already exists", json.RootElement.GetProperty("message").GetString());
+        }
+        Assert.Equal(1, await app.DbAsync(db => db.EquipmentCategories.CountAsync(x => x.Name == name)));
+    }
+
+    private async Task<HttpResponseMessage> PostCategoryWithFetchAsync(string name)
+    {
+        var client = app.Client("Administrator");
+        var token = TokenPattern().Match(await client.GetStringAsync("/admin/categories?form=add")).Groups[1].Value;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/admin/categories/save")
+        {
+            Content = new FormUrlEncodedContent([new("__RequestVerificationToken", token), new("Input.Name", name), new("Input.IsActive", "true")])
+        };
+        request.Headers.Add("X-Requested-With", "fetch");
+        return await client.SendAsync(request);
+    }
+
     [GeneratedRegex("name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"")]
     private static partial Regex TokenPattern();
 }

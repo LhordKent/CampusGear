@@ -22,7 +22,7 @@
         <div class="page-header-actions">
             @if (Model.Status == "pending") { <a class="live-button secondary" href="@basePath">Show all accounts</a> }
             else if (Model.PendingTotal > 0) { <a class="live-button secondary" href="@basePath?status=pending">Verify registrations<span class="live-count">@Model.PendingTotal</span></a> }
-            <a class="live-button" href="/admin/users/new@(borrowers ? "?role=Borrower" : "")"><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>@(borrowers ? "Add borrower" : "Create account")</a>
+            <a class="live-button" href="/admin/users/new@(borrowers ? "?role=Borrower" : "")" data-modal-load><svg class="icon" aria-hidden="true"><use href="/icons.svg#plus"></use></svg>@(borrowers ? "Add borrower" : "Create account")</a>
         </div>
     </header>
     @if (Model.Feedback is not null)
@@ -48,7 +48,7 @@
             </select></label>
             <a class="live-button secondary live-filter-reset" href="@basePath" data-live-reset>Clear</a>
         </form>
-        <div id="user-results" class="live-results">
+        <div id="user-results" class="live-results" data-refresh-region>
         <p class="live-result-count" data-live-count>@Model.Total matching account@(Model.Total == 1 ? "" : "s")</p>
         @if (Model.Rows.Count == 0)
         {
@@ -86,7 +86,7 @@
                                 {
                                     <form method="post" action="/admin/users/@row.Id/reject">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button danger" type="submit" aria-label="Reject @row.FullName">Reject</button></form>
                                 }
-                                <a class="live-button secondary" href="/admin/users/@row.Id/edit">Edit</a>
+                                <a class="live-button secondary" href="/admin/users/@row.Id/edit" data-modal-load>Edit</a>
                                 <form method="post" action="/admin/users/@row.Id/delete" onsubmit="return confirm('Delete this account? Accounts with borrowing history are deactivated instead.')">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button secondary" type="submit" aria-label="Delete @row.FullName">Delete</button></form>
                             </div></td>
                         </tr>
@@ -104,4 +104,6 @@
         }
         </div>
     </section>
+    @if (ViewData["Editor"] is string editor) { <partial name="@editor" model='ViewData["EditorModel"]' /> }
 </main>
+@section Scripts { <script src="~/js/modal-forms.js" asp-append-version="true"></script> }

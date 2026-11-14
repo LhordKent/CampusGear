@@ -127,7 +127,7 @@ body { background: var(--ws-canvas); color: var(--ws-text); font-size: 14px; -we
 .live-badge:is([data-state='pending'], [data-state='pending approval'], [data-state='due today']) { background: var(--ws-pending-bg); border-color: var(--ws-pending-border); color: var(--ws-pending-text); }
 .live-badge:is([data-state='approved'], [data-state='reserved'], [data-state='open'], [data-state='inprogress']) { background: var(--ws-info-bg); border-color: var(--ws-info-border); color: var(--ws-info-text); }
 .live-badge:is([data-state='borrowed'], [data-state='released']) { background: var(--ws-teal-soft); border-color: var(--ws-teal-line); color: var(--ws-link); }
-.live-badge:is([data-state='returned'], [data-state='available'], [data-state='active'], [data-state='completed'], [data-state='closed']) { background: var(--ws-success-bg); border-color: var(--ws-success-border); color: var(--ws-success-text); }
+.live-badge:is([data-state='returned'], [data-state='returned early'], [data-state='available'], [data-state='active'], [data-state='completed'], [data-state='closed']) { background: var(--ws-success-bg); border-color: var(--ws-success-border); color: var(--ws-success-text); }
 .live-badge:is([data-state='overdue'], [data-state='returned late'], [data-state='rejected']) { background: var(--ws-danger-bg); border-color: var(--ws-danger-border); color: var(--ws-danger-text); }
 .live-badge:is([data-state='maintenance hold'], [data-state='maintenance'], [data-state='for repair']) { background: var(--ws-repair-bg); border-color: var(--ws-repair-border); color: var(--ws-repair-text); }
 
@@ -552,6 +552,7 @@ html.js [data-toast]:not([data-toast-keep]) { display: none; }
     border: 1px solid var(--ws-border-strong); border-radius: 16px; background: var(--ws-card); color: var(--ws-text);
     box-shadow: 0 30px 60px -20px rgb(0 0 0 / .5);
 }
+.live-modal.live-modal-wide { width: min(860px, calc(100vw - 24px)); }
 .live-modal::backdrop { background: var(--ws-backdrop); backdrop-filter: blur(2px); }
 .live-modal[open] { animation: modal-in .24s var(--motion-ease, ease) both; }
 .live-modal[open]::backdrop { animation: motion-fade .2s ease both; }

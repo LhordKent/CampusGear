@@ -1,0 +1,46 @@
+@using CampusGear.Models
+@model InventoryPageModel
+@{
+    var adding = Model.Input.Id is null;
+    var errors = ViewData.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).Distinct().ToList();
+}
+<dialog id="equipment-editor" class="live-modal live-modal-wide" aria-labelledby="equipment-editor-title" data-modal-autoshow data-modal-return="/admin/equipment" data-figma-source="@(adding ? "695:5882" : "695:6052")">
+    <div class="live-modal-head">
+        <div><p class="page-eyebrow">Inventory</p><h2 id="equipment-editor-title">@(adding ? "Add Equipment Item" : "Edit Equipment Item")</h2></div>
+        <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/icons.svg#x"></use></svg></button>
+    </div>
+    <p class="live-modal-lede">Each item is one physical unit with its own asset code. Units with the same name and category appear together in the borrower catalog.</p>
+    <form id="equipment-editor-form" method="post" action="/admin/equipment/save" enctype="multipart/form-data" class="live-form" data-modal-form novalidate>
+        @Html.AntiForgeryToken()
+        <input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
+        <div class="live-modal-alert wide" role="alert" data-modal-alert hidden="@(errors.Count == 0)">@string.Join(" ", errors)</div>
+        <p class="form-section-title wide">Identity</p>
+        <label class="live-field span-4"><span>Equipment name</span><input asp-for="Input.Name" required maxlength="160" placeholder="e.g. Canon EOS R50 Camera" /></label>
+        <label class="live-field span-2"><span>Asset code</span><input asp-for="Input.AssetCode" required maxlength="64" placeholder="EQ-000" /></label>
+        <label class="live-field span-2"><span>Category</span><select asp-for="Input.CategoryId">@foreach (var category in Model.Categories) { <option value="@category.Id">@category.Name</option> }</select></label>
+        <label class="live-field span-2"><span>Condition</span><select asp-for="Input.Condition" asp-items="Html.GetEnumSelectList<EquipmentCondition>()"></select></label>
+        <label class="live-field span-2"><span>Serial number <small>Optional</small></span><input asp-for="Input.SerialNumber" maxlength="120" /></label>
+        <p class="form-section-title wide">Storage and details</p>
+        <label class="live-field span-4"><span>Storage location <small>Optional</small></span><input asp-for="Input.Location" maxlength="160" placeholder="e.g. Equipment Room A, Shelf 2" /></label>
+        <label class="live-field wide"><span>Description <small>Optional</small></span><textarea asp-for="Input.Description" maxlength="2000" rows="3"></textarea></label>
+        <div class="live-field wide inventory-photo">
+            <label for="imageFile">Equipment photo <small class="live-muted">JPEG, PNG, WebP or GIF · up to 5 MB · shown to borrowers in the equipment catalog</small></label>
+            <div class="inventory-photo-row">
+                <img id="inventory-photo-preview" class="inventory-photo-preview" src="@Model.Input.ImagePath" alt="" hidden="@(Model.Input.ImagePath is null)" />
+                <input id="imageFile" name="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-image-preview="inventory-photo-preview" />
+            </div>
+            @if (Model.Input.ImagePath is not null)
+            {
+                <label class="live-check"><input asp-for="Input.RemoveImage" /> Remove the current photo</label>
+            }
+        </div>
+        <div class="wide">
+            <label class="live-check"><input asp-for="Input.IsActive" /> Active inventory item</label>
+            <p class="live-help">Damaged or unserviceable items enter maintenance. Close their maintenance case after repair to restore availability. Equipment with an active loan cannot be edited.</p>
+        </div>
+        <div class="live-modal-actions wide">
+            <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+            <button class="live-button" type="submit">@(adding ? "Add item" : "Save changes")</button>
+        </div>
+    </form>
+</dialog>

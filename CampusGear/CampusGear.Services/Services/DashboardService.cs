@@ -180,7 +180,7 @@ public sealed class DashboardService(IDashboardReadRepository reads, UserManager
         var loans = await reads.RecentLoansAsync(cancellationToken);
         return loans.Select(x => new ActivityItem(x.Reservation.BorrowerProfile.User.FullName,
                 $"{x.Reservation.EquipmentItem.Name} · {x.Reservation.EquipmentItem.AssetCode}",
-                x.ReturnedAtUtc is null ? x.DueAtUtc < now ? "Overdue" : "Released" : x.ReturnedAtUtc > x.DueAtUtc ? "Returned late" : "Returned",
+                x.ReturnedAtUtc is null ? x.DueAtUtc < now ? "Overdue" : "Released" : x.ReturnedAtUtc > x.DueAtUtc ? "Returned late" : CustodianTime.IsReturnedEarly(x) ? "Returned early" : "Returned",
                 x.ReturnedAtUtc is { } returned ? $"Returned {CustodianTime.Format(returned)}" : $"Released {CustodianTime.Format(x.ReleasedAtUtc)}",
                 $"/custodian/reservations/{x.ReservationId}"))
             .ToList();

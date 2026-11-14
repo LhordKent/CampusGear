@@ -48,13 +48,13 @@ public sealed class CustodianService(ICustodianReadRepository reads, IBorrowerRe
         {
             var dateStart = CustodianTime.Utc(date.ToDateTime(TimeOnly.MinValue));
             var dateEnd = CustodianTime.Utc(date.AddDays(1).ToDateTime(TimeOnly.MinValue));
-            var count = bookings.Count(x => x.StartAtUtc < dateEnd && x.EndAtUtc > dateStart);
+            var count = bookings.Count(x => x.StartAtUtc < dateEnd && CustodianTime.BookedUntil(x) > dateStart);
             days.Add(new(date, date.Month == first.Month, date == today, date == selectedDay,
                 selectedItem?.MaintenanceHold == true ? "Maintenance" : count > 0 ? "Reserved" : "Available", count));
         }
         var selectedStart = CustodianTime.Utc(selectedDay.ToDateTime(TimeOnly.MinValue));
         var selectedEnd = CustodianTime.Utc(selectedDay.AddDays(1).ToDateTime(TimeOnly.MinValue));
-        var slots = bookings.Where(x => x.StartAtUtc < selectedEnd && x.EndAtUtc > selectedStart)
+        var slots = bookings.Where(x => x.StartAtUtc < selectedEnd && CustodianTime.BookedUntil(x) > selectedStart)
             .Select(x => new CustodianCalendarSlot(x.Id, x.BorrowerProfile.User.FullName,
                 CustodianTime.Format(x.StartAtUtc), CustodianTime.Format(x.EndAtUtc), CustodianTime.Status(x, now))).ToList();
         return new CustodianCalendarViewModel(items, selectedItem, first, days, selectedDay, slots,

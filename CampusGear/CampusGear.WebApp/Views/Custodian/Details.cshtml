@@ -141,7 +141,8 @@
                 </div>
                 @if (returnedAt is { } actualReturnDate)
                 {
-                    <span class="live-badge" data-state="@(actualReturnDate > loan.DueAtUtc ? "returned late" : "returned")">@(actualReturnDate > loan.DueAtUtc ? "Returned late" : "Returned")</span>
+                    var returnLabel = actualReturnDate > loan.DueAtUtc ? "Returned late" : actualReturnDate < loan.DueAtUtc ? "Returned early" : "Returned";
+                    <span class="live-badge" data-state="@returnLabel.ToLowerInvariant()">@returnLabel</span>
                 }
                 else
                 {
@@ -230,6 +231,10 @@
         @if (Model.CanReturn)
         {
             <p class="reservation-workflow-intro">Compare the returned item with its release condition. Record any damage or issue in the inspection notes.</p>
+            @if (Model.Status == "Borrowed")
+            {
+                <p class="live-feedback" role="note">Early return: this loan is due @CustodianTime.Format(dueAt). It can be returned now; the item becomes available for the rest of the booking.</p>
+            }
             <form class="live-form live-release-form reservation-action-form" method="post" action="@route/return">
                 @Html.AntiForgeryToken()
                 <label class="live-field span-2" for="ReturnCondition">

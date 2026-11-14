@@ -302,7 +302,7 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
         {
             var dayStart = ToUtc(date.ToDateTime(TimeOnly.MinValue));
             var dayEnd = ToUtc(date.AddDays(1).ToDateTime(TimeOnly.MinValue));
-            var overlapping = bookings.Where(x => x.StartAtUtc < dayEnd && x.EndAtUtc > dayStart &&
+            var overlapping = bookings.Where(x => x.StartAtUtc < dayEnd && CustodianTime.BookedUntil(x) > dayStart &&
                 (x.Status != ReservationStatus.Pending || x.HoldExpiresAtUtc > now)).ToList();
             var state = item?.IsMaintenanceHold == true ? "Maintenance"
                 : overlapping.Any(x => x.Status is ReservationStatus.Released or ReservationStatus.Completed) ? "Borrowed"
@@ -313,12 +313,12 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
 
         var selectedStart = ToUtc(selected.ToDateTime(TimeOnly.MinValue));
         var selectedEnd = ToUtc(selected.AddDays(1).ToDateTime(TimeOnly.MinValue));
-        var slots = bookings.Where(x => x.StartAtUtc < selectedEnd && x.EndAtUtc > selectedStart &&
+        var slots = bookings.Where(x => x.StartAtUtc < selectedEnd && CustodianTime.BookedUntil(x) > selectedStart &&
                 (x.Status != ReservationStatus.Pending || x.HoldExpiresAtUtc > now))
             .OrderBy(x => x.StartAtUtc)
             .Select(x => new CalendarSlot(
                 Manila(x.StartAtUtc).ToString("h:mm tt", CultureInfo.InvariantCulture),
-                Manila(x.EndAtUtc).ToString("h:mm tt", CultureInfo.InvariantCulture),
+                Manila(CustodianTime.BookedUntil(x)).ToString("h:mm tt", CultureInfo.InvariantCulture),
                 x.Status is ReservationStatus.Released or ReservationStatus.Completed ? "Borrowed" : "Reserved"))
             .ToList();
 
@@ -465,6 +465,8 @@ public sealed class BorrowerService(IBorrowerReadRepository reads, IEquipmentAva
         if (reservation.Loan is { ReturnedAtUtc: { } returned } completed &&
             returned > completed.DueAtUtc)
             return "Returned late";
+        if (CustodianTime.IsReturnedEarly(reservation.Loan))
+            return "Returned early";
         if (reservation.Status == ReservationStatus.Pending &&
             (reservation.HoldExpiresAtUtc == null || reservation.HoldExpiresAtUtc <= now || reservation.StartAtUtc <= now))
             return "Expired";

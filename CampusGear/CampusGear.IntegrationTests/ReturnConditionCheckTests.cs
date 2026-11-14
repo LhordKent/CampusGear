@@ -153,7 +153,38 @@ public sealed class ReturnConditionCheckTests(WebAppFixture app)
         var response = await ReturnAsync(reservationId, "Good");
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.DoesNotContain("Returned late", await FollowAsync(response));
+        var page = await FollowAsync(response);
+        Assert.DoesNotContain("Returned late", page);
+        Assert.Contains("Returned early", page);
+    }
+
+    [Fact]
+    public async Task Return_Early_IsOfferedBeforeTheDueTime()
+    {
+        var (reservationId, _, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(1));
+
+        var page = await app.Client("Custodian").GetStringAsync($"/custodian/reservations/{reservationId}");
+
+        Assert.Contains("Early return: this loan is due", page);
+        Assert.Contains("Record return", page);
+    }
+
+    [Fact]
+    public async Task Return_Early_FreesTheRestOfTheBookingOnTheCalendar()
+    {
+        var (reservationId, itemId, _) = await OnLoanAsync(DateTime.UtcNow.AddDays(3));
+        // A day in the middle of the booking, as a Manila calendar date (UTC+8).
+        var day = DateTime.UtcNow.AddDays(2).AddHours(8).Date;
+        var calendar = $"/custodian/calendar?year={day.Year}&month={day.Month}&equipmentItemId={itemId}&day={day:yyyy-MM-dd}";
+
+        var before = await app.Client("Custodian").GetStringAsync(calendar);
+        await ReturnAsync(reservationId, "Good");
+        var after = await app.Client("Custodian").GetStringAsync(calendar);
+
+        var label = day.ToString("MMMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+        Assert.Contains($"{label} — Reserved — 1 booking\"", before);
+        Assert.Contains($"{label} — Available — 0 bookings\"", after);
+        Assert.Contains("No reservations overlap this day", after);
     }
 
     // WBS 33.0 — Condition Check

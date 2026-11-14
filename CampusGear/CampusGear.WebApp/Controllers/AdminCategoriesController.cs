@@ -30,7 +30,8 @@ public sealed class AdminCategoriesController(ICategoryService categories) : Con
                 RowVersion = x.RowVersion
             };
         }
-        return View(await PageAsync(input, cancellationToken, q));
+        var page = await PageAsync(input, cancellationToken, q);
+        return Request.WantsModal() ? PartialView("_CategoryEditor", page) : View(page);
     }
 
     [HttpPost("admin/categories/{id:guid}/delete")]
@@ -45,18 +46,22 @@ public sealed class AdminCategoriesController(ICategoryService categories) : Con
     [HttpPost("admin/categories/save")]
     public async Task<IActionResult> Save([Bind(Prefix = "Input")] CategoryInput input, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid) return View("Index", await PageAsync(input, cancellationToken));
+        if (!ModelState.IsValid) return await InvalidAsync(input, cancellationToken);
         var result = await categories.SaveAsync(Actor(),
             new(input.Id, input.Name, input.Description, input.IsActive, input.RowVersion), cancellationToken);
         if (result.Outcome == OperationOutcome.NotFound) return NotFound();
         if (!result.Succeeded)
         {
             foreach (var error in result.Errors ?? []) ModelState.AddModelError(error.Field, error.Message);
-            return View("Index", await PageAsync(input, cancellationToken));
+            return await InvalidAsync(input, cancellationToken);
         }
+        if (Request.IsFetch()) return ModalForms.Saved(result.Message);
         TempData["CategoryFeedback"] = result.Message;
         return Redirect("/admin/categories");
     }
+
+    private async Task<IActionResult> InvalidAsync(CategoryInput input, CancellationToken ct) =>
+        Request.IsFetch() ? ModalForms.Rejected(ModelState) : View("Index", await PageAsync(input, ct));
 
     private async Task<CategoriesPageModel> PageAsync(CategoryInput input, CancellationToken ct, string? q = null)
     {

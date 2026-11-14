@@ -33,7 +33,8 @@ public sealed class AdminInventoryController(IInventoryService inventory, ICateg
                 ImagePath = item.ImagePath
             };
         }
-        return View(await PageAsync(input, q, page, cancellationToken));
+        var model = await PageAsync(input, q, page, cancellationToken);
+        return Request.WantsModal() ? PartialView("_EquipmentEditor", model) : View(model);
     }
     [HttpPost("admin/equipment/{id:guid}/delete")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
@@ -47,7 +48,7 @@ public sealed class AdminInventoryController(IInventoryService inventory, ICateg
     [RequestSizeLimit(8 * 1024 * 1024)]
     public async Task<IActionResult> Save([Bind(Prefix = "Input")] EquipmentEditInput input, IFormFile? imageFile, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid) return View("Equipment", await PageAsync(input, null, 1, cancellationToken));
+        if (!ModelState.IsValid) return await InvalidAsync(input, cancellationToken);
         await using var stream = imageFile is { Length: > 0 } ? imageFile.OpenReadStream() : null;
         var result = await inventory.SaveAsync(Actor(), new EquipmentCommand
         {
@@ -67,11 +68,14 @@ public sealed class AdminInventoryController(IInventoryService inventory, ICateg
         if (!result.Succeeded)
         {
             foreach (var error in result.Errors ?? []) ModelState.AddModelError(error.Field, error.Message);
-            return View("Equipment", await PageAsync(input, null, 1, cancellationToken));
+            return await InvalidAsync(input, cancellationToken);
         }
+        if (Request.IsFetch()) return ModalForms.Saved(result.Message);
         TempData["InventoryFeedback"] = result.Message;
         return Redirect("/admin/equipment");
     }
+    private async Task<IActionResult> InvalidAsync(EquipmentEditInput input, CancellationToken ct) =>
+        Request.IsFetch() ? ModalForms.Rejected(ModelState) : View("Equipment", await PageAsync(input, null, 1, ct));
     [HttpPost("admin/categories")]
     public async Task<IActionResult> AddCategory(string? name, CancellationToken cancellationToken)
     {

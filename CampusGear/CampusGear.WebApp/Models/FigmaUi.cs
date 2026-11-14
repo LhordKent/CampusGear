@@ -1,7 +1,5 @@
 namespace CampusGear.Models;
 
-public sealed record FigmaEditorFooter(string FormId, string CancelUrl);
-
 /// <summary>A workspace navigation link. Icon is a symbol id in wwwroot/icons.svg; Group starts a labelled section.</summary>
 public sealed record FigmaNavigation(string Path, string Label, string Icon, string? Group = null);
 

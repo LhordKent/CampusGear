@@ -30,31 +30,47 @@ public sealed class AdminUsersController(IUserAdministrationService service) : C
     [HttpPost("admin/users/{id}/edit")]
     public async Task<IActionResult> Edit(string id, AdminUserEditInput input, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid) return await EditViewAsync(id, input, cancellationToken);
+        if (!ModelState.IsValid) return Request.IsFetch() ? ModalForms.Rejected(ModelState) : await EditViewAsync(id, input, cancellationToken);
         var result = await service.EditAsync(Actor, id, Command(input), cancellationToken);
         if (result.Outcome == OperationOutcome.NotFound) return NotFound();
         if (result.Outcome == OperationOutcome.Forbidden) return Forbid();
-        if (result.Succeeded) { Feedback(result); return Redirect("/admin/users"); }
+        if (result.Succeeded) return Request.IsFetch() ? ModalForms.Saved(result.Message) : SavedRedirect(result, "/admin/users");
         if (result.Reload) ModelState.Clear();
-        Errors(result); return await EditViewAsync(id, result.Reload ? null : input, cancellationToken);
+        Errors(result);
+        return Request.IsFetch() ? ModalForms.Rejected(ModelState) : await EditViewAsync(id, result.Reload ? null : input, cancellationToken);
     }
     private async Task<IActionResult> EditViewAsync(string id, AdminUserEditInput? input, CancellationToken ct)
     {
         var page = await service.GetEditAsync(Actor, id, input is null ? null : Command(input), ct);
         if (page is null) return NotFound();
-        return View("Edit", new AdminUserEditPage(page.Id, page.Email, page.ApprovalStatus, page.ContactNumber, page.CurrentRole, page.HasBorrowerProfile, page.IsSelf,
-        new AdminUserEditInput { FirstName = page.Input.FirstName, LastName = page.Input.LastName, Role = page.Input.Role, IsActive = page.Input.IsActive, StudentNumber = page.Input.StudentNumber, Department = page.Input.Department, IsEligible = page.Input.IsEligible, EligibilityNotes = page.Input.EligibilityNotes, ConcurrencyStamp = page.Input.ConcurrencyStamp, ProfileRowVersion = page.Input.ProfileRowVersion }));
+        return await EditorAsync("_EditAccount", new AdminUserEditPage(page.Id, page.Email, page.ApprovalStatus, page.ContactNumber, page.CurrentRole, page.HasBorrowerProfile, page.IsSelf,
+        new AdminUserEditInput { FirstName = page.Input.FirstName, LastName = page.Input.LastName, Role = page.Input.Role, IsActive = page.Input.IsActive, StudentNumber = page.Input.StudentNumber, Department = page.Input.Department, IsEligible = page.Input.IsEligible, EligibilityNotes = page.Input.EligibilityNotes, ConcurrencyStamp = page.Input.ConcurrencyStamp, ProfileRowVersion = page.Input.ProfileRowVersion }), ct);
     }
     [HttpGet("admin/users/new")]
-    public IActionResult Create(string? role) => View("Create", new AdminUserCreateInput { Role = role is "Borrower" or "Custodian" or "Administrator" ? role : "Borrower" });
+    public Task<IActionResult> Create(string? role, CancellationToken cancellationToken) =>
+        EditorAsync("_CreateAccount", new AdminUserCreateInput { Role = role is "Borrower" or "Custodian" or "Administrator" ? role : "Borrower" }, cancellationToken);
     [HttpPost("admin/users/new")]
     public async Task<IActionResult> Create(AdminUserCreateInput input, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid) return View("Create", input);
+        if (!ModelState.IsValid) return await CreateFailedAsync(input, cancellationToken);
         var result = await service.CreateAsync(Actor, new UserCreateCommand { FirstName = input.FirstName, LastName = input.LastName, Email = input.Email, Role = input.Role, Password = input.Password, StudentNumber = input.StudentNumber, Department = input.Department, ContactNumber = input.ContactNumber }, cancellationToken);
-        if (!result.Succeeded) { Errors(result); return View("Create", input); }
-        Feedback(result); return Redirect(input.Role == "Borrower" ? "/admin/borrowers" : "/admin/users");
+        if (!result.Succeeded) { Errors(result); return await CreateFailedAsync(input, cancellationToken); }
+        return Request.IsFetch() ? ModalForms.Saved(result.Message) : SavedRedirect(result, input.Role == "Borrower" ? "/admin/borrowers" : "/admin/users");
     }
+    private async Task<IActionResult> CreateFailedAsync(AdminUserCreateInput input, CancellationToken ct) =>
+        Request.IsFetch() ? ModalForms.Rejected(ModelState) : await EditorAsync("_CreateAccount", input, ct);
+    /// <summary>
+    /// The account dialogs: only the dialog when JavaScript asks for it, otherwise the user list with the dialog
+    /// open over it, so a bookmarked, refreshed, or script-less editor still looks the same.
+    /// </summary>
+    private async Task<IActionResult> EditorAsync(string editor, object model, CancellationToken ct)
+    {
+        if (Request.WantsModal()) return PartialView(editor, model);
+        ViewData["Editor"] = editor;
+        ViewData["EditorModel"] = model;
+        return View("Index", await service.GetPageAsync(null, null, null, 1, ct));
+    }
+    private RedirectResult SavedRedirect(OperationResult<string> result, string url) { Feedback(result); return Redirect(url); }
     [HttpPost("admin/users/{id}/delete")]
     public async Task<IActionResult> Delete(string id, string? returnUrl, CancellationToken cancellationToken)
     {

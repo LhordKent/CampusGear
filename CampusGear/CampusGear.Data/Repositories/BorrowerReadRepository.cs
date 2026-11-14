@@ -59,7 +59,8 @@ public sealed class BorrowerReadRepository(ApplicationDbContext db) : IBorrowerR
             x.IsMaintenanceHold || x.Condition == EquipmentCondition.Damaged || x.Condition == EquipmentCondition.Unserviceable, x.CategoryId, x.Category.Name, x.ImagePath)).ToListAsync(ct);
     public async Task<IReadOnlyList<Reservation>> CalendarBookingsAsync(Guid itemId, DateTime fromUtc, DateTime toUtc, DateTime now, bool staff, CancellationToken ct)
     {
-        var query = db.Reservations.AsNoTracking().Include(x => x.BorrowerProfile).ThenInclude(x => x.User)
+        // The loan is loaded so an early return frees the rest of its booking on the calendar.
+        var query = db.Reservations.AsNoTracking().Include(x => x.BorrowerProfile).ThenInclude(x => x.User).Include(x => x.Loan)
             .Where(x => x.EquipmentItemId == itemId && x.StartAtUtc < toUtc && x.EndAtUtc > fromUtc &&
                 (x.Status == ReservationStatus.Approved || x.Status == ReservationStatus.Released || x.Status == ReservationStatus.Completed ||
                 x.Status == ReservationStatus.Pending && (!staff || x.HoldExpiresAtUtc > now && x.StartAtUtc > now)));
