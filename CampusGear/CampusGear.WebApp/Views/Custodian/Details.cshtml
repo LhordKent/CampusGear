@@ -185,7 +185,6 @@
                 <span class="borrowing-id-label">CUSTODIAN WORKFLOW</span>
                 <h2 id="reservation-workflow-heading">@(returning ? "Return & condition assessment" : record.Status == ReservationStatus.Approved ? "Equipment release" : "Reservation decision")</h2>
             </div>
-            <span class="live-badge" data-state="@Model.Status.ToLowerInvariant()">@Model.Status</span>
         </div>
 
         @if (Model.CanApprove || Model.CanReject)
