@@ -74,7 +74,7 @@ public sealed class DashboardService(IDashboardReadRepository reads, UserManager
         return new DonutChart("Equipment status", "Every active unit, by its status right now", "active units",
         [
             new("Available", Count(ItemStatus.Available), 1, admin ? "/admin/equipment" : "/custodian/calendar"),
-            new("Reserved", Count(ItemStatus.Reserved), 2, admin ? "/admin/history?status=approved" : "/custodian/returns?queue=release"),
+            new("Reserved", Count(ItemStatus.Reserved), 2, admin ? "/admin/history?status=approved" : "/custodian/approvals?status=approved"),
             new("Borrowed", Count(ItemStatus.Borrowed), 3, admin ? "/admin/history?status=borrowed" : "/custodian/returns"),
             new("For repair", Count(ItemStatus.ForRepair), 4, "/admin/maintenance")
         ]);

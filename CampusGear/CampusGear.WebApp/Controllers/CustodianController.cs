@@ -33,9 +33,10 @@ public sealed class CustodianController(
     public async Task<IActionResult> Returns(string? q, string? queue, string? from, string? to,
         int page = 1, CancellationToken cancellationToken = default)
     {
+        // Approved bookings are released from Approval & Release; old links to the release tab go there.
+        if (queue?.ToLowerInvariant() == "release") return Redirect("/custodian/approvals?status=approved");
         Workspace();
-        queue = queue?.ToLowerInvariant() == "release" ? "release" : "active";
-        return View("Queue", Feedback(await desk.GetListAsync(nameof(Returns), "Release and return desk", q, "all", from, to, page, queue, cancellationToken)));
+        return View("Queue", Feedback(await desk.GetListAsync(nameof(Returns), "Return desk", q, "all", from, to, page, "active", cancellationToken)));
     }
 
     [Authorize(Roles = "Custodian")]

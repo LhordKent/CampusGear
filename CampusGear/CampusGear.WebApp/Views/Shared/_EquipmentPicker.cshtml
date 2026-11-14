@@ -35,8 +35,7 @@
                         @if (item.ImagePath is not null) { <img src="@item.ImagePath" alt="" loading="lazy" decoding="async" /> }
                         else { <svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(item.Name, item.Category)" /></svg> }
                     </span>
-                    <span class="equip-option-text"><strong>@item.Name</strong><small>@item.AssetCode · @item.Category</small></span>
-                    <span class="live-badge" data-state="@State(item.Status)">@ItemStatuses.Label(item.Status)</span>
+                    <span class="equip-option-text"><strong>@item.Name</strong><small>@item.AssetCode · @item.Category</small><span class="visually-hidden">, @ItemStatuses.Label(item.Status)</span></span>
                 </a>
             </li>
         }

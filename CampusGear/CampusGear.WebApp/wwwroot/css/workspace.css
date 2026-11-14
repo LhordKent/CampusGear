@@ -600,7 +600,7 @@ html.js [data-toast]:not([data-toast-keep]) { display: none; }
 .equip-picker-list { list-style: none; margin: 0; padding: 8px; display: grid; align-content: start; gap: 4px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--ws-border-strong) transparent; }
 .equip-picker-list li[hidden] { display: none; }
 .equip-option {
-    display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 10px;
+    display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 12px; padding: 8px 10px;
     border: 1px solid transparent; border-radius: 11px; color: inherit; text-decoration: none;
     transition: background-color .2s ease, border-color .2s ease;
 }
@@ -612,7 +612,6 @@ html.js [data-toast]:not([data-toast-keep]) { display: none; }
 .equip-option-text { display: grid; gap: 2px; min-width: 0; }
 .equip-option-text strong { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .equip-option-text small { font-size: 12px; color: var(--ws-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.equip-option .live-badge { font-size: 11px; padding: 2px 8px; }
 .equip-picker-empty { margin: 0; padding: 18px 16px; font-size: 13px; color: var(--ws-muted); text-align: center; }
 .calendar-selection { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0; }
 .calendar-selected { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-width: 0; }

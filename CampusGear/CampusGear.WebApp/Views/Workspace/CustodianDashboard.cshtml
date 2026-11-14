@@ -19,7 +19,7 @@
         </div>
         <div class="page-header-actions">
             <a class="live-button secondary" href="/custodian/calendar">Availability calendar</a>
-            <a class="live-button secondary" href="/custodian/returns?queue=release">Release desk @if (desk.ReadyToRelease > 0) { <span class="live-count">@desk.ReadyToRelease</span> }</a>
+            <a class="live-button secondary" href="/custodian/approvals?status=approved">Release desk @if (desk.ReadyToRelease > 0) { <span class="live-count">@desk.ReadyToRelease</span> }</a>
             <a class="live-button" href="/custodian/approvals">Review requests @if (desk.Pending > 0) { <span class="live-count">@desk.Pending</span> }</a>
         </div>
     </header>
