@@ -761,3 +761,56 @@ html.js [data-toast]:not([data-toast-keep]) { display: none; }
 @media(max-width:900px){.borrowing-id-dates{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}.borrowing-id-dates>div:nth-child(2){border-right:0}.borrowing-id-dates>div:nth-child(3){padding-left:0}}
 @media(max-width:420px){.borrowing-id-masthead{flex-direction:column;gap:15px}.borrowing-id-number{justify-items:start;text-align:left}.borrowing-id-equipment{grid-template-columns:1fr}.borrowing-id-equipment-image{max-height:180px}.borrowing-id-equipment-image img{max-height:180px}.borrowing-id-dates>div{padding:0 8px}.borrowing-id-dates strong{font-size:11px}}
 @media(max-width:640px){.borrowing-id-card{border-radius:16px}.borrowing-id-masthead{align-items:flex-start;padding:18px}.borrowing-id-brand{gap:10px}.borrowing-id-brand img{width:38px;height:38px}.borrowing-id-brand strong{font-size:16px}.borrowing-id-brand span{font-size:8px}.borrowing-id-number{gap:4px}.borrowing-id-number strong{font-size:10px}.borrowing-id-content{padding:22px 18px 0}.borrowing-id-borrower{align-items:flex-start;gap:15px}.borrowing-id-avatar{flex-basis:64px;width:64px;height:64px;font-size:19px}.borrowing-id-borrower h2,.borrowing-id-equipment h2{font-size:18px}.borrowing-id-equipment{grid-template-columns:105px minmax(0,1fr);gap:15px}.borrowing-id-equipment-image,.borrowing-id-equipment-image img{min-height:112px}.borrowing-id-equipment-meta{gap:10px 18px}.borrowing-id-dates>div{padding-right:10px;padding-left:10px}.borrowing-id-footer{flex-direction:column;padding:12px 18px}}
+
+/* ---------- Account editor (Views/AdminUsers/_EditAccount.cshtml) ---------- */
+.account-identity { display: flex; align-items: center; gap: 16px; margin: 18px 22px 0; padding: 16px 18px; border: 1px solid var(--ws-border); border-radius: 14px; background: linear-gradient(120deg, var(--ws-card-raised), var(--ws-inset)); }
+.account-identity .borrowing-id-avatar { flex: 0 0 56px; width: 56px; height: 56px; border-width: 2px; font-size: 18px; }
+.account-identity-copy { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.account-identity-copy strong { font-size: 17px; color: var(--ws-text); overflow-wrap: anywhere; }
+.account-identity-copy span { font-size: 12.5px; color: var(--ws-muted); overflow-wrap: anywhere; }
+.account-identity-badges { display: grid; justify-items: end; gap: 6px; text-align: right; }
+.account-identity-badges small { font-size: 11px; color: var(--ws-faint); }
+.account-section { min-width: 0; margin: 14px 0 0; padding: 0; border: 0; box-shadow: inset 0 1px 0 var(--ws-border); }
+.account-section:first-of-type { margin-top: 0; box-shadow: none; }
+.account-section > legend { padding: 16px 0 10px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ws-muted); }
+.account-section:first-of-type > legend { padding-top: 2px; }
+.account-section > :not(legend) + :not(legend) { margin-top: 12px; }
+.account-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.account-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ws-muted); }
+.account-roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.account-role { position: relative; display: block; cursor: pointer; }
+.account-role input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.account-role-card { display: grid; gap: 4px; height: 100%; padding: 12px 14px; border: 1px solid var(--ws-border-input); border-radius: 12px; background: var(--ws-input); transition: border-color .15s, background-color .15s; }
+.account-role-card .icon { width: 18px; height: 18px; color: var(--ws-muted); }
+.account-role-card strong { font-size: 14px; color: var(--ws-text); }
+.account-role-card small { font-size: 12px; line-height: 1.45; color: var(--ws-muted); }
+.account-role:hover .account-role-card { border-color: var(--ws-teal-line); }
+.account-role input:checked + .account-role-card { border-color: var(--ws-teal); background: var(--ws-teal-soft); box-shadow: inset 0 0 0 1px var(--ws-teal); }
+.account-role input:checked + .account-role-card .icon { color: var(--ws-link); }
+.account-role input:focus-visible + .account-role-card { outline: 3px solid var(--ws-focus); outline-offset: 2px; }
+.account-role:has(input:disabled) { cursor: not-allowed; }
+.account-role input:disabled { cursor: not-allowed; }
+.account-role input:disabled:not(:checked) + .account-role-card { opacity: .45; }
+.account-switch { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border: 1px solid var(--ws-border); border-radius: 12px; background: var(--ws-card-raised); cursor: pointer; }
+.account-switch input[type='checkbox'] { position: relative; flex: 0 0 38px; width: 38px; height: 22px; margin: 1px 0 0; border: 1px solid var(--ws-border-strong); border-radius: 999px; background: var(--ws-neutral-bg); appearance: none; cursor: pointer; transition: background-color .15s, border-color .15s; }
+.account-switch input[type='checkbox']::after { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--ws-text-soft); content: ""; transition: transform .15s; }
+.account-switch input[type='checkbox']:checked { border-color: var(--ws-teal); background: var(--ws-teal); }
+.account-switch input[type='checkbox']:checked::after { background: var(--ws-on-accent); transform: translateX(16px); }
+.account-switch input[type='checkbox']:focus-visible { outline: 3px solid var(--ws-focus); outline-offset: 2px; }
+.account-switch:has(input:disabled) { cursor: not-allowed; opacity: .7; }
+.account-switch-copy { display: grid; gap: 2px; }
+.account-switch-copy strong { font-size: 14px; color: var(--ws-text); }
+.account-switch-copy small { font-size: 12.5px; line-height: 1.45; color: var(--ws-muted); }
+/* The borrower profile only applies while Borrower is the chosen role. */
+.account-editor:not(:has(input[name='Role'][value='Borrower']:checked)) .account-borrower { display: none; }
+.account-editor .live-modal-actions { align-items: center; margin-top: 18px; }
+.account-actions-note { margin: 0 auto 0 0; font-size: 12px; color: var(--ws-muted); }
+@media (max-width: 720px) {
+    .account-grid, .account-roles { grid-template-columns: 1fr; }
+    .account-identity { flex-wrap: wrap; }
+    .account-identity-badges { justify-items: start; text-align: left; }
+    .account-actions-note { flex-basis: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .account-role-card, .account-switch input[type='checkbox'], .account-switch input[type='checkbox']::after { transition: none; }
+}
