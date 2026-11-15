@@ -19,8 +19,7 @@ namespace ASI.Basecode.WebApp.Models
                     new("/admin/maintenance", Screen.Maintenance, "wrench"),
                     new("/admin/history", Screen.BorrowingHistory, "history", Screen.Reservations),
                     new("/admin/calendar", Screen.AvailabilityCalendar, "calendar"),
-                    new("/admin/borrowers", Screen.BorrowerProfiles, "users", Screen.People),
-                    new("/admin/users", Screen.UsersRoles, "shield"),
+                    new("/admin/users", Screen.UsersRoles, "users", Screen.People),
                     new("/admin/audit", Screen.AuditLog, "audit"),
                 ],
                 RoleNames.Custodian =>

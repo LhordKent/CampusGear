@@ -3,27 +3,25 @@
 @using ASI.Basecode.Services.ServiceModels
 @model AdminUsersPage
 @{
-    var borrowers = Context.Request.Path == "/admin/borrowers";
-    var basePath = borrowers ? "/admin/borrowers" : "/admin/users";
-    ViewData["Title"] = Model.Status == "pending" ? TitleText.RegistrationVerification : borrowers ? TitleText.BorrowerProfiles : TitleText.UserRoleManagement;
+    var basePath = "/admin/users";
+    ViewData["Title"] = Model.Status == "pending" ? TitleText.RegistrationVerification : TitleText.UserRoleManagement;
     ViewData["WorkspaceRole"] = "Administrator";
     var roles = new[] { "Borrower", "Custodian", "Administrator" };
     var returnUrl = ScreenUrls.Query(basePath, new { q = Model.Query, role = Model.Role, status = Model.Status, page = Model.Page });
 }
-<main class="live-content" data-figma-source="@(borrowers ? "695:6398" : "695:7067")">
+<main class="live-content" data-figma-source="695:7067">
     <header class="page-header">
         <div class="page-header-text">
             <p class="page-eyebrow">People</p>
-            <h1>@(Model.Status == "pending" ? "Registration Verification" : borrowers ? "Borrower Profiles" : "User & Role Management")</h1>
+            <h1>@(Model.Status == "pending" ? "Registration Verification" : "User & Role Management")</h1>
             <p class="page-description">@(Model.Status == "pending"
                 ? "New sign-ups waiting for approval. The latest submissions are listed first."
-                : borrowers ? "Student borrowers, their department, and whether they can borrow. Newest accounts first."
-                : "Every account in CampusGear with its role and status. Newest accounts first.")</p>
+                : "Every account in CampusGear: staff and student borrowers, their role, department, and status. Newest accounts first.")</p>
         </div>
         <div class="page-header-actions">
             @if (Model.Status == "pending") { <a class="live-button secondary" href="@basePath">Show all accounts</a> }
             else if (Model.PendingTotal > 0) { <a class="live-button secondary" href="@basePath?status=pending">Verify registrations<span class="live-count">@Model.PendingTotal</span></a> }
-            <a class="live-button" href="/admin/users/new@(borrowers ? "?role=Borrower" : "")" data-modal-load><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#plus"></use></svg>@(borrowers ? "Add borrower" : "Create account")</a>
+            <a class="live-button" href="/admin/users/new@(Model.Role == "Borrower" ? "?role=Borrower" : "")" data-modal-load><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#plus"></use></svg>Create account</a>
         </div>
     </header>
     @if (Model.Feedback is not null)
@@ -37,9 +35,9 @@
     <section class="live-panel" aria-label="Accounts">
         <form class="live-filters" method="get" action="@basePath" role="search" aria-label="Find user accounts" data-live-search data-live-target="#user-results">
             <label for="q" class="live-filter-search">Search accounts<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name, email, Student ID, or department" autocomplete="off" /></span></label>
-            @if (!borrowers) { <label for="role">Role<select id="role" name="role"><option value="all" selected="@(Model.Role == "all")">All roles</option>
+            <label for="role">Role<select id="role" name="role"><option value="all" selected="@(Model.Role == "all")">All roles</option>
                 @foreach (var role in roles) { <option value="@role" selected="@(Model.Role == role)">@role</option> }
-            </select></label> }
+            </select></label>
             <label for="status">Account status<select id="status" name="status">
                 <option value="all" selected="@(Model.Status == "all")">All accounts</option>
                 <option value="pending" selected="@(Model.Status == "pending")">Pending approval</option>
@@ -59,7 +57,7 @@
         {
             <div class="live-table-wrap" tabindex="0" aria-label="User accounts table">
                 <table class="live-table">
-                    <thead><tr><th scope="col">@Table.Name</th><th scope="col">@Table.StudentIdNumber</th><th scope="col">@Table.Email</th><th scope="col">@(borrowers ? Table.Department : Table.Role)</th><th scope="col">@Table.Status</th><th scope="col">@Table.Registered</th><th scope="col">@Table.Action</th></tr></thead>
+                    <thead><tr><th scope="col">@Table.Name</th><th scope="col">@Table.StudentIdNumber</th><th scope="col">@Table.Email</th><th scope="col">@Table.Role</th><th scope="col">@Table.Status</th><th scope="col">@Table.Registered</th><th scope="col">@Table.Action</th></tr></thead>
                     <tbody>
                     @foreach (var row in Model.Rows)
                     {
@@ -73,7 +71,9 @@
                             <td><strong>@row.FullName</strong></td>
                             <td>@(row.StudentNumber ?? "—")</td>
                             <td>@row.Email</td>
-                            <td>@if (borrowers) { @(row.Department ?? "—") } else { <span class="live-badge">@(row.Role.Length > 0 ? row.Role : "No role")</span> }</td>
+                            <td><span class="live-badge">@(row.Role.Length > 0 ? row.Role : "No role")</span>
+                                @if (row.Role == "Borrower") { <small>@(row.Department ?? "No department")</small> }
+                            </td>
                             <td><span class="live-badge">@status</span>
                                 @if (row.IsEligible is false) { <small>Borrowing access paused</small> }
                             </td>

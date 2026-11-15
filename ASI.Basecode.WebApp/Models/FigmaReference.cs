@@ -22,7 +22,6 @@ namespace ASI.Basecode.WebApp.Models
                 "/admin/calendar" => "695:4296",
                 "/admin/categories" => "695:4991",
                 "/admin/equipment" => "695:5691",
-                "/admin/borrowers" => "695:6398",
                 "/admin/users" => "695:7067",
                 "/admin/audit" => "945:195",
                 "/admin/history" => "695:4595",

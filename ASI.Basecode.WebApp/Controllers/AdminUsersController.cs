@@ -29,10 +29,11 @@ namespace ASI.Basecode.WebApp.Controllers
             _audit = audit;
         }
 
+        /// <summary>Borrower profiles are part of the user list now; old links open it filtered to borrowers.</summary>
         [HttpGet("admin/borrowers")]
-        public Task<IActionResult> Borrowers(string? q, string? status, int page = 1, CancellationToken cancellationToken = default)
+        public IActionResult Borrowers()
         {
-            return Index(q, RoleNames.Borrower, status, page, cancellationToken);
+            return RedirectPermanent("/admin/users?role=" + RoleNames.Borrower);
         }
 
         [HttpGet("admin/users")]
@@ -165,7 +166,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             return Request.IsFetch()
                 ? ModalForms.Saved(result.Message)
-                : SavedRedirect(result, input.Role == RoleNames.Borrower ? "/admin/borrowers" : "/admin/users");
+                : SavedRedirect(result, "/admin/users");
         }
 
         private async Task<IActionResult> CreateFailedAsync(UserCreateModel input, CancellationToken ct)
