@@ -18,7 +18,7 @@
                 ? "New sign-ups waiting for approval. The latest submissions are listed first."
                 : "Every account in CampusGear: staff and student borrowers, their role, department, and status. Newest accounts first.")</p>
         </div>
-        <div class="page-header-actions">
+        <div class="page-header-actions" id="user-header-actions" data-refresh-region>
             @if (Model.Status == "pending") { <a class="live-button secondary" href="@basePath">Show all accounts</a> }
             else if (Model.PendingTotal > 0) { <a class="live-button secondary" href="@basePath?status=pending">Verify registrations<span class="live-count">@Model.PendingTotal</span></a> }
             <a class="live-button" href="/admin/users/new@(Model.Role == "Borrower" ? "?role=Borrower" : "")" data-modal-load><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#plus"></use></svg>Create account</a>
@@ -79,13 +79,10 @@
                             </td>
                             <td class="live-nowrap">@row.RegisteredManila</td>
                             <td><div class="admin-user-actions">
-                                @if (row.ApprovalStatus != AccountApprovalStatus.Approved)
-                                {
-                                    <form method="post" action="/admin/users/@row.Id/approve">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button" type="submit" aria-label="Approve @row.FullName">Approve</button></form>
-                                }
                                 @if (row.ApprovalStatus == AccountApprovalStatus.PendingApproval)
                                 {
-                                    <form method="post" action="/admin/users/@row.Id/reject">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button danger" type="submit" aria-label="Reject @row.FullName">Reject</button></form>
+                                    @* Approve and Reject are inside the review dialog, so the details are seen before deciding. *@
+                                    <a class="live-button" href="/admin/users/@row.Id/review" data-modal-load aria-label="Review @row.FullName's registration">Review</a>
                                 }
                                 <a class="live-button secondary" href="/admin/users/@row.Id/edit" data-modal-load>Edit</a>
                                 <form method="post" action="/admin/users/@row.Id/delete" onsubmit="return confirm('Delete this account? Accounts with borrowing history are deactivated instead.')">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button secondary" type="submit" aria-label="Delete @row.FullName">Delete</button></form>

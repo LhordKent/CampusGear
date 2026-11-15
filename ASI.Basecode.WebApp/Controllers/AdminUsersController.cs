@@ -55,6 +55,19 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        /// <summary>The registration details an administrator reviews before approving or rejecting.</summary>
+        [HttpGet("admin/users/{id}/review")]
+        public async Task<IActionResult> Review(string id, CancellationToken cancellationToken)
+        {
+            var page = await _service.GetEditAsync(RequestActor, id, null, cancellationToken);
+            if (page is null)
+            {
+                return NotFound();
+            }
+
+            return await EditorAsync("_ReviewRegistration", page, cancellationToken);
+        }
+
         [HttpPost("admin/users/{id}/approve")]
         public Task<IActionResult> Approve(string id, string? returnUrl, CancellationToken cancellationToken)
         {
@@ -78,6 +91,18 @@ namespace ASI.Basecode.WebApp.Controllers
             if (result.Outcome == OperationOutcome.NotFound)
             {
                 return NotFound();
+            }
+
+            // From the review dialog: answer with JSON so the dialog closes and a toast confirms the decision.
+            if (Request.IsFetch())
+            {
+                if (result.Succeeded)
+                {
+                    return ModalForms.Saved(result.Message);
+                }
+
+                Errors(result);
+                return ModalForms.Rejected(ModelState);
             }
 
             Feedback(result);

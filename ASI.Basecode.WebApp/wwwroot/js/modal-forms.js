@@ -128,12 +128,13 @@
             showError(form, invalid?.validationMessage ? `${invalid.closest('label')?.querySelector('span')?.firstChild?.textContent.trim() ?? 'A field'}: ${invalid.validationMessage}` : 'Check the highlighted field.', invalid?.name);
             return;
         }
-        const submit = form.querySelector('[type="submit"]');
+        // The clicked button decides where the form posts (formaction), so one dialog can offer two actions.
+        const submit = event.submitter ?? form.querySelector('[type="submit"]');
         if (submit.disabled) return;
         submit.disabled = true;
         submit.classList.add('motion-busy');
         try {
-            const response = await fetch(form.action, {
+            const response = await fetch(submit.formAction || form.action, {
                 method: 'POST', body: new FormData(form), credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'fetch', Accept: 'application/json' }
             });

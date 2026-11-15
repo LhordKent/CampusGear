@@ -1,0 +1,78 @@
+@using ASI.Basecode.Resources.Constants
+@using ASI.Basecode.Services.ServiceModels
+@model UserEditPage
+@{
+    var pending = Model.ApprovalStatus == AccountApprovalStatus.PendingApproval;
+    var status = Model.ApprovalStatus switch
+    {
+        AccountApprovalStatus.PendingApproval => "Pending approval",
+        AccountApprovalStatus.Rejected => "Rejected",
+        _ => "Approved"
+    };
+    var fullName = $"{Model.Input.FirstName} {Model.Input.LastName}".Trim();
+    var initials = string.Concat(new[] { Model.Input.FirstName, Model.Input.LastName }
+        .Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => char.ToUpperInvariant(x.Trim()[0])));
+    var errors = ViewData.ModelState.TryGetValue("", out var summary) ? summary.Errors.Select(x => x.ErrorMessage).Distinct().ToList() : [];
+}
+<dialog id="registration-review" class="live-modal live-modal-wide" aria-labelledby="registration-review-title" data-modal-autoshow data-modal-return="/admin/users?status=pending">
+    <div class="live-modal-head">
+        <div><p class="page-eyebrow">Registration review</p><h2 id="registration-review-title">@(pending ? "Check the student's ID before deciding" : "Registration record")</h2></div>
+        <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
+    </div>
+
+    @* Horizontal ID card; shares the borrowing-id-* styles with the custodian's reservation record (main.css). *@
+    <article class="borrowing-id-card" aria-label="CampusGear student registration ID">
+        <header class="borrowing-id-masthead">
+            <div class="borrowing-id-brand">
+                <img src="/img/b95f3.svg" alt="" />
+                <div><strong>CampusGear</strong><span>UNIVERSITY EQUIPMENT SERVICES</span></div>
+            </div>
+            <div class="borrowing-id-number">
+                <span>STUDENT ID NUMBER</span>
+                <strong>@(Model.Input.StudentNumber ?? "Not provided")</strong>
+                <span class="live-badge" data-state="@status.ToLowerInvariant()">@status</span>
+            </div>
+        </header>
+
+        <div class="borrowing-id-content">
+            <section class="borrowing-id-borrower" aria-labelledby="registration-applicant-heading">
+                <div class="borrowing-id-avatar" aria-hidden="true">@initials</div>
+                <div class="borrowing-id-borrower-copy">
+                    <span class="borrowing-id-label" id="registration-applicant-heading">STUDENT APPLICANT</span>
+                    <h2>@fullName</h2>
+                    <p class="borrowing-id-student-number">Student ID <strong>@(Model.Input.StudentNumber ?? "Not provided")</strong></p>
+                    <div class="borrowing-id-contact">
+                        <span>@Model.Email</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="borrowing-id-dates" aria-label="Registration details">
+                <div><span>REGISTERED</span><strong>@Model.RegisteredManila</strong></div>
+                <div><span>MOBILE NUMBER</span><strong>@(Model.ContactNumber ?? "Not provided")</strong></div>
+                <div><span>DEPARTMENT</span><strong>@(string.IsNullOrWhiteSpace(Model.Input.Department) ? "Not provided" : Model.Input.Department)</strong></div>
+                <div><span>ACCOUNT STATUS</span><strong>@status</strong></div>
+            </section>
+        </div>
+        <footer class="borrowing-id-footer">
+            <span>CAMPUSGEAR STUDENT REGISTRATION</span>
+            <span>Times shown in Manila time (UTC+8)</span>
+        </footer>
+    </article>
+
+    <form id="registration-review-form" class="live-form" method="post" action="/admin/users/@Model.Id/approve" data-modal-form novalidate>
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="returnUrl" value="/admin/users?status=pending" />
+        <div class="live-modal-alert wide" role="alert" data-modal-alert hidden="@(errors.Count == 0)">@string.Join(" ", errors)</div>
+        @if (pending)
+        { <p class="live-help wide">Approving lets the student sign in and borrow equipment. A rejected registration cannot sign in.</p> }
+        <div class="live-modal-actions wide">
+            <button class="live-button secondary" type="button" data-modal-close>@(pending ? "Cancel" : "Close")</button>
+            @if (pending)
+            {
+                <button class="live-button danger" type="submit" formaction="/admin/users/@Model.Id/reject">Reject registration</button>
+                <button class="live-button" type="submit">Approve registration</button>
+            }
+        </div>
+    </form>
+</dialog>

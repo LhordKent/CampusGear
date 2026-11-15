@@ -226,6 +226,7 @@ namespace ASI.Basecode.Services.ServiceModels
         string CurrentRole,
         bool HasBorrowerProfile,
         bool IsSelf,
-        UserEditModel Input
+        UserEditModel Input,
+        string RegisteredManila
     );
 }

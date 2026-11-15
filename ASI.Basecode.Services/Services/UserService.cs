@@ -524,7 +524,8 @@ namespace ASI.Basecode.Services.Services
                 string.Join(", ", currentRoles),
                 target.BorrowerProfile is not null,
                 target.Id == actor.UserId,
-                input
+                input,
+                ManilaTime.Format(target.CreatedAtUtc)
             );
         }
 
