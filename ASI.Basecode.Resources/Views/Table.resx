@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="Action" xml:space="preserve">
+    <value>ACTION</value>
+  </data>
+  <data name="ActionActor" xml:space="preserve">
+    <value>ACTION / ACTOR</value>
+  </data>
+  <data name="Department" xml:space="preserve">
+    <value>DEPARTMENT</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>DETAILS</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>EMAIL</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>NAME</value>
+  </data>
+  <data name="Record" xml:space="preserve">
+    <value>RECORD</value>
+  </data>
+  <data name="Registered" xml:space="preserve">
+    <value>REGISTERED</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>RESULT</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>ROLE</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>STATUS</value>
+  </data>
+  <data name="StudentIdNumber" xml:space="preserve">
+    <value>STUDENT ID NUMBER</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>TIME</value>
+  </data>
+</root>

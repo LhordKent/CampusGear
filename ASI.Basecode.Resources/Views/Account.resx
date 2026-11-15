@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="AccountSignIn" xml:space="preserve">
+    <value>Account sign in</value>
+  </data>
+  <data name="CampusEmail" xml:space="preserve">
+    <value>Campus email</value>
+  </data>
+  <data name="EmailPlaceholder" xml:space="preserve">
+    <value>name@campus.edu</value>
+  </data>
+  <data name="ForgotPassword" xml:space="preserve">
+    <value>Forgot password?</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordPlaceholder" xml:space="preserve">
+    <value>Enter your password</value>
+  </data>
+</root>

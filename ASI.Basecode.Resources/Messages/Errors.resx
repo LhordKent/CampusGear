@@ -1,0 +1,368 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="AccountCreationUnavailable" xml:space="preserve">
+    <value>Account creation is unavailable. Please try again later.</value>
+  </data>
+  <data name="AccountLocked" xml:space="preserve">
+    <value>This account is temporarily locked. Try again later.</value>
+  </data>
+  <data name="ActiveCategoryRequired" xml:space="preserve">
+    <value>Choose an active category.</value>
+  </data>
+  <data name="ActiveEquipmentPreventsDeactivation" xml:space="preserve">
+    <value>Move or deactivate this category's active equipment before deactivating the category.</value>
+  </data>
+  <data name="ActiveLoan" xml:space="preserve">
+    <value>This item is on loan. Record its return before placing it in maintenance.</value>
+  </data>
+  <data name="ActiveLoanPreventsEdit" xml:space="preserve">
+    <value>Record the active loan's return before editing this equipment.</value>
+  </data>
+  <data name="ActiveLoanRequired" xml:space="preserve">
+    <value>Only an active loan can be returned.</value>
+  </data>
+  <data name="AdministrationBusy" xml:space="preserve">
+    <value>Account administration is busy. Please try again.</value>
+  </data>
+  <data name="AdministratorCodeDeliveryFailed" xml:space="preserve">
+    <value>We could not send the administrator code. Please try again.</value>
+  </data>
+  <data name="AlreadySubmitted" xml:space="preserve">
+    <value>This request was already submitted.</value>
+  </data>
+  <data name="ApprovalRequired" xml:space="preserve">
+    <value>Only approved requests can be released.</value>
+  </data>
+  <data name="AuthenticationCodeInvalid" xml:space="preserve">
+    <value>The code is invalid or has already been used.</value>
+  </data>
+  <data name="BookingEnded" xml:space="preserve">
+    <value>The booking time has ended. Equipment can no longer be released.</value>
+  </data>
+  <data name="BorrowerFieldsOnly" xml:space="preserve">
+    <value>Student ID Number and department apply to borrowers only.</value>
+  </data>
+  <data name="BorrowerNoLongerEligible" xml:space="preserve">
+    <value>The borrower is no longer eligible to borrow equipment.</value>
+  </data>
+  <data name="BorrowerOwnershipRequired" xml:space="preserve">
+    <value>Only borrowers can request equipment, and only for themselves.</value>
+  </data>
+  <data name="BorrowerProfileRequired" xml:space="preserve">
+    <value>The borrower has no borrowing profile.</value>
+  </data>
+  <data name="BorrowerProfileRoleRequired" xml:space="preserve">
+    <value>Borrower profile details apply when Borrower is selected. Existing profiles are retained when roles change.</value>
+  </data>
+  <data name="BorrowerRoleRequired" xml:space="preserve">
+    <value>The account no longer has borrower access.</value>
+  </data>
+  <data name="BorrowingHistoryInvalidDateRange" xml:space="preserve">
+    <value>The to date must be on or after the from date.</value>
+  </data>
+  <data name="BorrowingPaused" xml:space="preserve">
+    <value>Your borrowing access is currently paused. Contact an administrator.</value>
+  </data>
+  <data name="CancellationForbidden" xml:space="preserve">
+    <value>You cannot cancel this request.</value>
+  </data>
+  <data name="CancellationUnavailable" xml:space="preserve">
+    <value>This request can no longer be cancelled.</value>
+  </data>
+  <data name="CaseAlreadyClosed" xml:space="preserve">
+    <value>This maintenance case is already closed.</value>
+  </data>
+  <data name="CaseNotFound" xml:space="preserve">
+    <value>This maintenance case no longer exists. Reload the list.</value>
+  </data>
+  <data name="CodeAlreadyUsed" xml:space="preserve">
+    <value>The code is invalid or has already been used.</value>
+  </data>
+  <data name="CodeAttemptsExceeded" xml:space="preserve">
+    <value>Too many incorrect attempts. Request a new code.</value>
+  </data>
+  <data name="CodeCooldown" xml:space="preserve">
+    <value>A code was requested recently. Please wait before requesting a new one.</value>
+  </data>
+  <data name="CodeDeliveryFailed" xml:space="preserve">
+    <value>We could not send a code. Please try again.</value>
+  </data>
+  <data name="CodeExpired" xml:space="preserve">
+    <value>The code expired. Request a new one.</value>
+  </data>
+  <data name="ConcurrentBooking" xml:space="preserve">
+    <value>Another borrower just reserved this equipment for the requested time. Lower the quantity or choose another time.</value>
+  </data>
+  <data name="ConfigurationRequired" xml:space="preserve">
+    <value>Email:Smtp:Host and Email:Smtp:From must be configured before sending email.</value>
+  </data>
+  <data name="CustodianQueueInvalidDateRange" xml:space="preserve">
+    <value>The end date must be on or after the start date.</value>
+  </data>
+  <data name="CustodianRequired" xml:space="preserve">
+    <value>Only a custodian can do this.</value>
+  </data>
+  <data name="DamagedReleaseForbidden" xml:space="preserve">
+    <value>Damaged equipment cannot be released.</value>
+  </data>
+  <data name="DeletionFailed" xml:space="preserve">
+    <value>The account could not be deleted. Please try again.</value>
+  </data>
+  <data name="DescriptionRequired" xml:space="preserve">
+    <value>Describe the problem so the repair can be tracked.</value>
+  </data>
+  <data name="DescriptionTooLong" xml:space="preserve">
+    <value>Keep the description to 2000 characters or fewer.</value>
+  </data>
+  <data name="DevelopmentOnly" xml:space="preserve">
+    <value>The development email sender cannot run outside Development.</value>
+  </data>
+  <data name="DuplicateCategory" xml:space="preserve">
+    <value>That category already exists.</value>
+  </data>
+  <data name="DuplicateOrStaleCategory" xml:space="preserve">
+    <value>That category name already exists, or the record changed.</value>
+  </data>
+  <data name="DuplicateOrStaleEquipment" xml:space="preserve">
+    <value>The asset code or serial number already exists, or the record changed. Reload and try again.</value>
+  </data>
+  <data name="DuplicateRequestId" xml:space="preserve">
+    <value>This request ID is already in use.</value>
+  </data>
+  <data name="EmailAlreadyRegistered" xml:space="preserve">
+    <value>An account already uses this email address.</value>
+  </data>
+  <data name="EquipmentCatalogFutureStartRequired" xml:space="preserve">
+    <value>Choose a future borrowing time.</value>
+  </data>
+  <data name="EquipmentCatalogInvalidDateRange" xml:space="preserve">
+    <value>The return time must be after the borrowing time.</value>
+  </data>
+  <data name="FilterDatesOutOfRange" xml:space="preserve">
+    <value>Choose filter dates between 2000 and 2100.</value>
+  </data>
+  <data name="HoldExpired" xml:space="preserve">
+    <value>The pending hold expired. This request cannot be approved or rejected.</value>
+  </data>
+  <data name="ImageRequired" xml:space="preserve">
+    <value>Choose an image file to upload.</value>
+  </data>
+  <data name="ImageTooLarge" xml:space="preserve">
+    <value>Use an image of 5 MB or smaller.</value>
+  </data>
+  <data name="InactiveCategory" xml:space="preserve">
+    <value>This category is inactive. Choose another category.</value>
+  </data>
+  <data name="IneligibleBorrower" xml:space="preserve">
+    <value>The borrower account is not eligible to reserve equipment.</value>
+  </data>
+  <data name="InvalidBatchSize" xml:space="preserve">
+    <value>Batch size must be between 1 and 1000.</value>
+  </data>
+  <data name="InvalidBookingDates" xml:space="preserve">
+    <value>Choose a valid borrowing and return date and time.</value>
+  </data>
+  <data name="InvalidBookingInput" xml:space="preserve">
+    <value>Choose an item and a future time range in UTC.</value>
+  </data>
+  <data name="InvalidClosingCondition" xml:space="preserve">
+    <value>Choose Excellent, Good, or Fair as the condition after repair before closing the case.</value>
+  </data>
+  <data name="InvalidCondition" xml:space="preserve">
+    <value>Choose a valid condition.</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>The email or password is incorrect.</value>
+  </data>
+  <data name="InvalidEdit" xml:space="preserve">
+    <value>Choose a valid status and equipment condition, and keep the notes to 2000 characters.</value>
+  </data>
+  <data name="InvalidFilterDates" xml:space="preserve">
+    <value>Use valid dates for the date filters.</value>
+  </data>
+  <data name="InvalidFromDate" xml:space="preserve">
+    <value>Choose a valid from date.</value>
+  </data>
+  <data name="InvalidManilaDate" xml:space="preserve">
+    <value>Choose a valid date and time in Manila time.</value>
+  </data>
+  <data name="InvalidNameLength" xml:space="preserve">
+    <value>Enter a category name using 120 characters or fewer.</value>
+  </data>
+  <data name="InvalidRequestId" xml:space="preserve">
+    <value>Reload the form and try again.</value>
+  </data>
+  <data name="InvalidReturnCondition" xml:space="preserve">
+    <value>Choose a valid return condition.</value>
+  </data>
+  <data name="InvalidRole" xml:space="preserve">
+    <value>Choose Borrower, Custodian, or Administrator.</value>
+  </data>
+  <data name="InvalidToDate" xml:space="preserve">
+    <value>Choose a valid to date.</value>
+  </data>
+  <data name="ItemNotBookable" xml:space="preserve">
+    <value>This equipment is not available for borrowing.</value>
+  </data>
+  <data name="ItemUnavailable" xml:space="preserve">
+    <value>This item is inactive or on a maintenance hold. It cannot be approved or released.</value>
+  </data>
+  <data name="LastAdministratorRequired" xml:space="preserve">
+    <value>Keep at least one active, verified Administrator account.</value>
+  </data>
+  <data name="LiveReservationsPreventDeactivation" xml:space="preserve">
+    <value>Resolve this item's pending and approved reservations before deactivating it.</value>
+  </data>
+  <data name="MaintenanceEquipmentRequired" xml:space="preserve">
+    <value>Choose the equipment that needs maintenance.</value>
+  </data>
+  <data name="MaintenanceEquipmentUnavailable" xml:space="preserve">
+    <value>That equipment no longer exists or is inactive. Reload and choose another item.</value>
+  </data>
+  <data name="NameRequired" xml:space="preserve">
+    <value>Enter a category name.</value>
+  </data>
+  <data name="NotesTooLong" xml:space="preserve">
+    <value>Use 2000 characters or fewer.</value>
+  </data>
+  <data name="OpenCaseExists" xml:space="preserve">
+    <value>This item already has an open maintenance case. Update that case instead.</value>
+  </data>
+  <data name="PasswordResetCodeInvalid" xml:space="preserve">
+    <value>The code is invalid or has expired.</value>
+  </data>
+  <data name="PendingApproval" xml:space="preserve">
+    <value>Your account is pending administrator approval.</value>
+  </data>
+  <data name="PendingApprovalRequired" xml:space="preserve">
+    <value>Only pending requests can be approved.</value>
+  </data>
+  <data name="PendingRejectionRequired" xml:space="preserve">
+    <value>Only pending requests can be rejected.</value>
+  </data>
+  <data name="PurposeTooLong" xml:space="preserve">
+    <value>Use 500 characters or fewer.</value>
+  </data>
+  <data name="RecordBusy" xml:space="preserve">
+    <value>This record is busy. Please retry.</value>
+  </data>
+  <data name="RegistrationRejected" xml:space="preserve">
+    <value>Your registration was not approved. Please contact the administrator.</value>
+  </data>
+  <data name="RejectionReasonRequired" xml:space="preserve">
+    <value>A rejection reason is required.</value>
+  </data>
+  <data name="ReleaseNotStarted" xml:space="preserve">
+    <value>Release opens at the approved start time.</value>
+  </data>
+  <data name="ReleaseOutsideBooking" xml:space="preserve">
+    <value>Release must occur during the approved booking time.</value>
+  </data>
+  <data name="RepairDescriptionRequired" xml:space="preserve">
+    <value>Describe the repair before closing the case.</value>
+  </data>
+  <data name="ResendCooldown" xml:space="preserve">
+    <value>Please wait before requesting another code.</value>
+  </data>
+  <data name="ReservationEquipmentUnavailable" xml:space="preserve">
+    <value>The equipment is currently unavailable.</value>
+  </data>
+  <data name="ReservationIdRequired" xml:space="preserve">
+    <value>A reservation ID is required.</value>
+  </data>
+  <data name="ReservationNotFound" xml:space="preserve">
+    <value>Reservation was not found.</value>
+  </data>
+  <data name="ReservationPurposeRequired" xml:space="preserve">
+    <value>Purpose is required.</value>
+  </data>
+  <data name="ReservationRecordBusy" xml:space="preserve">
+    <value>This record is busy. Please retry the action.</value>
+  </data>
+  <data name="ReservationRequestEquipmentRequired" xml:space="preserve">
+    <value>Choose available equipment.</value>
+  </data>
+  <data name="ReservationRequestFutureStartRequired" xml:space="preserve">
+    <value>Choose a future start time.</value>
+  </data>
+  <data name="ReservationRequestInvalidDateRange" xml:space="preserve">
+    <value>The end time must be after the start time.</value>
+  </data>
+  <data name="ReservationRequestPurposeRequired" xml:space="preserve">
+    <value>Enter the purpose of your request.</value>
+  </data>
+  <data name="ResetAuthorizationExpired" xml:space="preserve">
+    <value>Your password reset permission expired. Request a new code.</value>
+  </data>
+  <data name="ResetRequestExpired" xml:space="preserve">
+    <value>This reset request is no longer valid. Request a new code.</value>
+  </data>
+  <data name="ReturnBeforeRelease" xml:space="preserve">
+    <value>Return time cannot precede release.</value>
+  </data>
+  <data name="ReusedRequestForm" xml:space="preserve">
+    <value>This request form was already used. Review the details and submit again.</value>
+  </data>
+  <data name="RoleAssignmentFailed" xml:space="preserve">
+    <value>The role could not be assigned. Please try again.</value>
+  </data>
+  <data name="ScheduleConflict" xml:space="preserve">
+    <value>The equipment is no longer available for this time.</value>
+  </data>
+  <data name="ScheduleUnavailable" xml:space="preserve">
+    <value>This equipment is unavailable for the requested time.</value>
+  </data>
+  <data name="SelfAccessChangeForbidden" xml:space="preserve">
+    <value>You cannot deactivate your own account or remove your own Administrator role.</value>
+  </data>
+  <data name="SelfDeletionForbidden" xml:space="preserve">
+    <value>You cannot delete your own account.</value>
+  </data>
+  <data name="SignInExpired" xml:space="preserve">
+    <value>This sign-in request is no longer valid. Sign in again.</value>
+  </data>
+  <data name="SignInRequired" xml:space="preserve">
+    <value>Sign in is required.</value>
+  </data>
+  <data name="SingleUnitOnly" xml:space="preserve">
+    <value>Only 1 unit of this equipment can be requested.</value>
+  </data>
+  <data name="StaffApprovalRequired" xml:space="preserve">
+    <value>The account must be approved before receiving a staff role.</value>
+  </data>
+  <data name="StaleAccountEdit" xml:space="preserve">
+    <value>This account changed while the form was open. Review the latest details and try again.</value>
+  </data>
+  <data name="StaleAccountPage" xml:space="preserve">
+    <value>This account changed while the page was open. Review it and try again.</value>
+  </data>
+  <data name="StaleCase" xml:space="preserve">
+    <value>Someone else changed this case while you were editing. Close this dialog to see the latest details, then try again.</value>
+  </data>
+  <data name="StaleCategory" xml:space="preserve">
+    <value>This category changed. Reload before saving.</value>
+  </data>
+  <data name="StaleEquipment" xml:space="preserve">
+    <value>This equipment changed. Reload it before saving.</value>
+  </data>
+  <data name="StaleRecord" xml:space="preserve">
+    <value>This record changed. Reload and retry.</value>
+  </data>
+  <data name="StartTimePassed" xml:space="preserve">
+    <value>The requested start time has passed.</value>
+  </data>
+  <data name="StudentNumberAlreadyRegistered" xml:space="preserve">
+    <value>This Student ID Number is already registered.</value>
+  </data>
+  <data name="UnsupportedImageType" xml:space="preserve">
+    <value>Upload a JPEG, PNG, WebP or GIF image.</value>
+  </data>
+  <data name="UpdateFailed" xml:space="preserve">
+    <value>We could not update the account. Please try again.</value>
+  </data>
+  <data name="VerifiedAccountRequired" xml:space="preserve">
+    <value>An active, verified account is required.</value>
+  </data>
+</root>

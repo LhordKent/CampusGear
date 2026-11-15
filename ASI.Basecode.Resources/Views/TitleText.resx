@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+  <data name="AdministratorVerification" xml:space="preserve">
+    <value>Administrator verification</value>
+  </data>
+  <data name="ApprovalRelease" xml:space="preserve">
+    <value>Approval &amp; Release</value>
+  </data>
+  <data name="AvailabilityCalendar" xml:space="preserve">
+    <value>Availability Calendar</value>
+  </data>
+  <data name="BorrowerProfiles" xml:space="preserve">
+    <value>Borrower Profiles</value>
+  </data>
+  <data name="BorrowingHistory" xml:space="preserve">
+    <value>Borrowing history</value>
+  </data>
+  <data name="BrowseEquipment" xml:space="preserve">
+    <value>Browse Equipment</value>
+  </data>
+  <data name="CreateAccount" xml:space="preserve">
+    <value>Create account</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="EnterResetCode" xml:space="preserve">
+    <value>Enter reset code</value>
+  </data>
+  <data name="EquipmentCategories" xml:space="preserve">
+    <value>Equipment Categories</value>
+  </data>
+  <data name="EquipmentMaintenance" xml:space="preserve">
+    <value>Equipment Maintenance</value>
+  </data>
+  <data name="EquipmentManagement" xml:space="preserve">
+    <value>Equipment Management</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="MyReservations" xml:space="preserve">
+    <value>My Reservations</value>
+  </data>
+  <data name="PasswordUpdated" xml:space="preserve">
+    <value>Password updated</value>
+  </data>
+  <data name="RegistrationSubmitted" xml:space="preserve">
+    <value>Registration submitted</value>
+  </data>
+  <data name="RegistrationVerification" xml:space="preserve">
+    <value>Registration Verification</value>
+  </data>
+  <data name="ReservationApprovals" xml:space="preserve">
+    <value>Reservation approvals</value>
+  </data>
+  <data name="ReservationRecord" xml:space="preserve">
+    <value>Reservation Record</value>
+  </data>
+  <data name="ResetPassword" xml:space="preserve">
+    <value>Reset password</value>
+  </data>
+  <data name="ReturnConditionCheck" xml:space="preserve">
+    <value>Return &amp; Condition Check</value>
+  </data>
+  <data name="ReturnDesk" xml:space="preserve">
+    <value>Return desk</value>
+  </data>
+  <data name="SetNewPassword" xml:space="preserve">
+    <value>Set new password</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="SystemAuditLog" xml:space="preserve">
+    <value>System Audit Log</value>
+  </data>
+  <data name="UserRoleManagement" xml:space="preserve">
+    <value>User &amp; Role Management</value>
+  </data>
+</root>

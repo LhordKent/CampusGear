@@ -31,7 +31,6 @@ appsettings.*.local.json
 *.log
 node_modules/
 coverage/
-/scripts/live-smoke-results.json
 
 # Operating system files
 Thumbs.db
