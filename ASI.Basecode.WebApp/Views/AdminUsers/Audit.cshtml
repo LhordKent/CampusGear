@@ -9,36 +9,31 @@
         <div class="page-header-text">
             <p class="page-eyebrow">People</p>
             <h1>System Audit Log</h1>
-            <p class="page-description">Every recorded change in CampusGear, newest first. Times are shown in Manila time.</p>
+            <p class="page-description">Who did what in CampusGear: sign-ins, account changes, reservations, and equipment updates. Newest first, in Manila time.</p>
         </div>
     </header>
     <section class="live-panel" aria-label="Audit history">
         <form class="live-filters" method="get" action="/admin/audit" role="search" aria-label="Search audit history" data-live-search data-live-target="#audit-results">
-            <label for="q" class="live-filter-search">Search audit events<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Action, actor, record, result, or IP address" autocomplete="off" /></span></label>
+            <label for="q" class="live-filter-search">Search audit events<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Search by name or email" autocomplete="off" /></span></label>
             <a class="live-button secondary live-filter-reset" href="/admin/audit" data-live-reset>Clear</a>
         </form>
         <div id="audit-results" class="live-results">
-        <p class="live-result-count" data-live-count>@Model.Total matching event@(Model.Total == 1 ? "" : "s")</p>
+        <p class="live-result-count" data-live-count>@Model.Total recorded activit@(Model.Total == 1 ? "y" : "ies")</p>
         @if (Model.Rows.Count == 0)
-        { <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><h3>No matching audit events</h3><p>Try another action, person, or record.</p></div> }
+        { <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><h3>No matching activity</h3><p>Try another name or email.</p></div> }
         else
         {
-            <div class="live-table-wrap" tabindex="0" aria-label="Audit events table">
+            <div class="live-table-wrap" tabindex="0" aria-label="Activity table">
                 <table class="live-table">
-                    <thead><tr><th scope="col">@Table.Time</th><th scope="col">@Table.ActionActor</th><th scope="col">@Table.Record</th><th scope="col">@Table.Result</th><th scope="col">@Table.Details</th></tr></thead>
+                    <thead><tr><th scope="col">@Table.When</th><th scope="col">@Table.Who</th><th scope="col">@Table.WhatHappened</th><th scope="col">@Table.Result</th></tr></thead>
                     <tbody>
                     @foreach (var row in Model.Rows)
                     {
                         <tr>
-                            <td>@row.TimeManila</td>
-                            <td><strong>@row.Action</strong><small>@row.ActorName</small><small>@row.ActorEmail</small></td>
-                            <td>@row.EntityType<small>@row.EntityId</small></td>
-                            <td><span class="live-badge">@row.Outcome</span></td>
-                            <td><details><summary>View details</summary>
-                                <p class="live-muted">IP: @(row.IpAddress ?? "Not recorded")<br />Request: @(row.CorrelationId ?? "Not recorded")</p>
-                                @if (row.BeforeJson is not null) { <h3>Before</h3><pre class="admin-audit-json">@row.BeforeJson</pre> }
-                                @if (row.AfterJson is not null) { <h3>After</h3><pre class="admin-audit-json">@row.AfterJson</pre> }
-                            </details></td>
+                            <td class="live-nowrap">@row.TimeManila</td>
+                            <td><strong>@row.Who</strong>@if (row.WhoEmail is not null) { <small>@row.WhoEmail</small> }</td>
+                            <td>@row.WhatHappened</td>
+                            <td><span class="live-badge" data-state="@row.ResultState">@row.Result</span></td>
                         </tr>
                     }
                     </tbody>

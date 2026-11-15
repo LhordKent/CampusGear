@@ -7,19 +7,15 @@ namespace ASI.Basecode.Services.ServiceModels
 
     public sealed record AdminAuditPage(IReadOnlyList<AdminAuditRow> Rows, string Query, int Page, int PageCount, int Total);
 
+    /// <summary>One System Audit Log row in plain words; ResultState picks the badge colour.</summary>
     public sealed record AdminAuditRow(
         Guid Id,
         string TimeManila,
-        string Action,
-        string ActorName,
-        string? ActorEmail,
-        string EntityType,
-        string EntityId,
-        string Outcome,
-        string? IpAddress,
-        string? CorrelationId,
-        string? BeforeJson,
-        string? AfterJson
+        string Who,
+        string? WhoEmail,
+        string WhatHappened,
+        string Result,
+        string ResultState
     );
 
     public sealed record AdminUserRow(

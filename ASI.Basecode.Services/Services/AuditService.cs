@@ -1,5 +1,4 @@
 using System.Data;
-using System.Text.Json;
 using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Manager;
@@ -27,21 +26,21 @@ namespace ASI.Basecode.Services.Services
             var total = data.Total;
             var pages = data.Pages;
             page = data.Page;
+            var targets = await _auditRepository.GetTargetsAsync(events, cancellationToken);
             var rows = events
-                .Select(x => new AdminAuditRow(
-                    x.Id,
-                    ManilaTime.FormatAudit(x.CreatedAtUtc),
-                    x.Action,
-                    x.ActorUser?.FullName ?? "Unauthenticated / system",
-                    x.ActorUser?.Email,
-                    x.EntityType,
-                    x.EntityId,
-                    x.Outcome,
-                    x.IpAddress,
-                    x.CorrelationId,
-                    PrettyJson(x.BeforeJson),
-                    PrettyJson(x.AfterJson)
-                ))
+                .Select(x =>
+                {
+                    var described = AuditDescriptions.Describe(x, targets.GetValueOrDefault($"{x.EntityType}:{x.EntityId}"));
+                    return new AdminAuditRow(
+                        x.Id,
+                        ManilaTime.FormatAudit(x.CreatedAtUtc),
+                        described.Who,
+                        described.WhoEmail,
+                        described.WhatHappened,
+                        described.Result,
+                        described.ResultState
+                    );
+                })
                 .ToList();
             return new AdminAuditPage(rows, q, page, pages, total);
         }
@@ -50,24 +49,6 @@ namespace ASI.Basecode.Services.Services
         {
             var text = value?.Trim() ?? string.Empty;
             return text.Length > 120 ? text[..120] : text;
-        }
-
-        private static string? PrettyJson(string? value)
-        {
-            if (value is null)
-            {
-                return null;
-            }
-
-            try
-            {
-                using var document = JsonDocument.Parse(value);
-                return JsonSerializer.Serialize(document.RootElement, new JsonSerializerOptions { WriteIndented = true });
-            }
-            catch (JsonException)
-            {
-                return value;
-            }
         }
 
         public async Task RecordAccountAsync(RequestContext actor, string action, string outcome, string? userId, CancellationToken ct)

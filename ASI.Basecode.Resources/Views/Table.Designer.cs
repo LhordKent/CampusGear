@@ -70,29 +70,11 @@ namespace ASI.Basecode.Resources.Views {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ACTION / ACTOR.
-        /// </summary>
-        public static string ActionActor {
-            get {
-                return ResourceManager.GetString("ActionActor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to DEPARTMENT.
         /// </summary>
         public static string Department {
             get {
                 return ResourceManager.GetString("Department", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DETAILS.
-        /// </summary>
-        public static string Details {
-            get {
-                return ResourceManager.GetString("Details", resourceCulture);
             }
         }
         
@@ -111,15 +93,6 @@ namespace ASI.Basecode.Resources.Views {
         public static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to RECORD.
-        /// </summary>
-        public static string Record {
-            get {
-                return ResourceManager.GetString("Record", resourceCulture);
             }
         }
         
@@ -169,11 +142,29 @@ namespace ASI.Basecode.Resources.Views {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to TIME.
+        ///   Looks up a localized string similar to WHAT HAPPENED.
         /// </summary>
-        public static string Time {
+        public static string WhatHappened {
             get {
-                return ResourceManager.GetString("Time", resourceCulture);
+                return ResourceManager.GetString("WhatHappened", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WHEN.
+        /// </summary>
+        public static string When {
+            get {
+                return ResourceManager.GetString("When", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WHO.
+        /// </summary>
+        public static string Who {
+            get {
+                return ResourceManager.GetString("Who", resourceCulture);
             }
         }
     }

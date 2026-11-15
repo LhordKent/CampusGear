@@ -5,23 +5,14 @@
   <data name="Action" xml:space="preserve">
     <value>ACTION</value>
   </data>
-  <data name="ActionActor" xml:space="preserve">
-    <value>ACTION / ACTOR</value>
-  </data>
   <data name="Department" xml:space="preserve">
     <value>DEPARTMENT</value>
-  </data>
-  <data name="Details" xml:space="preserve">
-    <value>DETAILS</value>
   </data>
   <data name="Email" xml:space="preserve">
     <value>EMAIL</value>
   </data>
   <data name="Name" xml:space="preserve">
     <value>NAME</value>
-  </data>
-  <data name="Record" xml:space="preserve">
-    <value>RECORD</value>
   </data>
   <data name="Registered" xml:space="preserve">
     <value>REGISTERED</value>
@@ -38,7 +29,13 @@
   <data name="StudentIdNumber" xml:space="preserve">
     <value>STUDENT ID NUMBER</value>
   </data>
-  <data name="Time" xml:space="preserve">
-    <value>TIME</value>
+  <data name="WhatHappened" xml:space="preserve">
+    <value>WHAT HAPPENED</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>WHEN</value>
+  </data>
+  <data name="Who" xml:space="preserve">
+    <value>WHO</value>
   </data>
 </root>

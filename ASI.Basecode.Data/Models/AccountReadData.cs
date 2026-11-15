@@ -14,4 +14,7 @@ namespace ASI.Basecode.Data.Models
     );
 
     public sealed record AuditPageData(IReadOnlyList<AuditEvent> Events, int Page, int Pages, int Total);
+
+    /// <summary>The readable name of the record an audit event is about; Person is the borrower for a reservation.</summary>
+    public sealed record AuditTarget(string Name, string? Person);
 }
