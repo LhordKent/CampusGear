@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<root>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-<resheader name="version"><value>2.0</value></resheader>
-  <data name="EmailAlreadyRegistered" xml:space="preserve"><value>An account already uses this email address.</value></data>
-  <data name="StudentNumberAlreadyRegistered" xml:space="preserve"><value>This Student ID Number is already registered.</value></data>
-  <data name="AccountCreationUnavailable" xml:space="preserve"><value>Account creation is unavailable. Please try again later.</value></data>
-</root>

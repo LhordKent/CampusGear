@@ -1,97 +1,67 @@
 # CampusGear
+## _Campus equipment borrowing system_
 
-Campus equipment borrowing on .NET 8, ASP.NET Core MVC/Identity, EF Core, and SQL Server.
+Built on the ASI C# BaseCode structure: .NET 8, ASP.NET Core MVC + Identity, EF Core, and SQL Server.
 
-**Registration requires administrator approval. Custodians approve/reject reservations, release equipment, and record returns. Administrators have read-only borrowing reports/details.** Signup sends no verification code.
+## Installation
+1.  Open the `ASI.Basecode.sln` file.
+    _※Use Visual Studio 2022_
+2.  Change the `CampusGear` connection string in `ASI.Basecode.WebApp/appsettings.json` based on your server.
+    _Development defaults to `.\SQLEXPRESS` / database `CampusGear` with Windows authentication._
+3.  Set `ASI.Basecode.WebApp` as the Startup project.
+4.  Clean and ReBuild the solution.
+5.  Run the `http` launch profile and open `http://localhost:5264/auth/login`.
+    _Starting in Development applies existing migrations and seeds basic equipment._
 
-## Find the code
-
-Browser → WebApp controller → Services workflow → Data repository → EF Core → SQL Server.
-
-| Project | Owns |
-|---|---|
-| [WebApp](CampusGear/CampusGear.WebApp) | Routes, form binding, authorization, HTTP/views, session adapter, UI assets |
-| [Services](CampusGear/CampusGear.Services) | Business rules, workflows, DTOs, transaction decisions, Identity coordination |
-| [Data](CampusGear/CampusGear.Data) | Focused repository interfaces/implementations, SQL queries, unit of work, locks, entities, migrations |
-| [Resources](CampusGear/CampusGear.Resources) | Shared roles/enums/limits, feature messages and workspace labels |
-| [IntegrationTests](CampusGear/CampusGear.IntegrationTests) | Real HTTP/SQL behavior, concurrency, architecture, uploads, account flows |
-
-Start with the [beginner cheatsheet](docs/CODEBASE_CHEATSHEET.md), [defense code walkthrough](docs/DEFENSE_CODE_WALKTHROUGH.md), [feature traces](docs/FEATURE_TRACES.md), [complete source catalog](docs/SOURCE_CATALOG.md), [permissions](docs/PERMISSIONS.md), and [current refactor report](docs/BASECODE_REFACTOR_PROGRESS.md). The [teacher alignment report](docs/TEACHER_BASECODE_ALIGNMENT.md) explains the shared base/DI conventions. Earlier refactor reports are historical.
-
-Application EF repositories inherit BaseRepository; business MVC controllers inherit ControllerBase<T>. Application dependencies are listed explicitly in WebApp/Startup.DI.cs. Authentication, registration and password reset have separate services/controllers with typed outcomes. Annotated inputs/results share ten feature files in Services/ServiceModels; public contracts are grouped in IServices.cs and IRepositories.cs. WebApp/Models contains Web-only composition. There is one authoritative ReservationService for booking/loan transitions. See [coding style and the current folder layout](docs/CODE_STYLE.md).
-
-## Run locally
-
-Requires .NET 8 SDK and SQL Server Express. Development defaults to `.\SQLEXPRESS` / database `CampusGear` with Windows authentication. Starting Development applies existing migrations and seeds basic equipment; this is normal startup, **not a test command**.
+From the command line:
 
 ```powershell
-dotnet tool restore
-dotnet restore .\CampusGear\CampusGear.sln
-dotnet run --project .\CampusGear\CampusGear.WebApp --launch-profile http
+dotnet restore .\ASI.Basecode.sln
+dotnet run --project .\ASI.Basecode.WebApp --launch-profile http
 ```
-
-Open `http://localhost:5264/auth/login`. Select the matching launch profile in Visual Studio. Configure another SQL server through `ConnectionStrings__CampusGear`. Never use the live database for automated fixtures.
 
 ## Initial administrator
 
-There is no committed default password. This operator procedure creates the initial administrator only when none exists; it does not replace an existing account.
+There is no committed default password. This creates the first administrator only when none exists:
 
 ```powershell
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_EMAIL = 'your-email@example.com'
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_NAME = 'Your Name'
 $setupPassword = Read-Host 'Initial administrator password' -AsSecureString
 $env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD = [System.Net.NetworkCredential]::new('', $setupPassword).Password
-dotnet run --project .\CampusGear\CampusGear.WebApp --launch-profile http -- --initialize-only
+dotnet run --project .\ASI.Basecode.WebApp --launch-profile http -- --initialize-only
 Remove-Item Env:CAMPUSGEAR_BOOTSTRAP_ADMIN_PASSWORD
 ```
 
-New borrowers register at `/auth/signup`, land on `/auth/registration-submitted`, and wait for approval in `/admin/users?status=pending`. An administrator can also create accounts at `/admin/users/new`, assign staff roles, or pause eligibility. Passwords use Identity's configured upper/lowercase, digit, symbol, and minimum-eight-character rules.
+New borrowers register at `/auth/signup` and wait for approval at `/admin/users?status=pending`.
 
-## Email and session configuration
+## Email
 
-SMTP is the default. Configure `Email:Smtp:Host`, `From`, `Port` (587), `EnableSsl` (true), `Username`, and `Password` in local User Secrets or the deployment secret store. For local Gmail setup, run [setup-gmail.ps1](scripts/setup-gmail.ps1); it prompts privately for an App Password. Email is used for administrator sign-in and password recovery, **not signup**.
-
-Development configuration precedence is: optional `%USERPROFILE%\.campusgear\email-secrets.json` → project User Secrets → environment → command line. The fallback path can be changed with `Email:DevelopmentSettingsFile`. The User Secrets ID remains `CampusGear-d27882c0-7d71-4d0d-97da-548b14740355`. Production loads neither local fallback nor Development User Secrets.
-
-Select the in-memory mailbox explicitly for local testing:
+SMTP is the default. Set `Email:Smtp:Host`, `From`, `Port` (587), `EnableSsl` (true), `Username`, and `Password` in User Secrets:
 
 ```powershell
-dotnet user-secrets set "Email:Provider" "Development" --project .\CampusGear\CampusGear.WebApp
+dotnet user-secrets set "Email:Smtp:Host" "smtp.gmail.com" --project .\ASI.Basecode.WebApp
 ```
 
-Restart after changing providers. `Development` never sends real mail and is forbidden outside Development. With SMTP in Development, `DevelopmentMirrorEmailSender` also copies messages into the local mailbox; a mirror entry is not proof of SMTP delivery. `/development/email` and `/auth/development-inbox` are Development-only, loopback-only, and no-store.
-
-Administrator codes are required except for the existing local Development bypass when provider is SMTP and Host is blank. Codes expire after ten minutes, permit five attempts, and impose a sixty-second resend cooldown. Failed delivery invalidates that code and permits retry. Startup/log diagnostics omit passwords and codes.
-
-Session/cookies remain `CampusGear.Flow` (15-minute idle flow) and `CampusGear.Auth` (8-hour cookie). A reset grant lasts ten minutes and is tied to the account security stamp. Multiple deployment instances need shared session storage and persistent/shared Data Protection keys.
-
-## Workflows
-
-- Borrower: `/borrower/home`, `/borrower/reservation`, own `/borrower/history`, `/borrower/calendar`.
-- Custodian: dashboard, approvals/releases/returns, history/calendar, read-only category/borrower directories, and maintenance.
-- Administrator: dashboard, equipment/categories, users/borrowers, maintenance/audit, read-only history/calendar/reservation details.
-
-Manila input/display times map to UTC records. Each physical unit has its own reservation; a quantity form requests up to ten units. Pending holds expire after 24 hours or at the start, whichever comes first. Half-open adjacent slots are allowed. Release rechecks eligibility and outstanding loans. Damaged/unserviceable returns create a repair hold.
-
-Category/item/account deletion retains history by deactivating records where required. SQL application locks, rowversion/concurrency-stamp checks, audits, upload compensation, and per-unit batch compensation are documented in the tracing guide.
-
-## Verification
+For local testing without real mail, use the in-memory mailbox (Development only) and view it at `/auth/development-inbox`:
 
 ```powershell
-dotnet build .\CampusGear\CampusGear.sln
-.\scripts\smoke-live.ps1
-# Or run the suite directly:
-dotnet test .\CampusGear\CampusGear.IntegrationTests
-node .\figma-reference\verify.cjs
-dotnet ef migrations has-pending-model-changes --project .\CampusGear\CampusGear.Data --startup-project .\CampusGear\CampusGear.WebApp --no-build
+dotnet user-secrets set "Email:Provider" "Development" --project .\ASI.Basecode.WebApp
 ```
 
-The smoke wrapper runs the current approval/permissions flow through the integration suite, plus Figma reference checks. It does not attach to a running app. Fixtures create/drop uniquely named disposable databases, force Development email, and disable Demo Mode. `CAMPUSGEAR_TEST_SQLSERVER` selects a test server; fixtures always replace its database name. Stop a running app before building if it locks output files.
+## Code Structure
 
-See [verification evidence](scripts/verification.md). This structural refactor adds no migration or schema change. Production migration application remains an explicit deployment operation.
-
-## Demo and visual references
-
-`DemoMode:Enabled` adds synthetic catalog/history only in Development. It creates/changes no accounts. Existing demo-domain accounts are required for synthetic borrowing records. `DM-` asset codes make seeding idempotent. To remove demo data, use `--remove-demo-data` deliberately against the intended Development database, then disable Demo Mode.
-
-[figma-reference](figma-reference) contains saved design snapshots and live screen mappings. [catalog.json](CampusGear/CampusGear.WebApp/wwwroot/figma/catalog.json) indexes 70 generated Razor frames under `/demo`; these are references, not working account/booking endpoints. Local assets/fonts live under `wwwroot/figma`. Edit live MVC views for live behavior.
+- `ASI.Basecode.Data`
+    - This project contains the repositories, entities, migrations and other logic that involves the database.
+    - Make sure that the repository is for db processing only.
+    - If it involves additional logic, move the logic into the service file.
+- `ASI.Basecode.Resources`
+    - This project is dedicated to storing messages, labels, roles, enums and other resources used by the website.
+    - It serves as a centralized location for managing static content that is displayed to users.
+- `ASI.Basecode.Services`
+    - This project contains the services (business rules and workflows) that run before connecting to the repository.
+    - This can also contain classes that can be used by the WebApp project with/without db processing.
+- `ASI.Basecode.WebApp`
+    - This project contains the main code, especially the `Controllers` and `Views`.
+    - Make sure that the controllers are clean and no other logic is involved.
+    - If it involves additional logic, move the logic into the service file.

@@ -1,0 +1,16 @@
+@model object
+@{
+    // One dashboard page for staff: the administrator and custodian sections are partials in this folder.
+    var administrator = Model is AdminDashboardViewModel;
+    ViewData["Title"] = TitleText.Dashboard;
+    ViewData["WorkspaceRole"] = administrator ? "Administrator" : "Custodian";
+}
+@if (administrator)
+{
+    <partial name="_AdminDashboard" model="Model" />
+}
+else
+{
+    <partial name="_CustodianDashboard" model="Model" />
+}
+@section Scripts { <script src="~/js/charts.js" asp-append-version="true"></script> }

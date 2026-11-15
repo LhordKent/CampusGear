@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<root>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-<resheader name="version"><value>2.0</value></resheader>
-  <data name="InvalidBookingDates" xml:space="preserve"><value>Choose a valid borrowing and return date and time.</value></data>
-  <data name="InvalidDateRange" xml:space="preserve"><value>The return time must be after the borrowing time.</value></data>
-  <data name="FutureStartRequired" xml:space="preserve"><value>Choose a future borrowing time.</value></data>
-</root>

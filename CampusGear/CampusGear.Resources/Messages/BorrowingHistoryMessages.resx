@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<root>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-<resheader name="version"><value>2.0</value></resheader>
-  <data name="InvalidFromDate" xml:space="preserve"><value>Choose a valid from date.</value></data>
-  <data name="InvalidToDate" xml:space="preserve"><value>Choose a valid to date.</value></data>
-  <data name="InvalidDateRange" xml:space="preserve"><value>The to date must be on or after the from date.</value></data>
-</root>

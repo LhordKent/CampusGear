@@ -1,0 +1,57 @@
+@model AdminAuditPage
+@{
+    ViewData["Title"] = TitleText.SystemAuditLog;
+    ViewData["WorkspaceRole"] = "Administrator";
+}
+@section Styles { <link rel="stylesheet" href="~/css/admin-users.css" asp-append-version="true" /> }
+<main class="live-content" data-figma-source="945:195">
+    <header class="page-header">
+        <div class="page-header-text">
+            <p class="page-eyebrow">People</p>
+            <h1>System Audit Log</h1>
+            <p class="page-description">Every recorded change in CampusGear, newest first. Times are shown in Manila time.</p>
+        </div>
+    </header>
+    <section class="live-panel" aria-label="Audit history">
+        <form class="live-filters" method="get" action="/admin/audit" role="search" aria-label="Search audit history" data-live-search data-live-target="#audit-results">
+            <label for="q" class="live-filter-search">Search audit events<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Action, actor, record, result, or IP address" autocomplete="off" /></span></label>
+            <a class="live-button secondary live-filter-reset" href="/admin/audit" data-live-reset>Clear</a>
+        </form>
+        <div id="audit-results" class="live-results">
+        <p class="live-result-count" data-live-count>@Model.Total matching event@(Model.Total == 1 ? "" : "s")</p>
+        @if (Model.Rows.Count == 0)
+        { <div class="live-empty"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><h3>No matching audit events</h3><p>Try another action, person, or record.</p></div> }
+        else
+        {
+            <div class="live-table-wrap" tabindex="0" aria-label="Audit events table">
+                <table class="live-table">
+                    <thead><tr><th scope="col">@Table.Time</th><th scope="col">@Table.ActionActor</th><th scope="col">@Table.Record</th><th scope="col">@Table.Result</th><th scope="col">@Table.Details</th></tr></thead>
+                    <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr>
+                            <td>@row.TimeManila</td>
+                            <td><strong>@row.Action</strong><small>@row.ActorName</small><small>@row.ActorEmail</small></td>
+                            <td>@row.EntityType<small>@row.EntityId</small></td>
+                            <td><span class="live-badge">@row.Outcome</span></td>
+                            <td><details><summary>View details</summary>
+                                <p class="live-muted">IP: @(row.IpAddress ?? "Not recorded")<br />Request: @(row.CorrelationId ?? "Not recorded")</p>
+                                @if (row.BeforeJson is not null) { <h3>Before</h3><pre class="admin-audit-json">@row.BeforeJson</pre> }
+                                @if (row.AfterJson is not null) { <h3>After</h3><pre class="admin-audit-json">@row.AfterJson</pre> }
+                            </details></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            <nav class="live-pager" aria-label="Audit history pages">
+                @if (Model.Page > 1)
+                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/audit", new { q = Model.Query, page = Model.Page - 1 })" data-live-page>Previous</a> }
+                <span>Page @Model.Page of @Model.PageCount</span>
+                @if (Model.Page < Model.PageCount)
+                { <a class="live-button secondary" href="@ScreenUrls.Query("/admin/audit", new { q = Model.Query, page = Model.Page + 1 })" data-live-page>Next</a> }
+            </nav>
+        }
+        </div>
+    </section>
+</main>

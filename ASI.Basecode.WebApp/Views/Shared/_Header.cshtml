@@ -1,0 +1,13 @@
+@using ASI.Basecode.Services.Manager
+@{
+    // Staff top bar: which workspace is open, the current page, today's Manila date and the theme toggle.
+    var role = (string?)ViewData["WorkspaceRole"] ?? "Borrower";
+    var title = ViewData["Title"] as string ?? "Campus equipment workspace";
+}
+<header class="live-topbar">
+    <p class="live-topbar-context"><span>@(role == "Administrator" ? "Administrator" : "Custodian") workspace</span><span aria-hidden="true">/</span><strong>@title</strong></p>
+    <div class="live-topbar-tools">
+    <time class="live-topbar-date" datetime="@ManilaTime.Local(DateTime.UtcNow).ToString("yyyy-MM-dd")">@ManilaTime.Local(DateTime.UtcNow).ToString("dddd, MMMM d, yyyy")</time>
+    <partial name="_ThemeToggle" />
+    </div>
+</header>

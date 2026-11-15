@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+  <data name="AccountUpdated" xml:space="preserve">
+    <value>Account details and access permissions updated.</value>
+  </data>
+  <data name="AdministratorCodeSent" xml:space="preserve">
+    <value>We sent an administrator sign-in code to your email.</value>
+  </data>
+  <data name="BatchWithdrawn" xml:space="preserve">
+    <value>Withdrawn automatically: the full requested quantity was not available.</value>
+  </data>
+  <data name="CategoryAdded" xml:space="preserve">
+    <value>Category added.</value>
+  </data>
+  <data name="CategorySaved" xml:space="preserve">
+    <value>Category saved.</value>
+  </data>
+  <data name="CodeResent" xml:space="preserve">
+    <value>A new code was sent to your email address.</value>
+  </data>
+  <data name="EquipmentAdded" xml:space="preserve">
+    <value>Equipment added.</value>
+  </data>
+  <data name="EquipmentUpdated" xml:space="preserve">
+    <value>Equipment updated.</value>
+  </data>
+  <data name="RequestAccepted" xml:space="preserve">
+    <value>If an account uses that email, a reset code has been sent.</value>
+  </data>
+  <data name="UnrequestedCodeNotice" xml:space="preserve">
+    <value>If you did not request this code, you can ignore this email.</value>
+  </data>
+</root>
