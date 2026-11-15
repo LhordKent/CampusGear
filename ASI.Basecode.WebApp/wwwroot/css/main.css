@@ -538,6 +538,12 @@ html.js [data-toast]:not([data-toast-keep]) { display: none; }
 .live-help { display: block; margin: 4px 0 0; font-size: 12.5px; font-weight: 400; line-height: 1.5; color: var(--ws-muted); }
 .live-check { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ws-text); }
 .live-check input { width: 18px; height: 18px; accent-color: var(--ws-teal); }
+/* A checkbox inside a .live-field must not pick up the text-box sizing (full width, 44px height, padding). */
+.live-field .live-check input[type='checkbox'], .live-check input[type='checkbox'] { flex: 0 0 18px; width: 18px; min-width: 0; height: 18px; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 4px; background: none; box-shadow: none; }
+.live-field .live-check { justify-content: flex-start; width: auto; line-height: 1.4; }
+/* A checkbox shown as a field: same height and frame as the text boxes and drop-downs beside it. */
+.live-field .live-check.live-check-box { display: flex; width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid var(--ws-border-input); border-radius: 9px; background: var(--ws-input); font-weight: 500; cursor: pointer; }
+.live-field .live-check.live-check-box:hover { border-color: var(--ws-teal-line); }
 .live-readonly strong { font-size: 14px; color: var(--ws-text); }
 .live-readonly { padding: 9px 0 0; }
 .live-content .live-editor-sheet .live-editor-actions, .live-content .live-editor-actions { display: flex; justify-content: flex-end; gap: 10px; margin: 24px 0 0; padding-top: 18px; border-top: 1px solid var(--ws-border); }

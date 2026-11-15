@@ -159,6 +159,7 @@ namespace ASI.Basecode.WebApp.Controllers
             ViewData["LastName"] = input.LastName;
             ViewData["StudentIdNumber"] = input.StudentIdNumber;
             ViewData["Email"] = input.Email;
+            ViewData["Department"] = input.Department;
             ViewData["MobileNumber"] = input.MobileNumber;
             return View("~/Views/Account/Register.cshtml");
         }

@@ -143,6 +143,11 @@ namespace ASI.Basecode.Services.ServiceModels
         [Required, EmailAddress(ErrorMessage = "Enter a valid email address."), StringLength(256)]
         public string Email { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Enter your department.")]
+        [StringLength(160)]
+        [Display(Name = "Department")]
+        public string Department { get; set; } = string.Empty;
+
         [Required]
         [RegularExpression(@"^[0-9]*$", ErrorMessage = "Mobile number must contain numbers only.")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "Mobile number must be exactly 11 digits (e.g. 09XXXXXXXXX).")]

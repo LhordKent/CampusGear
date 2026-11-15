@@ -36,14 +36,10 @@
             <input id="LastName" name="LastName" value="@Model.Input.LastName" required maxlength="100" autocomplete="family-name" />
             @Html.ValidationMessage("LastName")
         </label>
-        <div class="live-field live-readonly span-4"><span>Email</span><strong>@Model.Email</strong><small>@approval</small></div>
-        <div class="live-field live-readonly span-2"><span>Contact</span><strong>@(Model.ContactNumber ?? "Not recorded")</strong></div>
-        <label class="live-field wide" for="Department"><span>Department</span>
-            <input id="Department" name="Department" value="@Model.Input.Department" maxlength="160" />
-            @Html.ValidationMessage("Department")
-        </label>
+        <div class="live-field live-readonly"><span>Email</span><strong>@Model.Email</strong></div>
+        <div class="live-field live-readonly"><span>Contact number</span><strong>@(Model.ContactNumber ?? "Not recorded")</strong></div>
         <p class="form-section-title wide">Access</p>
-        <label class="live-field span-2" for="Role"><span>Role</span>
+        <label class="live-field" for="Role"><span>Role</span>
             <select id="Role" name="Role" disabled="@Model.IsSelf">
                 @foreach (var role in roles)
                 { <option value="@role" selected="@(Model.Input.Role == role)" disabled="@(!approved && role != "Borrower")">@role</option> }
@@ -51,22 +47,26 @@
             @if (Model.IsSelf) { <input type="hidden" name="Role" value="Administrator" /> }
             @Html.ValidationMessage("Role")
         </label>
-        <div class="live-field span-4">
+        <div class="live-field">
             <span>Status</span>
-            <label class="live-check" for="IsActive"><input id="IsActive" name="IsActive" type="checkbox" value="true" checked="@Model.Input.IsActive" disabled="@Model.IsSelf" />Account is active</label>
+            <label class="live-check live-check-box" for="IsActive"><input id="IsActive" name="IsActive" type="checkbox" value="true" checked="@Model.Input.IsActive" disabled="@Model.IsSelf" />Account is active</label>
             <input type="hidden" name="IsActive" value="@(Model.IsSelf ? "true" : "false")" />
-            <p class="live-help">Deactivation signs the user out. Their reservations and history stay intact.</p>
         </div>
+        <p class="live-help wide">Deactivation signs the user out; their reservations and history stay intact. Role and status changes require the user to sign in again.</p>
         <details class="wide live-profile-fields" open="@(Model.CurrentRole == "Borrower")"><summary>Borrower profile &amp; borrowing access</summary><div class="live-form live-form-nested">
         @if (!Model.HasBorrowerProfile)
         { <p class="live-help wide">Profile details are created when Borrower is selected. Leave these fields empty when assigning a staff role.</p> }
-        <label class="live-field span-2" for="StudentNumber"><span>Student ID Number</span>
+        <label class="live-field" for="StudentNumber"><span>Student ID Number</span>
             <input id="StudentNumber" name="StudentNumber" value="@Model.Input.StudentNumber" maxlength="64" />
             @Html.ValidationMessage("StudentNumber")
         </label>
+        <label class="live-field" for="Department"><span>Department</span>
+            <input id="Department" name="Department" value="@Model.Input.Department" maxlength="160" />
+            @Html.ValidationMessage("Department")
+        </label>
         <div class="live-field wide">
             <span>Borrowing access</span>
-            <label class="live-check" for="IsEligible"><input id="IsEligible" name="IsEligible" type="checkbox" value="true" checked="@Model.Input.IsEligible" />Eligible to reserve equipment</label>
+            <label class="live-check live-check-box" for="IsEligible"><input id="IsEligible" name="IsEligible" type="checkbox" value="true" checked="@Model.Input.IsEligible" />Eligible to reserve equipment</label>
             <input type="hidden" name="IsEligible" value="false" />
         </div>
         <label class="live-field wide" for="EligibilityNotes"><span>Eligibility notes <small>Optional</small></span>
@@ -74,7 +74,6 @@
             @Html.ValidationMessage("EligibilityNotes")
         </label>
         </div></details>
-        <p class="live-help wide">Role and status changes require the user to sign in again.</p>
         <div class="live-modal-actions wide">
             <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
             <button class="live-button" type="submit">Save changes</button>

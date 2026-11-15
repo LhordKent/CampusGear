@@ -93,6 +93,7 @@ namespace ASI.Basecode.Services.Services
                     {
                         UserId = user.Id,
                         StudentNumber = studentId,
+                        Department = input.Department.Trim(),
                         ContactNumber = input.MobileNumber.Trim(),
                         IsEligible = true,
                     }

@@ -36,11 +36,18 @@
                 @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
             </label>
         </div>
-        <label class="auth-field" for="Email">
-            <span class="auth-field-label">Email address</span>
-            <input class="auth-input" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="jordan@example.com" autocomplete="email" required />
-            @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
-        </label>
+        <div class="auth-row">
+            <label class="auth-field" for="Email">
+                <span class="auth-field-label">Email address</span>
+                <input class="auth-input" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="jordan@example.com" autocomplete="email" required />
+                @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
+            </label>
+            <label class="auth-field" for="Department">
+                <span class="auth-field-label">Department</span>
+                <input class="auth-input" id="Department" name="Department" type="text" value="@(ViewData["Department"] as string)" placeholder="e.g. College of Engineering" autocomplete="organization-title" maxlength="160" required />
+                @Html.ValidationMessage("Department", null, new { @class = "auth-field-error" })
+            </label>
+        </div>
         <div>
             <div class="auth-row">
                 <label class="auth-field" for="Password">
