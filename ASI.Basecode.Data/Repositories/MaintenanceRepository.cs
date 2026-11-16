@@ -92,7 +92,10 @@ namespace ASI.Basecode.Data.Repositories
                     x.AssetCode,
                     x.Condition,
                     Context.MaintenanceCases.Any(c => c.EquipmentItemId == x.Id && c.Status != MaintenanceStatus.Closed),
-                    Context.Loans.Any(l => l.Reservation.EquipmentItemId == x.Id && l.ReturnedAtUtc == null)
+                    Context.Loans.Any(l => l.Reservation.EquipmentItemId == x.Id && l.ReturnedAtUtc == null),
+                    x.Category.Name,
+                    x.Location,
+                    x.ImagePath
                 ))
                 .ToListAsync(ct);
             return new(cases, choices, page, pages, total, open, closed);

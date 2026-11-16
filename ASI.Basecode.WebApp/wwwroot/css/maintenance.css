@@ -1,0 +1,426 @@
+/* Maintenance page (Views/Maintenance/Index.cshtml): the "Open maintenance" dialog.
+   This file loads before main.css (the layout's Styles section), so overrides of shared modal rules are scoped to
+   .live-modal.maint-open to win regardless of order. */
+
+.live-modal.maint-open {
+    width: min(720px, calc(100vw - 24px));
+    overflow-x: hidden;
+    /* Keeps auto-scrolled content clear of the sticky header and footer. */
+    scroll-padding: 110px 0 96px;
+}
+
+.maint-open-sub {
+    margin: 5px 0 0;
+    color: var(--ws-muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.live-modal > .maint-open-form {
+    margin: 0;
+    padding: 0;
+}
+
+.maint-open-body {
+    display: grid;
+    gap: 22px;
+    padding: 20px 22px 6px;
+}
+
+/* ---------- Steps ---------- */
+.maint-step {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.maint-step + .maint-step {
+    padding-top: 20px;
+    border-top: 1px solid var(--ws-border);
+}
+
+.maint-step-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    padding: 0;
+    color: var(--ws-text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.maint-step-num {
+    display: inline-grid;
+    width: 22px;
+    height: 22px;
+    flex: none;
+    place-items: center;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--ws-teal) 16%, transparent);
+    color: var(--ws-link);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.maint-note {
+    margin: 8px 0 0;
+    color: var(--ws-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.maint-error {
+    margin: 8px 0 0;
+    color: var(--ws-warn-text);
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+.maint-error[hidden],
+.maint-empty[hidden],
+.maint-group[hidden],
+.maint-option[hidden] {
+    display: none;
+}
+
+/* ---------- Search and filters ---------- */
+.maint-picker-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    margin-bottom: 10px;
+}
+
+.maint-picker-search {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.maint-picker-search input {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--ws-border-input);
+    border-radius: 9px;
+    background: var(--ws-input);
+    color: var(--ws-text);
+    font: 500 14px/1.4 Inter, Arial, sans-serif;
+}
+
+.maint-picker-search input::placeholder {
+    color: var(--ws-faint);
+    font-weight: 400;
+}
+
+.maint-picker-search input:focus {
+    outline: none;
+    border-color: var(--ws-teal);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ws-teal) 22%, transparent);
+}
+
+.maint-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.maint-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 5px 12px;
+    border: 1px solid var(--ws-border-strong);
+    border-radius: 999px;
+    background: var(--ws-card);
+    color: var(--ws-text-soft);
+    font: 500 12.5px/1.2 Inter, Arial, sans-serif;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.maint-chip span {
+    color: var(--ws-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.maint-chip[aria-pressed='true'] {
+    border-color: var(--ws-teal);
+    background: color-mix(in srgb, var(--ws-teal) 14%, transparent);
+    color: var(--ws-text);
+}
+
+.maint-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ws-warn-text);
+}
+
+/* ---------- Equipment list (radio cards) ---------- */
+.maint-list {
+    display: grid;
+    gap: 6px;
+    max-height: min(330px, 42vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px;
+    border: 1px solid var(--ws-border);
+    border-radius: 12px;
+    background: var(--ws-inset);
+}
+
+.maint-list.is-invalid {
+    border-color: var(--ws-warn-border, var(--ws-bronze));
+}
+
+.maint-group {
+    margin: 8px 6px 2px;
+    color: var(--ws-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.maint-option {
+    position: relative;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto 20px;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--ws-card);
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+/* The radio stays real (keyboard, screen readers, form post) but is drawn as the whole card. */
+.maint-option-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.maint-option-media {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    place-items: center;
+    border: 1px solid var(--ws-border);
+    border-radius: 9px;
+    background: var(--ws-input);
+    color: var(--ws-teal);
+}
+
+.maint-option-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.maint-option-media svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.maint-option-text {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.maint-option-text strong,
+.maint-option-text small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.maint-option-text strong {
+    color: var(--ws-text);
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.maint-option-text small {
+    color: var(--ws-muted);
+    font-size: 12px;
+}
+
+.maint-badge {
+    padding: 3px 9px;
+    border: 1px solid var(--ws-border);
+    border-radius: 999px;
+    color: var(--ws-text-soft);
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.maint-badge[data-state='good'] {
+    border-color: color-mix(in srgb, var(--ws-teal) 40%, transparent);
+    color: var(--ws-link);
+}
+
+.maint-badge[data-state='fair'] {
+    border-color: color-mix(in srgb, var(--ws-bronze) 45%, transparent);
+    color: var(--ws-text-soft);
+}
+
+.maint-badge[data-state='bad'] {
+    border-color: var(--ws-warn-border, var(--ws-bronze));
+    background: var(--ws-warn-bg);
+    color: var(--ws-warn-text);
+}
+
+.maint-badge[data-state='blocked'] {
+    color: var(--ws-muted);
+}
+
+.maint-option-check {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: var(--ws-teal);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transform: scale(.8);
+    transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.maint-option:has(.maint-option-input:checked) {
+    border-color: var(--ws-teal);
+    background: color-mix(in srgb, var(--ws-teal) 9%, var(--ws-card));
+}
+
+.maint-option:has(.maint-option-input:checked) .maint-option-check {
+    opacity: 1;
+    transform: none;
+}
+
+.maint-option:has(.maint-option-input:focus-visible) {
+    outline: 3px solid var(--ws-focus);
+    outline-offset: 1px;
+}
+
+.maint-option.is-blocked {
+    background: transparent;
+    cursor: not-allowed;
+}
+
+.maint-option.is-blocked .maint-option-media,
+.maint-option.is-blocked .maint-option-text {
+    opacity: .55;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .maint-option:not(.is-blocked):hover {
+        border-color: var(--ws-teal-line, var(--ws-teal));
+    }
+
+    .maint-chip:hover {
+        border-color: var(--ws-teal);
+    }
+}
+
+.maint-empty {
+    margin: 8px 0 0;
+    padding: 14px;
+    border: 1px dashed var(--ws-border-strong);
+    border-radius: 10px;
+    color: var(--ws-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ---------- Issue ---------- */
+.maint-starters {
+    margin-bottom: 10px;
+}
+
+.live-modal .maint-step .live-field {
+    gap: 6px;
+}
+
+/* ---------- Footer ---------- */
+.live-modal.maint-open .maint-open-actions {
+    align-items: center;
+    margin: 0;
+    padding: 14px 22px 18px;
+}
+
+.maint-summary {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--ws-muted);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.maint-summary.is-set {
+    color: var(--ws-text);
+    font-weight: 600;
+}
+
+@media (max-width: 560px) {
+    .maint-open-body {
+        padding: 16px 16px 6px;
+    }
+
+    .maint-option {
+        grid-template-columns: 40px minmax(0, 1fr) 20px;
+    }
+
+    .maint-option .maint-badge {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .maint-option-check {
+        grid-column: 3;
+        grid-row: 1 / span 2;
+    }
+
+    .maint-option-media {
+        grid-row: span 2;
+        width: 40px;
+        height: 40px;
+    }
+
+    .maint-summary {
+        display: none;
+    }
+
+    .live-modal.maint-open .maint-open-actions {
+        padding: 12px 16px 16px;
+    }
+
+    .maint-open-actions .live-button {
+        flex: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .maint-chip,
+    .maint-option,
+    .maint-option-check {
+        transition: none;
+    }
+}

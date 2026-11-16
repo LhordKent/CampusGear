@@ -129,12 +129,14 @@
             return;
         }
         // The clicked button decides where the form posts (formaction), so one dialog can offer two actions.
+        // button.formAction returns the page's own URL when the attribute is absent, so only use it when it is set.
         const submit = event.submitter ?? form.querySelector('[type="submit"]');
+        const target = submit.hasAttribute('formaction') ? submit.formAction : form.action;
         if (submit.disabled) return;
         submit.disabled = true;
         submit.classList.add('motion-busy');
         try {
-            const response = await fetch(submit.formAction || form.action, {
+            const response = await fetch(target, {
                 method: 'POST', body: new FormData(form), credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'fetch', Accept: 'application/json' }
             });
