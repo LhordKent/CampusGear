@@ -71,8 +71,19 @@
         radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(--ws-teal) 22%, transparent), transparent 60%),
         linear-gradient(160deg, var(--cg-raised), var(--ws-input));
     color: var(--cg-teal);
-    font: 500 18px Oxanium, sans-serif;
-    letter-spacing: .04em;
+}
+
+/* Equipment icon (Models/EquipmentIcon.cs) in the same outline style as the borrower catalog. */
+.equipment-card-placeholder svg {
+    width: 30%;
+    max-width: 84px;
+    height: auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: .85;
 }
 
 .equipment-card-status {
