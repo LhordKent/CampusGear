@@ -1,36 +1,48 @@
 @{
     Layout = "_AccountLayout";
     ViewData["Title"] = TitleText.SignIn;
-    ViewData["FigmaFrame"] = "15_3";
+    // Split layout: the intro is real markup beside the card instead of Figma backdrop art, so both share one vertical center.
+    ViewData["AuthSplit"] = true;
 }
-<section class="auth-card" aria-labelledby="account-title">
-    <header>
-        <h1 id="account-title">@Account.AccountSignIn</h1>
-    </header>
-    <hr class="auth-divider" />
-    @await Html.PartialAsync("_AccountFeedback")
-    <form class="auth-form" action="/auth/login" method="post">
-        @Html.AntiForgeryToken()
-        <label class="auth-field" for="Email">
-            <span class="auth-field-label">@Account.CampusEmail</span>
-            <span class="auth-input-wrap">
-                <img class="auth-input-icon" src="/img/afa76.svg" alt="" />
-                <input class="auth-input has-icon" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="@Account.EmailPlaceholder" autocomplete="username" required />
-            </span>
-            @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
-        </label>
-        <label class="auth-field" for="Password">
-            <span class="auth-field-label">@Account.Password</span>
-            <span class="auth-input-wrap">
-                <img class="auth-input-icon" src="/img/5e774.svg" alt="" />
-                <input class="auth-input has-icon" id="Password" name="Password" type="password" placeholder="@Account.PasswordPlaceholder" autocomplete="current-password" required />
-            </span>
-            @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
-        </label>
-        <button class="auth-action" type="submit">@Button.SignIn</button>
-    </form>
-    <div class="auth-actions">
-        <a class="auth-link" href="/auth/password-reset-request">@Account.ForgotPassword</a>
-        <a class="auth-secondary" href="/auth/signup">@Button.CreateNewAccount</a>
+<div class="auth-split">
+    <div class="auth-intro">
+        <img class="auth-intro-mark" src="/img/7ef91.svg" alt="" width="124" height="103" />
+        <p class="auth-intro-eyebrow">@Account.SignInEyebrow</p>
+        <h1 id="signin-title" class="auth-intro-title">@Account.SignInHeadline <span>@Account.SignInHeadlineBrand</span></h1>
+        <p class="auth-intro-lead">@Account.SignInLead</p>
+        <div class="auth-intro-scope">
+            <hr class="auth-intro-rule" />
+            <p class="auth-intro-label">@Account.SystemScope</p>
+            <p class="auth-intro-steps">@Account.SystemScopeSteps</p>
+        </div>
+        <p class="auth-intro-foot">@Account.CampusName</p>
     </div>
-</section>
+    <section class="auth-card" aria-labelledby="signin-title">
+        @await Html.PartialAsync("_AccountFeedback")
+        <form class="auth-form" action="/auth/login" method="post">
+            @Html.AntiForgeryToken()
+            <label class="auth-field" for="Email">
+                <span class="auth-field-label">@Account.CampusEmail</span>
+                <span class="auth-input-wrap">
+                    <img class="auth-input-icon" src="/img/afa76.svg" alt="" />
+                    <input class="auth-input has-icon" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="@Account.EmailPlaceholder" autocomplete="username" required />
+                </span>
+                @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
+            </label>
+            <div class="auth-field">
+                <div class="auth-field-head">
+                    <label class="auth-field-label" for="Password">@Account.Password</label>
+                    <a class="auth-link" href="/auth/password-reset-request">@Account.ForgotPassword</a>
+                </div>
+                <span class="auth-input-wrap">
+                    <img class="auth-input-icon" src="/img/5e774.svg" alt="" />
+                    <input class="auth-input has-icon has-reveal" id="Password" name="Password" type="password" placeholder="@Account.PasswordPlaceholder" autocomplete="current-password" required />
+                    @await Html.PartialAsync("_PasswordReveal", "Password")
+                </span>
+                @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
+            </div>
+            <button class="auth-action" type="submit">@Button.SignIn</button>
+        </form>
+        <p class="auth-switch">@Account.NewHere <a class="auth-link" href="/auth/signup">@Account.CreateAccountLink</a></p>
+    </section>
+</div>

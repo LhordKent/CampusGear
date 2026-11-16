@@ -113,5 +113,95 @@ namespace ASI.Basecode.Resources.Views {
                 return ResourceManager.GetString("PasswordPlaceholder", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show password.
+        /// </summary>
+        public static string ShowPassword {
+            get {
+                return ResourceManager.GetString("ShowPassword", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Campus access / sign in.
+        /// </summary>
+        public static string SignInEyebrow {
+            get {
+                return ResourceManager.GetString("SignInEyebrow", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in to.
+        /// </summary>
+        public static string SignInHeadline {
+            get {
+                return ResourceManager.GetString("SignInHeadline", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to CampusGear.
+        /// </summary>
+        public static string SignInHeadlineBrand {
+            get {
+                return ResourceManager.GetString("SignInHeadlineBrand", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use your campus account for equipment borrowing..
+        /// </summary>
+        public static string SignInLead {
+            get {
+                return ResourceManager.GetString("SignInLead", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to System scope.
+        /// </summary>
+        public static string SystemScope {
+            get {
+                return ResourceManager.GetString("SystemScope", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reserve / Verify / Release / Return.
+        /// </summary>
+        public static string SystemScopeSteps {
+            get {
+                return ResourceManager.GetString("SystemScopeSteps", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to University of Cebu / South Campus.
+        /// </summary>
+        public static string CampusName {
+            get {
+                return ResourceManager.GetString("CampusName", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to New here?.
+        /// </summary>
+        public static string NewHere {
+            get {
+                return ResourceManager.GetString("NewHere", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create an account.
+        /// </summary>
+        public static string CreateAccountLink {
+            get {
+                return ResourceManager.GetString("CreateAccountLink", resourceCulture);
+            }
+        }
     }
 }

@@ -2,8 +2,10 @@
 @{
     var frame = ViewData["FigmaFrame"] as string ?? "15_3";
     var title = ViewData["Title"] as string ?? "Account access";
+    // Split pages (login) lay out their own intro beside the card, so they skip the Figma frame and keep only the corner art.
+    var split = ViewData["AuthSplit"] is true;
     // The design frame is static HTML in wwwroot/html (one file per Figma frame, e.g. 15_3.html).
-    var sourceFrame = System.IO.File.ReadAllText(System.IO.Path.Combine(HostEnvironment.WebRootPath, "html", frame + ".html"));
+    var sourceFrame = split ? string.Empty : System.IO.File.ReadAllText(System.IO.Path.Combine(HostEnvironment.WebRootPath, "html", frame + ".html"));
     // The original Figma signup uses mobile verification; CampusGear registration is verified by an administrator.
     var sourceMarkup = sourceFrame
         .Replace("MOBILE TRUST", "ADMINISTRATOR REVIEW", StringComparison.Ordinal)
@@ -30,17 +32,23 @@
     @await Html.PartialAsync("_AccountStyles")
     <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
 </head>
-<body class="auth-page">
+<body class="auth-page@(split ? " auth-page-split" : "")">
     <div class="auth-backdrop" aria-hidden="true" inert>
-        <div class="auth-figma-frame">
-            @Html.Raw(sourceMarkup)
-        </div>
+        @if (!split)
+        {
+            <div class="auth-figma-frame">
+                @Html.Raw(sourceMarkup)
+            </div>
+        }
     </div>
     <main class="auth-main" id="main-content">
-        <div class="auth-mobile-brand">
-            <img src="/img/7ef91.svg" alt="" />
-            <span>CampusGear</span>
-        </div>
+        @if (!split)
+        {
+            <div class="auth-mobile-brand">
+                <img src="/img/7ef91.svg" alt="" />
+                <span>CampusGear</span>
+            </div>
+        }
         @RenderBody()
     </main>
     <script>
@@ -51,6 +59,21 @@
             resize();
             addEventListener('resize', resize);
         })();
+        // Password show/hide toggles rendered by _PasswordReveal.
+        document.querySelectorAll('.auth-reveal[data-reveal]').forEach(button => {
+            const input = document.getElementById(button.dataset.reveal);
+            if (!input) return;
+            button.addEventListener('click', () => {
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                button.setAttribute('aria-pressed', String(show));
+            });
+            // Never submit with the password left visible on screen.
+            input.form?.addEventListener('submit', () => {
+                input.type = 'password';
+                button.setAttribute('aria-pressed', 'false');
+            });
+        });
     </script>
     <script src="~/js/motion.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

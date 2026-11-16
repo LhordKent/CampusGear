@@ -20,4 +20,34 @@
   <data name="PasswordPlaceholder" xml:space="preserve">
     <value>Enter your password</value>
   </data>
+  <data name="ShowPassword" xml:space="preserve">
+    <value>Show password</value>
+  </data>
+  <data name="SignInEyebrow" xml:space="preserve">
+    <value>Campus access / sign in</value>
+  </data>
+  <data name="SignInHeadline" xml:space="preserve">
+    <value>Sign in to</value>
+  </data>
+  <data name="SignInHeadlineBrand" xml:space="preserve">
+    <value>CampusGear</value>
+  </data>
+  <data name="SignInLead" xml:space="preserve">
+    <value>Use your campus account for equipment borrowing.</value>
+  </data>
+  <data name="SystemScope" xml:space="preserve">
+    <value>System scope</value>
+  </data>
+  <data name="SystemScopeSteps" xml:space="preserve">
+    <value>Reserve / Verify / Release / Return</value>
+  </data>
+  <data name="CampusName" xml:space="preserve">
+    <value>University of Cebu / South Campus</value>
+  </data>
+  <data name="NewHere" xml:space="preserve">
+    <value>New here?</value>
+  </data>
+  <data name="CreateAccountLink" xml:space="preserve">
+    <value>Create an account</value>
+  </data>
 </root>
