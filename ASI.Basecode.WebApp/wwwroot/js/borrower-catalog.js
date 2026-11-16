@@ -40,7 +40,9 @@
             const text = `${card.dataset.name} ${card.dataset.category} ${card.dataset.description}`.toLowerCase();
             const visible = (!term || text.includes(term)) &&
                 (!category || card.dataset.category === category) &&
-                (!availableOnly.checked || card.dataset.requestable === 'true');
+                // "Available now" keeps items with a unit on the shelf right now (the card's "Available" badge);
+                // "In use" items can still be booked for later, so being requestable is not enough.
+                (!availableOnly.checked || card.dataset.availability === 'Available');
             card.hidden = !visible;
             if (visible) shown++;
         });
