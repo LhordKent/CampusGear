@@ -18,7 +18,27 @@ namespace ASI.Basecode.Data.Repositories
             CancellationToken ct
         )
         {
-            return await Context
+            return await Blocking(ids, start, end, now).Select(x => x.EquipmentItemId).Distinct().ToListAsync(ct);
+        }
+
+        public async Task<IReadOnlyList<BusyIntervalData>> BusyIntervalsAsync(
+            IReadOnlyList<Guid> ids,
+            DateTime fromUtc,
+            DateTime toUtc,
+            DateTime now,
+            CancellationToken ct
+        )
+        {
+            return await Blocking(ids, fromUtc, toUtc, now)
+                .OrderBy(x => x.StartAtUtc)
+                .Select(x => new BusyIntervalData(x.EquipmentItemId, x.StartAtUtc, x.EndAtUtc))
+                .ToListAsync(ct);
+        }
+
+        // The one rule for "this unit is taken": the booking check and the borrower's date picker both use it.
+        private IQueryable<Reservation> Blocking(IReadOnlyList<Guid> ids, DateTime start, DateTime end, DateTime now)
+        {
+            return Context
                 .Reservations.AsNoTracking()
                 .Where(x =>
                     ids.Contains(x.EquipmentItemId)
@@ -32,10 +52,7 @@ namespace ASI.Basecode.Data.Repositories
                             && x.HoldExpiresAtUtc > now
                             && x.StartAtUtc > now
                     )
-                )
-                .Select(x => x.EquipmentItemId)
-                .Distinct()
-                .ToListAsync(ct);
+                );
         }
 
         public async Task<IReadOnlyList<CalendarItemData>> CalendarItemsAsync(CancellationToken ct)

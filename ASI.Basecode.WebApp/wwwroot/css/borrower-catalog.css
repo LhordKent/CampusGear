@@ -155,7 +155,7 @@ html:has(.reserve-dialog:modal) { overflow: hidden; }
 .reserve-close:hover { background: var(--cg-raised); color: var(--cg-text); }
 .reserve-close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 
-.reserve-scroll { overflow-y: auto; overscroll-behavior: contain; padding: 24px; display: grid; gap: 24px; }
+.reserve-scroll { overflow-y: auto; overscroll-behavior: contain; padding: 24px; display: grid; gap: 24px; scroll-padding: 12px; }
 .reserve-equipment { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 24px; align-items: start; }
 .reserve-media { aspect-ratio: 4 / 3; overflow: hidden; border: 1px solid var(--cg-border); border-radius: 12px; background: var(--catalog-inset); }
 .reserve-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -228,6 +228,104 @@ html:has(.reserve-dialog:modal) { overflow: hidden; }
 }
 .reserve-actions .borrower-button { min-width: 132px; font-size: 13px; }
 
+/* ---------- Date and time picker (wwwroot/js/reservation-picker.js) ---------- */
+/* Booked days and times are hatched and muted, so "taken" reads without relying on colour alone. */
+.catalog-page {
+    --when-hatch: repeating-linear-gradient(135deg, transparent 0 5px, color-mix(in srgb, var(--cg-muted) 22%, transparent) 5px 6px);
+}
+.when-trigger {
+    width: 100%; min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 14px;
+    border: 1px solid var(--cg-border); border-radius: 10px; background: var(--cg-input, var(--ws-input)); color: var(--cg-text);
+    font: 500 14px/1.3 Inter, Arial, sans-serif; text-align: left; cursor: pointer;
+    transition: border-color var(--motion-fast, 200ms) ease, box-shadow var(--motion-fast, 200ms) ease;
+}
+.when-trigger:hover { border-color: var(--cg-teal); }
+.when-trigger[aria-expanded='true'] { border-color: var(--cg-teal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-teal) 22%, transparent); }
+.when-trigger[aria-invalid='true'] { border-color: var(--catalog-busy-border); }
+.when-trigger:disabled { cursor: not-allowed; }
+.when-trigger.is-empty .when-trigger-text { color: var(--cg-muted); font-weight: 400; }
+.when-trigger-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.when-trigger svg { flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.when-trigger-icon { width: 18px; height: 18px; color: var(--cg-muted); }
+.when-trigger-chevron { width: 16px; height: 16px; color: var(--cg-muted); transition: transform var(--motion-fast, 200ms) var(--catalog-ease-out); }
+.when-trigger[aria-expanded='true'] .when-trigger-chevron { transform: rotate(180deg); }
+
+.when-panel {
+    margin: 14px 0 0; padding: 16px; border: 1px solid var(--cg-border); border-radius: 12px; background: var(--catalog-inset);
+    animation: when-in 200ms var(--catalog-ease-out) both;
+}
+.when-panel[hidden] { display: none; }
+@keyframes when-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.when-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.when-title { margin: 0; font-size: 14px; font-weight: 600; color: var(--cg-text); }
+.when-sub { margin: 3px 0 0; font-size: 12px; line-height: 1.45; color: var(--cg-muted); }
+.when-close, .when-nav {
+    flex: none; width: 32px; height: 32px; display: inline-grid; place-items: center; padding: 0; border: 0; border-radius: 8px;
+    background: transparent; color: var(--cg-muted); cursor: pointer; transition: background-color 150ms ease, color 150ms ease;
+}
+.when-close svg, .when-nav svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.when-nav:disabled { opacity: .35; cursor: default; }
+
+.when-body { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.when-month { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.when-month-label { margin: 0; font-size: 14px; font-weight: 600; color: var(--cg-text); }
+.when-weekdays, .when-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.when-weekdays span { padding: 4px 0; text-align: center; font-size: 11px; font-weight: 600; letter-spacing: .03em; color: var(--cg-muted); }
+.when-day {
+    position: relative; height: 38px; padding: 0; border: 1px solid transparent; border-radius: 8px; background: transparent;
+    color: var(--cg-text); font: 500 13px Inter, Arial, sans-serif; font-variant-numeric: tabular-nums; cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+/* Partly booked: a small bronze dot under the date. */
+.when-day[data-state='partial']::after {
+    content: ''; position: absolute; left: 50%; bottom: 5px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--cg-bronze);
+}
+.when-day[data-state='full'] { background: var(--when-hatch); color: var(--cg-muted); text-decoration: line-through; cursor: not-allowed; }
+.when-day[data-state='past'] { color: var(--cg-muted); opacity: .45; cursor: default; }
+.when-day[data-state='unknown'] { color: var(--cg-muted); }
+.when-day.is-outside { opacity: .4; }
+.when-day.is-today { border-color: var(--cg-teal); }
+.when-day[aria-pressed='true'] { background: var(--cg-teal); border-color: var(--cg-teal); color: #fff; opacity: 1; text-decoration: none; }
+.when-day[aria-pressed='true'][data-state='partial']::after { background: #fff; }
+
+.when-day-label { margin: 6px 0 10px; font-size: 13px; font-weight: 600; color: var(--cg-text); }
+.when-slots {
+    position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px;
+    max-height: 268px; overflow-y: auto; overscroll-behavior: contain; padding: 2px 4px 2px 2px; scroll-behavior: auto;
+}
+.when-slot {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-height: 44px; padding: 6px 10px;
+    border: 1px solid var(--cg-border); border-radius: 8px; background: var(--cg-surface); color: var(--cg-text);
+    font: 600 13px/1.2 Inter, Arial, sans-serif; font-variant-numeric: tabular-nums; text-align: left; cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.when-slot-tag { font-size: 11px; font-weight: 500; color: var(--cg-muted); }
+.when-slot-tag:empty { display: none; }
+.when-slot[data-state='booked'] { background: var(--when-hatch); color: var(--cg-muted); cursor: not-allowed; }
+.when-slot[data-state='booked'] .when-slot-time { text-decoration: line-through; }
+.when-slot[data-state='unknown'] { color: var(--cg-muted); cursor: progress; }
+.when-slot[aria-pressed='true'] { background: var(--cg-teal); border-color: var(--cg-teal); color: #fff; }
+.when-slot[aria-pressed='true'] .when-slot-tag { color: inherit; opacity: .85; }
+.when-empty { margin: 0; padding: 12px; border: 1px dashed var(--cg-border); border-radius: 8px; font-size: 13px; color: var(--cg-muted); }
+
+.when-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--cg-rule); }
+.when-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; padding: 0; list-style: none; font-size: 12px; color: var(--cg-muted); }
+.when-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.when-legend i { position: relative; width: 14px; height: 14px; border: 1px solid var(--cg-border); border-radius: 4px; background: var(--cg-surface); }
+.when-legend i[data-state='partial']::after { content: ''; position: absolute; left: 50%; bottom: 2px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--cg-bronze); }
+.when-legend i[data-state='full'] { background: var(--when-hatch); }
+.when-status { margin: 0; font-size: 12px; color: var(--cg-muted); }
+.when-status:empty { display: none; }
+
+@media (hover: hover) and (pointer: fine) {
+    .when-close:hover, .when-nav:hover:not(:disabled) { background: var(--cg-raised); color: var(--cg-text); }
+    .when-day:not([aria-disabled]):not([aria-pressed='true']):hover { background: var(--cg-raised); }
+    .when-slot:not([aria-disabled]):not([aria-pressed='true']):hover { border-color: var(--cg-teal); }
+}
+.when-day:focus-visible, .when-slot:focus-visible, .when-nav:focus-visible, .when-close:focus-visible, .when-trigger:focus-visible {
+    outline: 2px solid var(--cg-focus, var(--cg-teal)); outline-offset: 2px;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1000px) {
     .catalog-page { margin-left: 0; }
@@ -257,10 +355,28 @@ html:has(.reserve-dialog:modal) { overflow: hidden; }
     .reserve-actions { padding: 12px 16px; }
     .reserve-actions .borrower-button { flex: 1; min-width: 0; }
     .reserve-header { padding-left: 16px; }
+    .when-panel { padding: 12px; }
+    .when-slots { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); max-height: 220px; }
+}
+@media (max-width: 760px) {
+    .when-body { grid-template-columns: 1fr; gap: 14px; }
+}
+/* Short screens (small laptops, phones in landscape): a tighter picker that fits the dialog without scrolling. */
+@media (max-height: 820px) {
+    .when-panel { padding: 12px 14px; }
+    .when-head { margin-bottom: 8px; }
+    .when-day { height: 32px; }
+    .when-weekdays span { padding: 2px 0; }
+    .when-day-label { margin: 2px 0 8px; }
+    .when-slots { max-height: 214px; }
+    .when-slot { min-height: 40px; padding: 5px 10px; }
+    .when-foot { margin-top: 10px; padding-top: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
     .reserve-dialog:modal, .reserve-dialog:modal::backdrop, .reserve-dialog.is-closing, .reserve-dialog.is-closing::backdrop { animation-duration: 1ms; }
     .catalog-card-link, .catalog-media img, .catalog-cta svg { transition: none; }
     .catalog-card-link:hover, .catalog-card-link:hover .catalog-media img { transform: none; }
     .reserve-availability[data-state='checking']::before { animation: none; }
+    .when-panel { animation: none; }
+    .when-trigger-chevron, .when-day, .when-slot { transition: none; }
 }

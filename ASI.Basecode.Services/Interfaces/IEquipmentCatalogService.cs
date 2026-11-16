@@ -21,6 +21,12 @@ namespace ASI.Basecode.Services.Interfaces
             string? end,
             CancellationToken cancellationToken
         );
+        Task<OperationResult<ReservationSchedule>> ScheduleAsync(
+            RequestContext actor,
+            Guid equipmentItemId,
+            string? from,
+            CancellationToken cancellationToken
+        );
         Task<ReservationPageViewModel> GetRequestPageAsync(
             bool isEligible,
             ReservationRequestModel input,
