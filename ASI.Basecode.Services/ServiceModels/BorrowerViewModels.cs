@@ -7,7 +7,6 @@ namespace ASI.Basecode.Services.ServiceModels
     public sealed record BorrowerHomeViewModel(
         string FirstName,
         bool IsEligible,
-        IReadOnlyList<CatalogEquipment> RecentlyAdded,
         IReadOnlyList<CatalogEquipment> ReadyNow,
         IReadOnlyList<HomeCategory> Categories,
         int ProductCount,

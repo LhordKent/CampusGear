@@ -47,7 +47,6 @@ namespace ASI.Basecode.Services.Services
                 new BorrowerHomeViewModel(
                     user?.FirstName is { Length: > 0 } first ? first : "there",
                     profile.IsEligible,
-                    catalog.Items.OrderByDescending(x => x.AddedAtUtc).ThenBy(x => x.Name).Take(4).ToList(),
                     catalog
                         .Items.Where(x => x.FreeNowUnits > 0)
                         .OrderByDescending(x => x.FreeNowUnits)
