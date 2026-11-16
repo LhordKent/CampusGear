@@ -105,7 +105,9 @@
                     @Html.ValidationMessage("StudentNumber")
                 </label>
                 <label class="live-field" for="Department"><span>Department</span>
-                    <input id="Department" name="Department" value="@Model.Input.Department" maxlength="160" />
+                    <select id="Department" name="Department">
+                        @await Html.PartialAsync("_DepartmentOptions", new DepartmentOptionsModel(Model.Input.Department, "No department", AllowEmpty: true))
+                    </select>
                     @Html.ValidationMessage("Department")
                 </label>
             </div>

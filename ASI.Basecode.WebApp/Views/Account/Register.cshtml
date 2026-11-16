@@ -49,7 +49,9 @@
                 </label>
                 <label class="auth-field" for="Department">
                     <span class="auth-field-label">Department</span>
-                    <input class="auth-input" id="Department" name="Department" type="text" value="@(ViewData["Department"] as string)" placeholder="e.g. College of Engineering" autocomplete="organization-title" maxlength="160" required />
+                    <select class="auth-input auth-select" id="Department" name="Department" required>
+                        @await Html.PartialAsync("_DepartmentOptions", new DepartmentOptionsModel(ASI.Basecode.Resources.Constants.Departments.Find(ViewData["Department"] as string), "Select your department", AllowEmpty: false))
+                    </select>
                     @Html.ValidationMessage("Department", null, new { @class = "auth-field-error" })
                 </label>
             </div>

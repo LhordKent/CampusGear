@@ -1,0 +1,17 @@
+@using ASI.Basecode.Resources.Constants
+@model DepartmentOptionsModel
+@{
+    var selected = Model.Selected?.Trim();
+    var listed = Departments.Find(selected);
+    var legacy = !string.IsNullOrEmpty(selected) && listed is null ? selected : null;
+    var current = listed ?? legacy;
+}
+<option value="" disabled="@(!Model.AllowEmpty)" selected="@(current is null)">@Model.Placeholder</option>
+@foreach (var department in Departments.All)
+{
+    <option value="@department" selected="@(department == current)">@department</option>
+}
+@if (legacy is not null)
+{
+    <option value="@legacy" selected>@legacy (not in list)</option>
+}

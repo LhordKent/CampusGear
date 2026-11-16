@@ -1121,7 +1121,16 @@ namespace ASI.Basecode.Resources.Messages {
                 return ResourceManager.GetString("StudentNumberAlreadyRegistered", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose your department from the list..
+        /// </summary>
+        public static string DepartmentNotListed {
+            get {
+                return ResourceManager.GetString("DepartmentNotListed", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Upload a JPEG, PNG, WebP or GIF image..
         /// </summary>

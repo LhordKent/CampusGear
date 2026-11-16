@@ -356,6 +356,9 @@
   <data name="StudentNumberAlreadyRegistered" xml:space="preserve">
     <value>This Student ID Number is already registered.</value>
   </data>
+  <data name="DepartmentNotListed" xml:space="preserve">
+    <value>Choose your department from the list.</value>
+  </data>
   <data name="UnsupportedImageType" xml:space="preserve">
     <value>Upload a JPEG, PNG, WebP or GIF image.</value>
   </data>
