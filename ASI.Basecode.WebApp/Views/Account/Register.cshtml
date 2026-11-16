@@ -1,69 +1,81 @@
 @{
     Layout = "_AccountLayout";
     ViewData["Title"] = TitleText.CreateAccount;
-    ViewData["FigmaFrame"] = "524_2";
 }
-<section class="auth-card auth-signup" aria-labelledby="account-title">
-    <header>
-        <h1 id="account-title">Create your campus account</h1>
-        <p class="auth-description">An administrator must approve your account before you can sign in.</p>
-    </header>
-    <hr class="auth-divider" />
-    @await Html.PartialAsync("_AccountFeedback")
-    <form class="auth-form" action="/auth/signup" method="post">
-        @Html.AntiForgeryToken()
-        <div class="auth-row">
-            <label class="auth-field" for="FirstName">
-                <span class="auth-field-label">First name</span>
-                <input class="auth-input" id="FirstName" name="FirstName" type="text" value="@(ViewData["FirstName"] as string)" placeholder="Jordan" autocomplete="given-name" maxlength="100" required />
-                @Html.ValidationMessage("FirstName", null, new { @class = "auth-field-error" })
-            </label>
-            <label class="auth-field" for="LastName">
-                <span class="auth-field-label">Last name</span>
-                <input class="auth-input" id="LastName" name="LastName" type="text" value="@(ViewData["LastName"] as string)" placeholder="Lee" autocomplete="family-name" maxlength="100" required />
-                @Html.ValidationMessage("LastName", null, new { @class = "auth-field-error" })
-            </label>
-        </div>
-        <div class="auth-row">
-            <label class="auth-field" for="StudentIdNumber">
-                <span class="auth-field-label">Student ID Number</span>
-                <input class="auth-input" id="StudentIdNumber" name="StudentIdNumber" type="text" inputmode="numeric" pattern="[0-9]+" title="Student ID Number must contain numbers only." value="@(ViewData["StudentIdNumber"] as string)" autocomplete="off" maxlength="64" required />
-                @Html.ValidationMessage("StudentIdNumber", null, new { @class = "auth-field-error" })
-            </label>
-            <label class="auth-field" for="MobileNumber">
-                <span class="auth-field-label">Mobile number</span>
-                <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" inputmode="numeric" maxlength="11" minlength="11" pattern="[0-9]{11}" title="Mobile number must contain numbers only, exactly 11 digits (e.g. 09XXXXXXXXX)." value="@(ViewData["MobileNumber"] as string)" placeholder="09XXXXXXXXX" autocomplete="tel" required />
-                @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
-            </label>
-        </div>
-        <div class="auth-row">
-            <label class="auth-field" for="Email">
-                <span class="auth-field-label">Email address</span>
-                <input class="auth-input" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="jordan@example.com" autocomplete="email" required />
-                @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
-            </label>
-            <label class="auth-field" for="Department">
-                <span class="auth-field-label">Department</span>
-                <input class="auth-input" id="Department" name="Department" type="text" value="@(ViewData["Department"] as string)" placeholder="e.g. College of Engineering" autocomplete="organization-title" maxlength="160" required />
-                @Html.ValidationMessage("Department", null, new { @class = "auth-field-error" })
-            </label>
-        </div>
-        <div>
+<div class="auth-split is-wide">
+    @await Html.PartialAsync("_AuthIntro", new AuthIntroModel
+    {
+        Eyebrow = "New account / Borrower access",
+        Title = "Create your",
+        TitleAccent = "campus account",
+        Lead = "An administrator must approve your account before you can sign in.",
+        StepsLabel = "Access sequence",
+        Steps = new[] { "Submit your details", "Administrator review", "Sign in" },
+        CurrentStep = 1
+    })
+    <section class="auth-card auth-signup" aria-labelledby="auth-title">
+        @await Html.PartialAsync("_AccountFeedback")
+        <form class="auth-form" action="/auth/signup" method="post">
+            @Html.AntiForgeryToken()
             <div class="auth-row">
-                <label class="auth-field" for="Password">
-                    <span class="auth-field-label">Password</span>
-                    <input class="auth-input" id="Password" name="Password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required aria-describedby="password-help" />
-                    @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
+                <label class="auth-field" for="FirstName">
+                    <span class="auth-field-label">First name</span>
+                    <input class="auth-input" id="FirstName" name="FirstName" type="text" value="@(ViewData["FirstName"] as string)" placeholder="Jordan" autocomplete="given-name" maxlength="100" required />
+                    @Html.ValidationMessage("FirstName", null, new { @class = "auth-field-error" })
                 </label>
-                <label class="auth-field" for="ConfirmPassword">
-                    <span class="auth-field-label">Confirm password</span>
-                    <input class="auth-input" id="ConfirmPassword" name="ConfirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password" minlength="8" required />
-                    @Html.ValidationMessage("ConfirmPassword", null, new { @class = "auth-field-error" })
+                <label class="auth-field" for="LastName">
+                    <span class="auth-field-label">Last name</span>
+                    <input class="auth-input" id="LastName" name="LastName" type="text" value="@(ViewData["LastName"] as string)" placeholder="Lee" autocomplete="family-name" maxlength="100" required />
+                    @Html.ValidationMessage("LastName", null, new { @class = "auth-field-error" })
                 </label>
             </div>
-            <span class="auth-field-help" id="password-help">At least 8 characters, with uppercase and lowercase letters, a number, and a symbol.</span>
-        </div>
-        <button class="auth-action" type="submit">CREATE ACCOUNT</button>
-    </form>
-    <div class="auth-actions"><a class="auth-link" href="/auth/login">Already have an account? Return to sign in</a></div>
-</section>
+            <div class="auth-row">
+                <label class="auth-field" for="StudentIdNumber">
+                    <span class="auth-field-label">Student ID Number</span>
+                    <input class="auth-input" id="StudentIdNumber" name="StudentIdNumber" type="text" inputmode="numeric" pattern="[0-9]+" title="Student ID Number must contain numbers only." value="@(ViewData["StudentIdNumber"] as string)" autocomplete="off" maxlength="64" required />
+                    @Html.ValidationMessage("StudentIdNumber", null, new { @class = "auth-field-error" })
+                </label>
+                <label class="auth-field" for="MobileNumber">
+                    <span class="auth-field-label">Mobile number</span>
+                    <input class="auth-input" id="MobileNumber" name="MobileNumber" type="tel" inputmode="numeric" maxlength="11" minlength="11" pattern="[0-9]{11}" title="Mobile number must contain numbers only, exactly 11 digits (e.g. 09XXXXXXXXX)." value="@(ViewData["MobileNumber"] as string)" placeholder="09XXXXXXXXX" autocomplete="tel" required />
+                    @Html.ValidationMessage("MobileNumber", null, new { @class = "auth-field-error" })
+                </label>
+            </div>
+            <div class="auth-row">
+                <label class="auth-field" for="Email">
+                    <span class="auth-field-label">Email address</span>
+                    <input class="auth-input" id="Email" name="Email" type="email" value="@(ViewData["Email"] as string)" placeholder="jordan@example.com" autocomplete="email" required />
+                    @Html.ValidationMessage("Email", null, new { @class = "auth-field-error" })
+                </label>
+                <label class="auth-field" for="Department">
+                    <span class="auth-field-label">Department</span>
+                    <input class="auth-input" id="Department" name="Department" type="text" value="@(ViewData["Department"] as string)" placeholder="e.g. College of Engineering" autocomplete="organization-title" maxlength="160" required />
+                    @Html.ValidationMessage("Department", null, new { @class = "auth-field-error" })
+                </label>
+            </div>
+            <div>
+                <div class="auth-row">
+                    <label class="auth-field" for="Password">
+                        <span class="auth-field-label">Password</span>
+                        <span class="auth-input-wrap">
+                            <input class="auth-input has-reveal" id="Password" name="Password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required aria-describedby="password-help" />
+                            @await Html.PartialAsync("_PasswordReveal", "Password")
+                        </span>
+                        @Html.ValidationMessage("Password", null, new { @class = "auth-field-error" })
+                    </label>
+                    <label class="auth-field" for="ConfirmPassword">
+                        <span class="auth-field-label">Confirm password</span>
+                        <span class="auth-input-wrap">
+                            <input class="auth-input has-reveal" id="ConfirmPassword" name="ConfirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password" minlength="8" required />
+                            @await Html.PartialAsync("_PasswordReveal", "ConfirmPassword")
+                        </span>
+                        @Html.ValidationMessage("ConfirmPassword", null, new { @class = "auth-field-error" })
+                    </label>
+                </div>
+                <span class="auth-field-help" id="password-help">At least 8 characters, with uppercase and lowercase letters, a number, and a symbol.</span>
+            </div>
+            <button class="auth-action" type="submit">CREATE ACCOUNT</button>
+        </form>
+        <p class="auth-switch">Already have an account? <a class="auth-link" href="/auth/login">Sign in</a></p>
+    </section>
+</div>

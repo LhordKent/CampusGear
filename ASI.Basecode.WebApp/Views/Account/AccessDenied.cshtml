@@ -1,13 +1,20 @@
 @{
     Layout = "_AccountLayout";
     ViewData["Title"] = TitleText.AccessDenied;
-    ViewData["FigmaFrame"] = "136_20";
 }
-<section class="auth-card compact" aria-labelledby="account-title">
-    <header>
-        <h1 id="account-title">Access denied</h1>
-        <p class="auth-description">Your role can&rsquo;t open this page. Ask an administrator to review your role if you need access.</p>
-    </header>
-    <hr class="auth-divider" />
-    <div class="auth-actions"><a class="auth-action" href="/auth/login">GO TO MY WORKSPACE</a></div>
-</section>
+<div class="auth-split">
+    @await Html.PartialAsync("_AuthIntro", new AuthIntroModel
+    {
+        Eyebrow = "Authorization / Access restricted",
+        Title = "Access",
+        TitleAccent = "denied",
+        Lead = "Your role can’t open this page. Ask an administrator to review your role if you need access."
+    })
+    <section class="auth-card" aria-labelledby="auth-title">
+        <div class="auth-summary">
+            <strong>Workspace permission required</strong>
+            <p>This page is outside your account’s assigned role. No access rights are changed from this screen.</p>
+        </div>
+        <a class="auth-action" href="/auth/login">GO TO MY WORKSPACE</a>
+    </section>
+</div>

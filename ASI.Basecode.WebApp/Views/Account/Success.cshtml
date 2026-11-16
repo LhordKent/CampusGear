@@ -1,17 +1,24 @@
 @{
     Layout = "_AccountLayout";
     ViewData["Title"] = TitleText.PasswordUpdated;
-    ViewData["FigmaFrame"] = "917_11";
 }
-<section class="auth-card compact" aria-labelledby="account-title">
-    <header>
-        <h1 id="account-title">Password updated</h1>
-    </header>
-    <hr class="auth-divider" />
-    <div class="auth-success-mark" aria-hidden="true">✓</div>
-    <div class="auth-summary">
-        <strong>Password updated</strong>
-        <p>Sign in with your new password.</p>
-    </div>
-    <div class="auth-actions"><a class="auth-action" href="/auth/login">RETURN TO SIGN IN</a></div>
-</section>
+<div class="auth-split">
+    @await Html.PartialAsync("_AuthIntro", new AuthIntroModel
+    {
+        Eyebrow = "Account recovery / Complete",
+        Title = "Password",
+        TitleAccent = "updated",
+        Lead = "Your new password is active. Your role and permissions are unchanged.",
+        StepsLabel = "Recovery steps",
+        Steps = new[] { "Verify account", "Verify code", "Set new password" },
+        CurrentStep = 4
+    })
+    <section class="auth-card" aria-labelledby="auth-title">
+        <div class="auth-success-mark" aria-hidden="true">✓</div>
+        <div class="auth-summary">
+            <strong>Ready to sign in</strong>
+            <p>Sign in with your new password.</p>
+        </div>
+        <a class="auth-action" href="/auth/login">RETURN TO SIGN IN</a>
+    </section>
+</div>

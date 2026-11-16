@@ -1,0 +1,42 @@
+@model AuthIntroModel
+<div class="auth-intro">
+    <img class="auth-intro-mark" src="/img/7ef91.svg" alt="" width="124" height="103" />
+    @if (!string.IsNullOrEmpty(Model.Eyebrow))
+    {
+        <p class="auth-intro-eyebrow">@Model.Eyebrow</p>
+    }
+    <h1 id="auth-title" class="auth-intro-title">@Model.Title@if (!string.IsNullOrEmpty(Model.TitleAccent)) {<text> <span>@Model.TitleAccent</span></text>}</h1>
+    @if (!string.IsNullOrEmpty(Model.Lead))
+    {
+        <p class="auth-intro-lead">@Model.Lead</p>
+    }
+    @if (Model.Steps.Count > 0 || !string.IsNullOrEmpty(Model.Scope))
+    {
+        <div class="auth-intro-scope">
+            <hr class="auth-intro-rule" />
+            @if (!string.IsNullOrEmpty(Model.StepsLabel))
+            {
+                <p class="auth-intro-label">@Model.StepsLabel</p>
+            }
+            @if (Model.Steps.Count > 0)
+            {
+                <ol class="auth-intro-progress">
+                    @for (var i = 0; i < Model.Steps.Count; i++)
+                    {
+                        var step = i + 1;
+                        var state = step < Model.CurrentStep ? "is-done" : step == Model.CurrentStep ? "is-current" : "is-next";
+                        <li class="@state" aria-current="@(step == Model.CurrentStep ? "step" : null)">
+                            <span class="auth-intro-progress-mark" aria-hidden="true">@(step < Model.CurrentStep ? "✓" : step.ToString("00"))</span>
+                            <span>@Model.Steps[i]@if (step < Model.CurrentStep) {<span class="auth-visually-hidden"> (done)</span>}</span>
+                        </li>
+                    }
+                </ol>
+            }
+            else
+            {
+                <p class="auth-intro-steps">@Model.Scope</p>
+            }
+        </div>
+    }
+    <p class="auth-intro-foot">@Account.CampusName</p>
+</div>
