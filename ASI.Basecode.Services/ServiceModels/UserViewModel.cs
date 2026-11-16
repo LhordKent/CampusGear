@@ -139,7 +139,7 @@ namespace ASI.Basecode.Services.ServiceModels
         [Required, EmailAddress(ErrorMessage = "Enter a valid email address."), StringLength(256)]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Enter your department.")]
+        [Required(ErrorMessage = "Choose your department.")]
         [StringLength(160)]
         [Display(Name = "Department")]
         public string Department { get; set; } = string.Empty;

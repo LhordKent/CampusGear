@@ -88,6 +88,35 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // Busy times for the request dialog's date picker. No borrower details are included, only numbered units.
+        [HttpGet("borrower/reservation/schedule")]
+        public async Task<IActionResult> Schedule(Guid equipmentItemId, string? from, CancellationToken cancellationToken)
+        {
+            var result = await _catalog.ScheduleAsync(RequestActor, equipmentItemId, from, cancellationToken);
+            if (result.Outcome == OperationOutcome.Forbidden)
+            {
+                return Forbid();
+            }
+
+            if (result.Outcome == OperationOutcome.NotFound)
+            {
+                return NotFound();
+            }
+
+            var schedule = result.Value!;
+            return Json(
+                new
+                {
+                    bookableUnits = schedule.BookableUnits,
+                    maxPerRequest = schedule.MaxPerRequest,
+                    now = schedule.NowLocal,
+                    from = schedule.FromLocal,
+                    to = schedule.ToLocal,
+                    busy = schedule.Busy.Select(x => new { unit = x.Unit, start = x.Start, end = x.End }),
+                }
+            );
+        }
+
         [HttpPost("borrower/reservation")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReservation(ReservationRequestModel input, CancellationToken cancellationToken)

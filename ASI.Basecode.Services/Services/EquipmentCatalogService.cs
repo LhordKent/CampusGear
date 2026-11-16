@@ -47,7 +47,6 @@ namespace ASI.Basecode.Services.Services
                 new BorrowerHomeViewModel(
                     user?.FirstName is { Length: > 0 } first ? first : "there",
                     profile.IsEligible,
-                    catalog.Items.OrderByDescending(x => x.AddedAtUtc).ThenBy(x => x.Name).Take(4).ToList(),
                     catalog
                         .Items.Where(x => x.FreeNowUnits > 0)
                         .OrderByDescending(x => x.FreeNowUnits)
@@ -170,6 +169,65 @@ namespace ASI.Basecode.Services.Services
                 .ToList();
             var free = await _availability.FindFreeUnitsAsync(bookable, startUtc, endUtc, now, equipmentItemId, cancellationToken);
             return OperationResult<AvailabilityResult>.Ok(new(bookable.Count, free.Count, Math.Min(free.Count, MaxUnitsPerRequest)));
+        }
+
+        /// <summary>Busy times for every bookable unit of a product over a window of about three months.</summary>
+        public async Task<OperationResult<ReservationSchedule>> ScheduleAsync(
+            RequestContext actor,
+            Guid equipmentItemId,
+            string? from,
+            CancellationToken cancellationToken
+        )
+        {
+            const int windowDays = 92;
+            var profile = await OwnProfileAsync(actor, cancellationToken);
+            if (profile is null)
+            {
+                return new(OperationOutcome.Forbidden);
+            }
+
+            var units = await _reads.CatalogAsync(cancellationToken);
+            var unit = units.SingleOrDefault(x => x.Id == equipmentItemId);
+            if (unit is null)
+            {
+                return new(OperationOutcome.NotFound);
+            }
+
+            // Grouped exactly like AvailabilityAsync, so the picker and the booking check count the same units.
+            var bookable = units
+                .Where(x => x.CategoryId == unit.CategoryId && x.Name == unit.Name && x.IsBookable)
+                .OrderBy(x => x.AssetCode)
+                .Select(x => x.Id)
+                .ToList();
+            var now = _timeProvider.GetUtcNow().UtcDateTime;
+            var localNow = ManilaTime.Local(now);
+            var today = DateOnly.FromDateTime(localNow);
+            var firstDay = ManilaTime.TryParseDate(from, out var requested) && requested > today ? requested : today;
+            var fromLocal = firstDay.ToDateTime(TimeOnly.MinValue);
+            var toLocal = fromLocal.AddDays(windowDays);
+            var busy = await _availability.BusyIntervalsAsync(
+                bookable,
+                ManilaTime.Utc(fromLocal),
+                ManilaTime.Utc(toLocal),
+                now,
+                cancellationToken
+            );
+            var index = bookable.Select((id, i) => (id, i)).ToDictionary(x => x.id, x => x.i);
+            return OperationResult<ReservationSchedule>.Ok(
+                new ReservationSchedule(
+                    bookable.Count,
+                    Math.Min(bookable.Count, MaxUnitsPerRequest),
+                    ManilaTime.Input(localNow),
+                    ManilaTime.Input(fromLocal),
+                    ManilaTime.Input(toLocal),
+                    busy.Select(x => new ScheduleBusy(
+                            index[x.EquipmentItemId],
+                            ManilaTime.Input(ManilaTime.Local(x.StartAtUtc)),
+                            ManilaTime.Input(ManilaTime.Local(x.EndAtUtc))
+                        ))
+                        .ToList()
+                )
+            );
         }
 
         private Task<BorrowerProfile?> OwnProfileAsync(RequestContext actor, CancellationToken ct)

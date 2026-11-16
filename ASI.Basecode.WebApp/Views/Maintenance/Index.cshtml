@@ -131,30 +131,112 @@
         </div>
     </section>
 
-    <dialog id="open-maintenance" class="live-modal" aria-labelledby="open-maintenance-title">
+    @* Open maintenance: step 1 picks a unit from a searchable list (damaged units first, unavailable ones last),
+       step 2 describes the issue. wwwroot/js/maintenance-open.js filters, validates and keeps the footer summary. *@
+    @{
+        var choices = Model.Items
+            .OrderByDescending(x => x.NeedsAttention)
+            .ThenBy(x => x.Blocked is not null)
+            .ThenBy(x => x.Name)
+            .ThenBy(x => x.AssetCode)
+            .ToList();
+        var attention = choices.Count(x => x.NeedsAttention);
+        string ConditionState(MaintenanceItemOption item) => item.Blocked is not null ? "blocked"
+            : item.Condition switch
+            {
+                EquipmentCondition.Damaged or EquipmentCondition.Unserviceable => "bad",
+                EquipmentCondition.Fair => "fair",
+                _ => "good"
+            };
+    }
+    <dialog id="open-maintenance" class="live-modal maint-open" aria-labelledby="open-maintenance-title" aria-describedby="open-maintenance-sub">
         <div class="live-modal-head">
-            <div><p class="page-eyebrow">New case</p><h2 id="open-maintenance-title">Open maintenance</h2></div>
+            <div>
+                <p class="page-eyebrow">New case</p>
+                <h2 id="open-maintenance-title">Open maintenance</h2>
+                <p class="maint-open-sub" id="open-maintenance-sub">The unit is held right away: no new reservations or releases until the case is closed.</p>
+            </div>
             <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
         </div>
-        <p class="live-modal-lede">The item is held as soon as the case opens: new reservations and releases are blocked until the repair is recorded. Record an active loan's return first.</p>
-        <form method="post" action="/admin/maintenance/open" class="live-form" data-modal-form novalidate>
+        <form method="post" action="/admin/maintenance/open" class="maint-open-form" data-modal-form data-maint-open novalidate>
             @Html.AntiForgeryToken()
-            <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
-            <label id="open-maintenance-item" class="live-field wide" data-refresh-region><span>Equipment <small>@available of @Model.Items.Count units can be placed in maintenance</small></span>
-                <select name="equipmentItemId" required>
-                    <option value="">Choose equipment…</option>
-                    @foreach (var item in Model.Items)
-                    { <option value="@item.Id" disabled="@(item.Blocked is not null)">@item.Name · @item.AssetCode · @item.Condition@(item.Blocked is null ? "" : $" ({item.Blocked})")</option> }
-                </select>
-            </label>
-            <label class="live-field wide"><span>Issue description</span>
-                <textarea name="description" required maxlength="2000" rows="4" placeholder="What is wrong, how it was found, and anything the repairer should know"></textarea>
-            </label>
-            <div class="live-modal-actions wide">
+            <div class="maint-open-body">
+                <div class="live-modal-alert" role="alert" data-modal-alert hidden></div>
+
+                <fieldset id="open-maintenance-item" class="maint-step" data-refresh-region>
+                    <legend class="maint-step-title"><span class="maint-step-num" aria-hidden="true">1</span>Choose the equipment</legend>
+                    <div class="maint-picker-tools">
+                        <label class="live-search-input maint-picker-search">
+                            <span class="visually-hidden">Search equipment</span>
+                            <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg>
+                            <input type="search" placeholder="Search name, asset code, category or location" autocomplete="off" data-maint-search />
+                        </label>
+                        @if (attention > 0)
+                        {
+                            <div class="maint-chips" role="group" aria-label="Show">
+                                <button type="button" class="maint-chip" aria-pressed="true" data-maint-filter="">All</button>
+                                <button type="button" class="maint-chip" aria-pressed="false" data-maint-filter="attention"><i class="maint-dot" aria-hidden="true"></i>Needs attention <span>@attention</span></button>
+                            </div>
+                        }
+                    </div>
+                    <div class="maint-list" role="radiogroup" aria-label="Equipment" aria-describedby="maint-picker-note" data-maint-list>
+                        @{ var shownBlockedHeading = false; }
+                        @foreach (var item in choices)
+                        {
+                            var blocked = item.Blocked is not null;
+                            if (blocked && !shownBlockedHeading)
+                            {
+                                shownBlockedHeading = true;
+                                <p class="maint-group" data-maint-group>Can’t be placed in maintenance</p>
+                            }
+                            var location = string.IsNullOrWhiteSpace(item.Location) ? null : item.Location;
+                            <label class="maint-option @(blocked ? "is-blocked" : "")" data-maint-option
+                                   data-attention="@(item.NeedsAttention ? "true" : "false")"
+                                   data-search="@($"{item.Name} {item.AssetCode} {item.Category} {location} {item.Condition}".ToLowerInvariant())"
+                                   data-label="@item.Name · @item.AssetCode">
+                                <input class="maint-option-input" type="radio" name="equipmentItemId" value="@item.Id" disabled="@blocked" />
+                                <span class="maint-option-media" aria-hidden="true">
+                                    @if (item.ImagePath is not null) { <img src="@item.ImagePath" alt="" loading="lazy" decoding="async" /> }
+                                    else { <svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(item.Name, item.Category)" /></svg> }
+                                </span>
+                                <span class="maint-option-text">
+                                    <strong>@item.Name</strong>
+                                    <small>@item.AssetCode · @item.Category@(location is null ? "" : $" · {location}")</small>
+                                </span>
+                                <span class="maint-badge" data-state="@ConditionState(item)">@(item.Blocked ?? item.Condition.ToString())</span>
+                                <svg class="maint-option-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12.5 4 4 8-9" /></svg>
+                            </label>
+                        }
+                    </div>
+                    <p class="maint-empty" data-maint-empty hidden>No equipment matches your search.</p>
+                    <p class="maint-error" role="alert" data-maint-error="equipment" hidden>Choose the equipment that needs maintenance.</p>
+                    <p class="maint-note" id="maint-picker-note">@available of @Model.Items.Count units can be placed in maintenance. Record an active loan’s return first.</p>
+                </fieldset>
+
+                <div class="maint-step">
+                    <label class="maint-step-title" for="open-maintenance-description"><span class="maint-step-num" aria-hidden="true">2</span>Describe the issue</label>
+                    <div class="maint-chips maint-starters" role="group" aria-label="Start with a common issue">
+                        @foreach (var starter in new[] { "Won’t power on", "Physical damage", "Missing parts or accessories", "Not working properly", "Routine inspection" })
+                        { <button type="button" class="maint-chip" data-maint-starter="@starter">@starter</button> }
+                    </div>
+                    <div class="live-field">
+                        <textarea id="open-maintenance-description" name="description" required maxlength="2000" rows="4" aria-describedby="maint-description-hint" placeholder="What’s wrong, how it was found, and anything the repairer should know"></textarea>
+                        <small class="maint-note" id="maint-description-hint">Staff see this on the case until it’s closed.</small>
+                    </div>
+                    <p class="maint-error" role="alert" data-maint-error="description" hidden>Describe the issue so the repairer knows what to check.</p>
+                </div>
+            </div>
+            <div class="live-modal-actions maint-open-actions">
+                <p class="maint-summary" data-maint-summary aria-live="polite">No equipment selected</p>
                 <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
                 <button class="live-button" type="submit">Open maintenance case</button>
             </div>
         </form>
     </dialog>
+    <partial name="~/Views/Borrower/_EquipmentIcons.cshtml" />
 </main>
-@section Scripts { <script src="~/js/modal-forms.js" asp-append-version="true"></script> }
+@section Styles { <link rel="stylesheet" href="~/css/maintenance.css" asp-append-version="true" /> }
+@section Scripts {
+    <script src="~/js/modal-forms.js" asp-append-version="true"></script>
+    <script src="~/js/maintenance-open.js" asp-append-version="true"></script>
+}

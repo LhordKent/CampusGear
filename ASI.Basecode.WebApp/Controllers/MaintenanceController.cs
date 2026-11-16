@@ -40,9 +40,12 @@ namespace ASI.Basecode.WebApp.Controllers
                             x.Name,
                             x.AssetCode,
                             x.Condition,
-                            x.HasCase ? "already in maintenance"
-                                : x.OnLoan ? "on loan"
-                                : null
+                            x.HasCase ? "Already in maintenance"
+                                : x.OnLoan ? "On loan"
+                                : null,
+                            x.Category,
+                            x.Location,
+                            x.ImagePath
                         ))
                         .ToList(),
                     result.Status,

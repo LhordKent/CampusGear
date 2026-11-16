@@ -33,6 +33,31 @@
 .live-content > :nth-child(n + 5) { animation-delay: calc(var(--motion-stagger) * 4); }
 .auth-backdrop { animation: motion-fade var(--motion-slow) var(--motion-ease) both; }
 
+/* Account pages: the intro rises in line by line, then the card follows, so the eye lands on the headline first. */
+@keyframes auth-rise { from { opacity: 0; transform: translateY(calc(var(--motion-distance) * 2)); } to { opacity: 1; transform: none; } }
+@keyframes auth-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+@keyframes auth-ping { from { opacity: .7; transform: scale(1); } to { opacity: 0; transform: scale(1.9); } }
+@keyframes auth-drift-a { to { transform: translate3d(7vw, 5vh, 0); } }
+@keyframes auth-drift-b { to { transform: translate3d(-6vw, -7vh, 0); } }
+.auth-intro > * { animation: auth-rise var(--motion-slow) var(--motion-ease) both; }
+.auth-intro > :nth-child(2) { animation-delay: var(--motion-stagger); }
+.auth-intro > :nth-child(3) { animation-delay: calc(var(--motion-stagger) * 2); }
+.auth-intro > :nth-child(4) { animation-delay: calc(var(--motion-stagger) * 3); }
+.auth-intro > :nth-child(n + 5) { animation-delay: calc(var(--motion-stagger) * 4); }
+.auth-split > .auth-card { animation-delay: calc(var(--motion-stagger) * 2); }
+/* The amber rule draws left to right just after its block arrives. */
+.auth-intro-rule { animation: auth-draw var(--motion-slow) var(--motion-ease) calc(var(--motion-stagger) * 6) both; }
+/* Current step: two soft pings once the page settles, then it stays still. */
+.auth-intro-progress .is-current .auth-intro-progress-mark::after {
+    content: ''; position: absolute; inset: -1px; border: 1px solid #c77833; border-radius: 50%; pointer-events: none;
+    opacity: 0; animation: auth-ping 1.4s var(--motion-ease) 900ms 2 both;
+}
+/* Ambient backdrop: two glows drift slowly back and forth. Transform only, so it stays on the compositor. */
+.auth-glow-a { animation: auth-drift-a 26s ease-in-out infinite alternate; }
+.auth-glow-b { animation: auth-drift-b 32s ease-in-out infinite alternate; }
+/* Password show/hide: the two eye icons cross-fade. A transition, not keyframes, so rapid clicks retarget smoothly. */
+.auth-reveal-icon { transition: opacity var(--motion-fast) var(--motion-ease), transform var(--motion-fast) var(--motion-ease); }
+
 /* Buttons: smooth colour changes, a slight lift on hover and a press-in on click. */
 :is(.live-button, .borrower-button, .auth-action, .auth-secondary, .live-logout button, .live-filters button, .live-dashboard-shortcuts a) {
     transition: background-color var(--motion-fast) var(--motion-ease-press), border-color var(--motion-fast) var(--motion-ease-press),
@@ -125,4 +150,5 @@ summary { transition: color var(--motion-fast) var(--motion-ease-press), backgro
     .motion-progress::before { animation: none; left: 0; width: 100%; opacity: .6; }
     .motion-busy::after { animation: none; }
     :is(.live-navigation nav > a, .live-extra-navigation a):hover:not(.live-nav-active) { transform: none; }
+    .auth-glow-a, .auth-glow-b, .auth-intro-progress .is-current .auth-intro-progress-mark::after { animation: none; }
 }

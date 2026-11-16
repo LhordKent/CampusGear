@@ -4,10 +4,24 @@ namespace ASI.Basecode.Services.ServiceModels
 {
     public sealed record AvailabilityResult(int BookableUnits, int FreeUnits, int MaxQuantity);
 
+    /// <summary>
+    /// When each unit of a product is taken, for the borrower's date picker. Times are Manila wall-clock
+    /// ("yyyy-MM-ddTHH:mm", the same format as the form inputs). Units are numbered, never identified.
+    /// </summary>
+    public sealed record ReservationSchedule(
+        int BookableUnits,
+        int MaxPerRequest,
+        string NowLocal,
+        string FromLocal,
+        string ToLocal,
+        IReadOnlyList<ScheduleBusy> Busy
+    );
+
+    public sealed record ScheduleBusy(int Unit, string Start, string End);
+
     public sealed record BorrowerHomeViewModel(
         string FirstName,
         bool IsEligible,
-        IReadOnlyList<CatalogEquipment> RecentlyAdded,
         IReadOnlyList<CatalogEquipment> ReadyNow,
         IReadOnlyList<HomeCategory> Categories,
         int ProductCount,

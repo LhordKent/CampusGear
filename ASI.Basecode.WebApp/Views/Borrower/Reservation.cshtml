@@ -106,7 +106,7 @@
                         </div>
                         <label class="catalog-toggle">
                             <input type="checkbox" data-catalog-available />
-                            <span>Available to reserve</span>
+                            <span>Available now</span>
                         </label>
                     </div>
                 </div>
@@ -285,4 +285,7 @@
 
     <partial name="_EquipmentIcons" />
 </main>
-@section Scripts { <script src="~/js/borrower-catalog.js" asp-append-version="true"></script> }
+@section Scripts {
+    <script src="~/js/reservation-picker.js" asp-append-version="true"></script>
+    <script src="~/js/borrower-catalog.js" asp-append-version="true"></script>
+}

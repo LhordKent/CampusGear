@@ -18,7 +18,17 @@ namespace ASI.Basecode.Data.Models
         PersonRecord? ClosedByUser
     );
 
-    public sealed record MaintenanceChoice(Guid Id, string Name, string AssetCode, EquipmentCondition Condition, bool HasCase, bool OnLoan);
+    public sealed record MaintenanceChoice(
+        Guid Id,
+        string Name,
+        string AssetCode,
+        EquipmentCondition Condition,
+        bool HasCase,
+        bool OnLoan,
+        string Category,
+        string? Location,
+        string? ImagePath
+    );
 
     public sealed record MaintenanceListData(
         IReadOnlyList<MaintenanceRecord> Cases,

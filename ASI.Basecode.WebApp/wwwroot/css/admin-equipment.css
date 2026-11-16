@@ -1,4 +1,4 @@
-.admin-equipment-page .live-heading {
+﻿.admin-equipment-page .live-heading {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -71,8 +71,19 @@
         radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(--ws-teal) 22%, transparent), transparent 60%),
         linear-gradient(160deg, var(--cg-raised), var(--ws-input));
     color: var(--cg-teal);
-    font: 500 18px Oxanium, sans-serif;
-    letter-spacing: .04em;
+}
+
+/* Equipment icon (Models/EquipmentIcon.cs) in the same outline style as the borrower catalog. */
+.equipment-card-placeholder svg {
+    width: 30%;
+    max-width: 84px;
+    height: auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: .85;
 }
 
 .equipment-card-status {
@@ -174,6 +185,497 @@
     border-radius: 12px;
     color: var(--cg-muted);
     text-align: center;
+}
+
+/* ==========================================================================
+   Add/Edit equipment dialog (Views/AdminInventory/_EquipmentEditor.cshtml, wwwroot/js/equipment-editor.js)
+   Left: the form in three sections. Right: a sticky live preview of the borrower catalog card, holding the photo.
+   ========================================================================== */
+/* This file loads before main.css (see _Layout's Styles section), so rules that override the shared modal styles
+   are scoped to .live-modal.equip-editor to win regardless of order. */
+.live-modal.equip-editor {
+    width: min(980px, calc(100vw - 24px));
+    overflow-x: hidden;
+}
+
+.live-modal.equip-editor .equip-editor-head {
+    padding: 20px 24px 16px;
+}
+
+.equip-editor-sub {
+    margin: 5px 0 0;
+    color: var(--ws-muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.equip-editor-code {
+    display: inline-block;
+    padding: 1px 7px;
+    border: 1px solid var(--ws-border);
+    border-radius: 6px;
+    background: var(--ws-card-raised);
+    color: var(--ws-text);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The body and footer carry their own padding (the shared .live-modal > form rule would indent them twice). */
+.live-modal > .equip-editor-form {
+    margin: 0;
+    padding: 0;
+}
+
+.equip-editor-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 0 32px;
+    align-items: start;
+    padding: 22px 24px 6px;
+}
+
+.equip-editor-alert {
+    grid-column: 1 / -1;
+    margin-bottom: 18px;
+}
+
+.equip-editor-main {
+    min-width: 0;
+}
+
+.equip-section {
+    padding: 0 0 22px;
+}
+
+.equip-section + .equip-section {
+    padding-top: 22px;
+    border-top: 1px solid var(--ws-border);
+}
+
+.equip-section-title {
+    margin: 0 0 14px;
+    color: var(--ws-text);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+/* align-items/align-content: start keeps inputs at their own height when a neighbour in the row has a hint. */
+.equip-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 18px;
+    align-items: start;
+}
+
+.equip-grid > .live-field {
+    align-content: start;
+}
+
+.equip-span-all {
+    grid-column: 1 / -1;
+}
+
+.live-modal .equip-editor-form .live-field {
+    gap: 6px;
+}
+
+.equip-hint {
+    color: var(--ws-muted);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+.live-modal .live-field > .equip-label-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.live-modal .live-field > .equip-label-row small {
+    margin-left: 0;
+}
+
+.equip-counter {
+    margin-left: auto;
+    color: var(--ws-faint);
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.equip-counter.is-near {
+    color: var(--ws-warn-text);
+}
+
+.equip-note {
+    margin: 10px 0 0;
+    color: var(--ws-muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+/* The shared footer has -22px side margins for padded forms; this form's footer sits flush, so they would overflow. */
+.live-modal.equip-editor .equip-editor-actions {
+    margin: 0;
+    padding: 14px 24px 18px;
+}
+
+.equip-editor-actions .live-button {
+    min-width: 116px;
+}
+
+/* ---------- Preview column ---------- */
+.equip-editor-aside {
+    position: sticky;
+    top: 104px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--ws-border);
+    border-radius: 14px;
+    background: var(--ws-inset);
+}
+
+.equip-editor-aside > .equip-section-title {
+    margin-bottom: 12px;
+}
+
+.equip-photo {
+    display: grid;
+    gap: 12px;
+}
+
+.equip-preview-card {
+    overflow: hidden;
+    border: 1px solid var(--cg-border);
+    border-radius: 12px;
+    background: var(--cg-surface);
+    box-shadow: 0 8px 20px -14px rgb(0 0 0 / .35);
+}
+
+.equip-photo-frame {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-bottom: 1px solid var(--cg-rule);
+    background: var(--ws-input);
+    cursor: pointer;
+    transition: box-shadow 150ms ease;
+}
+
+/* Empty: a dashed drop area inside the frame. */
+.equip-photo-frame:not(.has-photo)::before {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border: 1.5px dashed var(--ws-border-strong);
+    border-radius: 9px;
+    pointer-events: none;
+    transition: border-color 150ms ease;
+}
+
+.equip-photo-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.equip-photo-img[hidden],
+.equip-photo-empty[hidden],
+.equip-photo-busy[hidden],
+.equip-photo-error[hidden],
+.equip-photo-actions [hidden] {
+    display: none;
+}
+
+.equip-photo-empty {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    max-width: 210px;
+    padding: 16px;
+    color: var(--ws-muted);
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.equip-photo-empty strong {
+    color: var(--ws-text);
+    font-size: 13.5px;
+}
+
+.equip-photo-glyph {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 4px;
+    fill: none;
+    stroke: var(--ws-teal);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.equip-photo-frame.is-removed .equip-photo-glyph {
+    stroke: var(--ws-muted);
+}
+
+/* The same status chip the inventory cards show, updated by the Active switch. */
+.equip-photo-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    padding: 3px 9px;
+    border: 1px solid color-mix(in srgb, var(--ws-teal) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ws-card) 82%, transparent);
+    color: var(--ws-link);
+    font-size: 11.5px;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+}
+
+.equip-photo-status.is-inactive {
+    border-color: var(--ws-border-strong);
+    color: var(--ws-muted);
+}
+
+.equip-photo-hint,
+.equip-photo-drop,
+.equip-photo-busy {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: linear-gradient(to top, rgb(0 0 0 / .62), transparent 55%);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+}
+
+.equip-photo-drop {
+    align-items: center;
+    background: color-mix(in srgb, var(--ws-teal) 80%, transparent);
+    font-size: 14px;
+}
+
+.equip-photo-busy {
+    align-items: center;
+    background: rgb(0 0 0 / .45);
+    opacity: 1;
+}
+
+.equip-photo-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: motion-spin var(--motion-spin, 700ms) linear infinite;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .equip-photo-frame:not(.has-photo):hover::before {
+        border-color: var(--ws-teal);
+    }
+
+    .equip-photo-frame.has-photo:hover .equip-photo-hint {
+        opacity: 1;
+    }
+}
+
+.equip-photo-frame.is-dragging {
+    box-shadow: inset 0 0 0 2px var(--ws-teal);
+}
+
+.equip-photo-frame.is-dragging .equip-photo-drop {
+    opacity: 1;
+}
+
+.equip-photo-frame.is-dragging .equip-photo-hint {
+    opacity: 0;
+}
+
+.equip-photo-frame.is-invalid::before,
+.equip-photo:has(.equip-photo-input[aria-invalid='true']) .equip-photo-frame::before {
+    border-color: var(--ws-warn-border, var(--ws-bronze));
+}
+
+.equip-photo:has(.equip-photo-input:focus-visible) .equip-preview-card {
+    outline: 3px solid var(--ws-focus);
+    outline-offset: 2px;
+}
+
+.equip-preview-body {
+    display: grid;
+    gap: 3px;
+    padding: 12px 14px 14px;
+}
+
+.equip-preview-category,
+.equip-preview-name,
+.equip-preview-code {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.equip-preview-category {
+    color: var(--cg-muted);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.equip-preview-name {
+    color: var(--cg-text);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.equip-preview-code {
+    color: var(--cg-muted);
+    font-size: 11.5px;
+}
+
+.equip-preview-body .is-placeholder {
+    color: var(--ws-faint);
+    font-weight: 500;
+}
+
+/* The real file input carries the upload but is driven by the frame and the buttons. */
+.equip-photo .equip-photo-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.equip-photo-info {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.equip-photo-name {
+    margin: 0;
+    overflow: hidden;
+    color: var(--ws-text);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.equip-photo-meta,
+.equip-photo-tips {
+    margin: 0;
+    color: var(--ws-muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.equip-photo-tips {
+    font-size: 12px;
+}
+
+.equip-photo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.equip-photo-actions .live-button {
+    flex: 1 1 auto;
+}
+
+.equip-photo-actions .live-button.equip-photo-remove {
+    color: var(--ws-warn-text);
+}
+
+.equip-photo-error {
+    margin: 0;
+    color: var(--ws-warn-text);
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+@media (max-width: 820px) {
+    .equip-editor-body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+        padding: 18px 18px 6px;
+    }
+
+    .equip-editor-aside {
+        position: static;
+        margin-bottom: 18px;
+    }
+
+    .equip-preview-card {
+        max-width: 360px;
+    }
+
+    .live-modal.equip-editor .equip-editor-head,
+    .live-modal.equip-editor .equip-editor-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+}
+
+@media (max-width: 520px) {
+    .equip-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .equip-preview-card {
+        max-width: none;
+    }
+
+    .equip-editor-actions .live-button {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .equip-photo-frame,
+    .equip-photo-frame::before,
+    .equip-photo-hint,
+    .equip-photo-drop {
+        transition: none;
+    }
+
+    .equip-photo-spinner {
+        animation: none;
+        border-right-color: currentColor;
+        opacity: .6;
+    }
 }
 
 @media (max-width: 1000px) {

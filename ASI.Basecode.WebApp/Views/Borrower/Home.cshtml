@@ -2,12 +2,6 @@
 @{
     ViewData["Title"] = TitleText.Home;
     ViewData["WorkspaceRole"] = "Borrower";
-    static string StatusClass(string availability) => availability switch
-    {
-        "Available" => "is-available",
-        "In use" => "is-in-use",
-        _ => "is-unavailable"
-    };
     var active = Model.PendingCount + Model.ApprovedCount + Model.BorrowedCount;
 }
 @section Styles {
@@ -105,39 +99,6 @@
                 </ul>
             }
         </section>
-
-        @if (Model.RecentlyAdded.Count > 0)
-        {
-            <section class="home-section" aria-labelledby="featured-title">
-                <div class="home-section-head" data-reveal>
-                    <div><h2 id="featured-title">Recently added</h2><p>The newest equipment in the catalog. Open one to see details and reserve it.</p></div>
-                    <a class="live-link" href="/borrower/reservation">See the full catalog<svg class="icon" aria-hidden="true"><use href="/img/icons.svg#arrow-right"></use></svg></a>
-                </div>
-                <ul class="catalog-grid home-featured" role="list" data-reveal-group>
-                    @foreach (var item in Model.RecentlyAdded)
-                    {
-                        <li class="catalog-card @StatusClass(item.Availability)">
-                            <a class="catalog-card-link" href="/borrower/reservation?equipmentItemId=@item.Id">
-                                <div class="catalog-media">
-                                    @if (item.ImagePath is not null) { <img src="@item.ImagePath" alt="" loading="lazy" decoding="async" /> }
-                                    else { <span class="catalog-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(item.Name, item.Category)" /></svg></span> }
-                                    <span class="catalog-status"><i aria-hidden="true"></i>@item.Availability</span>
-                                </div>
-                                <div class="catalog-body">
-                                    <p class="catalog-category">@item.Category</p>
-                                    <h3 class="catalog-name">@item.Name</h3>
-                                    <p class="catalog-description">@(item.Description ?? "No description provided yet.")</p>
-                                </div>
-                                <div class="catalog-footer">
-                                    <span class="catalog-detail">@item.AvailabilityDetail</span>
-                                    <span class="catalog-cta">@(item.IsRequestable ? "Reserve" : "View details")<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span>
-                                </div>
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </section>
-        }
 
         @if (Model.ReadyNow.Count > 0)
         {

@@ -38,6 +38,13 @@ namespace ASI.Basecode.Services.Services
             var feedback = new AccountFeedback();
             var email = input.Email.Trim();
             var studentId = input.StudentIdNumber.Trim();
+            // Public sign-up only accepts a listed department, saved with the list's spelling.
+            var department = Departments.Find(input.Department);
+            if (department is null)
+            {
+                feedback.AddError(nameof(input.Department), Errors.DepartmentNotListed);
+            }
+
             if (await _userManager.FindByEmailAsync(email) is not null)
             {
                 await _audit.RecordAccountAsync(actor, "Auth.SignUp", "DuplicateEmail", null, ct);
@@ -93,7 +100,7 @@ namespace ASI.Basecode.Services.Services
                     {
                         UserId = user.Id,
                         StudentNumber = studentId,
-                        Department = input.Department.Trim(),
+                        Department = department,
                         ContactNumber = input.MobileNumber.Trim(),
                         IsEligible = true,
                     }

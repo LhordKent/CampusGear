@@ -44,7 +44,7 @@
                         }
                         else
                         {
-                            <div class="equipment-card-placeholder" aria-hidden="true"><span>CampusGear</span></div>
+                            <div class="equipment-card-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For(item.Name, item.Category.Name)" /></svg></div>
                         }
                         @if (item.IsActive && item.IsMaintenanceHold)
                         {
@@ -86,5 +86,10 @@
         </div>
     </section>
     @if (editor) { <partial name="_EquipmentEditor" model="Model" /> }
+    @* Icons for items without a photo; outside #inventory-results so live search refreshes keep them. *@
+    <partial name="~/Views/Borrower/_EquipmentIcons.cshtml" />
 </main>
-@section Scripts { <script src="~/js/modal-forms.js" asp-append-version="true"></script> }
+@section Scripts {
+    <script src="~/js/modal-forms.js" asp-append-version="true"></script>
+    <script src="~/js/equipment-editor.js" asp-append-version="true"></script>
+}

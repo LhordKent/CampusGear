@@ -41,4 +41,7 @@ namespace ASI.Basecode.Data.Models
     );
 
     public sealed record EquipmentStateData(Guid Id, bool IsActive, bool Unusable, bool Borrowed, bool Reserved);
+
+    /// <summary>A time a unit cannot be booked: an approved or released booking, or a live pending hold.</summary>
+    public sealed record BusyIntervalData(Guid EquipmentItemId, DateTime StartAtUtc, DateTime EndAtUtc);
 }

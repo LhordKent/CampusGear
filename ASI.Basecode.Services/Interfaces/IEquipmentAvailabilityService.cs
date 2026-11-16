@@ -16,5 +16,12 @@ namespace ASI.Basecode.Services.Interfaces
             Guid preferredUnitId,
             CancellationToken cancellationToken
         );
+        Task<IReadOnlyList<BusyIntervalData>> BusyIntervalsAsync(
+            IReadOnlyList<Guid> unitIds,
+            DateTime fromUtc,
+            DateTime toUtc,
+            DateTime now,
+            CancellationToken cancellationToken
+        );
     }
 }

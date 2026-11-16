@@ -19,6 +19,9 @@
     let current = cards.find(card => card.dataset.id === field('id').value) || null;
     let freeUnits = null;
     let submitting = false;
+    // Calendar and time list that grays out booked times (wwwroot/js/reservation-picker.js). Without it the native inputs stay.
+    const picker = window.createReservationPicker?.({ form, start, end, quantity }) || null;
+    const focusTarget = name => picker?.triggerFor(name) || form.elements[name];
 
     /* ---------- Filtering ---------- */
     const filters = catalog.querySelector('[data-catalog-filters]');
@@ -37,7 +40,9 @@
             const text = `${card.dataset.name} ${card.dataset.category} ${card.dataset.description}`.toLowerCase();
             const visible = (!term || text.includes(term)) &&
                 (!category || card.dataset.category === category) &&
-                (!availableOnly.checked || card.dataset.requestable === 'true');
+                // "Available now" keeps items with a unit on the shelf right now (the card's "Available" badge);
+                // "In use" items can still be booked for later, so being requestable is not enough.
+                (!availableOnly.checked || card.dataset.availability === 'Available');
             card.hidden = !visible;
             if (visible) shown++;
         });
@@ -112,6 +117,7 @@
         }
         freeUnits = null;
         updateQuantityLimits();
+        picker?.setItem(requestable ? card.dataset.id : null);
     };
 
     /* ---------- Quantity stepper ---------- */
@@ -126,6 +132,8 @@
         const value = Number(quantity.value);
         dialog.querySelector('[data-step="-1"]').disabled = !(value > 1);
         dialog.querySelector('[data-step="1"]').disabled = !(value < max);
+        // More units need more free capacity, so the grayed-out times change with the quantity.
+        picker?.refresh();
     };
     dialog.querySelectorAll('[data-step]').forEach(button => button.addEventListener('click', () => {
         const next = Math.min(maxQuantity(), Math.max(1, (Number(quantity.value) || 1) + Number(button.dataset.step)));
@@ -212,6 +220,7 @@
     const close = () => {
         if (!dialog.open || dialog.classList.contains('is-closing')) return;
         availabilityRequest?.abort();
+        picker?.close();
         const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (reduced) { dialog.close(); return; }
         dialog.classList.add('is-closing');
@@ -224,7 +233,12 @@
         if (opener?.isConnected) opener.focus();
         opener = null;
     });
-    dialog.addEventListener('cancel', event => { event.preventDefault(); if (!submitting) close(); });
+    dialog.addEventListener('cancel', event => {
+        event.preventDefault();
+        // Escape inside the date picker closes only the picker.
+        if (picker?.isOpen()) { picker.close(); return; }
+        if (!submitting) close();
+    });
     dialog.querySelectorAll('[data-close-dialog]').forEach(link => link.addEventListener('click', event => {
         event.preventDefault();
         if (!submitting) close();
@@ -248,6 +262,7 @@
         if (target) target.textContent = message;
         const input = form.elements[name];
         if (input) input.setAttribute('aria-invalid', message ? 'true' : 'false');
+        picker?.setInvalid(name, !!message);
     };
     const validate = () => {
         const errors = [];
@@ -269,7 +284,7 @@
         const errors = validate();
         if (errors.length > 0 || submit.disabled) {
             event.preventDefault();
-            const first = form.elements[errors[0]?.[0]];
+            const first = errors[0] ? focusTarget(errors[0][0]) : null;
             first?.focus();
             first?.classList.remove('motion-shake');
             void first?.offsetWidth;
@@ -313,7 +328,7 @@
         dialog.showModal();
         checkAvailability();
         const firstError = dialog.querySelector('[data-error-for]:not(:empty)');
-        if (firstError) form.elements[firstError.dataset.errorFor]?.focus();
+        if (firstError) focusTarget(firstError.dataset.errorFor)?.focus();
     } else if (dialog.open) {
         dialog.close();
     }

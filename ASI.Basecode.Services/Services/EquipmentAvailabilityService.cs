@@ -73,5 +73,16 @@ namespace ASI.Basecode.Services.Services
             var blocked = await _reads.BlockedAsync(unitIds, startUtc, endUtc, now, cancellationToken);
             return unitIds.Where(id => !blocked.Contains(id)).OrderByDescending(id => id == preferredUnitId).ToList();
         }
+
+        public async Task<IReadOnlyList<BusyIntervalData>> BusyIntervalsAsync(
+            IReadOnlyList<Guid> unitIds,
+            DateTime fromUtc,
+            DateTime toUtc,
+            DateTime now,
+            CancellationToken cancellationToken
+        )
+        {
+            return unitIds.Count == 0 ? [] : await _reads.BusyIntervalsAsync(unitIds, fromUtc, toUtc, now, cancellationToken);
+        }
     }
 }
