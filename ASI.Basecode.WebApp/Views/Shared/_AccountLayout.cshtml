@@ -13,9 +13,13 @@
     @await Html.PartialAsync("_AccountStyles")
     <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
 </head>
-@* Each account page renders an .auth-split: an _AuthIntro beside its card. The backdrop only carries the faded corner art. *@
+@* Each account page renders an .auth-split: an _AuthIntro beside its card. The backdrop is decoration only:
+   two slow-drifting glows, the faded corner art (::before) and a dot grid that fades toward the edges (::after). *@
 <body class="auth-page">
-    <div class="auth-backdrop" aria-hidden="true"></div>
+    <div class="auth-backdrop" aria-hidden="true">
+        <span class="auth-glow auth-glow-a"></span>
+        <span class="auth-glow auth-glow-b"></span>
+    </div>
     <main class="auth-main" id="main-content">
         @RenderBody()
     </main>
