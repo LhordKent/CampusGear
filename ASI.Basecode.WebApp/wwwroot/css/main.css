@@ -856,3 +856,6 @@ html:active-view-transition-type(page-nav)::view-transition-old(root),
 html:active-view-transition-type(page-nav)::view-transition-new(root) { animation: none; }
 @keyframes page-out { to { opacity: 0; } }
 @keyframes page-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* Approved but never collected before the booking ended (ReservationDisplay "Not picked up") */
+.live-badge[data-state='not picked up'] { background: var(--ws-warn-bg); border-color: var(--ws-warn-border); color: var(--ws-warn-text); }

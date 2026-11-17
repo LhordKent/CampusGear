@@ -462,7 +462,7 @@ namespace ASI.Basecode.Services.Services
             {
                 await using var transaction = await BeginItemTransactionAsync(candidate.EquipmentItemId, cancellationToken);
                 var reservation = await _records.FindAsync(candidate.Id, cancellationToken);
-                if (reservation is null || !IsDueToExpire(reservation, now))
+                if (reservation is null || !(IsDueToExpire(reservation, now) || IsNoShow(reservation, now)))
                 {
                     continue;
                 }
@@ -501,13 +501,24 @@ namespace ASI.Basecode.Services.Services
             reservation.Status = ReservationStatus.Expired;
             reservation.HoldExpiresAtUtc = null;
             reservation.UpdatedAtUtc = now;
-            AddAudit(actor, "reservation.expired", reservation, before, now);
+            // An approved booking that expires was never collected; it keeps its approval decision, which is how the
+            // screens tell "Not picked up" apart from a request that expired before anyone decided on it.
+            AddAudit(actor, before == ReservationStatus.Approved ? "reservation.not_picked_up" : "reservation.expired", reservation, before, now);
         }
 
         private static bool IsDueToExpire(Reservation reservation, DateTime now)
         {
             return reservation.Status == ReservationStatus.Pending
                 && (reservation.HoldExpiresAtUtc is null || reservation.HoldExpiresAtUtc <= now || reservation.StartAtUtc <= now);
+        }
+
+        /// <summary>
+        /// A no-show: approved, but the booking ended without a release. Release closes at the end time
+        /// (ReleaseWindow), so nothing more can happen to it. Only the expiry worker closes these out.
+        /// </summary>
+        private static bool IsNoShow(Reservation reservation, DateTime now)
+        {
+            return reservation.Status == ReservationStatus.Approved && reservation.Loan is null && reservation.EndAtUtc <= now;
         }
 
         private Task<bool> HasConflictAsync(

@@ -86,6 +86,7 @@ namespace ASI.Basecode.Services.Manager
                     ? ($"Cancelled their request to borrow {name ?? "equipment"}", Successful)
                     : ($"Cancelled {person}'s reservation of {name ?? "equipment"}", Successful),
                 "reservation.expired" => ($"{Capitalize(person)}'s request to borrow {name ?? "equipment"} expired before it was approved", Waiting("Expired")),
+                "reservation.not_picked_up" => ($"{Capitalize(person)} did not pick up {name ?? "equipment"} before the booking ended", Waiting("Not picked up")),
                 "reservation.released" => ($"Released {name ?? "equipment"} to {person}", Successful),
                 "reservation.returned" => ($"Recorded the return of {name ?? "equipment"} from {person}", Successful),
 

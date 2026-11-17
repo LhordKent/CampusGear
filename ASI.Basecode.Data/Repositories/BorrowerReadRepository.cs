@@ -86,7 +86,7 @@ namespace ASI.Basecode.Data.Repositories
             return new(
                 upcoming,
                 await mine.CountAsync(x => x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now, ct),
-                await mine.CountAsync(x => x.Status == ReservationStatus.Approved, ct),
+                await mine.CountAsync(x => x.Status == ReservationStatus.Approved && x.EndAtUtc > now, ct),
                 await Context.Loans.CountAsync(x => x.Reservation.BorrowerProfileId == profileId && x.ReturnedAtUtc == null, ct),
                 await Context.Loans.CountAsync(
                     x => x.Reservation.BorrowerProfileId == profileId && x.ReturnedAtUtc == null && x.DueAtUtc < ReturnGrace.OverdueIfDueBefore(now),

@@ -41,8 +41,10 @@ namespace ASI.Basecode.Data.Repositories
             var overdueIfDueBefore = ReturnGrace.OverdueIfDueBefore(now);
             if (queue == "approvals")
             {
+                // An approved booking whose time has ended can no longer be released (a no-show), so it leaves the queue
+                // at once rather than waiting for the expiry worker to mark it Expired.
                 query = query.Where(x =>
-                    x.Status == ReservationStatus.Approved
+                    x.Status == ReservationStatus.Approved && x.EndAtUtc > now
                     || x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now
                 );
                 if (status == "pending")
@@ -117,6 +119,8 @@ namespace ASI.Basecode.Data.Repositories
             var ordered = queue switch
             {
                 "active" => included.OrderByDescending(x => x.Loan!.ReleasedAtUtc).ThenByDescending(x => x.CreatedAtUtc),
+                // Pending release: the next pickup first, which is the order the desk hands equipment out in.
+                "approvals" when status == "approved" => included.OrderBy(x => x.StartAtUtc).ThenBy(x => x.Id),
                 _ => included.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id),
             };
             return new(
@@ -128,7 +132,7 @@ namespace ASI.Basecode.Data.Repositories
                     x => x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now,
                     ct
                 ),
-                await Context.Reservations.CountAsync(x => x.Status == ReservationStatus.Approved, ct),
+                await Context.Reservations.CountAsync(x => x.Status == ReservationStatus.Approved && x.EndAtUtc > now, ct),
                 await Context.Loans.CountAsync(x => x.ReturnedAtUtc == null, ct)
             );
         }

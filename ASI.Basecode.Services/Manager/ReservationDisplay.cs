@@ -20,6 +20,10 @@ namespace ASI.Basecode.Services.Manager
             return reservation.Loan is { ReturnedAtUtc: { } returned } && returned < reservation.EndAtUtc ? returned : reservation.EndAtUtc;
         }
 
+        /// <summary>An expired booking that had been approved: the borrower never collected it.</summary>
+        public static bool IsNotPickedUp(Reservation reservation) =>
+            reservation.Status == ReservationStatus.Expired && reservation.DecidedAtUtc is not null && reservation.Loan is null;
+
         public static string Status(Reservation reservation, DateTime now)
         {
             if (reservation.Loan is { ReturnedAtUtc: null } loan && ReturnGrace.IsLate(loan.DueAtUtc, now))
@@ -43,6 +47,15 @@ namespace ASI.Basecode.Services.Manager
             )
             {
                 return "Expired";
+            }
+
+            // Approved but never collected: it kept its approval decision when the booking ended (see ReservationService.Expire).
+            if (
+                IsNotPickedUp(reservation)
+                || reservation.Status == ReservationStatus.Approved && reservation.Loan is null && reservation.EndAtUtc <= now
+            )
+            {
+                return "Not picked up";
             }
 
             return reservation.Status switch
