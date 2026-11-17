@@ -14,10 +14,22 @@
         CurrentStep = 2
     })
     <section class="auth-card" aria-labelledby="auth-title">
-        <div class="auth-success-mark" aria-hidden="true">✓</div>
+        <div class="auth-status">
+            <div class="auth-success-mark is-pending" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <div>
+                <h2 id="auth-title" class="auth-status-title">Registration received</h2>
+                <span class="auth-status-badge">Pending approval</span>
+            </div>
+        </div>
         <div class="auth-summary">
-            <strong>Pending approval</strong>
-            <p>Your registration has been submitted. You can sign in once an administrator approves your account.</p>
+            <strong>What happens next</strong>
+            <ol class="auth-next-steps">
+                <li>An administrator reviews your details.</li>
+                <li>Once approved, your account is activated.</li>
+                <li>Sign in with the email and password you registered.</li>
+            </ol>
         </div>
         <a class="auth-action" href="/auth/login">RETURN TO SIGN IN</a>
     </section>
