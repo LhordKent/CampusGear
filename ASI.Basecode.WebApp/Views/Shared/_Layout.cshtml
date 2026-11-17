@@ -31,6 +31,24 @@
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/password-rules.css" asp-append-version="true" />
+    @* Page transitions: hold the first frame of a new page until its content has parsed, so the transition never
+       animates a half-drawn page. Ignored by browsers without support. *@
+    <link rel="expect" href="#workspace-content" blocking="render" />
+    @* Start fetching a same-site page as soon as a link is pressed, so the transition starts sooner. "conservative"
+       (on press, not on hover) keeps a prefetched page from going stale. Sign-in pages, in-place loaders, and
+       downloads are left out. *@
+    <script type="speculationrules">
+    {
+        "prefetch": [{
+            "where": { "and": [
+                { "href_matches": "/*" },
+                { "not": { "href_matches": "/auth/*" } },
+                { "not": { "selector_matches": "[data-modal-load], [data-live-page], [download], [target=_blank], [data-no-prefetch]" } }
+            ] },
+            "eagerness": "conservative"
+        }]
+    }
+    </script>
 </head>
 <body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaReference.Frame(path)">
     <a class="live-skip" href="#workspace-content">Skip to content</a>
@@ -44,10 +62,13 @@
                     <details class="site-menu" data-site-menu>
                         <summary aria-label="Open menu"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#list"></use></svg><span>Menu</span></summary>
                         <nav class="site-nav" aria-label="Main navigation">
+                            @* Each link and the active pill carry view-transition names, so the pill slides between tabs on
+                               navigation (css/main.css, "Page transitions"). *@
+                            @{ var navIndex = 0; }
                             @foreach (var item in navigation)
                             {
                                 var active = IsActive(item);
-                                <a class="@(active ? "is-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)">@item.Label</a>
+                                <a class="@(active ? "is-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)" style="view-transition-name: nav-link-@(navIndex++)">@if (active) { <span class="nav-pill" aria-hidden="true"></span> }@item.Label</a>
                             }
                         </nav>
                     </details>
@@ -58,7 +79,7 @@
                     </div>
                 </div>
             </header>
-            <div id="workspace-content" class="site-main" tabindex="-1">@RenderBody()</div>
+            <div id="workspace-content" class="site-main page-transition" tabindex="-1">@RenderBody()</div>
             <footer class="site-footer">
                 <div class="site-footer-inner">
                     <span>Campus<strong>Gear</strong> · Campus equipment borrowing</span>
@@ -75,11 +96,12 @@
                 <details class="live-navigation" open>
                     <summary>Workspace menu</summary>
                     <nav aria-label="Workspace navigation">
+                        @{ var sideIndex = 0; }
                         @foreach (var item in navigation)
                         {
                             var active = IsActive(item);
                             if (item.Group is not null) { <p class="live-nav-group">@item.Group</p> }
-                            <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#@item.Icon"></use></svg><span>@item.Label</span></a>
+                            <a class="@(active ? "live-nav-active" : "")" href="@item.Path" aria-current="@(active ? "page" : null)" style="view-transition-name: nav-link-@(sideIndex++)">@if (active) { <span class="nav-pill" aria-hidden="true"></span> }<svg class="icon" aria-hidden="true"><use href="/img/icons.svg#@item.Icon"></use></svg><span>@item.Label</span></a>
                         }
                     </nav>
                 </details>
@@ -90,7 +112,7 @@
             </aside>
             <div class="live-main">
                 <partial name="_Header" />
-                <div id="workspace-content" tabindex="-1">@RenderBody()</div>
+                <div id="workspace-content" class="page-transition" tabindex="-1">@RenderBody()</div>
             </div>
         </div>
     }
