@@ -94,7 +94,8 @@ namespace ASI.Basecode.Services.Services
             status = status?.ToLowerInvariant() ?? "all";
             if (queue == "approvals")
             {
-                status = status is "approved" or "all" ? status : "pending";
+                // Two tabs: Pending requests (default) and Pending release. Anything else falls back to the pending tab.
+                status = status == "approved" ? "approved" : "pending";
             }
             else if (
                 status is not ("pending" or "approved" or "borrowed" or "returned" or "rejected" or "cancelled" or "expired" or "late")

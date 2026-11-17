@@ -35,7 +35,7 @@
         return url;
     };
 
-    async function load(form, url, { replaceForm = false, scroll = false } = {}) {
+    async function load(form, url, { replaceForm = false, scroll = false, swap = [] } = {}) {
         const region = document.querySelector(form.dataset.liveTarget);
         if (!region) { location.href = url; return; }
         form._controller?.abort();
@@ -57,6 +57,12 @@
             if (replaceForm) {
                 const nextForm = doc.querySelector(`form[data-live-target="${form.dataset.liveTarget}"]`);
                 if (nextForm) form.replaceChildren(...nextForm.childNodes);
+            }
+            // Other parts of the page that depend on the query, such as queue tabs and their heading.
+            for (const selector of swap) {
+                const current = document.querySelector(selector);
+                const replacement = doc.querySelector(selector);
+                if (current && replacement) current.replaceChildren(...replacement.childNodes);
             }
             history.replaceState(history.state, '', url.pathname + url.search);
             document.dispatchEvent(new CustomEvent('campusgear:content', { detail: { root: region } }));
@@ -104,6 +110,25 @@
             if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
             event.preventDefault();
             load(form, new URL(link.href), { scroll: true });
+        });
+    });
+
+    // Queue tabs (nav[data-live-tabs="#region"]) switch in place: the tab link is fetched, and the results, the form
+    // (its hidden status and reset link), the tabs themselves, and any data-live-swap selectors are replaced.
+    document.querySelectorAll('nav[data-live-tabs]').forEach(nav => {
+        const form = document.querySelector(`form[data-live-target="${nav.dataset.liveTabs}"]`);
+        if (!form) return;
+        const tabSelector = `nav[data-live-tabs="${nav.dataset.liveTabs}"]`;
+        const extra = (nav.dataset.liveSwap || '').split(',').map(s => s.trim()).filter(Boolean);
+        nav.addEventListener('click', event => {
+            const tab = event.target.closest('a[href]');
+            if (!tab || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+            event.preventDefault();
+            if (tab.getAttribute('aria-current') === 'page') return;
+            // Show the new tab as active right away; the swap confirms it with fresh counts.
+            nav.querySelectorAll('a').forEach(a => a.toggleAttribute('aria-current', a === tab));
+            tab.setAttribute('aria-current', 'page');
+            load(form, new URL(tab.href), { replaceForm: true, swap: [tabSelector, ...extra] });
         });
     });
 })();
