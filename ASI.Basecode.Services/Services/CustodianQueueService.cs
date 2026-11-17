@@ -29,6 +29,25 @@ namespace ASI.Basecode.Services.Services
             }
 
             var now = _timeProvider.GetUtcNow().UtcDateTime;
+            var actions = Actions(reservation, now);
+
+            // Administrators inspect the same record; only custodians receive action controls.
+            return new CustodianDetailViewModel(
+                Record: ReservationRecord.From(reservation),
+                Status: ReservationDisplay.Status(reservation, now),
+                CanApprove: custodian && actions.CanApprove,
+                CanReject: custodian && actions.CanReject,
+                CanRelease: custodian && actions.CanRelease,
+                CanReturn: custodian && reservation.Status == ReservationStatus.Released && reservation.Loan is { ReturnedAtUtc: null },
+                AvailabilityNote: actions.Note,
+                Feedback: null,
+                Error: null
+            );
+        }
+
+        /// <summary>Which desk actions a reservation allows right now. Shared by the details page and the queue dialogs.</summary>
+        private static (bool CanApprove, bool CanReject, bool CanRelease, string? Note) Actions(Reservation reservation, DateTime now)
+        {
             var pending =
                 reservation.Status == ReservationStatus.Pending && reservation.HoldExpiresAtUtc > now && reservation.StartAtUtc > now;
             var item = reservation.EquipmentItem;
@@ -37,20 +56,8 @@ namespace ASI.Basecode.Services.Services
                 && !item.IsMaintenanceHold
                 && item.Condition is not (EquipmentCondition.Damaged or EquipmentCondition.Unserviceable);
             var releaseOpen =
-                reservation.Status == ReservationStatus.Approved && usable && now >= reservation.StartAtUtc && now < reservation.EndAtUtc;
-
-            // Administrators inspect the same record; only custodians receive action controls.
-            return new CustodianDetailViewModel(
-                Record: ReservationRecord.From(reservation),
-                Status: ReservationDisplay.Status(reservation, now),
-                CanApprove: custodian && pending && usable,
-                CanReject: custodian && pending,
-                CanRelease: custodian && releaseOpen,
-                CanReturn: custodian && reservation.Status == ReservationStatus.Released && reservation.Loan is { ReturnedAtUtc: null },
-                AvailabilityNote: GetAvailabilityNote(reservation, usable, pending, now),
-                Feedback: null,
-                Error: null
-            );
+                reservation.Status == ReservationStatus.Approved && usable && ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now);
+            return (pending && usable, pending, releaseOpen, GetAvailabilityNote(reservation, usable, pending, now));
         }
 
         private static string? GetAvailabilityNote(Reservation reservation, bool usable, bool pending, DateTime now)
@@ -60,9 +67,13 @@ namespace ASI.Basecode.Services.Services
             {
                 return Errors.ItemUnavailable;
             }
+            if (reservation.Status == ReservationStatus.Approved && now < ReleaseWindow.OpensAt(reservation.StartAtUtc))
+            {
+                return string.Format(Errors.ReleaseNotStarted, ManilaTime.Format(ReleaseWindow.OpensAt(reservation.StartAtUtc)));
+            }
             if (reservation.Status == ReservationStatus.Approved && now < reservation.StartAtUtc)
             {
-                return Errors.ReleaseNotStarted;
+                return $"Early pickup: the booking starts at {ManilaTime.Format(reservation.StartAtUtc)}. The loan is still due at {ManilaTime.Format(reservation.EndAtUtc)}.";
             }
             if (reservation.Status == ReservationStatus.Approved && now >= reservation.EndAtUtc)
             {
@@ -94,7 +105,8 @@ namespace ASI.Basecode.Services.Services
             status = status?.ToLowerInvariant() ?? "all";
             if (queue == "approvals")
             {
-                status = status is "approved" or "all" ? status : "pending";
+                // Two tabs: Pending requests (default) and Pending release. Anything else falls back to the pending tab.
+                status = status == "approved" ? "approved" : "pending";
             }
             else if (
                 status is not ("pending" or "approved" or "borrowed" or "returned" or "rejected" or "cancelled" or "expired" or "late")
@@ -153,18 +165,38 @@ namespace ASI.Basecode.Services.Services
             var pages = result.Pages;
             page = result.Page;
             var rows = records
-                .Select(x => new CustodianListRow(
-                    x.Id,
-                    x.BorrowerProfile.User.FullName,
-                    x.BorrowerProfile.User.Email ?? string.Empty,
-                    x.EquipmentItem.Name,
-                    x.EquipmentItem.AssetCode,
-                    ManilaTime.Format(x.StartAtUtc),
-                    ManilaTime.Format(x.EndAtUtc),
-                    ReservationDisplay.Status(x, now),
-                    x.Loan?.ConditionAtReturn?.ToString(),
-                    x.Loan?.ReturnedAtUtc is { } returned ? ManilaTime.Format(returned) : null
-                ))
+                .Select(x =>
+                {
+                    var row = new CustodianListRow(
+                        x.Id,
+                        x.BorrowerProfile.User.FullName,
+                        x.BorrowerProfile.User.Email ?? string.Empty,
+                        x.EquipmentItem.Name,
+                        x.EquipmentItem.AssetCode,
+                        ManilaTime.Format(x.StartAtUtc),
+                        ManilaTime.Format(x.EndAtUtc),
+                        ReservationDisplay.Status(x, now),
+                        x.Loan?.ConditionAtReturn?.ToString(),
+                        x.Loan?.ReturnedAtUtc is { } returned ? ManilaTime.Format(returned) : null
+                    );
+                    if (queue != "approvals")
+                    {
+                        return row;
+                    }
+
+                    var actions = Actions(x, now);
+                    return row with
+                    {
+                        Purpose = x.Purpose,
+                        Notes = x.Notes,
+                        EquipmentCondition = x.EquipmentItem.Condition.ToString(),
+                        HoldExpiresManila = x.HoldExpiresAtUtc is { } hold ? ManilaTime.Format(hold) : null,
+                        CanApprove = actions.CanApprove,
+                        CanReject = actions.CanReject,
+                        CanRelease = actions.CanRelease,
+                        ActionNote = actions.Note,
+                    };
+                })
                 .ToList();
             return new(
                 search ?? string.Empty,

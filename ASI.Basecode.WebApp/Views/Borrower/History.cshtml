@@ -65,7 +65,7 @@
                                 <td>
                                     @if (row.CanCancel)
                                     {
-                                        <form method="post" action="/borrower/reservation/@row.Id/cancel" onsubmit="return confirm('Cancel this reservation request? This cannot be undone.')">
+                                        <form method="post" action="/borrower/reservation/@row.Id/cancel" data-confirm-title="Cancel this request?" data-confirm="Your request for @row.EquipmentName (@row.StartManila) will be withdrawn and the time slot released. This can't be undone." data-confirm-ok="Cancel request" data-confirm-cancel="Keep request">
                                             @Html.AntiForgeryToken()
                                             <button class="borrower-button borrower-button-danger" type="submit">Cancel request</button>
                                         </form>

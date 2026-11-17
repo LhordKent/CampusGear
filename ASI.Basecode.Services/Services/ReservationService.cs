@@ -331,22 +331,25 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.InvalidState, Errors.ApprovalRequired);
             }
 
-            if (now < reservation.StartAtUtc || now >= reservation.EndAtUtc)
+            if (!ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now))
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.ReleaseOutsideBooking);
             }
 
             await AcquireBorrowerLockAsync(reservation.BorrowerProfileId, cancellationToken);
             now = UtcNow();
-            if (now < reservation.StartAtUtc || now >= reservation.EndAtUtc)
+            if (!ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now))
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.ReleaseOutsideBooking);
             }
 
             await RequireEligibleBorrowerAsync(reservation.BorrowerProfileId, cancellationToken);
             EnsureUsable(reservation.EquipmentItem);
+            // An early pickup takes the item before the booking starts, so the item must also be free from now until
+            // then: an earlier booking that has not ended, or a loan not yet returned, blocks the handoff.
+            var heldFrom = now < reservation.StartAtUtc ? now : reservation.StartAtUtc;
             if (
-                await HasConflictAsync(itemId, reservation.StartAtUtc, reservation.EndAtUtc, now, reservation.Id, cancellationToken)
+                await HasConflictAsync(itemId, heldFrom, reservation.EndAtUtc, now, reservation.Id, cancellationToken)
                 || await _loans.HasOutstandingExceptAsync(itemId, reservation.Id, cancellationToken)
             )
             {
@@ -459,7 +462,7 @@ namespace ASI.Basecode.Services.Services
             {
                 await using var transaction = await BeginItemTransactionAsync(candidate.EquipmentItemId, cancellationToken);
                 var reservation = await _records.FindAsync(candidate.Id, cancellationToken);
-                if (reservation is null || !IsDueToExpire(reservation, now))
+                if (reservation is null || !(IsDueToExpire(reservation, now) || IsNoShow(reservation, now)))
                 {
                     continue;
                 }
@@ -498,13 +501,24 @@ namespace ASI.Basecode.Services.Services
             reservation.Status = ReservationStatus.Expired;
             reservation.HoldExpiresAtUtc = null;
             reservation.UpdatedAtUtc = now;
-            AddAudit(actor, "reservation.expired", reservation, before, now);
+            // An approved booking that expires was never collected; it keeps its approval decision, which is how the
+            // screens tell "Not picked up" apart from a request that expired before anyone decided on it.
+            AddAudit(actor, before == ReservationStatus.Approved ? "reservation.not_picked_up" : "reservation.expired", reservation, before, now);
         }
 
         private static bool IsDueToExpire(Reservation reservation, DateTime now)
         {
             return reservation.Status == ReservationStatus.Pending
                 && (reservation.HoldExpiresAtUtc is null || reservation.HoldExpiresAtUtc <= now || reservation.StartAtUtc <= now);
+        }
+
+        /// <summary>
+        /// A no-show: approved, but the booking ended without a release. Release closes at the end time
+        /// (ReleaseWindow), so nothing more can happen to it. Only the expiry worker closes these out.
+        /// </summary>
+        private static bool IsNoShow(Reservation reservation, DateTime now)
+        {
+            return reservation.Status == ReservationStatus.Approved && reservation.Loan is null && reservation.EndAtUtc <= now;
         }
 
         private Task<bool> HasConflictAsync(

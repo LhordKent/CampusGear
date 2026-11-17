@@ -17,14 +17,18 @@ namespace ASI.Basecode.Data.Repositories
                     reservation.Status == ReservationStatus.Pending && reservation.HoldExpiresAtUtc > now && reservation.StartAtUtc > now,
                 ct
             );
+            // Ready once pickup opens (ReleaseWindow.EarlyPickup before the start), until the booking ends.
+            var pickupOpensBy = now + ReleaseWindow.EarlyPickup;
             var readyToRelease = await Context.Reservations.CountAsync(
                 reservation =>
-                    reservation.Status == ReservationStatus.Approved && reservation.StartAtUtc <= now && reservation.EndAtUtc > now,
+                    reservation.Status == ReservationStatus.Approved && reservation.StartAtUtc <= pickupOpensBy && reservation.EndAtUtc > now,
                 ct
             );
-            var overdue = await Context.Loans.CountAsync(loan => loan.ReturnedAtUtc == null && loan.DueAtUtc < now, ct);
+            // A loan inside its ReturnGrace period after the due time still counts as due, not overdue.
+            var overdueIfDueBefore = ReturnGrace.OverdueIfDueBefore(now);
+            var overdue = await Context.Loans.CountAsync(loan => loan.ReturnedAtUtc == null && loan.DueAtUtc < overdueIfDueBefore, ct);
             var dueToday = await Context.Loans.CountAsync(
-                loan => loan.ReturnedAtUtc == null && loan.DueAtUtc >= now && loan.DueAtUtc < end,
+                loan => loan.ReturnedAtUtc == null && loan.DueAtUtc >= overdueIfDueBefore && loan.DueAtUtc < end,
                 ct
             );
 

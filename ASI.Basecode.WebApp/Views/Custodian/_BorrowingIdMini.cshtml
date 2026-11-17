@@ -1,0 +1,47 @@
+@model CustodianListRow
+@* Compact borrowing ID card shown at the top of the queue dialogs (approve, release, return).
+   ViewData: "ItemLabel" (equipment heading), "StartLabel" (first date heading). *@
+@{
+    var initials = string.Concat(Model.BorrowerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+    var late = Model.Status is "Overdue";
+}
+<article class="borrowing-id-card is-compact" aria-label="CampusGear Borrowing ID">
+    <header class="borrowing-id-masthead">
+        <div class="borrowing-id-brand">
+            <img src="/img/b95f3.svg" alt="" />
+            <div><strong>CampusGear</strong><span>BORROWING ID</span></div>
+        </div>
+        <div class="borrowing-id-number">
+            <span>RESERVATION ID</span>
+            <strong>RES-@Model.Id.ToString("N").ToUpperInvariant()</strong>
+            <span class="live-badge custodian-status @(late ? "late" : "")">@Model.Status</span>
+        </div>
+    </header>
+    <div class="borrowing-id-compact-body">
+        <div class="borrowing-id-compact-person">
+            <div class="borrowing-id-avatar" aria-hidden="true">@initials</div>
+            <div>
+                <span class="borrowing-id-label">AUTHORIZED BORROWER</span>
+                <strong>@Model.BorrowerName</strong>
+                <small>@Model.BorrowerEmail</small>
+            </div>
+        </div>
+        <div class="borrowing-id-compact-item">
+            <span class="borrowing-id-label">@(ViewData["ItemLabel"] ?? "EQUIPMENT")</span>
+            <strong>@Model.EquipmentName</strong>
+            <small>Asset @Model.AssetCode@(Model.EquipmentCondition is { } condition ? $" · {condition}" : "")</small>
+        </div>
+    </div>
+    <div class="borrowing-id-dates">
+        <div><span>@(ViewData["StartLabel"] ?? "BOOKING START")</span><strong>@Model.StartManila</strong></div>
+        <div><span>EXPECTED RETURN</span><strong class="@(late ? "is-late" : "")">@Model.EndManila</strong></div>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Purpose))
+    {
+        <div class="borrowing-id-compact-purpose">
+            <span class="borrowing-id-label">PURPOSE OF BORROWING</span>
+            <p class="custodian-preserve">@Model.Purpose</p>
+            @if (!string.IsNullOrWhiteSpace(Model.Notes)) { <small class="custodian-preserve">@Model.Notes</small> }
+        </div>
+    }
+</article>

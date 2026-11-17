@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/css/login.css" />
     @await Html.PartialAsync("_AccountStyles")
     <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/password-rules.css" asp-append-version="true" />
 </head>
 @* Each account page renders an .auth-split: an _AuthIntro beside its card. The backdrop is decoration only:
    two slow-drifting glows, the faded corner art (::before) and a dot grid that fades toward the edges (::after). *@
@@ -41,6 +42,7 @@
         });
     </script>
     <script src="~/js/motion.js" asp-append-version="true"></script>
+    <script src="~/js/password-rules.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

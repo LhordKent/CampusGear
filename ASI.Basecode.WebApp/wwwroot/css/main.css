@@ -814,3 +814,48 @@ html.js [data-toast]:not([data-toast-keep]) { display: none; }
 @media (prefers-reduced-motion: reduce) {
     .account-role-card, .account-switch input[type='checkbox'], .account-switch input[type='checkbox']::after { transition: none; }
 }
+
+/* Confirmation dialog (js/confirm-dialog.js), used in place of the browser's confirm() box */
+.live-modal.confirm-dialog { width: min(440px, calc(100vw - 24px)); }
+.confirm-dialog-body { display: flex; gap: 14px; align-items: flex-start; padding: 22px 22px 4px; }
+.confirm-dialog-icon { display: grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; border: 1px solid var(--ws-danger-border); border-radius: 50%; background: var(--ws-danger-bg); color: var(--ws-danger-text); font-weight: 800; font-size: 16px; }
+.confirm-dialog h2 { margin: 6px 0 6px; font-size: 17px; font-weight: 700; color: var(--ws-text); overflow-wrap: anywhere; }
+.confirm-dialog p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--ws-muted); }
+.confirm-dialog .live-modal-actions { position: static; margin: 18px 0 0; }
+
+/* ---------- Page transitions ----------
+   Cross-document View Transitions: on a same-site navigation the page content fades and rises into place, and the
+   active-tab pill slides from the old tab to the new one. Browsers without support, and anyone who prefers reduced
+   motion, get the normal instant navigation. The "page-nav" type keeps these animations off the theme crossfade.
+   Each nav link has its own view-transition-name (set in _Layout) so its label is drawn above the moving pill. */
+.site-nav a, .live-navigation nav > a { position: relative; isolation: isolate; }
+.site-nav a.is-active { background: transparent; box-shadow: none; }
+.live-navigation nav > a.live-nav-active { background: transparent; }
+.nav-pill { position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--ws-teal-soft); pointer-events: none; view-transition-name: nav-pill; }
+.site-nav .nav-pill { box-shadow: inset 0 -2px 0 var(--ws-teal); }
+.page-transition { view-transition-name: page; }
+
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition { navigation: auto; types: page-nav; }
+}
+
+/* One soft ease-out curve for everything, so the pill, the labels, and the content settle together.
+   The pill glides under the labels; the header and the rest of the page stay put. */
+:root { --page-ease: cubic-bezier(.25, 1, .3, 1); }
+html:active-view-transition-type(page-nav)::view-transition-group(*) { z-index: 2; animation-duration: .42s; animation-timing-function: var(--page-ease); }
+html:active-view-transition-type(page-nav)::view-transition-group(nav-pill) { z-index: 1; }
+html:active-view-transition-type(page-nav)::view-transition-group(root) { z-index: 0; }
+/* While the pill stretches to the new tab's width, keep it full height so its corners and underline stay true. */
+html:active-view-transition-type(page-nav)::view-transition-old(nav-pill),
+html:active-view-transition-type(page-nav)::view-transition-new(nav-pill) { height: 100%; }
+/* Content: the old page fades as the new one rises in, overlapping rather than one after the other. */
+html:active-view-transition-type(page-nav)::view-transition-group(page) { animation: none; }
+html:active-view-transition-type(page-nav)::view-transition-old(page) { animation: page-out .2s ease-out both; }
+html:active-view-transition-type(page-nav)::view-transition-new(page) { animation: page-in .42s var(--page-ease) both; }
+html:active-view-transition-type(page-nav)::view-transition-old(root),
+html:active-view-transition-type(page-nav)::view-transition-new(root) { animation: none; }
+@keyframes page-out { to { opacity: 0; } }
+@keyframes page-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* Approved but never collected before the booking ended (ReservationDisplay "Not picked up") */
+.live-badge[data-state='not picked up'] { background: var(--ws-warn-bg); border-color: var(--ws-warn-border); color: var(--ws-warn-text); }

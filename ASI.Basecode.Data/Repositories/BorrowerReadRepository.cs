@@ -86,10 +86,10 @@ namespace ASI.Basecode.Data.Repositories
             return new(
                 upcoming,
                 await mine.CountAsync(x => x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now, ct),
-                await mine.CountAsync(x => x.Status == ReservationStatus.Approved, ct),
+                await mine.CountAsync(x => x.Status == ReservationStatus.Approved && x.EndAtUtc > now, ct),
                 await Context.Loans.CountAsync(x => x.Reservation.BorrowerProfileId == profileId && x.ReturnedAtUtc == null, ct),
                 await Context.Loans.CountAsync(
-                    x => x.Reservation.BorrowerProfileId == profileId && x.ReturnedAtUtc == null && x.DueAtUtc < now,
+                    x => x.Reservation.BorrowerProfileId == profileId && x.ReturnedAtUtc == null && x.DueAtUtc < ReturnGrace.OverdueIfDueBefore(now),
                     ct
                 ),
                 await mine.CountAsync(x => x.Status == ReservationStatus.Completed, ct)
@@ -108,14 +108,20 @@ namespace ASI.Basecode.Data.Repositories
         )
         {
             var query = Context.Reservations.AsNoTracking().Where(x => x.BorrowerProfileId == profileId);
+            var overdueIfDueBefore = ReturnGrace.OverdueIfDueBefore(now);
             query = status switch
             {
                 "pending" => query.Where(x => x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now),
                 "approved" => query.Where(x => x.Status == ReservationStatus.Approved),
                 "borrowed" => query.Where(x => x.Status == ReservationStatus.Released),
                 "returned" => query.Where(x => x.Status == ReservationStatus.Completed),
+                // Late means past the ReturnGrace period: overdue now, or returned after due + grace.
                 "late" => query.Where(x =>
-                    x.Loan != null && (x.Loan.ReturnedAtUtc == null && x.Loan.DueAtUtc < now || x.Loan.ReturnedAtUtc > x.Loan.DueAtUtc)
+                    x.Loan != null
+                    && (
+                        x.Loan.ReturnedAtUtc == null && x.Loan.DueAtUtc < overdueIfDueBefore
+                        || x.Loan.ReturnedAtUtc > x.Loan.DueAtUtc.AddMinutes(ReturnGrace.Minutes)
+                    )
                 ),
                 "cancelled" => query.Where(x => x.Status == ReservationStatus.Cancelled),
                 _ => query,

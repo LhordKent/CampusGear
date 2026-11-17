@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>
-    /// Materializes elapsed pending holds as Expired. Availability checks already ignore
-    /// elapsed holds, so a delayed tick cannot keep an item blocked.
+    /// Materializes elapsed pending holds as Expired, and closes out no-shows (approved bookings that ended without a
+    /// release) the same way. Availability checks already ignore both, so a delayed tick cannot keep an item blocked.
     /// </summary>
     public sealed class ReservationExpiryWorker : BackgroundService
     {
@@ -50,7 +50,7 @@ namespace ASI.Basecode.Services.Services
 
                         if (total > 0)
                         {
-                            _logger.LogInformation("Expired {Count} pending equipment reservations.", total);
+                            _logger.LogInformation("Expired {Count} equipment reservations (elapsed holds and no-shows).", total);
                         }
                     }
                     catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)

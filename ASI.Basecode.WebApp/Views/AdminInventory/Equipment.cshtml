@@ -65,7 +65,7 @@
                         </dl>
                     </div>
                     <footer class="equipment-card-footer">
-                        <form method="post" action="/admin/equipment/@item.Id/delete" onsubmit="return confirm('Delete this item? Items with borrowing or repair history are deactivated instead.')">@Html.AntiForgeryToken()<button class="live-link equipment-card-delete" type="submit" aria-label="Delete @item.AssetCode">Delete</button></form>
+                        <form method="post" action="/admin/equipment/@item.Id/delete" data-confirm-title="Delete @item.Name (@item.AssetCode)?" data-confirm="Items with borrowing or repair history are deactivated instead of deleted." data-confirm-ok="Delete item" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<button class="live-link equipment-card-delete" type="submit" aria-label="Delete @item.AssetCode">Delete</button></form>
                         <a class="live-link" href="/admin/equipment?id=@item.Id" data-modal-load>Edit item</a>
                     </footer>
                 </article>

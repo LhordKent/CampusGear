@@ -133,6 +133,12 @@
         const submit = event.submitter ?? form.querySelector('[type="submit"]');
         const target = submit.hasAttribute('formaction') ? submit.formAction : form.action;
         if (submit.disabled) return;
+        // A button marked data-requires="Field" needs that field filled, but only for that action (Reject needs a reason, Approve does not).
+        const needed = submit.dataset.requires && form.querySelector(`[name="${CSS.escape(submit.dataset.requires)}"]`);
+        if (needed && !needed.value.trim()) {
+            showError(form, `${needed.closest('label')?.querySelector('span')?.firstChild?.textContent.trim() ?? 'This field'} is required for this action.`, needed.name);
+            return;
+        }
         submit.disabled = true;
         submit.classList.add('motion-busy');
         try {

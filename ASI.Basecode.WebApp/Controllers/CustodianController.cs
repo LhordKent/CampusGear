@@ -3,6 +3,8 @@ using AutoMapper;
 using ASI.Basecode.Resources.Constants;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using ASI.Basecode.WebApp.Models;
+using ASI.Basecode.WebApp.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -109,7 +111,8 @@ namespace ASI.Basecode.WebApp.Controllers
             return TransitionAsync(
                 id,
                 actor => _reservations.ApproveAsync(actor, id, cancellationToken),
-                "Reservation approved. The booking is ready for release at its start time."
+                "Reservation approved. The booking is pending release at its start time.",
+                successRedirect: "/custodian/approvals"
             );
         }
 
@@ -236,7 +239,8 @@ namespace ASI.Basecode.WebApp.Controllers
             Guid id,
             Func<ReservationActor, Task<ReservationResult>> operation,
             string success,
-            bool returnTransition = false
+            bool returnTransition = false,
+            string? successRedirect = null
         )
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -248,15 +252,39 @@ namespace ASI.Basecode.WebApp.Controllers
             try
             {
                 var result = await operation(new(userId, HttpContext.Connection.RemoteIpAddress?.ToString(), HttpContext.TraceIdentifier));
-                TempData["CustodianFeedback"] =
+                var message =
                     result.Status == ReservationStatus.Expired
                         ? "The pending hold expired before this action. Its equipment slot was released."
                     : returnTransition && result.ConditionAtReturn is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable
                         ? "Return recorded. A maintenance hold was created for this equipment."
                     : success;
+
+                // A modal form (js/modal-forms.js) shows the message as a toast and refreshes the list in place.
+                if (Request.IsFetch())
+                {
+                    return ModalForms.Saved(message);
+                }
+
+                TempData["CustodianFeedback"] = message;
+                if (successRedirect is not null)
+                {
+                    return Redirect(successRedirect);
+                }
             }
             catch (ReservationWorkflowException exception)
             {
+                if (Request.IsFetch())
+                {
+                    var status = exception.Code switch
+                    {
+                        ReservationErrorCode.Forbidden => StatusCodes.Status403Forbidden,
+                        ReservationErrorCode.NotFound => StatusCodes.Status404NotFound,
+                        _ => StatusCodes.Status422UnprocessableEntity,
+                    };
+                    var text = exception.Code == ReservationErrorCode.NotFound ? "This reservation no longer exists." : exception.Message;
+                    return new JsonResult(ApiResult.CreateError(text, null)) { StatusCode = status };
+                }
+
                 if (exception.Code == ReservationErrorCode.Forbidden)
                 {
                     return Forbid();
@@ -275,6 +303,11 @@ namespace ASI.Basecode.WebApp.Controllers
 
         private Task<IActionResult> InvalidFormAsync(Guid id, string error)
         {
+            if (Request.IsFetch())
+            {
+                return Task.FromResult<IActionResult>(new JsonResult(ApiResult.CreateError(error, null)) { StatusCode = StatusCodes.Status422UnprocessableEntity });
+            }
+
             TempData["CustodianError"] = error;
             return Task.FromResult<IActionResult>(Redirect($"/custodian/reservations/{id:D}"));
         }

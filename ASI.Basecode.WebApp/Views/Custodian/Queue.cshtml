@@ -5,9 +5,12 @@
     var returns = Model.Queue == "active";
     var staffPath = ViewData["WorkspaceRole"] as string == "Administrator" ? "/admin" : "/custodian";
     var basePath = staffPath + (returns ? "/returns" : history ? "/history" : "/approvals");
-    var source = history ? "695:4595" : returns ? staffPath == "/admin" ? "695:3957" : "695:2032" : staffPath == "/admin" ? "695:3278" : "695:1499";
+    var returnOptions = new ConditionOptionsModel("Condition at return", ConditionOptionsModel.ReturnConditions, ASI.Basecode.Resources.Constants.EquipmentCondition.Good, "Damaged or Unserviceable puts the item on a maintenance hold.");
+    var releaseTab = !history && !returns && Model.Status == "approved";
+    var source =history ? "695:4595" : returns ? staffPath == "/admin" ? "695:3957" : "695:2032" : staffPath == "/admin" ? "695:3278" : "695:1499";
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
+@section Scripts { <script src="~/js/modal-forms.js" asp-append-version="true"></script> }
 <main class="live-content" data-figma-source="@source">
     <header class="page-header">
         <div class="page-header-text">
@@ -21,35 +24,42 @@
         <div class="page-header-actions">
             @if (history) { <a class="live-button secondary" href="@staffPath/calendar"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#calendar"></use></svg>Availability calendar</a> }
             else if (returns) { <a class="live-button secondary" href="@staffPath/approvals">Pending requests<span class="live-count">@Model.PendingCount</span></a> }
-            else { <a class="live-button secondary" href="@staffPath/approvals?status=approved">Ready for release<span class="live-count">@Model.ApprovedCount</span></a> }
         </div>
     </header>
+    @if (!history && !returns)
+    {
+        @* Segmented tabs. The pill sits outside the <nav> so it survives the nav being refreshed in place, and slides
+           to the active tab (js/live-search.js). Without JavaScript the active tab is highlighted by CSS. *@
+        <div class="queue-tabs">
+            <span class="queue-tabs-pill" aria-hidden="true"></span>
+            <nav id="queue-tabs" aria-label="Approval queues" data-refresh-region data-live-tabs="#queue-results" data-live-swap="#queue-title">
+                <a href="@basePath" aria-current="@(releaseTab ? null : "page")">Pending requests<span class="queue-tabs-count">@Model.PendingCount</span></a>
+                <a href="@basePath?status=approved" aria-current="@(releaseTab ? "page" : null)">Pending release<span class="queue-tabs-count">@Model.ApprovedCount</span></a>
+            </nav>
+        </div>
+    }
     @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
     @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
     <section class="live-panel" aria-labelledby="queue-title">
-        <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? "Active loans awaiting return" : history ? "Reservation and loan records" : "Request queue")</h2><span class="live-muted">Times in Manila (UTC+8)</span></div>
+        <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? "Active loans awaiting return" : history ? "Reservation and loan records" : releaseTab ? "Approved bookings awaiting handoff" : "Requests awaiting a decision")</h2><span class="live-muted">Times in Manila (UTC+8)</span></div>
         <form class="live-filters" method="get" action="@basePath" role="search" aria-label="Filter records" data-live-search data-live-target="#queue-results">
             <label for="queue-search" class="live-filter-search">Search borrower or equipment<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="queue-search" name="q" type="search" value="@Model.Search" maxlength="100" placeholder="Name, email, or asset code" autocomplete="off" /></span></label>
-            @if (!returns)
+            @if (history)
             {
                 <label for="queue-status">Status<select id="queue-status" name="status">
-                    @if (history)
-                    {
-                        @foreach (var status in new[] { "all", "pending", "approved", "borrowed", "returned", "rejected", "cancelled", "expired", "late" })
-                        { <option value="@status" selected="@(Model.Status == status)">@(char.ToUpperInvariant(status[0]) + status[1..])</option> }
-                    }
-                    else
-                    {
-                        @foreach (var status in new[] { "pending", "approved", "all" })
-                        { <option value="@status" selected="@(Model.Status == status)">@(status == "all" ? "Pending and approved" : char.ToUpperInvariant(status[0]) + status[1..])</option> }
-                    }
+                    @foreach (var status in new[] { "all", "pending", "approved", "borrowed", "returned", "rejected", "cancelled", "expired", "late" })
+                    { <option value="@status" selected="@(Model.Status == status)">@(char.ToUpperInvariant(status[0]) + status[1..])</option> }
                 </select></label>
+            }
+            else if (!returns)
+            {
+                <input type="hidden" name="status" value="@(releaseTab ? "approved" : "pending")" />
             }
             <label for="queue-from">Booking from<input id="queue-from" name="from" type="date" value="@Model.From" /></label>
             <label for="queue-to">Booking through<input id="queue-to" name="to" type="date" value="@Model.To" /></label>
-            <a class="live-button secondary live-filter-reset" href="@basePath" data-live-reset>Reset</a>
+            <a class="live-button secondary live-filter-reset" href="@(releaseTab ? basePath + "?status=approved" : basePath)" data-live-reset>Reset</a>
         </form>
-        <div id="queue-results" class="live-results">
+        <div id="queue-results" class="live-results" data-refresh-region>
         <p class="live-result-count" data-live-count>@Model.Total record@(Model.Total == 1 ? "" : "s")@(string.IsNullOrWhiteSpace(Model.Search) ? "" : $" matching “{Model.Search}”")</p>
         @if (Model.Rows.Count == 0)
         {
@@ -63,7 +73,96 @@
                     {
                         <tr><td><strong>@row.BorrowerName</strong><small>@row.BorrowerEmail</small></td><td>@row.EquipmentName<small>@row.AssetCode</small></td><td>@row.StartManila<small>Until @row.EndManila</small></td><td><span class="live-badge custodian-status @(row.Status is "Overdue" or "Returned late" ? "late" : "")">@row.Status</span></td>
                             @if (history) { <td>@(row.ReturnCondition ?? "—")<small>@row.ReturnedManila</small></td> }
-                            <td><a class="live-button secondary" href="/custodian/reservations/@row.Id">@(returns ? row.Status == "Borrowed" ? "Record early return" : "Record return" : "Review details")</a></td></tr>
+                            @if (staffPath == "/custodian" && !history)
+                            {
+                                var dialogId = $"desk-{row.Id:N}";
+                                var early = returns && row.Status == "Borrowed";
+                                var pendingRow = !returns && row.Status == "Pending";
+                                var label = returns ? early ? "Record early return" : "Record return" : pendingRow ? "Review request" : "Release equipment";
+                                var releaseDefault = Enum.TryParse<ASI.Basecode.Resources.Constants.EquipmentCondition>(row.EquipmentCondition, out var current) && ConditionOptionsModel.ReleaseConditions.Contains(current) ? current : ASI.Basecode.Resources.Constants.EquipmentCondition.Good;
+                                var cardData = new ViewDataDictionary(ViewData) { ["ItemLabel"] = returns ? "EQUIPMENT ON LOAN" : pendingRow ? "EQUIPMENT REQUESTED" : "EQUIPMENT TO RELEASE", ["StartLabel"] = returns ? "BORROWED" : "BOOKING START" };
+                                <td class="custodian-row-actions">
+                                    <button class="live-button @(returns || pendingRow || row.CanRelease ? "" : "secondary")" type="button" data-modal-open="@dialogId">@label</button>
+                                    <dialog id="@dialogId" class="live-modal return-dialog" aria-labelledby="@dialogId-title">
+                                        <div class="live-modal-head">
+                                            <div><p class="page-eyebrow">@row.AssetCode</p><h2 id="@dialogId-title">@label</h2></div>
+                                            <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
+                                        </div>
+                                        <partial name="_BorrowingIdMini" model="row" view-data="cardData" />
+                                        @if (returns)
+                                        {
+                                            @if (early) { <p class="live-feedback" role="note">Returning before the due time. The item becomes available for the rest of the booking.</p> }
+                                            <form method="post" action="/custodian/reservations/@row.Id/return" class="live-form" data-modal-form novalidate>
+                                                @Html.AntiForgeryToken()
+                                                <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
+                                                <partial name="_ConditionOptions" model="returnOptions" />
+                                                <label class="live-field wide"><span>Damage or inspection notes <small>Optional</small></span>
+                                                    <textarea name="Notes" rows="3" maxlength="2000" placeholder="Describe damage, missing parts, or other inspection findings"></textarea>
+                                                </label>
+                                                <div class="live-modal-actions wide">
+                                                    <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+                                                    <button class="live-button" type="submit">@label</button>
+                                                </div>
+                                            </form>
+                                        }
+                                        else if (pendingRow)
+                                        {
+                                            @if (row.ActionNote is { } note) { <p class="live-feedback warning" role="note">@note</p> }
+                                            else if (row.HoldExpiresManila is { } hold) { <p class="live-feedback" role="note">The borrower's hold expires @hold. Decide before then or the slot is released.</p> }
+                                            @if (!row.CanReject)
+                                            {
+                                                <div class="live-modal-actions"><button class="live-button secondary" type="button" data-modal-close>Close</button></div>
+                                            }
+                                            else
+                                            {
+                                            <form method="post" action="/custodian/reservations/@row.Id/reject" class="live-form" data-modal-form novalidate>
+                                                @Html.AntiForgeryToken()
+                                                <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
+                                                <label class="live-field wide"><span>Rejection reason <small>Required only to reject</small></span>
+                                                    <textarea name="Reason" rows="2" maxlength="1000" placeholder="Explain why this request cannot proceed" disabled="@(!row.CanReject)"></textarea>
+                                                </label>
+                                                <div class="live-modal-actions wide">
+                                                    <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+                                                    <button class="live-button danger" type="submit" data-requires="Reason" disabled="@(!row.CanReject)">Reject</button>
+                                                    <button class="live-button" type="submit" formaction="/custodian/reservations/@row.Id/approve" disabled="@(!row.CanApprove)">Approve request</button>
+                                                </div>
+                                            </form>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var releaseOptions = new ConditionOptionsModel("Condition at release", ConditionOptionsModel.ReleaseConditions, releaseDefault, "Verify the borrower and the item at handoff.");
+                                            @* A note on a releasable booking is informational (early pickup); otherwise it explains why release is blocked. *@
+                                            @if (row.ActionNote is { } note) { <p class="live-feedback @(row.CanRelease ? "" : "warning")" role="note">@note</p> }
+                                            @if (!row.CanRelease)
+                                            {
+                                                @* Nothing can be recorded yet (or any more), so the dialog only explains why. *@
+                                                <div class="live-modal-actions"><button class="live-button secondary" type="button" data-modal-close>Close</button></div>
+                                            }
+                                            else
+                                            {
+                                            <form method="post" action="/custodian/reservations/@row.Id/release" class="live-form" data-modal-form novalidate>
+                                                @Html.AntiForgeryToken()
+                                                <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
+                                                <partial name="_ConditionOptions" model="releaseOptions" />
+                                                <label class="live-field wide"><span>Release notes <small>Optional</small></span>
+                                                    <textarea name="Notes" rows="2" maxlength="2000" placeholder="Accessories included, existing marks, or other handoff notes"></textarea>
+                                                </label>
+                                                <div class="live-modal-actions wide">
+                                                    <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+                                                    <button class="live-button" type="submit">Record release</button>
+                                                </div>
+                                            </form>
+                                            }
+                                        }
+                                    </dialog>
+                                </td>
+                            }
+                            else
+                            {
+                                <td><a class="live-button secondary" href="/custodian/reservations/@row.Id">@(returns ? "View return" : "Review details")</a></td>
+                            }
+                            </tr>
                     }</tbody>
                 </table>
             </div>

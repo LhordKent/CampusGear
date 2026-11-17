@@ -35,7 +35,15 @@
         return url;
     };
 
-    async function load(form, url, { replaceForm = false, scroll = false } = {}) {
+    // Fades and lifts freshly swapped results in (css: .is-entering). Restarting the class replays it each time.
+    const enter = region => {
+        region.classList.remove('is-entering');
+        void region.offsetWidth;
+        region.classList.add('is-entering');
+        region.addEventListener('animationend', () => region.classList.remove('is-entering'), { once: true });
+    };
+
+    async function load(form, url, { replaceForm = false, scroll = false, swap = [], animate = false } = {}) {
         const region = document.querySelector(form.dataset.liveTarget);
         if (!region) { location.href = url; return; }
         form._controller?.abort();
@@ -58,6 +66,16 @@
                 const nextForm = doc.querySelector(`form[data-live-target="${form.dataset.liveTarget}"]`);
                 if (nextForm) form.replaceChildren(...nextForm.childNodes);
             }
+            // Other parts of the page that depend on the query, such as queue tabs and their heading.
+            for (const selector of swap) {
+                const current = document.querySelector(selector);
+                const replacement = doc.querySelector(selector);
+                if (current && replacement) {
+                    current.replaceChildren(...replacement.childNodes);
+                    document.dispatchEvent(new CustomEvent('campusgear:content', { detail: { root: current } }));
+                }
+            }
+            if (animate) enter(region);
             history.replaceState(history.state, '', url.pathname + url.search);
             document.dispatchEvent(new CustomEvent('campusgear:content', { detail: { root: region } }));
             const count = region.querySelector('[data-live-count]');
@@ -104,6 +122,49 @@
             if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
             event.preventDefault();
             load(form, new URL(link.href), { scroll: true });
+        });
+    });
+
+    // Queue tabs (nav[data-live-tabs="#region"]) switch in place: the tab link is fetched, and the results, the form
+    // (its hidden status and reset link), the tabs themselves, and any data-live-swap selectors are replaced.
+    // Inside a .queue-tabs wrapper, its .queue-tabs-pill slides to the active tab: at once on click, then again if the
+    // refreshed counts change the tab widths.
+    document.querySelectorAll('nav[data-live-tabs]').forEach(nav => {
+        const form = document.querySelector(`form[data-live-target="${nav.dataset.liveTabs}"]`);
+        if (!form) return;
+        const tabSelector = `nav[data-live-tabs="${nav.dataset.liveTabs}"]`;
+        const extra = (nav.dataset.liveSwap || '').split(',').map(s => s.trim()).filter(Boolean);
+        const wrapper = nav.closest('.queue-tabs');
+        const pill = wrapper?.querySelector('.queue-tabs-pill');
+
+        const placePill = () => {
+            if (!pill) return;
+            const active = nav.querySelector('a[aria-current="page"]');
+            wrapper.classList.toggle('has-pill', Boolean(active));
+            if (!active) return;
+            pill.style.setProperty('--pill-x', `${nav.offsetLeft + active.offsetLeft}px`);
+            pill.style.setProperty('--pill-w', `${active.offsetWidth}px`);
+        };
+        if (pill) {
+            placePill();
+            // Turn on the slide only after the first placement, so the pill does not fly in from the left on load.
+            requestAnimationFrame(() => requestAnimationFrame(() => wrapper.classList.add('is-ready')));
+            new ResizeObserver(placePill).observe(nav);
+            document.addEventListener('campusgear:content', event => {
+                if (event.detail?.root === nav || event.detail?.root?.contains?.(nav)) placePill();
+            });
+        }
+
+        nav.addEventListener('click', event => {
+            const tab = event.target.closest('a[href]');
+            if (!tab || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+            event.preventDefault();
+            if (tab.getAttribute('aria-current') === 'page') return;
+            // Show the new tab as active right away (the pill starts sliding now); the swap confirms it with fresh counts.
+            nav.querySelectorAll('a').forEach(a => { if (a !== tab) a.removeAttribute('aria-current'); });
+            tab.setAttribute('aria-current', 'page');
+            placePill();
+            load(form, new URL(tab.href), { replaceForm: true, swap: [tabSelector, ...extra], animate: true });
         });
     });
 })();

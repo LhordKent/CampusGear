@@ -70,9 +70,11 @@ namespace ASI.Basecode.Data.Repositories
                 .Reservations.AsNoTracking()
                 .Where(x =>
                     x.Status == ReservationStatus.Pending
-                    && (x.HoldExpiresAtUtc == null || x.HoldExpiresAtUtc <= now || x.StartAtUtc <= now)
+                        && (x.HoldExpiresAtUtc == null || x.HoldExpiresAtUtc <= now || x.StartAtUtc <= now)
+                    // No-shows: approved bookings that ended without being released.
+                    || x.Status == ReservationStatus.Approved && x.Loan == null && x.EndAtUtc <= now
                 )
-                .OrderBy(x => x.HoldExpiresAtUtc)
+                .OrderBy(x => x.HoldExpiresAtUtc ?? x.EndAtUtc)
                 .Select(x => new ExpiryCandidate(x.Id, x.EquipmentItemId))
                 .Take(size)
                 .ToListAsync(ct);

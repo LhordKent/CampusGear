@@ -255,10 +255,10 @@
     <value>A rejection reason is required.</value>
   </data>
   <data name="ReleaseNotStarted" xml:space="preserve">
-    <value>Release opens at the approved start time.</value>
+    <value>Pickup opens at {0}, 30 minutes before the booking starts.</value>
   </data>
   <data name="ReleaseOutsideBooking" xml:space="preserve">
-    <value>Release must occur during the approved booking time.</value>
+    <value>Equipment can be released from 30 minutes before the booking starts until the booking ends.</value>
   </data>
   <data name="RepairDescriptionRequired" xml:space="preserve">
     <value>Describe the repair before closing the case.</value>

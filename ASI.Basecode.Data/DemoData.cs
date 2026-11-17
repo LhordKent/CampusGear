@@ -616,7 +616,7 @@ namespace ASI.Basecode.Data
                         {
                             Status = "Completed",
                             Condition = loan.ConditionAtReturn.ToString(),
-                            Late = returned > loan.DueAtUtc,
+                            Late = ReturnGrace.IsLate(loan.DueAtUtc, returned),
                         },
                         new { Status = "Released" }
                     );
