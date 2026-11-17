@@ -22,12 +22,6 @@
 @media(max-width:640px){.reservation-detail-page{padding-right:14px!important;padding-left:14px!important}.reservation-condition,.reservation-workflow{padding:20px 18px}.reservation-workflow .live-decision-actions{flex-wrap:wrap;justify-content:flex-start}.reservation-workflow .live-decision-actions>*{flex:1 1 auto}.reservation-workflow .live-decision-actions form .live-button{width:100%}}
 @media(max-width:420px){.reservation-condition-grid{grid-template-columns:1fr}.reservation-condition-grid .reservation-condition-alert{grid-column:auto}.reservation-section-heading{align-items:flex-start;flex-direction:column}}
 
-/* Approval & Release queue tabs */
-.custodian-tabs{display:flex;gap:4px;margin:0 0 16px;flex-wrap:wrap;border-bottom:1px solid var(--ws-border)}
-.custodian-tabs a{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:-1px;border-bottom:2px solid transparent;color:var(--ws-muted);font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;transition:color .15s,border-color .15s}
-.custodian-tabs a:hover{color:var(--ws-text)}
-.custodian-tabs a[aria-current=page]{color:var(--ws-text);border-bottom-color:var(--ws-teal)}
-.custodian-tabs a:focus-visible{outline:2px solid var(--ws-focus);outline-offset:-2px;border-radius:6px 6px 0 0}
 
 /* Return desk: record the return from a dialog on the list */
 .custodian-row-actions{white-space:nowrap}
@@ -84,3 +78,25 @@
 .borrowing-id-compact-purpose p{margin:4px 0 0;color:var(--ws-text);font-size:13px;line-height:1.5;max-height:4.5em;overflow:auto}
 .borrowing-id-compact-purpose small{display:block;margin-top:4px;color:var(--ws-muted);font-size:12px}
 .return-dialog .live-modal-actions .live-button.danger{margin-left:auto}
+
+/* Approval queue tabs: a segmented control whose pill slides to the active tab (js/live-search.js positions it) */
+.queue-tabs{position:relative;display:inline-flex;margin:0 0 16px;padding:4px;border:1px solid var(--ws-border);border-radius:12px;background:var(--ws-inset)}
+.queue-tabs nav{position:relative;z-index:1;display:flex;gap:4px}
+.queue-tabs nav a{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 16px;border-radius:9px;color:var(--ws-muted);font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;transition:color .25s ease}
+.queue-tabs nav a:hover{color:var(--ws-text)}
+.queue-tabs nav a[aria-current=page]{color:var(--ws-text)}
+.queue-tabs nav a:focus-visible{outline:2px solid var(--ws-focus);outline-offset:2px}
+.queue-tabs-count{display:inline-grid;min-width:22px;height:22px;padding:0 6px;place-items:center;border-radius:999px;background:var(--ws-neutral-bg);color:var(--ws-text-soft);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;transition:background-color .25s ease,color .25s ease}
+.queue-tabs nav a[aria-current=page] .queue-tabs-count{background:var(--ws-teal);color:var(--ws-on-accent)}
+/* The pill: placed by JS through --pill-x/--pill-w; hidden until placed, so a JS-less page uses the fallback below. */
+.queue-tabs-pill{position:absolute;top:4px;bottom:4px;left:0;width:var(--pill-w,0);transform:translateX(var(--pill-x,0));border-radius:9px;background:var(--ws-teal-soft);box-shadow:inset 0 -2px 0 var(--ws-teal);opacity:0;pointer-events:none}
+.queue-tabs.has-pill .queue-tabs-pill{opacity:1}
+.queue-tabs.is-ready .queue-tabs-pill{transition:transform .38s cubic-bezier(.25,1,.3,1),width .38s cubic-bezier(.25,1,.3,1)}
+.queue-tabs:not(.has-pill) nav a[aria-current=page]{background:var(--ws-teal-soft);box-shadow:inset 0 -2px 0 var(--ws-teal)}
+/* The list dims while the other tab loads, then the new rows rise in. */
+#queue-results{transition:opacity .2s ease}
+#queue-results[aria-busy=true]{opacity:.55}
+#queue-results.is-entering{animation:queue-enter .36s cubic-bezier(.25,1,.3,1) both}
+@keyframes queue-enter{from{opacity:0;transform:translateY(6px)}}
+@media(max-width:520px){.queue-tabs{display:flex}.queue-tabs nav{flex:1}.queue-tabs nav a{flex:1;justify-content:center;padding:0 10px}}
+@media(prefers-reduced-motion:reduce){.queue-tabs.is-ready .queue-tabs-pill,#queue-results{transition:none}#queue-results.is-entering{animation:none}}

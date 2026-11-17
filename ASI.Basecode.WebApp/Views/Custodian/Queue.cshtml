@@ -28,10 +28,15 @@
     </header>
     @if (!history && !returns)
     {
-        <nav id="queue-tabs" class="custodian-tabs" aria-label="Approval queues" data-refresh-regiondata-live-tabs="#queue-results" data-live-swap="#queue-title">
-            <a href="@basePath" aria-current="@(releaseTab ? null : "page")">Pending requests<span class="live-count">@Model.PendingCount</span></a>
-            <a href="@basePath?status=approved" aria-current="@(releaseTab ? "page" : null)">Pending release<span class="live-count">@Model.ApprovedCount</span></a>
-        </nav>
+        @* Segmented tabs. The pill sits outside the <nav> so it survives the nav being refreshed in place, and slides
+           to the active tab (js/live-search.js). Without JavaScript the active tab is highlighted by CSS. *@
+        <div class="queue-tabs">
+            <span class="queue-tabs-pill" aria-hidden="true"></span>
+            <nav id="queue-tabs" aria-label="Approval queues" data-refresh-region data-live-tabs="#queue-results" data-live-swap="#queue-title">
+                <a href="@basePath" aria-current="@(releaseTab ? null : "page")">Pending requests<span class="queue-tabs-count">@Model.PendingCount</span></a>
+                <a href="@basePath?status=approved" aria-current="@(releaseTab ? "page" : null)">Pending release<span class="queue-tabs-count">@Model.ApprovedCount</span></a>
+            </nav>
+        </div>
     }
     @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
     @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
