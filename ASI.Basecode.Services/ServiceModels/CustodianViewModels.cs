@@ -53,7 +53,18 @@ namespace ASI.Basecode.Services.ServiceModels
         string Status,
         string? ReturnCondition,
         string? ReturnedManila
-    );
+    )
+    {
+        // Filled for the Approval & Release queue, whose rows open approve/reject and release dialogs.
+        public string? Purpose { get; init; }
+        public string? Notes { get; init; }
+        public string? EquipmentCondition { get; init; }
+        public string? HoldExpiresManila { get; init; }
+        public bool CanApprove { get; init; }
+        public bool CanReject { get; init; }
+        public bool CanRelease { get; init; }
+        public string? ActionNote { get; init; }
+    }
 
     public sealed record CustodianListViewModel(
         string Search,

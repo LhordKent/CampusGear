@@ -71,10 +71,16 @@
 
 /* Return dialog: wider and taller so the ID card, options, and notes fit without scrolling */
 .live-modal.return-dialog{width:min(760px,calc(100vw - 24px));max-height:min(96vh,1000px)}
-.return-dialog .live-modal-head{padding:16px 22px 12px}
+.return-dialog .live-modal-head{z-index:3;padding:16px 22px 12px}
 .return-dialog .borrowing-id-card.is-compact{margin:16px 22px 0}
-.return-dialog > .live-feedback{margin:12px 22px 0}
+.live-modal.return-dialog > .live-feedback{margin:14px 22px 0}
 .return-dialog > form{padding-top:16px;gap:14px}
 .return-dialog .condition-option-list{flex-wrap:nowrap}
 .return-dialog textarea{min-height:72px}
 @media(max-width:640px){.return-dialog .condition-option-list{flex-wrap:wrap}}
+
+/* Purpose block on the compact ID card (approve and release dialogs) */
+.borrowing-id-compact-purpose{position:relative;z-index:1;padding:12px 16px;border-top:1px solid var(--ws-border)}
+.borrowing-id-compact-purpose p{margin:4px 0 0;color:var(--ws-text);font-size:13px;line-height:1.5;max-height:4.5em;overflow:auto}
+.borrowing-id-compact-purpose small{display:block;margin-top:4px;color:var(--ws-muted);font-size:12px}
+.return-dialog .live-modal-actions .live-button.danger{margin-left:auto}
