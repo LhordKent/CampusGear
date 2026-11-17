@@ -9,6 +9,7 @@
     var source =history ? "695:4595" : returns ? staffPath == "/admin" ? "695:3957" : "695:2032" : staffPath == "/admin" ? "695:3278" : "695:1499";
 }
 @section Styles { <link rel="stylesheet" href="~/css/custodian-workflows.css" asp-append-version="true" /> }
+@section Scripts { <script src="~/js/modal-forms.js" asp-append-version="true"></script> }
 <main class="live-content" data-figma-source="@source">
     <header class="page-header">
         <div class="page-header-text">
@@ -52,7 +53,7 @@
             <label for="queue-to">Booking through<input id="queue-to" name="to" type="date" value="@Model.To" /></label>
             <a class="live-button secondary live-filter-reset" href="@(releaseTab ? basePath + "?status=approved" : basePath)" data-live-reset>Reset</a>
         </form>
-        <div id="queue-results" class="live-results">
+        <div id="queue-results" class="live-results" data-refresh-region>
         <p class="live-result-count" data-live-count>@Model.Total record@(Model.Total == 1 ? "" : "s")@(string.IsNullOrWhiteSpace(Model.Search) ? "" : $" matching “{Model.Search}”")</p>
         @if (Model.Rows.Count == 0)
         {
@@ -66,7 +67,88 @@
                     {
                         <tr><td><strong>@row.BorrowerName</strong><small>@row.BorrowerEmail</small></td><td>@row.EquipmentName<small>@row.AssetCode</small></td><td>@row.StartManila<small>Until @row.EndManila</small></td><td><span class="live-badge custodian-status @(row.Status is "Overdue" or "Returned late" ? "late" : "")">@row.Status</span></td>
                             @if (history) { <td>@(row.ReturnCondition ?? "—")<small>@row.ReturnedManila</small></td> }
-                            <td><a class="live-button secondary" href="/custodian/reservations/@row.Id">@(returns ? row.Status == "Borrowed" ? "Record early return" : "Record return" : "Review details")</a></td></tr>
+                            @if (returns && staffPath == "/custodian")
+                            {
+                                var dialogId = $"return-{row.Id:N}";
+                                var early = row.Status == "Borrowed";
+                                <td class="custodian-row-actions">
+                                    <button class="live-button" type="button" data-modal-open="@dialogId">@(early ? "Record early return" : "Record return")</button>                                    <dialog id="@dialogId" class="live-modal return-dialog" aria-labelledby="@dialogId-title">
+                                        <div class="live-modal-head">
+                                            <div><p class="page-eyebrow">@row.AssetCode</p><h2 id="@dialogId-title">@(early ? "Record early return" : "Record return")</h2></div>
+                                            <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
+                                        </div>
+                                        @{
+                                            var initials = string.Concat(row.BorrowerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0])).ToUpperInvariant();
+                                        }
+                                        <article class="borrowing-id-card is-compact" aria-label="CampusGear Borrowing ID">
+                                            <header class="borrowing-id-masthead">
+                                                <div class="borrowing-id-brand">
+                                                    <img src="/img/b95f3.svg" alt="" />
+                                                    <div><strong>CampusGear</strong><span>BORROWING ID</span></div>
+                                                </div>
+                                                <div class="borrowing-id-number">
+                                                    <span>RESERVATION ID</span>
+                                                    <strong>RES-@row.Id.ToString("N").ToUpperInvariant()</strong>
+                                                    <span class="live-badge custodian-status @(row.Status is "Overdue" ? "late" : "")">@row.Status</span>
+                                                </div>
+                                            </header>
+                                            <div class="borrowing-id-compact-body">
+                                                <div class="borrowing-id-compact-person">
+                                                    <div class="borrowing-id-avatar" aria-hidden="true">@initials</div>
+                                                    <div>
+                                                        <span class="borrowing-id-label">AUTHORIZED BORROWER</span>
+                                                        <strong>@row.BorrowerName</strong>
+                                                        <small>@row.BorrowerEmail</small>
+                                                    </div>
+                                                </div>
+                                                <div class="borrowing-id-compact-item">
+                                                    <span class="borrowing-id-label">EQUIPMENT ON LOAN</span>
+                                                    <strong>@row.EquipmentName</strong>
+                                                    <small>Asset @row.AssetCode</small>
+                                                </div>
+                                            </div>
+                                            <div class="borrowing-id-dates">
+                                                <div><span>BORROWED</span><strong>@row.StartManila</strong></div>
+                                                <div><span>EXPECTED RETURN</span><strong class="@(row.Status is "Overdue" ? "is-late" : "")">@row.EndManila</strong></div>
+                                            </div>
+                                        </article>
+                                        @if (early)
+                                        {
+                                            <p class="live-feedback" role="note">Returning before the due time. The item becomes available for the rest of the booking.</p>
+                                        }
+                                        <form method="post" action="/custodian/reservations/@row.Id/return" class="live-form" data-modal-form novalidate>
+                                            @Html.AntiForgeryToken()
+                                            <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
+                                            <fieldset class="live-field wide condition-options">
+                                                <legend>Condition at return</legend>
+                                                <div class="condition-option-list">
+                                                    @foreach (var condition in Enum.GetValues<ASI.Basecode.Resources.Constants.EquipmentCondition>())
+                                                    {
+                                                        var hold = condition is ASI.Basecode.Resources.Constants.EquipmentCondition.Damaged or ASI.Basecode.Resources.Constants.EquipmentCondition.Unserviceable;
+                                                        <label class="condition-option @(hold ? "is-hold" : "")">
+                                                            <input type="radio" name="Condition" value="@condition" required checked="@(condition == ASI.Basecode.Resources.Constants.EquipmentCondition.Good)" />
+                                                            <span>@condition</span>
+                                                        </label>
+                                                    }
+                                                </div>
+                                                <small class="live-help">Damaged or Unserviceable puts the item on a maintenance hold.</small>
+                                            </fieldset>
+                                            <label class="live-field wide"><span>Damage or inspection notes <small>Optional</small></span>
+                                                <textarea name="Notes" rows="3" maxlength="2000" placeholder="Describe damage, missing parts, or other inspection findings"></textarea>
+                                            </label>
+                                            <div class="live-modal-actions wide">
+                                                <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
+                                                <button class="live-button" type="submit">@(early ? "Record early return" : "Record return")</button>
+                                            </div>
+                                        </form>
+                                    </dialog>
+                                </td>
+                            }
+                            else
+                            {
+                                <td><a class="live-button secondary" href="/custodian/reservations/@row.Id">@(returns ? "View return" : "Review details")</a></td>
+                            }
+                            </tr>
                     }</tbody>
                 </table>
             </div>

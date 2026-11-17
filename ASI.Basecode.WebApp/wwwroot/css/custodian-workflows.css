@@ -28,3 +28,53 @@
 .custodian-tabs a:hover{color:var(--ws-text)}
 .custodian-tabs a[aria-current=page]{color:var(--ws-text);border-bottom-color:var(--ws-teal)}
 .custodian-tabs a:focus-visible{outline:2px solid var(--ws-focus);outline-offset:-2px;border-radius:6px 6px 0 0}
+
+/* Return desk: record the return from a dialog on the list */
+.custodian-row-actions{white-space:nowrap}
+.custodian-row-actions .live-modal{white-space:normal;text-align:left}
+
+/* Condition at return: option buttons instead of a dropdown */
+.condition-options{border:0;padding:0;margin:0;min-width:0}
+.condition-options legend{padding:0;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--ws-text)}
+.condition-option-list{display:flex;flex-wrap:wrap;gap:8px}
+.condition-option{position:relative;cursor:pointer}
+.condition-option input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.condition-option span{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border:1px solid var(--ws-border-input);border-radius:999px;background:var(--ws-input);color:var(--ws-text-soft);font-size:13px;font-weight:600;transition:background-color .15s,border-color .15s,color .15s}
+.condition-option:hover span{border-color:var(--ws-teal-line);color:var(--ws-text)}
+.condition-option input:checked + span{border-color:var(--ws-teal);background:var(--ws-teal-soft);color:var(--ws-text)}
+.condition-option.is-hold input:checked + span{border-color:var(--ws-danger-border);background:var(--ws-danger-bg);color:var(--ws-danger-text)}
+.condition-option input:focus-visible + span{outline:2px solid var(--ws-focus);outline-offset:2px}
+.condition-options .live-help{display:block;margin-top:8px}
+
+/* Compact borrowing ID card inside the return dialog */
+.borrowing-id-card.is-compact{margin:0 0 18px;border-radius:14px;box-shadow:none}
+.borrowing-id-card.is-compact::after{right:-80px;top:-110px;width:220px;height:220px}
+.borrowing-id-card.is-compact .borrowing-id-masthead{gap:12px;padding:12px 16px}
+.borrowing-id-card.is-compact .borrowing-id-brand{gap:10px}
+.borrowing-id-card.is-compact .borrowing-id-brand img{width:32px;height:32px;padding:5px;border-radius:9px}
+.borrowing-id-card.is-compact .borrowing-id-brand strong{font-size:14px}
+.borrowing-id-card.is-compact .borrowing-id-brand span{font-size:8px}
+.borrowing-id-card.is-compact .borrowing-id-number{gap:3px}
+.borrowing-id-card.is-compact .borrowing-id-number strong{font-size:11px}
+.borrowing-id-card.is-compact .borrowing-id-number .live-badge{font-size:10px}
+.borrowing-id-compact-body{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;padding:14px 16px;border-bottom:1px solid var(--ws-border)}
+.borrowing-id-compact-person{display:flex;align-items:center;gap:12px;min-width:0}
+.borrowing-id-card.is-compact .borrowing-id-avatar{flex:0 0 44px;width:44px;height:44px;border-width:2px;font-size:15px}
+.borrowing-id-compact-body strong{display:block;margin-top:4px;color:var(--ws-text);font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+.borrowing-id-compact-body small{display:block;margin-top:2px;color:var(--ws-muted);font-size:12px;overflow-wrap:anywhere}
+.borrowing-id-compact-item{min-width:0;padding-left:14px;border-left:1px solid var(--ws-border)}
+.borrowing-id-card.is-compact .borrowing-id-dates{position:relative;z-index:1;grid-template-columns:repeat(2,minmax(0,1fr));row-gap:0;padding:12px 16px}
+.borrowing-id-card.is-compact .borrowing-id-dates>div{gap:4px}
+.borrowing-id-card.is-compact .borrowing-id-dates>div:nth-child(2){padding-right:0;border-right:0}
+.borrowing-id-card.is-compact .borrowing-id-dates .is-late{color:var(--ws-danger-text)}
+@media(max-width:520px){.borrowing-id-compact-body{grid-template-columns:1fr}.borrowing-id-compact-item{padding:12px 0 0;border-left:0;border-top:1px solid var(--ws-border)}}
+
+/* Return dialog: wider and taller so the ID card, options, and notes fit without scrolling */
+.live-modal.return-dialog{width:min(760px,calc(100vw - 24px));max-height:min(96vh,1000px)}
+.return-dialog .live-modal-head{padding:16px 22px 12px}
+.return-dialog .borrowing-id-card.is-compact{margin:16px 22px 0}
+.return-dialog > .live-feedback{margin:12px 22px 0}
+.return-dialog > form{padding-top:16px;gap:14px}
+.return-dialog .condition-option-list{flex-wrap:nowrap}
+.return-dialog textarea{min-height:72px}
+@media(max-width:640px){.return-dialog .condition-option-list{flex-wrap:wrap}}
