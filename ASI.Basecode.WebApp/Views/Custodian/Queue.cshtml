@@ -21,7 +21,7 @@
         <div class="page-header-actions">
             @if (history) { <a class="live-button secondary" href="@staffPath/calendar"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#calendar"></use></svg>Availability calendar</a> }
             else if (returns) { <a class="live-button secondary" href="@staffPath/approvals">Pending requests<span class="live-count">@Model.PendingCount</span></a> }
-            else { <a class="live-button secondary" href="@staffPath/approvals?status=approved">Ready for release<span class="live-count">@Model.ApprovedCount</span></a> }
+            else { <a class="live-button secondary" href="@staffPath/approvals?status=approved">Pending release<span class="live-count">@Model.ApprovedCount</span></a> }
         </div>
     </header>
     @if (!string.IsNullOrWhiteSpace(Model.Feedback)) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }

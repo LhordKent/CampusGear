@@ -181,19 +181,9 @@
        administrator) has none, and the page header already links back to the borrowing history, so the card is left out. *@
     @if (Model.CanApprove || Model.CanReject || (record.Status == ReservationStatus.Approved && !admin) || Model.CanReturn)
     {
-    <section class="reservation-workflow" aria-labelledby="reservation-workflow-heading">
-        <div class="reservation-section-heading">
-            <div>
-                <span class="borrowing-id-label">CUSTODIAN WORKFLOW</span>
-                <h2 id="reservation-workflow-heading">@(returning ? "Return & condition assessment" : record.Status == ReservationStatus.Approved ? "Equipment release" : "Reservation decision")</h2>
-            </div>
-        </div>
-
+    <section class="reservation-workflow" aria-label="@(returning ? "Return & condition assessment" : record.Status == ReservationStatus.Approved ? "Equipment release" : "Reservation decision")">
         @if (Model.CanApprove || Model.CanReject)
         {
-            <div class="reservation-workflow-intro">
-                <p>Review the borrower, requested equipment, schedule, and purpose on the borrowing ID before deciding on this request.</p>
-            </div>
             <div class="live-decision-actions">
                 <a class="live-button secondary" href="@staffPath/approvals">Back to requests</a>
                 <details class="live-reject">

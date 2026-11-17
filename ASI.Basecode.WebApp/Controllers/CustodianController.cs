@@ -109,7 +109,8 @@ namespace ASI.Basecode.WebApp.Controllers
             return TransitionAsync(
                 id,
                 actor => _reservations.ApproveAsync(actor, id, cancellationToken),
-                "Reservation approved. The booking is ready for release at its start time."
+                "Reservation approved. The booking is pending release at its start time.",
+                successRedirect: "/custodian/approvals"
             );
         }
 
@@ -236,7 +237,8 @@ namespace ASI.Basecode.WebApp.Controllers
             Guid id,
             Func<ReservationActor, Task<ReservationResult>> operation,
             string success,
-            bool returnTransition = false
+            bool returnTransition = false,
+            string? successRedirect = null
         )
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -254,6 +256,11 @@ namespace ASI.Basecode.WebApp.Controllers
                     : returnTransition && result.ConditionAtReturn is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable
                         ? "Return recorded. A maintenance hold was created for this equipment."
                     : success;
+
+                if (successRedirect is not null)
+                {
+                    return Redirect(successRedirect);
+                }
             }
             catch (ReservationWorkflowException exception)
             {
