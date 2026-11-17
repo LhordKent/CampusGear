@@ -32,8 +32,8 @@
             @Html.ValidationMessage("Role")
         </label>
         <label class="live-field" for="Password"><span>Temporary password</span>
-            <input id="Password" name="Password" type="password" required minlength="8" maxlength="100" autocomplete="new-password" />
-            <small class="live-help">At least 8 characters with upper and lower case letters, a number, and a symbol.</small>
+            <input id="Password" name="Password" type="password" required minlength="8" maxlength="100" autocomplete="new-password" aria-describedby="create-password-rules" />
+            <partial name="_PasswordRules" model='new PasswordRulesModel("Password", null, "create-password-rules")' />
             @Html.ValidationMessage("Password")
         </label>
         <label class="live-field" for="ContactNumber"><span>Contact number <small>Optional</small></span>

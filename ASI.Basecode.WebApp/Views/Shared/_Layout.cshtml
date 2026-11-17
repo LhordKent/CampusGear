@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/password-rules.css" asp-append-version="true" />
 </head>
 <body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaReference.Frame(path)">
     <a class="live-skip" href="#workspace-content">Skip to content</a>
@@ -98,6 +99,7 @@
     <script src="~/js/figma-live.js" asp-append-version="true"></script>
     <script src="~/js/live-search.js" asp-append-version="true"></script>
     <script src="~/js/confirm-dialog.js" asp-append-version="true"></script>
+    <script src="~/js/password-rules.js" asp-append-version="true"></script>
     <script src="~/js/motion.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

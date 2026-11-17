@@ -74,7 +74,7 @@
                         @Html.ValidationMessage("ConfirmPassword", null, new { @class = "auth-field-error" })
                     </label>
                 </div>
-                <span class="auth-field-help" id="password-help">At least 8 characters, with uppercase and lowercase letters, a number, and a symbol.</span>
+                <partial name="_PasswordRules" model='new PasswordRulesModel("Password", "ConfirmPassword")' />
             </div>
             <button class="auth-action" type="submit">CREATE ACCOUNT</button>
         </form>
