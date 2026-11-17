@@ -50,8 +50,11 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
         return data.bookable - taken.size;
     };
     // A start time works when the first 30 minutes have enough free units; every return time is at least that far out.
+    // Fair-use limits from the server (BorrowingLimits): how far ahead a booking may start, and how long it may last.
+    const latestStart = () => data && data.maxAdvance ? data.now + data.maxAdvance : Infinity;
     const startState = t => {
         if (t <= nowMin()) return 'past';
+        if (t > latestStart()) return 'beyond';
         if (!data) return failed ? 'open' : 'unknown';
         if (t + STEP > data.to) return 'unknown';
         return freeUnits(t, t + STEP) >= need() ? 'open' : 'booked';
@@ -59,8 +62,9 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
     // The latest return time before the next booking takes away too many units (no limit until bookings load).
     const endLimit = s => {
         if (!data) return Infinity;
+        const longest = data.maxDuration ? s + data.maxDuration : Infinity;
         let e = s;
-        while (e + STEP <= data.to && freeUnits(s, e + STEP) >= need()) e += STEP;
+        while (e + STEP <= data.to && e + STEP <= longest && freeUnits(s, e + STEP) >= need()) e += STEP;
         return e;
     };
 
@@ -74,6 +78,8 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
             bookable: json.bookableUnits,
             now: toMin(json.now),
             to: toMin(json.to),
+            maxAdvance: json.maxAdvanceMinutes || 0,
+            maxDuration: json.maxDurationMinutes || 0,
             busy: json.busy.map(x => ({ unit: x.unit, s: toMin(x.start), e: toMin(x.end) }))
         };
     };
@@ -93,6 +99,8 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
                 current.busy = current.busy.concat(more.busy);
                 current.to = more.to;
                 current.now = more.now;
+                current.maxAdvance = more.maxAdvance;
+                current.maxDuration = more.maxDuration;
             })
             .catch(() => { /* Keep what is loaded; the server still checks on submit. */ })
             .finally(() => { if (id === itemId) { loading = null; render(); } });
@@ -206,11 +214,12 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
         let future = 0, open = 0, booked = 0, unknown = 0;
         for (let t = d; t < d + DAY; t += STEP) {
             const state = startState(t);
-            if (state === 'past') continue;
+            if (state === 'past' || state === 'beyond') continue;
             future++;
             if (state === 'open') open++; else if (state === 'booked') booked++; else unknown++;
         }
-        if (future === 0) return 'past';
+        // A day wholly past the booking window looks like a past day (not selectable) but is described differently.
+        if (future === 0) return d > latestStart() ? 'beyond' : 'past';
         if (unknown === future) return 'unknown';
         if (open === 0 && unknown === 0) return 'full';
         return booked > 0 ? 'partial' : 'free';
@@ -231,7 +240,7 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
             return { past: 'before the borrowing time', full: 'unavailable, the item is booked before then',
                 partial: `available until ${timeText(limit)}`, free: 'available', unknown: 'loading' }[state];
         }
-        return { past: 'past', full: 'fully booked', partial: 'partly booked', free: 'available', unknown: 'loading' }[state];
+        return { past: 'past', beyond: 'too far ahead to book', full: 'fully booked', partial: 'partly booked', free: 'available', unknown: 'loading' }[state];
     };
 
     /* ---------- Rendering ---------- */
@@ -247,7 +256,11 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
         const gridStart = viewMonth - ((first.getUTCDay() + 6) % 7) * DAY;
         part('month').textContent = monthText(viewMonth);
         part('prev').disabled = viewMonth <= monthOf(today());
-        part('next').disabled = viewMonth >= addMonths(monthOf(today()), MONTHS_AHEAD);
+        // Return times can run into the month after the booking window, so the end picker may go one month further.
+        const lastMonth = Number.isFinite(latestStart())
+            ? monthOf(mode === 'end' && s !== null ? s + (data.maxDuration || 0) : latestStart())
+            : addMonths(monthOf(today()), MONTHS_AHEAD);
+        part('next').disabled = viewMonth >= lastMonth;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < 42; i++) {
             const d = gridStart + i * DAY;
@@ -263,7 +276,9 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
             button.classList.toggle('is-today', d === today());
             button.setAttribute('aria-pressed', String(d === day));
             button.setAttribute('aria-label', `${longDay(d)}, ${dayDescription(state, limit)}`);
-            if (state === 'past' || state === 'full') button.setAttribute('aria-disabled', 'true');
+            if (state === 'past' || state === 'beyond' || state === 'full') button.setAttribute('aria-disabled', 'true');
+            // Styled like a past day: greyed and not selectable.
+            if (state === 'beyond') button.dataset.state = 'past';
             fragment.append(button);
         }
         days.replaceChildren(fragment);
@@ -282,10 +297,11 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
             if (mode === 'end') {
                 if (t <= s) continue;
                 state = t <= limit ? 'open' : 'booked';
-                tag = state === 'open' ? duration(t - s) : 'Unavailable';
+                const tooLong = data && data.maxDuration && t - s > data.maxDuration;
+                tag = state === 'open' ? duration(t - s) : tooLong ? `Over ${data.maxDuration / DAY}-day limit` : 'Unavailable';
             } else {
                 state = startState(t);
-                if (state === 'past') continue;
+                if (state === 'past' || state === 'beyond') continue;
                 if (state === 'booked') tag = 'Booked';
                 else if (state === 'open' && data && data.bookable > 1) {
                     const free = freeUnits(t, t + STEP);

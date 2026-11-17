@@ -988,6 +988,33 @@ namespace ASI.Basecode.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You already have {0} active bookings. Cancel one, or wait until one is returned or ends, before booking again..
+        /// </summary>
+        public static string BookingLimitReached {
+            get {
+                return ResourceManager.GetString("BookingLimitReached", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A booking can last at most {0} days. Choose an earlier return time..
+        /// </summary>
+        public static string BookingTooLong {
+            get {
+                return ResourceManager.GetString("BookingTooLong", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bookings can start at most {0} days from today. Choose an earlier borrowing time..
+        /// </summary>
+        public static string BookingTooFarAhead {
+            get {
+                return ResourceManager.GetString("BookingTooFarAhead", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to This equipment is unavailable for the requested time..
         /// </summary>
         public static string ScheduleUnavailable {

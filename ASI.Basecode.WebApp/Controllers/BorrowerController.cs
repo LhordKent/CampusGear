@@ -112,6 +112,9 @@ namespace ASI.Basecode.WebApp.Controllers
                     now = schedule.NowLocal,
                     from = schedule.FromLocal,
                     to = schedule.ToLocal,
+                    // Fair-use limits, so the picker never offers a time the server would refuse.
+                    maxAdvanceMinutes = (int)BorrowingLimits.BookingWindow.TotalMinutes,
+                    maxDurationMinutes = (int)BorrowingLimits.MaxBookingDuration.TotalMinutes,
                     busy = schedule.Busy.Select(x => new { unit = x.Unit, start = x.Start, end = x.End }),
                 }
             );

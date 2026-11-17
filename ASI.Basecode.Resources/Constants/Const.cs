@@ -9,9 +9,29 @@ namespace ASI.Basecode.Resources.Constants
         public const string AdministratorOrCustodian = "Administrator,Custodian";
     }
 
+    /// <summary>
+    /// Fair-use limits on borrower requests, enforced by ReservationService when a request is created (under the
+    /// borrower lock, so they cannot be raced) and mirrored by the booking picker so it never offers a time the
+    /// server would refuse.
+    /// </summary>
     public static class BorrowingLimits
     {
         public const int MaxUnitsPerRequest = 10;
+
+        /// <summary>
+        /// Most bookings one borrower can hold at once: pending (hold still live), approved (not yet ended) or
+        /// borrowed (not yet returned). Units requested together for the same time count as one booking.
+        /// </summary>
+        public const int MaxActiveBookings = 3;
+
+        /// <summary>Longest single booking, from borrowing time to expected return.</summary>
+        public const int MaxBookingDays = 3;
+
+        /// <summary>How far ahead a booking may start.</summary>
+        public const int BookingWindowDays = 14;
+
+        public static readonly TimeSpan MaxBookingDuration = TimeSpan.FromDays(MaxBookingDays);
+        public static readonly TimeSpan BookingWindow = TimeSpan.FromDays(BookingWindowDays);
     }
 
     /// <summary>

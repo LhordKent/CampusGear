@@ -101,6 +101,17 @@ namespace ASI.Basecode.Services.Services
                 errors.Add(new(nameof(input.StartLocal), Errors.ReservationRequestFutureStartRequired));
             }
 
+            // Fair-use limits, shown on the field they concern. ReservationService enforces them again on create.
+            if (startUtc is not null && startUtc > _timeProvider.GetUtcNow().UtcDateTime + BorrowingLimits.BookingWindow)
+            {
+                errors.Add(new(nameof(input.StartLocal), string.Format(Errors.BookingTooFarAhead, BorrowingLimits.BookingWindowDays)));
+            }
+
+            if (startUtc is not null && endUtc is not null && endUtc - startUtc > BorrowingLimits.MaxBookingDuration)
+            {
+                errors.Add(new(nameof(input.EndLocal), string.Format(Errors.BookingTooLong, BorrowingLimits.MaxBookingDays)));
+            }
+
             if (errors.Count > 0)
             {
                 return new(OperationOutcome.Invalid, model, Errors: errors);

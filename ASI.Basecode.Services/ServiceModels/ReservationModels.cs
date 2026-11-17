@@ -28,6 +28,7 @@ namespace ASI.Basecode.Services.ServiceModels
         DuplicateRequest,
         Busy,
         StaleWrite,
+        LimitReached,
     }
 
     public sealed record ReservationResult(

@@ -311,6 +311,15 @@
   <data name="ScheduleConflict" xml:space="preserve">
     <value>The equipment is no longer available for this time.</value>
   </data>
+  <data name="BookingLimitReached" xml:space="preserve">
+    <value>You already have {0} active bookings. Cancel one, or wait until one is returned or ends, before booking again.</value>
+  </data>
+  <data name="BookingTooLong" xml:space="preserve">
+    <value>A booking can last at most {0} days. Choose an earlier return time.</value>
+  </data>
+  <data name="BookingTooFarAhead" xml:space="preserve">
+    <value>Bookings can start at most {0} days from today. Choose an earlier borrowing time.</value>
+  </data>
   <data name="ScheduleUnavailable" xml:space="preserve">
     <value>This equipment is unavailable for the requested time.</value>
   </data>

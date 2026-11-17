@@ -126,6 +126,10 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.InvalidInput, Errors.StartTimePassed);
             }
 
+            // Fair-use limits (BorrowingLimits). Checked here, under the borrower lock, so two requests sent at once
+            // cannot both slip under the active-booking limit.
+            await EnsureWithinBorrowingLimitsAsync(profile.Id, command.StartAtUtc, command.EndAtUtc, now, cancellationToken);
+
             var item = await _equipmentRepository.FindAsync(command.EquipmentItemId, cancellationToken);
             EnsureUsable(item);
             if (await HasConflictAsync(command.EquipmentItemId, command.StartAtUtc, command.EndAtUtc, now, null, cancellationToken))
@@ -504,6 +508,33 @@ namespace ASI.Basecode.Services.Services
             // An approved booking that expires was never collected; it keeps its approval decision, which is how the
             // screens tell "Not picked up" apart from a request that expired before anyone decided on it.
             AddAudit(actor, before == ReservationStatus.Approved ? "reservation.not_picked_up" : "reservation.expired", reservation, before, now);
+        }
+
+        private async Task EnsureWithinBorrowingLimitsAsync(
+            Guid profileId,
+            DateTime startAtUtc,
+            DateTime endAtUtc,
+            DateTime now,
+            CancellationToken cancellationToken
+        )
+        {
+            if (endAtUtc - startAtUtc > BorrowingLimits.MaxBookingDuration)
+            {
+                throw Error(ReservationErrorCode.LimitReached, string.Format(Errors.BookingTooLong, BorrowingLimits.MaxBookingDays));
+            }
+
+            if (startAtUtc > now + BorrowingLimits.BookingWindow)
+            {
+                throw Error(ReservationErrorCode.LimitReached, string.Format(Errors.BookingTooFarAhead, BorrowingLimits.BookingWindowDays));
+            }
+
+            // Units requested together share a booking time, so the 2nd..nth unit of one request is not a new booking.
+            var active = await _records.ActiveBookingTimesAsync(profileId, now, cancellationToken);
+            var sameBooking = active.Any(x => x.StartAtUtc == startAtUtc && x.EndAtUtc == endAtUtc);
+            if (!sameBooking && active.Count >= BorrowingLimits.MaxActiveBookings)
+            {
+                throw Error(ReservationErrorCode.LimitReached, string.Format(Errors.BookingLimitReached, BorrowingLimits.MaxActiveBookings));
+            }
         }
 
         private static bool IsDueToExpire(Reservation reservation, DateTime now)

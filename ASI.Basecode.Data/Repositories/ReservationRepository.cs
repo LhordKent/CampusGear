@@ -80,6 +80,24 @@ namespace ASI.Basecode.Data.Repositories
                 .ToListAsync(ct);
         }
 
+        public async Task<IReadOnlyList<BookingTime>> ActiveBookingTimesAsync(Guid borrowerProfileId, DateTime now, CancellationToken ct)
+        {
+            return await Context
+                .Reservations.AsNoTracking()
+                .Where(x =>
+                    x.BorrowerProfileId == borrowerProfileId
+                    && (
+                        x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now && x.StartAtUtc > now
+                        || x.Status == ReservationStatus.Approved && x.EndAtUtc > now
+                        || x.Status == ReservationStatus.Released && x.Loan != null && x.Loan.ReturnedAtUtc == null
+                    )
+                )
+                .Select(x => new { x.StartAtUtc, x.EndAtUtc })
+                .Distinct()
+                .Select(x => new BookingTime(x.StartAtUtc, x.EndAtUtc))
+                .ToListAsync(ct);
+        }
+
         public void Add(Reservation reservation) => Context.Reservations.Add(reservation);
     }
 }
