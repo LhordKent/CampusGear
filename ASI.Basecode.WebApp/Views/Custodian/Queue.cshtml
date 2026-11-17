@@ -127,7 +127,8 @@
                                         else
                                         {
                                             var releaseOptions = new ConditionOptionsModel("Condition at release", ConditionOptionsModel.ReleaseConditions, releaseDefault, "Verify the borrower and the item at handoff.");
-                                            @if (row.ActionNote is { } note) { <p class="live-feedback warning" role="note">@note</p> }
+                                            @* A note on a releasable booking is informational (early pickup); otherwise it explains why release is blocked. *@
+                                            @if (row.ActionNote is { } note) { <p class="live-feedback @(row.CanRelease ? "" : "warning")" role="note">@note</p> }
                                             @if (!row.CanRelease)
                                             {
                                                 @* Nothing can be recorded yet (or any more), so the dialog only explains why. *@

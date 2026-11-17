@@ -143,7 +143,7 @@
                 </div>
                 @if (returnedAt is { } actualReturnDate)
                 {
-                    var returnLabel = actualReturnDate > loan.DueAtUtc ? "Returned late" : actualReturnDate < loan.DueAtUtc ? "Returned early" : "Returned";
+                    var returnLabel = ReturnGrace.IsLate(loan.DueAtUtc, actualReturnDate) ? "Returned late" : actualReturnDate < loan.DueAtUtc ? "Returned early" : "Returned";
                     <span class="live-badge" data-state="@returnLabel.ToLowerInvariant()">@returnLabel</span>
                 }
                 else

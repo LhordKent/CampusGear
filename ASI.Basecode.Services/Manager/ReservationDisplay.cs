@@ -22,12 +22,12 @@ namespace ASI.Basecode.Services.Manager
 
         public static string Status(Reservation reservation, DateTime now)
         {
-            if (reservation.Loan is { ReturnedAtUtc: null } loan && loan.DueAtUtc < now)
+            if (reservation.Loan is { ReturnedAtUtc: null } loan && ReturnGrace.IsLate(loan.DueAtUtc, now))
             {
                 return "Overdue";
             }
 
-            if (reservation.Loan is { ReturnedAtUtc: { } returned } completed && returned > completed.DueAtUtc)
+            if (reservation.Loan is { ReturnedAtUtc: { } returned } completed && ReturnGrace.IsLate(completed.DueAtUtc, returned))
             {
                 return "Returned late";
             }

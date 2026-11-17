@@ -331,22 +331,25 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.InvalidState, Errors.ApprovalRequired);
             }
 
-            if (now < reservation.StartAtUtc || now >= reservation.EndAtUtc)
+            if (!ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now))
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.ReleaseOutsideBooking);
             }
 
             await AcquireBorrowerLockAsync(reservation.BorrowerProfileId, cancellationToken);
             now = UtcNow();
-            if (now < reservation.StartAtUtc || now >= reservation.EndAtUtc)
+            if (!ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now))
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.ReleaseOutsideBooking);
             }
 
             await RequireEligibleBorrowerAsync(reservation.BorrowerProfileId, cancellationToken);
             EnsureUsable(reservation.EquipmentItem);
+            // An early pickup takes the item before the booking starts, so the item must also be free from now until
+            // then: an earlier booking that has not ended, or a loan not yet returned, blocks the handoff.
+            var heldFrom = now < reservation.StartAtUtc ? now : reservation.StartAtUtc;
             if (
-                await HasConflictAsync(itemId, reservation.StartAtUtc, reservation.EndAtUtc, now, reservation.Id, cancellationToken)
+                await HasConflictAsync(itemId, heldFrom, reservation.EndAtUtc, now, reservation.Id, cancellationToken)
                 || await _loans.HasOutstandingExceptAsync(itemId, reservation.Id, cancellationToken)
             )
             {

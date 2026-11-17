@@ -57,7 +57,7 @@ namespace ASI.Basecode.Services.Services
                     .Select(x => new ActivityItem(
                         x.Reservation.BorrowerProfile.User.FullName,
                         $"{x.Reservation.EquipmentItem.Name} · {x.Reservation.EquipmentItem.AssetCode}",
-                        x.DueAtUtc < now ? "Overdue" : "Due today",
+                        ReturnGrace.IsLate(x.DueAtUtc, now) ? "Overdue" : "Due today",
                         $"Due {ManilaTime.Format(x.DueAtUtc)}",
                         $"/custodian/reservations/{x.ReservationId}"
                     ))
@@ -281,10 +281,10 @@ namespace ASI.Basecode.Services.Services
                     x.Reservation.BorrowerProfile.User.FullName,
                     $"{x.Reservation.EquipmentItem.Name} · {x.Reservation.EquipmentItem.AssetCode}",
                     x.ReturnedAtUtc is null
-                        ? x.DueAtUtc < now
+                        ? ReturnGrace.IsLate(x.DueAtUtc, now)
                             ? "Overdue"
                             : "Released"
-                        : x.ReturnedAtUtc > x.DueAtUtc
+                        : ReturnGrace.IsLate(x.DueAtUtc, x.ReturnedAtUtc.Value)
                             ? "Returned late"
                             : ReservationDisplay.IsReturnedEarly(x)
                                 ? "Returned early"

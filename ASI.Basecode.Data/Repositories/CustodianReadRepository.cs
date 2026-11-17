@@ -38,6 +38,7 @@ namespace ASI.Basecode.Data.Repositories
         )
         {
             var query = Context.Reservations.AsNoTracking();
+            var overdueIfDueBefore = ReturnGrace.OverdueIfDueBefore(now);
             if (queue == "approvals")
             {
                 query = query.Where(x =>
@@ -73,8 +74,13 @@ namespace ASI.Basecode.Data.Repositories
                         || x.Status == ReservationStatus.Pending
                             && (x.HoldExpiresAtUtc == null || x.HoldExpiresAtUtc <= now || x.StartAtUtc <= now)
                     ),
+                    // Late means past the ReturnGrace period: overdue now, or returned after due + grace.
                     "late" => query.Where(x =>
-                        x.Loan != null && (x.Loan.ReturnedAtUtc == null && x.Loan.DueAtUtc < now || x.Loan.ReturnedAtUtc > x.Loan.DueAtUtc)
+                        x.Loan != null
+                        && (
+                            x.Loan.ReturnedAtUtc == null && x.Loan.DueAtUtc < overdueIfDueBefore
+                            || x.Loan.ReturnedAtUtc > x.Loan.DueAtUtc.AddMinutes(ReturnGrace.Minutes)
+                        )
                     ),
                     _ => query,
                 };

@@ -56,7 +56,7 @@ namespace ASI.Basecode.Services.Services
                 && !item.IsMaintenanceHold
                 && item.Condition is not (EquipmentCondition.Damaged or EquipmentCondition.Unserviceable);
             var releaseOpen =
-                reservation.Status == ReservationStatus.Approved && usable && now >= reservation.StartAtUtc && now < reservation.EndAtUtc;
+                reservation.Status == ReservationStatus.Approved && usable && ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now);
             return (pending && usable, pending, releaseOpen, GetAvailabilityNote(reservation, usable, pending, now));
         }
 
@@ -67,9 +67,13 @@ namespace ASI.Basecode.Services.Services
             {
                 return Errors.ItemUnavailable;
             }
+            if (reservation.Status == ReservationStatus.Approved && now < ReleaseWindow.OpensAt(reservation.StartAtUtc))
+            {
+                return string.Format(Errors.ReleaseNotStarted, ManilaTime.Format(ReleaseWindow.OpensAt(reservation.StartAtUtc)));
+            }
             if (reservation.Status == ReservationStatus.Approved && now < reservation.StartAtUtc)
             {
-                return Errors.ReleaseNotStarted;
+                return $"Early pickup: the booking starts at {ManilaTime.Format(reservation.StartAtUtc)}. The loan is still due at {ManilaTime.Format(reservation.EndAtUtc)}.";
             }
             if (reservation.Status == ReservationStatus.Approved && now >= reservation.EndAtUtc)
             {
