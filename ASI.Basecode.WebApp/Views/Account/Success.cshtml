@@ -14,10 +14,16 @@
         CurrentStep = 4
     })
     <section class="auth-card" aria-labelledby="auth-title">
-        <div class="auth-success-mark" aria-hidden="true">✓</div>
+        <div class="auth-status">
+            <div class="auth-success-mark" aria-hidden="true">✓</div>
+            <div>
+                <h2 id="auth-title" class="auth-status-title">Password updated</h2>
+                <span class="auth-status-badge is-success">Ready to sign in</span>
+            </div>
+        </div>
         <div class="auth-summary">
-            <strong>Ready to sign in</strong>
-            <p>Sign in with your new password.</p>
+            <strong>What happens next</strong>
+            <p>Sign in with your new password. Your old password no longer works.</p>
         </div>
         <a class="auth-action" href="/auth/login">RETURN TO SIGN IN</a>
     </section>
