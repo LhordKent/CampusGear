@@ -814,3 +814,11 @@ html.js [data-toast]:not([data-toast-keep]) { display: none; }
 @media (prefers-reduced-motion: reduce) {
     .account-role-card, .account-switch input[type='checkbox'], .account-switch input[type='checkbox']::after { transition: none; }
 }
+
+/* Confirmation dialog (js/confirm-dialog.js), used in place of the browser's confirm() box */
+.live-modal.confirm-dialog { width: min(440px, calc(100vw - 24px)); }
+.confirm-dialog-body { display: flex; gap: 14px; align-items: flex-start; padding: 22px 22px 4px; }
+.confirm-dialog-icon { display: grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; border: 1px solid var(--ws-danger-border); border-radius: 50%; background: var(--ws-danger-bg); color: var(--ws-danger-text); font-weight: 800; font-size: 16px; }
+.confirm-dialog h2 { margin: 6px 0 6px; font-size: 17px; font-weight: 700; color: var(--ws-text); overflow-wrap: anywhere; }
+.confirm-dialog p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--ws-muted); }
+.confirm-dialog .live-modal-actions { position: static; margin: 18px 0 0; }
