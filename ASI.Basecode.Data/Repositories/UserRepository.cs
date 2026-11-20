@@ -113,6 +113,26 @@ namespace ASI.Basecode.Data.Repositories
                 || await Context.MaintenanceCases.AnyAsync(x => x.OpenedByUserId == userId || x.ClosedByUserId == userId, ct);
         }
 
+        // Released = the equipment is physically with the borrower; a return moves it to Completed.
+        public Task<bool> HasOpenLoanAsync(string userId, CancellationToken ct)
+        {
+            return Context.Reservations.AnyAsync(
+                x => x.BorrowerProfile.UserId == userId && x.Status == ReservationStatus.Released,
+                ct
+            );
+        }
+
+        // Pending and approved bookings have not left the desk yet, so they can be cancelled. Tracked for update.
+        public async Task<IReadOnlyList<Reservation>> OpenBookingsAsync(string userId, CancellationToken ct)
+        {
+            return await Context
+                .Reservations.Where(x =>
+                    x.BorrowerProfile.UserId == userId
+                    && (x.Status == ReservationStatus.Pending || x.Status == ReservationStatus.Approved)
+                )
+                .ToListAsync(ct);
+        }
+
         public async Task PrepareDeletionAsync(User user, CancellationToken ct)
         {
             await Context

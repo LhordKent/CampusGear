@@ -14,6 +14,8 @@ namespace ASI.Basecode.Data.Interfaces
         Task<bool> StudentExistsAsync(string number, string? excludingUser, CancellationToken ct);
         Task<bool> HasOtherAdministratorAsync(string excludingUser, CancellationToken ct);
         Task<bool> HasHistoryAsync(string userId, CancellationToken ct);
+        Task<bool> HasOpenLoanAsync(string userId, CancellationToken ct);
+        Task<IReadOnlyList<Reservation>> OpenBookingsAsync(string userId, CancellationToken ct);
         Task PrepareDeletionAsync(User user, CancellationToken ct);
         Task ReloadProfileAsync(BorrowerProfile profile, CancellationToken ct);
         Task<bool> ReloadUserAsync(User user, CancellationToken ct);

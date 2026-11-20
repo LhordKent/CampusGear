@@ -209,6 +209,16 @@ namespace ASI.Basecode.Services.Services
                     }
                 }
 
+                var deactivating = target.IsActive && !input.IsActive;
+                var pausing = profile is { IsEligible: true } && !input.IsEligible;
+
+                // Equipment on loan is physically with the student, so it cannot be cancelled away. Pausing is still
+                // allowed: the student keeps signing in and sees the due date.
+                if (deactivating && profile is not null && await _accountRepository.HasOpenLoanAsync(target.Id, cancellationToken))
+                {
+                    throw new AdminUserEditException(Errors.OpenLoanPreventsAccountDeactivation);
+                }
+
                 input.StudentNumber = Optional(input.StudentNumber);
                 input.Department = Optional(input.Department);
                 input.EligibilityNotes = Optional(input.EligibilityNotes);
@@ -268,6 +278,15 @@ namespace ASI.Basecode.Services.Services
                     profile.UpdatedAtUtc = DateTime.UtcNow;
                 }
 
+                var cancelled =
+                    (deactivating || pausing) && profile is not null
+                        ? CancelOpenBookings(
+                            actor,
+                            await _accountRepository.OpenBookingsAsync(target.Id, cancellationToken),
+                            deactivating ? "Cancelled automatically: the account was deactivated." : "Cancelled automatically: borrowing access was paused."
+                        )
+                        : 0;
+
                 _auditRepository.Add(
                     new AuditEvent
                     {
@@ -284,7 +303,7 @@ namespace ASI.Basecode.Services.Services
                 );
                 await _unitOfWork.SaveAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
-                return OperationResult<string>.Ok(id, Common.AccountUpdated);
+                return OperationResult<string>.Ok(id, Common.AccountUpdated + CancelledSuffix(cancelled));
             }
             catch (AdminUserEditException exception)
             {
@@ -443,10 +462,39 @@ namespace ASI.Basecode.Services.Services
                 return OperationResult<string>.Invalid(Errors.LastAdministratorRequired);
             }
 
+            // Any booking is history, so a borrower with bookings is deactivated here rather than deleted. Take the lock
+            // new bookings take, so none can slip in between this check and the cancellation below.
+            if (target.IsActive && target.BorrowerProfile is { } profile)
+            {
+                try
+                {
+                    await AcquireLockAsync($"CampusGear:BorrowerProfile:{profile.Id:N}", cancellationToken);
+                }
+                catch (AdminUserEditException exception)
+                {
+                    return OperationResult<string>.Invalid(exception.Message);
+                }
+
+                if (await _accountRepository.HasOpenLoanAsync(target.Id, cancellationToken))
+                {
+                    return OperationResult<string>.Invalid(Errors.OpenLoanPreventsAccountDeactivation);
+                }
+            }
+
             var hasHistory = await _accountRepository.HasHistoryAsync(target.Id, cancellationToken);
             var before = Snapshot(target, roles, target.BorrowerProfile);
+            var cancelled = 0;
             if (hasHistory)
             {
+                if (target.IsActive && target.BorrowerProfile is not null)
+                {
+                    cancelled = CancelOpenBookings(
+                        actor,
+                        await _accountRepository.OpenBookingsAsync(target.Id, cancellationToken),
+                        "Cancelled automatically: the account was deactivated."
+                    );
+                }
+
                 target.IsActive = false;
                 target.UpdatedAtUtc = DateTime.UtcNow;
                 await _userManager.UpdateAsync(target);
@@ -482,9 +530,63 @@ namespace ASI.Basecode.Services.Services
                 id,
                 hasHistory
                     ? $"{target.FullName} has borrowing history, so the account was deactivated instead of deleted. They can no longer sign in."
+                        + CancelledSuffix(cancelled)
                     : $"{target.FullName}'s account was deleted."
             );
         }
+
+        /// <summary>
+        /// Cancels pending and approved bookings as the administrator, with the same fields and audit event a
+        /// borrower's own cancellation records. The caller holds the borrower-profile lock, which approval and
+        /// release also take before re-checking eligibility, so neither can act on these bookings concurrently.
+        /// </summary>
+        private int CancelOpenBookings(RequestContext actor, IReadOnlyList<Reservation> bookings, string reason)
+        {
+            var now = DateTime.UtcNow;
+            foreach (var reservation in bookings)
+            {
+                var before = reservation.Status;
+                reservation.Status = ReservationStatus.Cancelled;
+                reservation.HoldExpiresAtUtc = null;
+                reservation.CancelledAtUtc = now;
+                reservation.DecisionReason = reason;
+                reservation.UpdatedAtUtc = now;
+                _auditRepository.Add(
+                    new AuditEvent
+                    {
+                        ActorUserId = actor.UserId,
+                        Action = "reservation.cancelled",
+                        EntityType = nameof(Reservation),
+                        EntityId = reservation.Id.ToString("D"),
+                        Outcome = "Succeeded",
+                        BeforeJson = JsonSerializer.Serialize(new { Status = before.ToString() }),
+                        AfterJson = JsonSerializer.Serialize(
+                            new
+                            {
+                                Status = reservation.Status.ToString(),
+                                reservation.EquipmentItemId,
+                                reservation.BorrowerProfileId,
+                                reservation.StartAtUtc,
+                                reservation.EndAtUtc,
+                                reservation.HoldExpiresAtUtc,
+                            }
+                        ),
+                        IpAddress = actor.IpAddress,
+                        CorrelationId = actor.CorrelationId,
+                    }
+                );
+            }
+
+            return bookings.Count;
+        }
+
+        private static string CancelledSuffix(int count) =>
+            count switch
+            {
+                0 => "",
+                1 => " Their 1 pending or approved booking was cancelled.",
+                _ => $" Their {count} pending or approved bookings were cancelled.",
+            };
 
         public async Task<UserEditPage?> GetEditAsync(
             RequestContext actor,

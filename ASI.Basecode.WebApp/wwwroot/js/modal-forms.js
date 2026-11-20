@@ -116,6 +116,11 @@
         const target = field ? form.querySelector(`[name="${CSS.escape(field)}"]`) : null;
         // The message shows inside the open dialog only, so one failed save never produces two notices.
         if (target) { target.setAttribute('aria-invalid', 'true'); target.focus(); }
+        // With no field to focus, the alert may sit far above the Save button in a long dialog; bring it into view.
+        else if (alert) {
+            const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            alert.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+        }
     };
 
     document.addEventListener('submit', async event => {

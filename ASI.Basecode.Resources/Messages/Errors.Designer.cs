@@ -691,6 +691,15 @@ namespace ASI.Basecode.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This student still has equipment on loan. Record the return before deactivating the account..
+        /// </summary>
+        public static string OpenLoanPreventsAccountDeactivation {
+            get {
+                return ResourceManager.GetString("OpenLoanPreventsAccountDeactivation", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Resolve this item's pending and approved reservations before deactivating it..
         /// </summary>
         public static string LiveReservationsPreventDeactivation {

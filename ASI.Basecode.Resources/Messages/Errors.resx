@@ -212,6 +212,9 @@
   <data name="LastAdministratorRequired" xml:space="preserve">
     <value>Keep at least one active, verified Administrator account.</value>
   </data>
+  <data name="OpenLoanPreventsAccountDeactivation" xml:space="preserve">
+    <value>This student still has equipment on loan. Record the return before deactivating the account.</value>
+  </data>
   <data name="LiveReservationsPreventDeactivation" xml:space="preserve">
     <value>Resolve this item's pending and approved reservations before deactivating it.</value>
   </data>
