@@ -24,7 +24,7 @@
     {
         <section class="live-panel" aria-label="@category.Name">
             <div class="chart-head">
-                <div><h2>@category.Name @if (!category.IsActive) { <span class="live-badge">Inactive</span> }</h2><p>@(category.Description ?? "No description.")</p></div>
+                <div><h2>@category.Name</h2><p>@(category.Description ?? "No description.")</p></div>
                 <span class="live-muted">@category.Units.Count unit@(category.Units.Count == 1 ? "" : "s")</span>
             </div>
             @if (category.Units.Count == 0)

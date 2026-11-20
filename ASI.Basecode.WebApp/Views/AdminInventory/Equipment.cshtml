@@ -26,7 +26,7 @@
     <section class="live-panel" aria-labelledby="inventory-title">
         <h2 id="inventory-title">Equipment inventory</h2>
         <form class="live-filters" method="get" action="/admin/equipment" role="search" aria-label="Find equipment" data-live-search data-live-target="#inventory-results">
-            <label for="inventory-q" class="live-filter-search">Search inventory<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="inventory-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name or asset code" autocomplete="off" /></span></label>
+            <label for="inventory-q" class="live-filter-search">Search inventory<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="inventory-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name, asset code, or category" autocomplete="off" /></span></label>
             <a class="live-button secondary live-filter-reset" href="/admin/equipment" data-live-reset>Clear</a>
         </form>
         <div id="inventory-results" class="live-results" data-refresh-region>

@@ -14,9 +14,17 @@ namespace ASI.Basecode.Data.Repositories
             return Context.EquipmentCategories.SingleOrDefaultAsync(x => x.Id == id, ct);
         }
 
+        // Unique index on Name; SQL Server's default collation makes this comparison case-insensitive, like the index.
+        public Task<EquipmentCategory?> FindByNameAsync(string name, CancellationToken ct)
+        {
+            return Context.EquipmentCategories.SingleOrDefaultAsync(x => x.Name == name, ct);
+        }
+
+        // A deleted category that still holds inactive equipment is kept as an inactive row (the items reference it),
+        // so it is left out here exactly like a deleted one.
         public async Task<CategoryList> ListAsync(string? search, CancellationToken ct)
         {
-            var query = Context.EquipmentCategories.AsNoTracking();
+            var query = Context.EquipmentCategories.AsNoTracking().Where(x => x.IsActive);
             var total = await query.CountAsync(ct);
             if (!string.IsNullOrEmpty(search))
             {
@@ -27,7 +35,14 @@ namespace ASI.Basecode.Data.Repositories
                 await query
                     .OrderByDescending(x => x.CreatedAtUtc)
                     .ThenBy(x => x.Name)
-                    .Select(x => new CategoryListRecord(x.Id, x.Name, x.Description, x.IsActive, x.Items.Count, x.AssetCodeSeries!.Prefix))
+                    .Select(x => new CategoryListRecord(
+                        x.Id,
+                        x.Name,
+                        x.Description,
+                        x.Items.Count(i => i.IsActive),
+                        x.Items.Count(i => !i.IsActive),
+                        x.AssetCodeSeries!.Prefix
+                    ))
                     .ToListAsync(ct),
                 total
             );

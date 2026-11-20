@@ -149,5 +149,14 @@ namespace ASI.Basecode.Resources.Messages {
                 return ResourceManager.GetString("UnrequestedCodeNotice", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} was restored with its earlier asset code prefix..
+        /// </summary>
+        public static string CategoryRestored {
+            get {
+                return ResourceManager.GetString("CategoryRestored", resourceCulture);
+            }
+        }
     }
 }

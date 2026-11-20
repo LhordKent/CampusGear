@@ -79,7 +79,7 @@ namespace ASI.Basecode.Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Choose an active category..
+        ///   Looks up a localized string similar to Choose a category..
         /// </summary>
         public static string ActiveCategoryRequired {
             get {
@@ -511,7 +511,7 @@ namespace ASI.Basecode.Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This category is inactive. Choose another category..
+        ///   Looks up a localized string similar to This category was deleted. Choose another category..
         /// </summary>
         public static string InactiveCategory {
             get {
@@ -1191,6 +1191,33 @@ namespace ASI.Basecode.Resources.Messages {
         public static string VerifiedAccountRequired {
             get {
                 return ResourceManager.GetString("VerifiedAccountRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A category with this name already exists..
+        /// </summary>
+        public static string CategoryNameTaken {
+            get {
+                return ResourceManager.GetString("CategoryNameTaken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A deleted category used this name. Add it as a new category to restore it, or choose another name..
+        /// </summary>
+        public static string CategoryNameDeleted {
+            get {
+                return ResourceManager.GetString("CategoryNameDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} still has active equipment. Move it to another category or deactivate it first..
+        /// </summary>
+        public static string CategoryHasActiveEquipment {
+            get {
+                return ResourceManager.GetString("CategoryHasActiveEquipment", resourceCulture);
             }
         }
     }

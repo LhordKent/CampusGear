@@ -1,44 +1,85 @@
 @model CategoriesPageModel
 @{ ViewData["Title"] = TitleText.EquipmentCategories; ViewData["WorkspaceRole"] = "Administrator";
-   var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid; }
+   var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid;
+   string Plural(int count, string one, string many) => $"{count} {(count == 1 ? one : many)}"; }
+@section Styles { <link rel="stylesheet" href="~/css/admin-categories.css" asp-append-version="true" /> }
 <main class="live-content" data-figma-source="695:4991">
     <header class="page-header">
         <div class="page-header-text">
             <p class="page-eyebrow">Inventory</p>
             <h1>Equipment Categories</h1>
-            <p class="page-description">Group equipment so borrowers can browse it and staff can report on it. Newest categories appear first.</p>
+            <p class="page-description">Group equipment so borrowers can browse it and staff can report on it. Each category gives its equipment an asset code, like CAM-001.</p>
         </div>
         <div class="page-header-actions">
             <a class="live-button" href="/admin/categories?form=add" data-modal-load><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#plus"></use></svg>Add category</a>
         </div>
     </header>
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
+    @if (Model.Error is not null) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
     <section class="live-panel" aria-labelledby="categories-title">
-        <h2 id="categories-title">Category records</h2>
+        <h2 id="categories-title" class="visually-hidden">Categories</h2>
         <form class="live-filters" method="get" action="/admin/categories" role="search" aria-label="Find categories" data-live-search data-live-target="#category-results">
             <label for="category-q" class="live-filter-search">Search categories<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="category-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name or description" autocomplete="off" /></span></label>
             <a class="live-button secondary live-filter-reset" href="/admin/categories" data-live-reset>Clear</a>
         </form>
         <div id="category-results" class="live-results" data-refresh-region>
-            <p class="live-result-count" data-live-count>@(string.IsNullOrEmpty(Model.Query) ? $"{Model.Total} categor{(Model.Total == 1 ? "y" : "ies")}" : $"{Model.Categories.Count} of {Model.Total} categories match")</p>
+            <p class="live-result-count" data-live-count>@(string.IsNullOrEmpty(Model.Query) ? Plural(Model.Total, "category", "categories") : $"{Model.Categories.Count} of {Plural(Model.Total, "category", "categories")} match")</p>
             @if (Model.Categories.Count == 0)
             {
                 <div class="live-empty">
                     <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#@(Model.Total == 0 ? "tag" : "search")"></use></svg>
                     <h3>@(Model.Total == 0 ? "No categories yet" : "No matching categories")</h3>
-                    <p>@(Model.Total == 0 ? "Add a category to organize your equipment." : "Try another name or description.")</p>
+                    <p>@(Model.Total == 0 ? "Add a category, then add equipment to it." : "Try another name or description.")</p>
+                    @if (Model.Total == 0) { <a class="live-button" href="/admin/categories?form=add" data-modal-load>Add category</a> }
                 </div>
             }
             else
             {
                 <div class="live-table-wrap" tabindex="0" role="region" aria-label="Equipment categories">
-                    <table class="live-table">
-                        <thead><tr><th scope="col">Name</th><th scope="col">Asset code prefix</th><th scope="col">Description</th><th scope="col">Items</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+                    <table class="live-table category-table">
+                        @* Fixed widths, so long descriptions wrap in place instead of reshaping the columns. *@
+                        <colgroup><col /><col class="col-codes" /><col class="col-equipment" /><col class="col-action" /></colgroup>
+                        <thead><tr><th scope="col">Category</th><th scope="col">Asset codes</th><th scope="col">Equipment</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
                         <tbody>
                         @foreach (var category in Model.Categories)
                         {
-                            <tr><td><strong>@category.Name</strong></td><td>@category.AssetCodePrefix</td><td>@(category.Description ?? "—")</td><td>@category.Items</td><td><span class="live-badge">@(category.IsActive ? "Active" : "Inactive")</span></td>
-                                <td><div class="admin-user-actions"><a class="live-button secondary" href="/admin/categories?id=@category.Id" data-modal-load>Edit</a><form method="post" action="/admin/categories/@category.Id/delete" data-confirm-title="Delete @category.Name?" data-confirm="A category that still holds equipment is deactivated instead of deleted." data-confirm-ok="Delete category" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<button class="live-button secondary" type="submit" aria-label="Delete @category.Name">Delete</button></form></div></td></tr>
+                            var blockedId = $"category-delete-blocked-{category.Id:N}";
+                            <tr>
+                                <td>
+                                    <div class="category-name">
+                                        <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cg-icon-@EquipmentIcon.For("", category.Name)" /></svg></span>
+                                        <div class="category-text">
+                                            <strong>@category.Name</strong>
+                                            @if (category.Description is not null) { <small class="category-description">@category.Description</small> }
+                                            else { <small class="category-description is-empty">No description</small> }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@if (category.AssetCodePrefix is not null) { <code class="category-code" title="Equipment in this category is numbered @(category.AssetCodePrefix)-001, @(category.AssetCodePrefix)-002, …">@(category.AssetCodePrefix)-###</code> } else { <span class="live-muted">—</span> }</td>
+                                <td>
+                                    @if (category.ActiveItems == 0 && category.InactiveItems == 0) { <span class="live-muted">No equipment yet</span> }
+                                    else
+                                    {
+                                        <a class="live-link category-count" href="/admin/equipment?q=@Uri.EscapeDataString(category.Name)">@Plural(category.ActiveItems, "item", "items")</a>
+                                        @if (category.InactiveItems > 0) { <small>@category.InactiveItems inactive</small> }
+                                    }
+                                </td>
+                                <td>
+                                    <div class="category-actions">
+                                        <a class="live-button secondary" href="/admin/categories?id=@category.Id" data-modal-load aria-label="Edit @category.Name">Edit</a>
+                                        @if (category.ActiveItems > 0)
+                                        {
+                                            @* Deleting is refused while equipment is in use, so say why up front instead of after a confirm. *@
+                                            <button class="live-button secondary" type="button" disabled aria-describedby="@blockedId" title="Move or deactivate its @Plural(category.ActiveItems, "item", "items") first">Delete</button>
+                                            <span id="@blockedId" class="visually-hidden">@category.Name can't be deleted while it has active equipment. Move or deactivate its @Plural(category.ActiveItems, "item", "items") first.</span>
+                                        }
+                                        else
+                                        {
+                                            <form method="post" action="/admin/categories/@category.Id/delete" data-confirm-title="Delete @category.Name?" data-confirm="@(category.InactiveItems > 0 ? $"{(category.InactiveItems == 1 ? "Its inactive item keeps its" : $"Its {category.InactiveItems} inactive items keep their")} borrowing history. Adding a category with this name later brings it back." : "This can't be undone.")" data-confirm-ok="Delete category" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<button class="live-button secondary category-delete" type="submit" aria-label="Delete @category.Name">Delete</button></form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
                         }
                         </tbody>
                     </table>
@@ -47,5 +88,6 @@
         </div>
     </section>
     @if (editor) { <partial name="_CategoryEditor" model="Model" /> }
+    <partial name="~/Views/Borrower/_EquipmentIcons.cshtml" />
 </main>
 @section Scripts { <script src="~/js/modal-forms.js" asp-append-version="true"></script> }

@@ -3,25 +3,28 @@
     var adding = Model.Input.Id is null;
     var errors = ViewData.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).Distinct().ToList();
 }
-<dialog id="category-editor" class="live-modal" aria-labelledby="category-editor-title" data-modal-autoshow data-modal-return="/admin/categories" data-figma-source="@(adding ? "695:5184" : "695:5347")">
+<dialog id="category-editor" class="live-modal category-editor" aria-labelledby="category-editor-title" data-modal-autoshow data-modal-return="/admin/categories" data-figma-source="@(adding ? "695:5184" : "695:5347")">
     <div class="live-modal-head">
-        <div><p class="page-eyebrow">Inventory</p><h2 id="category-editor-title">@(adding ? "Add Equipment Category" : "Edit Equipment Category")</h2></div>
+        <div><p class="page-eyebrow">Inventory</p><h2 id="category-editor-title">@(adding ? "Add equipment category" : "Edit equipment category")</h2></div>
         <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
     </div>
     <p class="live-modal-lede">Categories group equipment in the borrower catalog and on reports.</p>
     <form id="category-editor-form" method="post" action="/admin/categories/save" class="live-form" data-modal-form novalidate>
         @Html.AntiForgeryToken()<input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
         <div class="live-modal-alert wide" role="alert" data-modal-alert hidden="@(errors.Count == 0)">@string.Join(" ", errors)</div>
-        <label class="live-field wide"><span>Category name</span><input asp-for="Input.Name" required maxlength="120" placeholder="e.g. Cameras" /></label>
-        <label class="live-field wide"><span>Description <small>Optional · shown to staff and borrowers</small></span><textarea asp-for="Input.Description" maxlength="1000" rows="3" placeholder="What kind of equipment belongs here?"></textarea></label>
-        @* Same on/off switch as the equipment and account editors (.account-switch in main.css). *@
-        <label class="account-switch wide" for="Input_IsActive">
-            <input asp-for="Input.IsActive" role="switch" />
-            <span class="account-switch-copy">
-                <strong>Active category</strong>
-                <small>Only active categories can be chosen for equipment. A category with active equipment must stay active.</small>
-            </span>
+        <label class="live-field wide"><span>Category name</span>
+            <input asp-for="Input.Name" required maxlength="120" placeholder="e.g. Cameras" autocomplete="off" aria-describedby="@(adding || Model.EditingPrefix is not null ? "category-code-note" : null)" />
         </label>
+        @* How asset codes come from the name: worth knowing before the first save, since a prefix never changes afterwards. *@
+        @if (adding)
+        {
+            <p class="category-code-note wide" id="category-code-note"><span>Equipment gets asset codes from the first three letters of the name, for example <strong>Cameras</strong> → <code>CAM-001</code>. The prefix is set when you add the category.</span></p>
+        }
+        else if (Model.EditingPrefix is not null)
+        {
+            <p class="category-code-note wide" id="category-code-note"><span>Asset code prefix <code>@Model.EditingPrefix</code>. It stays the same if you rename the category, so existing labels remain valid.</span></p>
+        }
+        <label class="live-field wide"><span>Description <small>Optional · shown to staff and borrowers</small></span><textarea asp-for="Input.Description" maxlength="1000" rows="3" placeholder="What kind of equipment belongs here?"></textarea></label>
         <div class="live-modal-actions wide">
             <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
             <button class="live-button" type="submit">@(adding ? "Add category" : "Save changes")</button>

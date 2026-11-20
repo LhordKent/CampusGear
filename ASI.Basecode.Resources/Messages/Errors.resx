@@ -9,7 +9,7 @@
     <value>This account is temporarily locked. Try again later.</value>
   </data>
   <data name="ActiveCategoryRequired" xml:space="preserve">
-    <value>Choose an active category.</value>
+    <value>Choose a category.</value>
   </data>
   <data name="ActiveEquipmentPreventsDeactivation" xml:space="preserve">
     <value>Move or deactivate this category's active equipment before deactivating the category.</value>
@@ -153,7 +153,7 @@
     <value>Use an image of 5 MB or smaller.</value>
   </data>
   <data name="InactiveCategory" xml:space="preserve">
-    <value>This category is inactive. Choose another category.</value>
+    <value>This category was deleted. Choose another category.</value>
   </data>
   <data name="IneligibleBorrower" xml:space="preserve">
     <value>The borrower account is not eligible to reserve equipment.</value>
@@ -379,5 +379,14 @@
   </data>
   <data name="VerifiedAccountRequired" xml:space="preserve">
     <value>An active, verified account is required.</value>
+  </data>
+  <data name="CategoryNameTaken" xml:space="preserve">
+    <value>A category with this name already exists.</value>
+  </data>
+  <data name="CategoryNameDeleted" xml:space="preserve">
+    <value>A deleted category used this name. Add it as a new category to restore it, or choose another name.</value>
+  </data>
+  <data name="CategoryHasActiveEquipment" xml:space="preserve">
+    <value>{0} still has active equipment. Move it to another category or deactivate it first.</value>
   </data>
 </root>

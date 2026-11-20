@@ -94,6 +94,7 @@ namespace ASI.Basecode.Services.Manager
                 "category.updated" => ($"Updated the equipment category {name ?? ""}".TrimEnd(), Successful),
                 "category.deactivated" => ($"Deactivated the equipment category {name ?? ""}".TrimEnd(), Successful),
                 "category.deleted" => ($"Deleted the equipment category {name ?? ""}".TrimEnd(), Successful),
+                "category.restored" => ($"Restored the equipment category {name ?? ""}".TrimEnd(), Successful),
 
                 "equipment.created" => ($"Added the equipment {name ?? ""}".TrimEnd(), Successful),
                 "equipment.updated" => ($"Updated the equipment {name ?? ""}".TrimEnd(), Successful),

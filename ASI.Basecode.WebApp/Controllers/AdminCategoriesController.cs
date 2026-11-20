@@ -55,7 +55,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 return NotFound();
             }
 
-            TempData["CategoryFeedback"] = result.Message;
+            TempData[result.Succeeded ? "CategoryFeedback" : "CategoryError"] = result.Message;
             return Redirect("/admin/categories");
         }
 
@@ -100,7 +100,9 @@ namespace ASI.Basecode.WebApp.Controllers
         private async Task<CategoriesPageModel> PageAsync(CategoryEditModel input, CancellationToken ct, string? q = null)
         {
             var page = await _categories.GetPageAsync(q, ct);
-            return new(input, page.Categories, TempData["CategoryFeedback"] as string, page.Query, page.Total);
+            // The list holds the category being edited, so its asset code prefix needs no extra query.
+            var prefix = input.Id is { } id ? page.Categories.FirstOrDefault(x => x.Id == id)?.AssetCodePrefix : null;
+            return new(input, page.Categories, TempData["CategoryFeedback"] as string, page.Query, page.Total, TempData["CategoryError"] as string, prefix);
         }
     }
 }

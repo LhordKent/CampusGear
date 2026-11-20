@@ -1,0 +1,41 @@
+/* Equipment Categories (Views/AdminCategories). Uses the shared workspace tokens, so light and dark themes follow. */
+
+/* Fixed layout: a long description wraps inside its cell instead of widening the table. */
+.category-table { table-layout: fixed; min-width: 640px; }
+.category-table .col-codes { width: 150px; }
+.category-table .col-equipment { width: 150px; }
+.category-table .col-action { width: 170px; }
+.category-table td { vertical-align: middle; }
+
+.category-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.category-icon {
+    flex: none; display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--ws-teal-soft); color: var(--ws-link);
+}
+.category-icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.category-text { display: grid; gap: 2px; min-width: 0; }
+.category-text strong { font-size: 13px; }
+/* Two lines is enough to recognise a category; the editor shows the full text. */
+.live-table td .category-description {
+    margin: 0; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.live-table td .category-description.is-empty { font-style: italic; opacity: .75; }
+
+.category-code {
+    display: inline-block; padding: 3px 8px; border-radius: 6px;
+    border: 1px solid var(--ws-border); background: var(--ws-inset); color: var(--ws-text);
+    font: 600 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .02em; white-space: nowrap;
+}
+
+.category-count { font-weight: 600; text-decoration: none; }
+.category-count:hover, .category-count:focus-visible { text-decoration: underline; }
+
+.category-actions { display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; justify-content: flex-end; }
+.category-actions form { margin: 0; }
+.category-actions .live-button:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+
+/* Editor: the asset code note sits under the name it is derived from. */
+.category-code-note { margin: -8px 0 0; font-size: 12px; line-height: 1.55; color: var(--cg-muted); }
+.category-code-note code { font: 600 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--ws-text); }
+.category-code-note strong { color: var(--ws-text); font-weight: 600; }

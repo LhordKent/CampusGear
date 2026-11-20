@@ -41,7 +41,7 @@ namespace ASI.Basecode.Data.Repositories
             var query = Context.EquipmentItems.AsNoTracking();
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(x => x.Name.Contains(search) || x.AssetCode.Contains(search));
+                query = query.Where(x => x.Name.Contains(search) || x.AssetCode.Contains(search) || x.Category.Name.Contains(search));
             }
 
             var total = await query.CountAsync(ct);

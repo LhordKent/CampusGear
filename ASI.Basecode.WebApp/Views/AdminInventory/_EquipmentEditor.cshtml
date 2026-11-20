@@ -40,7 +40,7 @@
                         </label>
                         <label class="live-field">
                             <span>Category</span>
-                            <select asp-for="Input.CategoryId" data-preview-source="category">@foreach (var category in Model.Categories) { <option value="@category.Id">@category.Name</option> }</select>
+                            <select asp-for="Input.CategoryId" data-preview-source="category">@foreach (var category in Model.Categories) { <option value="@category.Id">@category.Name@(category.IsActive ? "" : " (deleted, choose another)")</option> }</select>
                         </label>
                         <label class="live-field">
                             <span>Condition</span>

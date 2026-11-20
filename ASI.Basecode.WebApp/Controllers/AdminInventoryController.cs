@@ -139,10 +139,16 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             var item = input.Id is { } id ? await _inventory.GetEditAsync(id, ct) : null;
+            // Inactive equipment can sit in a deleted category, which the picker otherwise leaves out. Without it the
+            // browser would silently select the first category and a save would move the item; listing it keeps the
+            // current value, and saving asks for another category.
+            IReadOnlyList<ASI.Basecode.Data.Models.CategoryRecord> categories = item?.Category is { IsActive: false } deleted
+                ? [deleted, .. result.Data.Categories]
+                : result.Data.Categories;
             return new(
                 input,
                 result.Data.Items,
-                result.Data.Categories,
+                categories,
                 result.Query,
                 result.Data.Page,
                 result.Data.Pages,

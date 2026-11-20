@@ -14,6 +14,7 @@ namespace ASI.Basecode.Data.Repositories
         {
             return await Context
                 .EquipmentCategories.AsNoTracking()
+                .Where(x => x.IsActive)
                 .OrderByDescending(x => x.CreatedAtUtc)
                 .ThenBy(x => x.Name)
                 .Select(x => new DirectoryCategoryData(
