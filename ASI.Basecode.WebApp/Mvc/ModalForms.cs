@@ -2,6 +2,12 @@ using ASI.Basecode.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
+// =====================================================================
+// MODAL FORMS (server side)  -  the C# half of wwwroot/js/modal-forms.js.
+// The JavaScript sends a header so the controller knows how to answer:
+//   X-Modal: 1               -> send only the dialog's HTML (WantsModal)
+//   X-Requested-With: fetch  -> answer with JSON {ok, message} instead of a page (IsFetch)
+// =====================================================================
 namespace ASI.Basecode.WebApp.Mvc
 {
     /// <summary>
@@ -11,13 +17,17 @@ namespace ASI.Basecode.WebApp.Mvc
     /// </summary>
     internal static class ModalForms
     {
+        // True when JavaScript asked for just the dialog (to open it over the current page).
         public static bool WantsModal(this HttpRequest request) => request.Headers["X-Modal"] == "1";
 
+        // True when the form was posted by JavaScript and expects a JSON answer.
         public static bool IsFetch(this HttpRequest request) => request.Headers.XRequestedWith == "fetch";
 
+        // JSON for "saved": the dialog closes and the message shows as a toast.
         public static JsonResult Saved(string? message) => new(ApiResult.CreateSuccess(message));
 
         /// <summary>Every error message in one line, with the first invalid field named so the dialog can focus it.</summary>
+        // JSON for "not saved": the dialog stays open and shows the error(s).
         public static JsonResult Rejected(ModelStateDictionary state)
         {
             var failed = state.Where(x => x.Value?.Errors.Count > 0).ToList();

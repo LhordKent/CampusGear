@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
+// =====================================================================
+// PASSWORD RESET CONTROLLER  (URLs start with /auth)
+// "Forgot password" in 3 steps:  1) enter email -> 2) enter the emailed code -> 3) choose a new password.
+// FLOW: each step -> this controller -> PasswordResetService -> database / email sender.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     [Route("auth")]
@@ -27,6 +32,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _passwordResetService = passwordResetService;
         }
 
+        // Step 1 (GET): the "enter your email" page.
         [AllowAnonymous, HttpGet("password-reset-request")]
         public IActionResult PasswordResetRequest()
         {
@@ -34,6 +40,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/PasswordResetRequest.cshtml");
         }
 
+        // Step 1 (POST): emails a reset code if the account exists (the page never says whether it does).
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("password-reset-request")]
         public async Task<IActionResult> PasswordResetRequest([FromForm] EmailInput input, CancellationToken cancellationToken)
         {
@@ -48,6 +55,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return RedirectToAction(nameof(PasswordResetCode));
         }
 
+        // Step 2 (GET): the "enter the code" page.
         [AllowAnonymous, HttpGet("password-reset-code")]
         public async Task<IActionResult> PasswordResetCode(CancellationToken cancellationToken)
         {
@@ -62,6 +70,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/PasswordResetCode.cshtml");
         }
 
+        // Step 2 (POST): checks the code.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("password-reset-code")]
         public async Task<IActionResult> PasswordResetCode([FromForm] CodeInput input, CancellationToken cancellationToken)
         {
@@ -85,6 +94,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/PasswordResetCode.cshtml");
         }
 
+        // Sends a new code.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("resend-password-reset-code")]
         public async Task<IActionResult> ResendPasswordResetCode(CancellationToken cancellationToken)
         {
@@ -95,6 +105,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 : RedirectToAction(nameof(PasswordResetCode));
         }
 
+        // Step 3 (GET): the "choose a new password" page (only after a correct code).
         [AllowAnonymous, HttpGet("password-reset-new")]
         public async Task<IActionResult> PasswordResetNew(CancellationToken cancellationToken)
         {
@@ -110,6 +121,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/PasswordResetNew.cshtml");
         }
 
+        // Step 3 (POST): saves the new password.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("password-reset-new")]
         public async Task<IActionResult> PasswordResetNew([FromForm] NewPasswordInput input, CancellationToken cancellationToken)
         {
@@ -133,6 +145,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/PasswordResetNew.cshtml");
         }
 
+        // "Password changed" page.
         [AllowAnonymous, HttpGet("success")]
         public IActionResult Success() => View("~/Views/Account/Success.cshtml");
     }

@@ -5,6 +5,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+// =====================================================================
+// DB INITIALIZER  -  runs once when the app starts (called from Program.cs).
+//   1. applies database migrations (creates/updates tables) - only in Development
+//   2. makes sure the roles exist: Administrator, Custodian, Borrower
+//   3. adds a few sample categories/items if the database has no equipment yet - only in Development
+//   4. creates the first administrator from the CAMPUSGEAR_BOOTSTRAP_ADMIN_* environment
+//      variables, if no administrator exists yet
+// =====================================================================
 namespace ASI.Basecode.Data
 {
     public static class DbInitializer

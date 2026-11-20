@@ -7,6 +7,11 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// MAINTENANCE SERVICE  -  repair cases for damaged equipment.
+// Open case  -> item.IsMaintenanceHold = true  (borrowers can't book it)
+// Close case -> record the repair + the item's new condition; the hold is lifted if no other case is open.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class MaintenanceService : ServiceBase, IMaintenanceService
@@ -35,6 +40,7 @@ namespace ASI.Basecode.Services.Services
             _timeProvider = clock;
         }
 
+        // The maintenance page list (filter by status, search).
         public async Task<MaintenancePage> GetPageAsync(string? status, string? query, int page, CancellationToken ct)
         {
             status = status == "closed" ? "closed" : "open";
@@ -47,6 +53,7 @@ namespace ASI.Basecode.Services.Services
             return new(await _cases.ListAsync(status, query, page, ct), status, query ?? "");
         }
 
+        // OPEN a case: the item must be active, not on loan, and not already have an open case.
         public async Task<OperationResult<bool>> OpenAsync(
             RequestContext actor,
             Guid equipmentItemId,
@@ -70,6 +77,7 @@ namespace ASI.Basecode.Services.Services
                 return Outcome(false, Errors.DescriptionTooLong, "description");
             }
 
+            // Lock the item so a booking or edit can't happen at the same moment.
             await using var transaction = await _unitOfWork.BeginAsync(cancellationToken);
             try
             {
@@ -98,6 +106,7 @@ namespace ASI.Basecode.Services.Services
                     OpenedAtUtc = now,
                     OpenedByUserId = actor.UserId!,
                 };
+                // Put the item on hold: it disappears from booking until the case is closed.
                 item.IsMaintenanceHold = true;
                 item.UpdatedAtUtc = now;
                 _cases.Add(maintenance);
@@ -132,6 +141,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // UPDATE a case (status, notes). Closing it needs a resolution and a usable condition (not Damaged).
         public async Task<OperationResult<bool>> UpdateAsync(
             RequestContext actor,
             Guid id,
@@ -163,6 +173,7 @@ namespace ASI.Basecode.Services.Services
                 return Outcome(false, Errors.CaseNotFound, status: OperationOutcome.NotFound);
             }
 
+            // Lock the item, load the case, and refuse if someone else changed it first (row version).
             await using var transaction = await _unitOfWork.BeginAsync(cancellationToken);
             try
             {
@@ -183,6 +194,7 @@ namespace ASI.Basecode.Services.Services
                 maintenance.Status = input.Status;
                 maintenance.Resolution = string.IsNullOrWhiteSpace(input.Resolution) ? null : input.Resolution.Trim();
                 var item = maintenance.EquipmentItem;
+                // Closing: save the item's new condition, and lift the hold unless another case is still open.
                 if (input.Status == MaintenanceStatus.Closed)
                 {
                     maintenance.ClosedAtUtc = now;

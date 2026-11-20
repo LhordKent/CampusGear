@@ -1,3 +1,4 @@
+// STARTUP LOG  -  writes a few lines at startup: which email provider is used and whether its settings exist.
 namespace ASI.Basecode.WebApp
 {
     // Logger configuration

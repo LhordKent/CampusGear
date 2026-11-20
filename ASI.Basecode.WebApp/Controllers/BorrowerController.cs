@@ -6,6 +6,15 @@ using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// BORROWER CONTROLLER  (students only)
+// Everything a student does: browse equipment, request a booking, cancel it, see history and calendar.
+//
+// FLOW (making a booking):
+// Reservation page -> CreateReservation() -> ReservationRequestService (fair-use rules)
+// -> ReservationService.CreateAsync (locks the item, checks conflicts) -> database.
+// The new booking is "Pending" until a custodian approves it.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     [Authorize(Roles = RoleNames.Borrower)]
@@ -37,6 +46,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _reservations = reservations;
         }
 
+        // Who is doing this (user id, IP, trace id) - passed to ReservationService for checks and the audit log.
         private ReservationActor Actor()
         {
             return new(
@@ -46,6 +56,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // GET /borrower/home: the student's home page with the equipment catalog.
         [HttpGet("borrower/home")]
         [HttpGet("borrower/dashboard")]
         public async Task<IActionResult> Home(CancellationToken cancellationToken)
@@ -53,12 +64,14 @@ namespace ASI.Basecode.WebApp.Controllers
             return Page(await _catalog.HomeAsync(RequestActor, cancellationToken), "Home");
         }
 
+        // GET /borrower/reservation: the booking page for one piece of equipment.
         [HttpGet("borrower/reservation")]
         public async Task<IActionResult> Reservation(Guid? equipmentItemId, string? state, Guid[]? id, CancellationToken cancellationToken)
         {
             return Page(await _catalog.ReservationAsync(RequestActor, equipmentItemId, state, id, cancellationToken), "Reservation");
         }
 
+        // GET /borrower/reservation/availability: "is this item free from START to END?" - answered as JSON for the booking form.
         [HttpGet("borrower/reservation/availability")]
         public async Task<IActionResult> Availability(Guid equipmentItemId, string? start, string? end, CancellationToken cancellationToken)
         {
@@ -120,6 +133,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // POST /borrower/reservation: submits a booking request (it becomes Pending).
         [HttpPost("borrower/reservation")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReservation(ReservationRequestModel input, CancellationToken cancellationToken)
@@ -136,6 +150,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Page(result, "Reservation");
         }
 
+        // POST /borrower/reservation/{id}/cancel: the student cancels their own pending or approved booking.
         [HttpPost("borrower/reservation/{id:guid}/cancel")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
@@ -161,6 +176,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/borrower/history");
         }
 
+        // GET /borrower/history: the student's past and current bookings, with filters.
         [HttpGet("borrower/history")]
         public async Task<IActionResult> History(
             string? status,
@@ -180,6 +196,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Page(result, "History");
         }
 
+        // GET /borrower/calendar: month view of the student's bookings.
         [HttpGet("borrower/calendar")]
         public async Task<IActionResult> Calendar(
             int? year,
@@ -192,6 +209,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Page(await _calendars.CalendarAsync(RequestActor, year, month, equipmentItemId, day, cancellationToken), "Calendar");
         }
 
+        // Turns a service result into the right page: the view, a 404, or "access denied".
         private IActionResult Page<T>(OperationResult<T> result, string view)
         {
             if (result.Outcome == OperationOutcome.Forbidden)

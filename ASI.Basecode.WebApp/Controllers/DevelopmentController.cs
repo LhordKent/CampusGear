@@ -3,6 +3,10 @@ using ASI.Basecode.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// DEVELOPMENT CONTROLLER  (only works while developing on your own PC)
+// Shows the emails the app "sent" (codes, notices) so you can test without a real mail server.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     public sealed class DevelopmentController : Controller

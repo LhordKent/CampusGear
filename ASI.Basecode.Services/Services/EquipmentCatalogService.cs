@@ -7,6 +7,11 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Identity;
 
+// =====================================================================
+// EQUIPMENT CATALOG SERVICE  -  what students see when browsing and booking (read-only).
+// Units with the same name and category are shown as ONE product with a quantity,
+// e.g. five "Canon EOS Camera" units = one card that says "5 available".
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class EquipmentCatalogService : ServiceBase, IEquipmentCatalogService
@@ -30,6 +35,7 @@ namespace ASI.Basecode.Services.Services
             _timeProvider = clock;
         }
 
+        // The student home page: catalog, their active bookings, and notices (e.g. borrowing paused).
         public async Task<OperationResult<BorrowerHomeViewModel>> HomeAsync(RequestContext actor, CancellationToken cancellationToken)
         {
             var profile = await OwnProfileAsync(actor, cancellationToken);
@@ -79,6 +85,7 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // The booking page for one product.
         public async Task<OperationResult<ReservationPageViewModel>> ReservationAsync(
             RequestContext actor,
             Guid? equipmentItemId,
@@ -126,6 +133,7 @@ namespace ASI.Basecode.Services.Services
             return OperationResult<ReservationPageViewModel>.Ok(model);
         }
 
+        // "Is it free?" check used by the booking form while the student picks dates.
         public async Task<OperationResult<AvailabilityResult>> AvailabilityAsync(
             RequestContext actor,
             Guid equipmentItemId,
@@ -172,6 +180,7 @@ namespace ASI.Basecode.Services.Services
         }
 
         /// <summary>Busy times for every bookable unit of a product over a window of about three months.</summary>
+        // Busy times for the date picker (about three months ahead).
         public async Task<OperationResult<ReservationSchedule>> ScheduleAsync(
             RequestContext actor,
             Guid equipmentItemId,
@@ -242,6 +251,7 @@ namespace ASI.Basecode.Services.Services
         /// are shown as one product whose quantity is the number of units that can be borrowed.
 
         /// </summary>
+        // Builds the product list: groups units into products and counts how many can be borrowed.
         public async Task<ReservationPageViewModel> GetRequestPageAsync(
             bool isEligible,
             ReservationRequestModel input,

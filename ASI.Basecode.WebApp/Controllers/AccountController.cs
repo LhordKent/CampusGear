@@ -7,6 +7,13 @@ using ASI.Basecode.WebApp.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+// =====================================================================
+// ACCOUNT CONTROLLER  (all URLs start with /auth)
+// Sign in, the emailed code for administrators (two-factor), sign out, and student sign-up.
+//
+// FLOW: browser form -> this controller -> AuthenticationService / RegistrationService
+//       -> Identity + database. The controller only reads the result and picks the next page.
+// =====================================================================
 
 namespace ASI.Basecode.WebApp.Controllers
 {
@@ -32,6 +39,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _registrationService = registrationService;
         }
 
+        // GET /auth/login: shows the sign-in page. Already signed in? Go straight to your dashboard.
         [AllowAnonymous, HttpGet("login")]
         public async Task<IActionResult> Login(CancellationToken cancellationToken)
         {
@@ -46,6 +54,8 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/Login.cshtml");
         }
 
+        // POST /auth/login: checks email + password.
+        // Result: signed in -> dashboard, administrator -> two-factor page (code emailed), wrong -> error again.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("login")]
         public async Task<IActionResult> Login([FromForm] LoginViewModel model, CancellationToken cancellationToken)
         {
@@ -73,6 +83,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/Login.cshtml");
         }
 
+        // GET /auth/two-factor: shows the "enter the code we emailed you" page (administrators only).
         [AllowAnonymous, HttpGet("two-factor")]
         public async Task<IActionResult> TwoFactor(CancellationToken cancellationToken)
         {
@@ -88,6 +99,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/TwoFactor.cshtml");
         }
 
+        // POST /auth/two-factor: checks the emailed code. Correct -> signed in and sent to the admin dashboard.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("two-factor")]
         public async Task<IActionResult> TwoFactor([FromForm] CodeInput input, CancellationToken cancellationToken)
         {
@@ -111,6 +123,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/TwoFactor.cshtml");
         }
 
+        // POST /auth/resend-two-factor: emails a new code.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("resend-two-factor")]
         public async Task<IActionResult> ResendTwoFactor(CancellationToken cancellationToken)
         {
@@ -121,6 +134,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 : RedirectToAction(nameof(TwoFactor));
         }
 
+        // POST /auth/logout: signs the user out and goes back to the login page.
         [Authorize, EnableRateLimiting("auth-post"), HttpPost("logout")]
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
@@ -134,6 +148,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/AccessDenied.cshtml");
         }
 
+        // GET /auth/signup: shows the student registration form.
         [AllowAnonymous, HttpGet("signup")]
         public IActionResult Register()
         {
@@ -141,6 +156,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/Register.cshtml");
         }
 
+        // POST /auth/signup: creates the student account. An admin must approve it before they can sign in.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("signup")]
         public async Task<IActionResult> Register([FromForm] SignUpInput input)
         {
@@ -170,6 +186,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/RegistrationSubmitted.cshtml");
         }
 
+        // Which dashboard each role lands on after signing in.
         private static string WorkspaceUrl(string? role)
         {
             return role switch

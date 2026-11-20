@@ -8,6 +8,14 @@ using ASI.Basecode.WebApp.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// CUSTODIAN CONTROLLER  (the borrowing desk)
+// Booking life cycle:  Pending -> Approve -> Approved -> Release (item handed over) -> Released (on loan)
+// -> Return (item back) -> Completed.   Reject / Cancel / Expire end it early.
+//
+// FLOW: button on the queue -> this controller -> ReservationService (ApproveAsync, RejectAsync,
+// ReleaseAsync, ReturnAsync) -> database. TransitionAsync() below runs all four the same way.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     // The borrowing desk belongs to the custodian. Administrators get read-only access to history, the calendar and
@@ -39,6 +47,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
         private const int PageSize = 12;
 
+        // GET /custodian/approvals: pending requests to approve/reject, and approved bookings ready to release.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpGet("custodian/approvals")]
         public async Task<IActionResult> Approvals(
@@ -54,6 +63,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("Queue", Feedback(await _desk.GetApprovalQueueAsync(new(q, status, from, to, page), cancellationToken)));
         }
 
+        // GET /custodian/returns: items currently on loan, waiting to be returned.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpGet("custodian/returns")]
         public async Task<IActionResult> Returns(
@@ -75,6 +85,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("Queue", Feedback(await _desk.GetReturnQueueAsync(new(q, "all", from, to, page), cancellationToken)));
         }
 
+        // GET /custodian/history: every booking, finished or not, with filters.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpGet("custodian/history")]
         public async Task<IActionResult> History(
@@ -90,6 +101,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("Queue", Feedback(await _desk.GetHistoryAsync(new(q, status, from, to, page), cancellationToken)));
         }
 
+        // GET /custodian/reservations/{id}: full details of one booking.
         [Authorize(Roles = RoleNames.CustodianOrAdministrator)]
         [HttpGet("custodian/reservations/{id:guid}")]
         public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
@@ -104,6 +116,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(model with { Feedback = TempData["CustodianFeedback"] as string, Error = TempData["CustodianError"] as string });
         }
 
+        // POST .../approve: Pending -> Approved.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpPost("custodian/reservations/{id:guid}/approve")]
         public Task<IActionResult> Approve(Guid id, CancellationToken cancellationToken)
@@ -116,6 +129,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // POST .../reject: Pending -> Rejected (a reason is required).
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpPost("custodian/reservations/{id:guid}/reject")]
         public Task<IActionResult> Reject(Guid id, [FromForm] string? reason, CancellationToken cancellationToken)
@@ -132,6 +146,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // POST .../release: hands the item over. Approved -> Released, and a Loan record is created.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpPost("custodian/reservations/{id:guid}/release")]
         public Task<IActionResult> Release(
@@ -158,6 +173,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // POST .../return: takes the item back. Released -> Completed. A Damaged return opens a maintenance case.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpPost("custodian/reservations/{id:guid}/return")]
         public Task<IActionResult> RecordReturn(
@@ -185,6 +201,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // GET /custodian/calendar: month view of all bookings.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpGet("custodian/calendar")]
         public async Task<IActionResult> Calendar(
@@ -199,6 +216,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("Calendar", await _calendars.GetStaffCalendarAsync(year, month, equipmentItemId, day, cancellationToken));
         }
 
+        // GET /admin/history: the same history page, for administrators (read-only).
         [Authorize(Roles = RoleNames.Administrator)]
         [HttpGet("admin/history")]
         public Task<IActionResult> AdminHistory(
@@ -213,6 +231,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return History(q, status, from, to, page, cancellationToken);
         }
 
+        // GET /admin/calendar: the same calendar, for administrators (read-only).
         [Authorize(Roles = RoleNames.Administrator)]
         [HttpGet("admin/calendar")]
         public Task<IActionResult> AdminCalendar(
@@ -235,6 +254,8 @@ namespace ASI.Basecode.WebApp.Controllers
             };
         }
 
+        // Runs one booking action (approve/reject/release/return) and turns the result or error into
+        // a toast (modal form) or a message + redirect (normal form).
         private async Task<IActionResult> TransitionAsync(
             Guid id,
             Func<ReservationActor, Task<ReservationResult>> operation,
@@ -301,6 +322,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect($"/custodian/reservations/{id:D}");
         }
 
+        // A bad form value (e.g. no condition picked): show the error without calling the service.
         private Task<IActionResult> InvalidFormAsync(Guid id, string error)
         {
             if (Request.IsFetch())
@@ -312,6 +334,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Task.FromResult<IActionResult>(Redirect($"/custodian/reservations/{id:D}"));
         }
 
+        // Reads the condition text from the form ("Good", "Damaged", ...).
         private static bool ValidCondition(string? value, out EquipmentCondition condition)
         {
             return Enum.TryParse(value, true, out condition) && Enum.IsDefined(condition);

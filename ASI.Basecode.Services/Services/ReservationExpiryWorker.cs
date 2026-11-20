@@ -3,6 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+// =====================================================================
+// RESERVATION EXPIRY WORKER  -  runs in the background every minute while the app is running.
+// Calls ReservationService.ExpireDueAsync to close requests that waited too long and
+// approved bookings that were never picked up. Nobody has to click anything.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>

@@ -8,6 +8,12 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// CATEGORY SERVICE  -  add, edit, delete equipment categories.
+// Each category gets an asset code prefix when it is created (e.g. "Cameras" -> CAM).
+// Delete: refused if the category has active equipment; hidden if it only has inactive equipment;
+// removed for good if it is empty. Adding a hidden category's name again restores it.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>
@@ -46,6 +52,7 @@ namespace ASI.Basecode.Services.Services
             _mapper = mapper;
         }
 
+        // Loads a category for the Edit modal (hidden/deleted ones count as not found).
         public async Task<CategoryEditModel?> GetEditAsync(Guid id, CancellationToken ct)
         {
             var category = await _categoryRepository.FindAsync(id, ct);
@@ -63,6 +70,7 @@ namespace ASI.Basecode.Services.Services
             };
         }
 
+        // The category list for the page.
         public async Task<CategoryPage> GetPageAsync(string? query, CancellationToken ct)
         {
             query = query?.Trim();
@@ -75,6 +83,7 @@ namespace ASI.Basecode.Services.Services
             return new(_mapper.Map<List<CategoryListItem>>(data.Rows), query ?? "", data.Total);
         }
 
+        // SAVE (add or edit). Also handles: duplicate names, and restoring a deleted category with the same name.
         public async Task<OperationResult<Guid>> SaveAsync(RequestContext actor, CategoryEditModel input, CancellationToken ct)
         {
             var validation = new List<ValidationResult>();
@@ -151,6 +160,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // DELETE: see the rules at the top of this file.
         public async Task<OperationResult<Guid>> DeleteAsync(RequestContext actor, Guid id, CancellationToken ct)
         {
             await using var transaction = await _unitOfWork.BeginAsync(ct);
@@ -207,6 +217,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // Quick "add category" from the equipment page: just a name.
         public async Task<OperationResult<Guid>> AddFromInventoryAsync(RequestContext actor, string? name, CancellationToken ct)
         {
             name = name?.Trim();

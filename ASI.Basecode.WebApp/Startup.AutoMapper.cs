@@ -2,6 +2,7 @@ using AutoMapper;
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.ServiceModels;
 
+// AUTOMAPPER SETUP  -  copies data-layer records into view models automatically (same property names).
 namespace ASI.Basecode.WebApp
 {
     // AutoMapper configuration

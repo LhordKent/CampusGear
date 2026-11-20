@@ -3,6 +3,7 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// CUSTODIAN READ REPOSITORY  -  read-only queries for the custodian's queues and booking details.
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class CustodianReadRepository : BaseRepository, ICustodianReadRepository

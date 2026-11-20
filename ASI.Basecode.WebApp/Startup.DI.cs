@@ -8,6 +8,12 @@ using ASI.Basecode.Services.Services;
 using ASI.Basecode.WebApp.Configuration;
 using Microsoft.AspNetCore.Identity;
 
+// =====================================================================
+// DEPENDENCY INJECTION  -  the list that says "when a class asks for IXxx, give it Xxx".
+// Example: a controller asks for IReservationService -> it gets ReservationService.
+// Looking for which class really runs behind an interface? Search for it in this file.
+// "Scoped" = one instance per web request.  "Singleton" = one instance for the whole app.
+// =====================================================================
 namespace ASI.Basecode.WebApp
 {
     // Other services configuration

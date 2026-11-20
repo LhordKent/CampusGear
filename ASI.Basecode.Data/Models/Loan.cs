@@ -1,5 +1,7 @@
 using ASI.Basecode.Resources.Constants;
 
+// LOAN (table: Loans)  -  created when the custodian hands an item over (Release).
+// ReturnedAtUtc empty = the item is still out. Filled in on Return.
 namespace ASI.Basecode.Data.Models
 {
     public sealed class Loan
@@ -10,8 +12,10 @@ namespace ASI.Basecode.Data.Models
 
         public DateTime ReleasedAtUtc { get; set; }
 
+        // When the item must be back (the booking's end time).
         public DateTime DueAtUtc { get; set; }
 
+        // Empty while the item is out on loan.
         public DateTime? ReturnedAtUtc { get; set; }
 
         public string ReleasedByUserId { get; set; } = string.Empty;

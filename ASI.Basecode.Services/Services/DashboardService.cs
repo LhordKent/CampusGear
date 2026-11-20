@@ -7,6 +7,11 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Identity;
 
+// =====================================================================
+// DASHBOARD SERVICE  -  numbers and charts for the custodian and admin dashboards (read-only).
+// FLOW: HomeController -> this service -> DashboardReadRepository -> database.
+// All dates are grouped in Manila time.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class DashboardService : ServiceBase, IDashboardService
@@ -33,6 +38,7 @@ namespace ASI.Basecode.Services.Services
         private const int TrendDays = 14;
         private const int RegistrationMonths = 6;
 
+        // Custodian dashboard: today's pickups and returns, overdue items, pending requests.
         public async Task<CustodianDashboardViewModel> GetCustodianAsync(string userId, CancellationToken cancellationToken)
         {
             var user = (await _userManager.FindByIdAsync(userId))!;
@@ -71,6 +77,7 @@ namespace ASI.Basecode.Services.Services
             return model;
         }
 
+        // Admin dashboard: equipment states, booking statuses, weekly activity, new sign-ups, recent activity.
         public async Task<AdminDashboardViewModel> GetAdministratorAsync(string userId, CancellationToken cancellationToken)
         {
             var user = (await _userManager.FindByIdAsync(userId))!;

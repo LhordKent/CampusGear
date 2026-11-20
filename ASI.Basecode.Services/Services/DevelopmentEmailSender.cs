@@ -4,6 +4,8 @@ using ASI.Basecode.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
+// DEVELOPMENT EMAIL SENDER  -  while developing, emails are kept in memory instead of being sent.
+// You can read them at /development/email.
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>

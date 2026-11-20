@@ -8,6 +8,11 @@ using ASI.Basecode.WebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// HOME CONTROLLER
+// The site root (/), the custodian and admin dashboards, and the error pages.
+// FLOW: dashboard URL -> this controller -> DashboardService -> DashboardReadRepository -> database.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     /// <summary>
@@ -37,6 +42,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/auth/login");
         }
 
+        // GET /custodian/dashboard: the custodian's home page (today's pickups, returns due, pending requests).
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpGet("custodian/dashboard")]
         public async Task<IActionResult> Custodian(CancellationToken cancellationToken)
@@ -47,6 +53,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // GET /admin/dashboard: the administrator's home page (counts, charts, recent activity).
         [Authorize(Roles = RoleNames.Administrator)]
         [HttpGet("admin/dashboard")]
         public async Task<IActionResult> Administrator(CancellationToken cancellationToken)

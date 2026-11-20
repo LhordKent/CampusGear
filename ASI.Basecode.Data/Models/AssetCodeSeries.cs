@@ -1,3 +1,4 @@
+// ASSET CODE SERIES (table: AssetCodeSeries)  -  one per category: its prefix (CAM) and the next number to give out.
 namespace ASI.Basecode.Data.Models
 {
     public sealed class AssetCodeSeries

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+// ACCOUNT USER STORE  -  connects ASP.NET Identity (users, passwords, roles) to our database,
+// and turns database errors (e.g. duplicate email) into friendly results.
 namespace ASI.Basecode.Data.Repositories
 {
     // Retains Identity's EF implementation; only translates relational constraint failures at the boundary.

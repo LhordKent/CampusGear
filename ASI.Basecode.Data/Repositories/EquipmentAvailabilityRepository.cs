@@ -3,6 +3,7 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// EQUIPMENT AVAILABILITY REPOSITORY  -  read-only queries: which items are busy when, and their current state.
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class EquipmentAvailabilityRepository : BaseRepository, IEquipmentAvailabilityRepository

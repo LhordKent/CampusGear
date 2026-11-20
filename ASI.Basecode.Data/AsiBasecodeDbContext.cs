@@ -2,6 +2,11 @@ using ASI.Basecode.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+// =====================================================================
+// DATABASE CONTEXT  -  the map between C# classes and SQL Server tables (Entity Framework).
+// Each "modelBuilder.Entity<...>" block sets up one table: column sizes, keys, indexes,
+// and how tables link (e.g. a Loan belongs to one Reservation). Changes here need a new migration.
+// =====================================================================
 namespace ASI.Basecode.Data
 {
     public sealed class AsiBasecodeDBContext : IdentityDbContext<User>

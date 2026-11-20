@@ -1,5 +1,6 @@
 using ASI.Basecode.Data.Interfaces;
 
+// BASE REPOSITORY  -  every repository inherits this to get the shared database context (Context).
 namespace ASI.Basecode.Data.Repositories
 {
     /// <summary>

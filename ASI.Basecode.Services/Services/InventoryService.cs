@@ -8,6 +8,11 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// INVENTORY SERVICE  -  add, edit and delete equipment items (admin Equipment page).
+// FLOW: AdminInventoryController -> this service -> EquipmentRepository, AssetCodeRepository,
+//       MaintenanceRepository -> database. Photos are saved to disk by EquipmentImageStore.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class InventoryService : ServiceBase, IInventoryService
@@ -45,23 +50,28 @@ namespace ASI.Basecode.Services.Services
             _images = images;
         }
 
+        // Loads one item for the Edit modal.
         public async Task<EquipmentRecord?> GetEditAsync(Guid id, CancellationToken ct)
         {
             var item = await _equipmentRepository.FindAsync(id, ct);
             return item is null ? null : EquipmentRecord.From(item);
         }
 
+        // What blocks editing right now: an open loan (no edits) or upcoming bookings (must stay active).
         public Task<EquipmentEditState> GetEditStateAsync(Guid id, CancellationToken ct)
         {
             return _equipmentRepository.EditStateAsync(id, _timeProvider.GetUtcNow().UtcDateTime, ct);
         }
 
+        // The equipment list for the page (15 per page), plus the categories for the dropdown.
         public async Task<InventoryPage> GetPageAsync(string? query, int page, CancellationToken ct)
         {
             query = query?.Trim();
             return new(await _equipmentRepository.InventoryAsync(query, page, ct), query ?? "");
         }
 
+        // DELETE: an item with borrowing/repair history is only made inactive (history is kept);
+        // an item with no history is removed completely, together with its photo.
         public async Task<OperationResult<Guid>> DeleteAsync(RequestContext actor, Guid id, CancellationToken ct)
         {
             var item = await _equipmentRepository.FindAsync(id, ct);
@@ -115,6 +125,13 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // SAVE (add or edit). Steps:
+        //   1. quick checks (condition, category, photo size)
+        //   2. save the new photo file first
+        //   3. lock the item + category, re-check, and refuse if the item is on loan
+        //   4. copy the form values onto the item; a NEW item gets its asset code (e.g. CAM-004)
+        //   5. Damaged -> maintenance hold + open repair case
+        //   6. audit log, save, commit. If anything fails, the new photo file is deleted again.
         public async Task<OperationResult<Guid>> SaveAsync(
             RequestContext actor,
             EquipmentEditModel input,
@@ -123,6 +140,7 @@ namespace ASI.Basecode.Services.Services
         )
         {
             var errors = new List<FieldError>();
+            // Step 1: quick checks before touching the database.
             input.Name = input.Name?.Trim() ?? "";
             if (!Enum.IsDefined(input.Condition))
             {
@@ -168,6 +186,7 @@ namespace ASI.Basecode.Services.Services
             {
                 // Include transaction creation in the compensation scope: the photo
                 // already exists even if the database cannot begin a transaction.
+                // Step 3: lock the item and its category so nobody changes them at the same time.
                 transaction = await _unitOfWork.BeginAsync(cancellationToken);
                 await _lockManager.AcquireAsync($"CampusGear:EquipmentItem:{itemId:N}", cancellationToken);
                 await _lockManager.AcquireAsync($"CampusGear:EquipmentCategory:{input.CategoryId:N}", cancellationToken);
@@ -189,12 +208,14 @@ namespace ASI.Basecode.Services.Services
                     return OperationResult<Guid>.Invalid(Errors.StaleEquipment);
                 }
 
+                // An item that is out on loan can't be edited until it is returned.
                 if (await _equipmentRepository.HasOutstandingLoanAsync(itemId, cancellationToken))
                 {
                     return OperationResult<Guid>.Invalid(Errors.ActiveLoanPreventsEdit);
                 }
 
                 var now = _timeProvider.GetUtcNow().UtcDateTime;
+                // Can't make it inactive while students still have upcoming bookings for it.
                 if (!input.IsActive && await _equipmentRepository.HasLiveReservationsAsync(itemId, now, cancellationToken))
                 {
                     return OperationResult<Guid>.Invalid(Errors.LiveReservationsPreventDeactivation);
@@ -211,6 +232,7 @@ namespace ASI.Basecode.Services.Services
                             item.IsActive,
                         }
                     );
+                // Step 4: copy the form values onto the item.
                 item.CategoryId = input.CategoryId;
                 item.Name = input.Name;
                 item.SerialNumber = Clean(input.SerialNumber);
@@ -225,6 +247,7 @@ namespace ASI.Basecode.Services.Services
                 }
 
                 item.UpdatedAtUtc = now;
+                // New item: take the next asset code from the category's series (CAM-001, CAM-002, ...).
                 if (input.Id is null)
                 {
                     assignedCode = await _assetCodes.AllocateAsync(input.CategoryId, cancellationToken);
@@ -232,6 +255,7 @@ namespace ASI.Basecode.Services.Services
                     _equipmentRepository.Add(item);
                 }
 
+                // Step 5: Damaged -> hide it from borrowers and open a repair case (if none is open yet).
                 if (input.Condition is EquipmentCondition.Damaged)
                 {
                     item.IsMaintenanceHold = true;
@@ -255,6 +279,7 @@ namespace ASI.Basecode.Services.Services
                     item.IsMaintenanceHold = true;
                 }
 
+                // Step 6: audit log, then save and commit.
                 _auditRepository.Add(
                     WorkflowRecords.Audit(
                         actor,
@@ -318,6 +343,7 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // Turns empty text into null and trims spaces.
         private static string? Clean(string? text)
         {
             return string.IsNullOrWhiteSpace(text) ? null : text.Trim();

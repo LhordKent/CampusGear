@@ -3,6 +3,9 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// =====================================================================
+// RESERVATION REPOSITORY  -  database queries for bookings (used by ReservationService).
+// =====================================================================
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class ReservationRepository : BaseRepository, IReservationRepository
@@ -10,6 +13,7 @@ namespace ASI.Basecode.Data.Repositories
         public ReservationRepository(IUnitOfWork unitOfWork, AsiBasecodeDBContext db)
             : base(unitOfWork, db) { }
 
+        // Finds a booking by the form's request id (to catch the same form being submitted twice).
         public Task<Reservation?> FindByRequestIdAsync(Guid requestId, CancellationToken ct)
         {
             return Context
@@ -24,6 +28,7 @@ namespace ASI.Basecode.Data.Repositories
             return Context.Reservations.SingleOrDefaultAsync(x => x.Id == id, ct);
         }
 
+        // Loads a booking with its loan, item and student - everything a status change needs.
         public Task<Reservation?> FindWorkflowAsync(Guid id, CancellationToken ct)
         {
             return Context
@@ -33,6 +38,7 @@ namespace ASI.Basecode.Data.Repositories
                 .SingleOrDefaultAsync(x => x.Id == id, ct);
         }
 
+        // Only the item id of a booking (so the item can be locked before the booking is loaded).
         public Task<Guid?> GetItemIdAsync(Guid id, CancellationToken ct)
         {
             return Context
@@ -42,6 +48,9 @@ namespace ASI.Basecode.Data.Repositories
                 .SingleOrDefaultAsync(ct);
         }
 
+        // THE CONFLICT CHECK: does any booking overlap START..END for this item?
+        // Counts: Approved, Released (on loan), and Pending requests whose hold is still running.
+        // Overlap rule: other.Start < END and other.End > START.
         public Task<bool> HasConflictAsync(Guid itemId, DateTime start, DateTime end, DateTime now, Guid? excluding, CancellationToken ct)
         {
             return Context.Reservations.AnyAsync(
@@ -64,6 +73,7 @@ namespace ASI.Basecode.Data.Repositories
             );
         }
 
+        // Bookings the expiry worker should close: late Pending requests and approved no-shows.
         public async Task<IReadOnlyList<ExpiryCandidate>> ExpiryCandidatesAsync(DateTime now, int size, CancellationToken ct)
         {
             return await Context
@@ -80,6 +90,7 @@ namespace ASI.Basecode.Data.Repositories
                 .ToListAsync(ct);
         }
 
+        // A student's current bookings (for the "max active bookings" fair-use rule).
         public async Task<IReadOnlyList<BookingTime>> ActiveBookingTimesAsync(Guid borrowerProfileId, DateTime now, CancellationToken ct)
         {
             return await Context

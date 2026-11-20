@@ -5,6 +5,11 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// AUDIT SERVICE  -  the audit log ("who did what, when").
+// Most actions write their audit entry themselves; this service shows the log page
+// and records sign-in events.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class AuditService : ServiceBase, IAuditService
@@ -18,6 +23,7 @@ namespace ASI.Basecode.Services.Services
             _unitOfWork = work;
         }
 
+        // One page of the audit log for /admin/audit, with search.
         public async Task<AdminAuditPage> GetAuditAsync(string? q, int page = 1, CancellationToken cancellationToken = default)
         {
             q = SearchText(q);
@@ -51,6 +57,7 @@ namespace ASI.Basecode.Services.Services
             return text.Length > 120 ? text[..120] : text;
         }
 
+        // Records a sign-in related event (login, failed password, code sent, ...).
         public async Task RecordAccountAsync(RequestContext actor, string action, string outcome, string? userId, CancellationToken ct)
         {
             _auditRepository.Add(

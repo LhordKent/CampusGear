@@ -6,6 +6,13 @@ using ASI.Basecode.WebApp.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// ADMIN USERS CONTROLLER  (administrators only)
+// The "Users & Roles" page: list accounts, approve/reject sign-ups, create, edit, delete, and the audit log.
+//
+// FLOW: page or modal form -> this controller -> UserService -> UserRepository + Identity -> database.
+// Important rules live in UserService, e.g. deactivating/pausing a student cancels their open bookings.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     [Authorize(Roles = RoleNames.Administrator)]
@@ -36,6 +43,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return RedirectPermanent("/admin/users?role=" + RoleNames.Borrower);
         }
 
+        // GET /admin/users: the account list with search, role and status filters.
         [HttpGet("admin/users")]
         public async Task<IActionResult> Index(
             string? q,
@@ -68,18 +76,21 @@ namespace ASI.Basecode.WebApp.Controllers
             return await EditorAsync("_ReviewRegistration", page, cancellationToken);
         }
 
+        // POST /admin/users/{id}/approve: lets a new student sign in.
         [HttpPost("admin/users/{id}/approve")]
         public Task<IActionResult> Approve(string id, string? returnUrl, CancellationToken cancellationToken)
         {
             return DecideRegistrationAsync(id, AccountApprovalStatus.Approved, returnUrl, cancellationToken);
         }
 
+        // POST /admin/users/{id}/reject: refuses a new student's registration.
         [HttpPost("admin/users/{id}/reject")]
         public Task<IActionResult> Reject(string id, string? returnUrl, CancellationToken cancellationToken)
         {
             return DecideRegistrationAsync(id, AccountApprovalStatus.Rejected, returnUrl, cancellationToken);
         }
 
+        // Shared by Approve and Reject: calls UserService.DecideAsync, then shows the result.
         private async Task<IActionResult> DecideRegistrationAsync(
             string id,
             AccountApprovalStatus decision,
@@ -109,12 +120,14 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/admin/users?status=pending");
         }
 
+        // GET /admin/users/{id}/edit: opens the Edit account modal.
         [HttpGet("admin/users/{id}/edit")]
         public Task<IActionResult> Edit(string id, CancellationToken cancellationToken)
         {
             return EditViewAsync(id, null, cancellationToken);
         }
 
+        // POST /admin/users/{id}/edit: saves the Edit account modal (name, role, active, borrowing access).
         [HttpPost("admin/users/{id}/edit")]
         public async Task<IActionResult> Edit(string id, UserEditModel input, CancellationToken cancellationToken)
         {
@@ -161,6 +174,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return await EditorAsync("_EditAccount", page, ct);
         }
 
+        // GET /admin/users/new: opens the Create account modal.
         [HttpGet("admin/users/new")]
         public Task<IActionResult> Create(string? role, CancellationToken cancellationToken)
         {
@@ -174,6 +188,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // POST /admin/users/new: creates a staff or student account.
         [HttpPost("admin/users/new")]
         public async Task<IActionResult> Create(UserCreateModel input, CancellationToken cancellationToken)
         {
@@ -221,6 +236,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect(url);
         }
 
+        // POST /admin/users/{id}/delete: deletes the account, or deactivates it if it has borrowing history.
         [HttpPost("admin/users/{id}/delete")]
         public async Task<IActionResult> Delete(string id, string? returnUrl, CancellationToken cancellationToken)
         {
@@ -234,6 +250,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/admin/users");
         }
 
+        // GET /admin/audit: the audit log (who did what, and when).
         [HttpGet("admin/audit")]
         public async Task<IActionResult> Audit(string? q, int page = 1, CancellationToken cancellationToken = default)
         {

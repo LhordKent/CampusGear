@@ -2,6 +2,8 @@ using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
+// CATEGORY REPOSITORY  -  database queries for equipment categories (used by CategoryService and InventoryService).
+// A category with IsActive = false is a "deleted" one that is kept only because inactive items still point to it.
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class CategoryRepository : BaseRepository, ICategoryRepository
@@ -22,6 +24,7 @@ namespace ASI.Basecode.Data.Repositories
 
         // A deleted category that still holds inactive equipment is kept as an inactive row (the items reference it),
         // so it is left out here exactly like a deleted one.
+        // The category list (deleted ones left out), with active/inactive item counts and the asset code prefix.
         public async Task<CategoryList> ListAsync(string? search, CancellationToken ct)
         {
             var query = Context.EquipmentCategories.AsNoTracking().Where(x => x.IsActive);
@@ -48,11 +51,13 @@ namespace ASI.Basecode.Data.Repositories
             );
         }
 
+        // Does the category hold any items (or only active ones, when activeOnly is true)?
         public Task<bool> HasItemsAsync(Guid id, bool activeOnly, CancellationToken ct)
         {
             return Context.EquipmentItems.AnyAsync(x => x.CategoryId == id && (!activeOnly || x.IsActive), ct);
         }
 
+        // Does the category exist and is it not deleted?
         public Task<bool> IsActiveAsync(Guid id, CancellationToken ct)
         {
             return Context.EquipmentCategories.AsNoTracking().AnyAsync(x => x.Id == id && x.IsActive, ct);

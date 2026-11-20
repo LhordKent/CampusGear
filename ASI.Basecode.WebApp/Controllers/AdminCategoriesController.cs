@@ -7,6 +7,11 @@ using ASI.Basecode.WebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// ADMIN CATEGORIES CONTROLLER  (administrators only)
+// The Equipment Categories page: list, add/edit (modal), delete.
+// FLOW: page or modal -> this controller -> CategoryService -> CategoryRepository -> database.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     [Authorize(Roles = RoleNames.Administrator)]
@@ -27,6 +32,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _categories = categories;
         }
 
+        // GET /admin/categories: the category list. With ?id=... it also opens the Edit modal.
         [HttpGet("admin/categories")]
         public async Task<IActionResult> Index(Guid? id, string? q, CancellationToken cancellationToken)
         {
@@ -46,6 +52,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Request.WantsModal() ? PartialView("_CategoryEditor", page) : View(page);
         }
 
+        // POST /admin/categories/{id}/delete: deletes a category (refused while it still has active equipment).
         [HttpPost("admin/categories/{id:guid}/delete")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
@@ -59,6 +66,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/admin/categories");
         }
 
+        // POST /admin/categories/save: saves the Add/Edit category modal.
         [HttpPost("admin/categories/save")]
         public async Task<IActionResult> Save([Bind(Prefix = "Input")] CategoryEditModel input, CancellationToken cancellationToken)
         {
@@ -92,11 +100,13 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/admin/categories");
         }
 
+        // Save failed: send the errors back to the modal (JSON) or re-show the page.
         private async Task<IActionResult> InvalidAsync(CategoryEditModel input, CancellationToken ct)
         {
             return Request.IsFetch() ? ModalForms.Rejected(ModelState) : View("Index", await PageAsync(input, ct));
         }
 
+        // Builds the page model: the list, messages, and the prefix of the category being edited.
         private async Task<CategoriesPageModel> PageAsync(CategoryEditModel input, CancellationToken ct, string? q = null)
         {
             var page = await _categories.GetPageAsync(q, ct);

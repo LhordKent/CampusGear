@@ -7,6 +7,11 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Identity;
 
+// =====================================================================
+// REGISTRATION SERVICE  -  student self sign-up (/auth/signup).
+// Creates the account as "Pending approval" with a borrower profile. The student can't sign in
+// until an administrator approves it on the Users & Roles page (UserService.DecideAsync).
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class RegistrationService : ServiceBase, IRegistrationService
@@ -29,6 +34,7 @@ namespace ASI.Basecode.Services.Services
             _audit = audit;
         }
 
+        // Validates the form, then creates the user, the Borrower role and the borrower profile together.
         public async Task<OperationResult<RegistrationResult>> SignUpAsync(
             RequestContext actor,
             SignUpInput input,

@@ -3,6 +3,7 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Identity;
 
+// CURRENT ACCOUNT SERVICE  -  the signed-in user's name and initials for the top bar.
 namespace ASI.Basecode.Services.Services
 {
     public sealed class CurrentAccountService : ServiceBase, ICurrentAccountService

@@ -9,6 +9,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
+// =====================================================================
+// AUTHENTICATION SERVICE  -  sign in and sign out.
+//   Students and custodians: email + password -> signed in.
+//   Administrators: email + password -> a code is emailed -> enter the code -> signed in.
+// Failed passwords count toward a lockout. Every attempt is written to the audit log.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class AuthenticationService : ServiceBase, IAuthenticationService
@@ -43,6 +49,7 @@ namespace ASI.Basecode.Services.Services
             _audit = audit;
         }
 
+        // The login page: if you're already signed in, it says where to send you.
         public async Task<OperationResult<AuthenticationResult>> GetLoginAsync(RequestContext actor, CancellationToken ct = default)
         {
             var feedback = new AccountFeedback();
@@ -62,6 +69,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
         }
 
+        // LOGIN step 1: check the email and password.
         public async Task<OperationResult<AuthenticationResult>> LoginAsync(
             RequestContext actor,
             LoginInput input,
@@ -71,6 +79,7 @@ namespace ASI.Basecode.Services.Services
             var feedback = new AccountFeedback();
             ClearPendingAdministrator();
             var email = input.Email.Trim();
+            // Unknown or inactive account: refuse (without saying which).
             var user = await _userManager.FindByEmailAsync(email);
             if (user is null || !user.IsActive)
             {
@@ -79,6 +88,7 @@ namespace ASI.Basecode.Services.Services
                 return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
             }
 
+            // Not approved yet (or rejected): tell them only AFTER the password is right.
             if (user.ApprovalStatus != AccountApprovalStatus.Approved)
             {
                 // The approval status is revealed only after the password is confirmed.
@@ -107,6 +117,7 @@ namespace ASI.Basecode.Services.Services
                 return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
             }
 
+            // Check the password (wrong tries count toward lockout).
             var passwordResult = await _signInManager.CheckPasswordSignInAsync(user, input.Password, lockoutOnFailure: true);
             if (!passwordResult.Succeeded)
             {
@@ -117,6 +128,7 @@ namespace ASI.Basecode.Services.Services
                 return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
             }
 
+            // Administrators need a second step: email them a code.
             if (await _userManager.IsInRoleAsync(user, RoleNames.Administrator) && !SkipAdministratorCode())
             {
                 // CheckPasswordSignInAsync validates the password without creating an auth cookie.
@@ -137,6 +149,7 @@ namespace ASI.Basecode.Services.Services
                 return feedback.Result(new AuthenticationResult(AuthenticationStatus.VerificationRequired, Notice: feedback.Notice));
             }
 
+            // Everyone else is signed in now.
             await _audit.RecordAccountAsync(actor, "Auth.Login", "Succeeded", user.Id, ct);
             await _signInManager.SignInAsync(user, isPersistent: false);
             return feedback.Result(
@@ -144,6 +157,7 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // The "enter your code" page (only valid right after step 1).
         public async Task<OperationResult<AuthenticationResult>> GetTwoFactorAsync(RequestContext actor, CancellationToken ct = default)
         {
             var feedback = new AccountFeedback();
@@ -155,6 +169,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.VerificationRequired, Notice: feedback.Notice));
         }
 
+        // LOGIN step 2 (administrators): check the emailed code, then sign in.
         public async Task<OperationResult<AuthenticationResult>> TwoFactorAsync(
             RequestContext actor,
             string? code,
@@ -196,6 +211,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.SignedIn, RoleNames.Administrator, feedback.Notice));
         }
 
+        // Emails a new code (there is a short wait between resends).
         public async Task<OperationResult<AuthenticationResult>> ResendTwoFactorAsync(RequestContext actor, CancellationToken ct = default)
         {
             var feedback = new AccountFeedback();
@@ -210,6 +226,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.VerificationRequired, Notice: feedback.Notice));
         }
 
+        // Sign out.
         public async Task<OperationResult<AuthenticationResult>> LogoutAsync(RequestContext actor, CancellationToken ct = default)
         {
             var feedback = new AccountFeedback();
@@ -219,6 +236,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
         }
 
+        // Which workspace the user belongs to (Administrator, Custodian or Borrower).
         private async Task<string> GetWorkspaceRoleAsync(User user)
         {
             if (await _userManager.IsInRoleAsync(user, RoleNames.Administrator))

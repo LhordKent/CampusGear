@@ -3,6 +3,7 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// EMAIL CHALLENGE REPOSITORY  -  stores the one-time email codes (admin login, password reset).
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class EmailChallengeRepository : BaseRepository, IEmailChallengeRepository

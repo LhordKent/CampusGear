@@ -1,3 +1,4 @@
+// BORROWER PROFILE (table: BorrowerProfiles)  -  the student part of an account (one per student user).
 namespace ASI.Basecode.Data.Models
 {
     public sealed class BorrowerProfile
@@ -12,6 +13,7 @@ namespace ASI.Basecode.Data.Models
 
         public string? ContactNumber { get; set; }
 
+        // "Can reserve equipment". false = borrowing paused: they can sign in but can't book.
         public bool IsEligible { get; set; } = true;
 
         public string? EligibilityNotes { get; set; }

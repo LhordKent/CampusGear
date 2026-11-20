@@ -3,6 +3,7 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// MAINTENANCE REPOSITORY  -  repair case queries (used by MaintenanceService and InventoryService).
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class MaintenanceRepository : BaseRepository, IMaintenanceRepository
@@ -10,6 +11,7 @@ namespace ASI.Basecode.Data.Repositories
         public MaintenanceRepository(IUnitOfWork unitOfWork, AsiBasecodeDBContext db)
             : base(unitOfWork, db) { }
 
+        // Does the item have an open repair case? (Optionally ignoring one case.)
         public Task<bool> HasOpenAsync(Guid itemId, CancellationToken ct, Guid? excludingCase = null)
         {
             return Context.MaintenanceCases.AnyAsync(
@@ -34,6 +36,7 @@ namespace ASI.Basecode.Data.Repositories
             return Context.MaintenanceCases.Include(x => x.EquipmentItem).SingleAsync(x => x.Id == id, ct);
         }
 
+        // The maintenance page list: filter by status, search, 15 per page.
         public async Task<MaintenanceListData> ListAsync(string status, string? search, int page, CancellationToken ct)
         {
             var all = Context.MaintenanceCases.AsNoTracking();

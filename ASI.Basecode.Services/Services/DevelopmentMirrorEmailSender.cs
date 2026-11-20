@@ -1,6 +1,7 @@
 using ASI.Basecode.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
+// DEVELOPMENT MIRROR EMAIL SENDER  -  sends the real email AND keeps a copy for /development/email.
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>

@@ -3,6 +3,10 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// =====================================================================
+// USER REPOSITORY  -  account queries for the admin Users & Roles page (used by UserService).
+// "Fresh" methods re-read from the database, ignoring anything loaded earlier in the request.
+// =====================================================================
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class UserRepository : BaseRepository, IUserRepository
@@ -18,6 +22,7 @@ namespace ASI.Basecode.Data.Repositories
                 .AnyAsync(x => x.ur.UserId == userId && x.r.NormalizedName == "BORROWER", ct);
         }
 
+        // The account list: search, role filter, status filter, paging.
         public async Task<AccountPageData> ListAsync(string search, string role, string status, int page, CancellationToken ct)
         {
             var query = Context.Users.AsNoTracking();
@@ -95,6 +100,7 @@ namespace ASI.Basecode.Data.Repositories
             return Context.BorrowerProfiles.AnyAsync(x => x.StudentNumber == number && x.UserId != excludingUser, ct);
         }
 
+        // Is there another active, verified administrator? (The last admin can't be removed.)
         public Task<bool> HasOtherAdministratorAsync(string excludingUser, CancellationToken ct)
         {
             return Context.UserRoles.AnyAsync(
@@ -106,6 +112,7 @@ namespace ASI.Basecode.Data.Repositories
             );
         }
 
+        // Has this account ever borrowed, decided, released, received or repaired anything?
         public async Task<bool> HasHistoryAsync(string userId, CancellationToken ct)
         {
             return await Context.Reservations.AnyAsync(x => x.BorrowerProfile.UserId == userId || x.DecidedByUserId == userId, ct)
@@ -114,6 +121,7 @@ namespace ASI.Basecode.Data.Repositories
         }
 
         // Released = the equipment is physically with the borrower; a return moves it to Completed.
+        // Does the student have an item on loan right now?
         public Task<bool> HasOpenLoanAsync(string userId, CancellationToken ct)
         {
             return Context.Reservations.AnyAsync(
@@ -123,6 +131,7 @@ namespace ASI.Basecode.Data.Repositories
         }
 
         // Pending and approved bookings have not left the desk yet, so they can be cancelled. Tracked for update.
+        // The student's Pending and Approved bookings (loaded so they can be cancelled).
         public async Task<IReadOnlyList<Reservation>> OpenBookingsAsync(string userId, CancellationToken ct)
         {
             return await Context
@@ -143,6 +152,7 @@ namespace ASI.Basecode.Data.Repositories
             );
         }
 
+        // Before deleting an account: unlink its audit entries and remove its codes and borrower profile.
         public async Task PrepareDeletionAsync(User user, CancellationToken ct)
         {
             await Context

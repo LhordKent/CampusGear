@@ -3,6 +3,7 @@ using AutoMapper;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
 
+// CONTROLLER BASE  -  every controller inherits this. It provides RequestActor and shared helpers.
 namespace ASI.Basecode.WebApp.Mvc
 {
     /// <summary>Shared MVC infrastructure. Business decisions belong to injected services.</summary>
@@ -29,6 +30,8 @@ namespace ASI.Basecode.WebApp.Mvc
             Mapper = mapper;
         }
 
+        // "Who is making this request": the signed-in user's id, their IP address, and a trace id.
+        // Passed to services for permission checks and the audit log.
         protected RequestContext RequestActor =>
             new(
                 User.Identity?.IsAuthenticated == true ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null,

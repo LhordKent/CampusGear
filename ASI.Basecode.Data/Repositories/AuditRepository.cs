@@ -2,6 +2,7 @@ using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
+// AUDIT REPOSITORY  -  saves and reads audit log entries (who did what, when, before/after).
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class AuditRepository : BaseRepository, IAuditRepository

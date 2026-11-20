@@ -7,6 +7,11 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// CUSTODIAN QUEUE SERVICE  -  builds the custodian's lists (read-only, no changes saved here).
+// Approvals tab, Returns tab, History tab, and the booking details page.
+// It also decides which buttons each row shows (Approve, Reject, Release, Return).
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class CustodianQueueService : ServiceBase, ICustodianQueueService
@@ -20,6 +25,7 @@ namespace ASI.Basecode.Services.Services
             _timeProvider = clock;
         }
 
+        // One booking's details page. Only custodians get the action buttons; admins just look.
         public async Task<CustodianDetailViewModel?> GetDetailsAsync(Guid id, bool custodian, CancellationToken cancellationToken)
         {
             var reservation = await _reads.DetailsAsync(id, cancellationToken);
@@ -86,6 +92,7 @@ namespace ASI.Basecode.Services.Services
             return null;
         }
 
+        // Shared list builder for the three tabs: filter, search, page, and the buttons per row.
         private async Task<CustodianListViewModel> BuildQueueAsync(
             CustodianQueueFilter filter,
             string queue,
@@ -216,16 +223,19 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // Approvals tab: Pending requests and Approved bookings waiting to be handed over.
         public Task<CustodianListViewModel> GetApprovalQueueAsync(CustodianQueueFilter filter, CancellationToken cancellationToken)
         {
             return BuildQueueAsync(filter, "approvals", cancellationToken);
         }
 
+        // Returns tab: items currently on loan.
         public Task<CustodianListViewModel> GetReturnQueueAsync(CustodianQueueFilter filter, CancellationToken cancellationToken)
         {
             return BuildQueueAsync(filter, "active", cancellationToken);
         }
 
+        // History tab: all bookings.
         public Task<CustodianListViewModel> GetHistoryAsync(CustodianQueueFilter filter, CancellationToken cancellationToken)
         {
             return BuildQueueAsync(filter, "history", cancellationToken);

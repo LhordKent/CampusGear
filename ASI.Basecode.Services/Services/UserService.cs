@@ -9,6 +9,16 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Identity;
 
+// =====================================================================
+// USER SERVICE  -  everything the admin does to accounts (Users & Roles page).
+// List, approve/reject sign-ups, create, edit (name, role, active, borrowing access), delete.
+//
+// Two switches on a student account:
+//   Active off ("deactivate")  -> can't sign in at all.
+//   Can reserve off ("pause")  -> can sign in, but can't book.
+// Turning either off CANCELS the student's Pending and Approved bookings (CancelOpenBookings).
+// Deactivating is refused while the student still has an item on loan.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class UserService : ServiceBase, IUserService
@@ -35,6 +45,7 @@ namespace ASI.Basecode.Services.Services
             _userManager = users;
         }
 
+        // The account list (search, role filter, status filter, paging).
         public async Task<AdminUsersPage> GetPageAsync(
             string? q,
             string? role,
@@ -70,6 +81,7 @@ namespace ASI.Basecode.Services.Services
             return new AdminUsersPage(rows, q, role, status, page, pages, total, pendingTotal, null, null);
         }
 
+        // Approve or reject a new student registration. Approved = can sign in.
         public async Task<OperationResult<string>> DecideAsync(
             RequestContext actor,
             string id,
@@ -129,6 +141,12 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // EDIT an account. Checks, in order:
+        //   - the admin is still a valid administrator
+        //   - nobody else saved this account meanwhile (concurrency stamp / row version)
+        //   - you can't lock yourself out, and at least one admin must remain
+        //   - deactivating is refused while the student has an item on loan
+        // Then saves, and cancels open bookings if the student was deactivated or paused.
         public async Task<OperationResult<string>> EditAsync(
             RequestContext actor,
             string id,
@@ -150,6 +168,7 @@ namespace ASI.Basecode.Services.Services
             try
             {
                 await using var transaction = await _unitOfWork.BeginAsync(IsolationLevel.ReadCommitted, cancellationToken);
+                // One admin edit at a time, plus the student's own lock (the same lock new bookings take).
                 await AcquireLockAsync("CampusGear:UserAdministration", cancellationToken);
                 var actorId = actor.UserId;
                 var actorAccount = actorId is null ? null : await _accountRepository.FindFreshAsync(actorId, cancellationToken);
@@ -209,6 +228,7 @@ namespace ASI.Basecode.Services.Services
                     }
                 }
 
+                // Is this save switching the account off, or pausing borrowing?
                 var deactivating = target.IsActive && !input.IsActive;
                 var pausing = profile is { IsEligible: true } && !input.IsEligible;
 
@@ -319,6 +339,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // CREATE an account from the admin page. It is approved and verified immediately (no email step).
         public async Task<OperationResult<string>> CreateAsync(
             RequestContext actor,
             UserCreateModel input,
@@ -429,6 +450,8 @@ namespace ASI.Basecode.Services.Services
             return OperationResult<string>.Ok(user.Id, $"{user.FullName} can now sign in as {input.Role}.");
         }
 
+        // DELETE: an account with any history (bookings, loans, repairs) is only deactivated, so the
+        // records stay. An account with no history is removed for good.
         public async Task<OperationResult<string>> DeleteAsync(RequestContext actor, string id, CancellationToken cancellationToken)
         {
             await using var transaction = await _unitOfWork.BeginAsync(IsolationLevel.ReadCommitted, cancellationToken);
@@ -588,6 +611,7 @@ namespace ASI.Basecode.Services.Services
                 _ => $" Their {count} pending or approved bookings were cancelled.",
             };
 
+        // Loads the account for the Edit modal, plus how many bookings saving would cancel (for the warning).
         public async Task<UserEditPage?> GetEditAsync(
             RequestContext actor,
             string id,
@@ -636,6 +660,7 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // Takes a named lock; if it can't get it within 10 seconds, shows "busy, try again".
         private async Task AcquireLockAsync(string resourceName, CancellationToken ct)
         {
             try
@@ -680,6 +705,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // A JSON picture of the account for the audit log (before/after).
         private static string Snapshot(User user, IEnumerable<string> roles, BorrowerProfile? profile)
         {
             return JsonSerializer.Serialize(

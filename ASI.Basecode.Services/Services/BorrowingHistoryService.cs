@@ -6,6 +6,9 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// BORROWING HISTORY SERVICE  -  the student's own booking history page (read-only).
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class BorrowingHistoryService : ServiceBase, IBorrowingHistoryService
@@ -19,6 +22,7 @@ namespace ASI.Basecode.Services.Services
             _timeProvider = clock;
         }
 
+        // One page of the student's bookings, filtered by status, dates and search text.
         public async Task<OperationResult<HistoryPageViewModel>> HistoryAsync(
             RequestContext actor,
             string? status,

@@ -1,3 +1,6 @@
+// Page-wide helpers that run on every page (loaded in _Layout.cshtml):
+//   - opens the side/top menus on desktop and collapses them on small screens
+//   - colours each status badge from its text (e.g. "Pending", "Overdue")
 (() => {
     // Navigation menus are always open on desktop and collapse behind their summary on small screens.
     const menus = [

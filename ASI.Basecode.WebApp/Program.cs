@@ -1,6 +1,13 @@
 using ASI.Basecode.Data;
 using ASI.Basecode.WebApp;
 
+// =====================================================================
+// PROGRAM  -  where the app starts.
+//   1. register all services (Startup.cs / Startup.DI.cs)
+//   2. build the app
+//   3. prepare the database (DbInitializer: migrations, roles, first admin)
+//   4. start listening for web requests
+// =====================================================================
 var appBuilder = WebApplication.CreateBuilder(args);
 
 var configurer = new StartupConfigurer(appBuilder.Configuration, appBuilder.Environment, args);

@@ -4,6 +4,7 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.WebApp.Authentication;
 using Microsoft.AspNetCore.Identity;
 
+// AUTH SETUP  -  ASP.NET Identity, the password rules (PasswordManager), and the sign-in cookie settings.
 namespace ASI.Basecode.WebApp
 {
     // Authorization configuration

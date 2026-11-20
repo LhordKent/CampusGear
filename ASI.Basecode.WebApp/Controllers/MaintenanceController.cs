@@ -6,6 +6,12 @@ using ASI.Basecode.WebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// MAINTENANCE CONTROLLER  (administrators and custodians)
+// Repair cases for damaged equipment: list them, open a case, update/close a case.
+// While a case is open, the item is on "maintenance hold" and can't be booked.
+// FLOW: page -> this controller -> MaintenanceService -> MaintenanceRepository -> database.
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     [Authorize(Roles = RoleNames.AdministratorOrCustodian)]
@@ -26,6 +32,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _maintenance = maintenance;
         }
 
+        // GET /admin/maintenance: the list of repair cases, with filters.
         [HttpGet("admin/maintenance")]
         public async Task<IActionResult> Index(string? status, string? q, int page = 1, CancellationToken cancellationToken = default)
         {
@@ -61,12 +68,14 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
+        // POST /admin/maintenance/open: opens a repair case for an item (puts it on hold).
         [HttpPost("admin/maintenance/open")]
         public async Task<IActionResult> Open(Guid equipmentItemId, string? description, CancellationToken cancellationToken)
         {
             return Result(await _maintenance.OpenAsync(RequestActor, equipmentItemId, description, cancellationToken));
         }
 
+        // POST /admin/maintenance/{id}/update: updates a case; closing it can release the hold.
         [HttpPost("admin/maintenance/{id:guid}/update")]
         public async Task<IActionResult> Update(Guid id, MaintenanceEditModel input, CancellationToken cancellationToken)
         {
@@ -80,6 +89,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Result(await _maintenance.UpdateAsync(RequestActor, id, input, cancellationToken));
         }
 
+        // Turns the service result into a redirect with a message, or a 404 / access denied.
         private IActionResult Result(OperationResult<bool> result)
         {
             var ok = result.Succeeded;

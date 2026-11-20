@@ -4,6 +4,10 @@ using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
+// =====================================================================
+// ASSET CODE REPOSITORY  -  the codes printed on equipment labels, e.g. CAM-001.
+// Each category has one "series": a 3-letter prefix (from its name) and the next number to give out.
+// =====================================================================
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class AssetCodeRepository : BaseRepository, IAssetCodeRepository
@@ -37,6 +41,7 @@ namespace ASI.Basecode.Data.Repositories
             }
         }
 
+        // New category: pick a free prefix (CAM, then CAM2, CAM3... if taken) and start its numbering.
         public async Task CreateSeriesAsync(EquipmentCategory category, CancellationToken ct)
         {
             await _locks.AcquireAsync(PrefixLock, ct);
@@ -44,6 +49,7 @@ namespace ASI.Basecode.Data.Repositories
         }
 
         // Inventory holds the category lock until the unit, audit event and counter commit together.
+        // New item: returns the next code in the category's series (CAM-004) and moves the counter on.
         public async Task<string> AllocateAsync(Guid categoryId, CancellationToken ct)
         {
             var series = await Context.AssetCodeSeries.SingleAsync(x => x.CategoryId == categoryId, ct);

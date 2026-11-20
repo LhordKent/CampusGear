@@ -4,6 +4,7 @@ using ASI.Basecode.Resources.Messages;
 using ASI.Basecode.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 
+// SMTP EMAIL SENDER  -  sends real emails through the mail server set in appsettings ("Email:Smtp").
 namespace ASI.Basecode.Services.Services
 {
     public sealed class SmtpEmailSender : IEmailSender

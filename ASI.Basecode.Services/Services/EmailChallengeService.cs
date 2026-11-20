@@ -11,6 +11,11 @@ using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
 
+// =====================================================================
+// EMAIL CHALLENGE SERVICE  -  the one-time codes sent by email (admin login, password reset).
+// A code lasts 10 minutes, can be used once, and you must wait 60 seconds before asking for another.
+// The code is stored encrypted (ASP.NET Data Protection), never as plain text.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>Creates and consumes one-time, email-delivered challenges.</summary>
@@ -40,6 +45,7 @@ namespace ASI.Basecode.Services.Services
             _protector = dataProtectionProvider.CreateProtector("CampusGear.EmailChallenge.v1");
         }
 
+        // Creates a new code for this user and purpose, and emails it.
         public async Task<ChallengeIssueResult> IssueAsync(
             User user,
             EmailChallengePurpose purpose,
@@ -121,6 +127,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // Checks a code the user typed. Correct codes are marked used so they can't be used again.
         public async Task<ChallengeVerifyStatus> VerifyAsync(
             string userId,
             EmailChallengePurpose purpose,

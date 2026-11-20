@@ -3,6 +3,10 @@ using ASI.Basecode.Resources.Messages;
 using ASI.Basecode.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 
+// =====================================================================
+// EQUIPMENT IMAGE STORE  -  saves and deletes equipment photos on disk (wwwroot/uploads/equipment).
+// The database only keeps the photo's web path (EquipmentItem.ImagePath).
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>
@@ -22,6 +26,7 @@ namespace ASI.Basecode.Services.Services
 
         public long MaxBytes => 5 * 1024 * 1024;
 
+        // Saves the uploaded photo under a generated name and returns its web path.
         public async Task<string> SaveAsync(
             Guid equipmentItemId,
             Stream content,
@@ -57,6 +62,7 @@ namespace ASI.Basecode.Services.Services
             return WebFolder + fileName;
         }
 
+        // Deletes a photo file (used when a photo is replaced/removed or a save fails).
         public void Delete(string? webPath)
         {
             if (string.IsNullOrEmpty(webPath) || !webPath.StartsWith(WebFolder, StringComparison.Ordinal))

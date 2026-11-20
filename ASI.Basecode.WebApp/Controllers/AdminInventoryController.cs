@@ -7,6 +7,13 @@ using ASI.Basecode.WebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// =====================================================================
+// ADMIN INVENTORY CONTROLLER  (administrators only)
+// The Equipment page: list items, add/edit one (with photo), delete one.
+//
+// FLOW (save): Add/Edit modal -> Save() -> InventoryService.SaveAsync
+// -> EquipmentRepository / AssetCodeRepository -> database (+ photo file on disk).
+// =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
     [Authorize(Roles = RoleNames.Administrator)]
@@ -30,6 +37,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _categories = categories;
         }
 
+        // GET /admin/equipment: the equipment cards. With ?id=... it also opens the Edit modal for that item.
         [HttpGet("admin/equipment")]
         public async Task<IActionResult> Equipment(string? q, Guid? id, int page = 1, CancellationToken cancellationToken = default)
         {
@@ -60,6 +68,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Request.WantsModal() ? PartialView("_EquipmentEditor", model) : View(model);
         }
 
+        // POST /admin/equipment/{id}/delete: deletes the item, or makes it inactive if it has borrowing/repair history.
         [HttpPost("admin/equipment/{id:guid}/delete")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
@@ -73,6 +82,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/admin/equipment");
         }
 
+        // POST /admin/equipment/save: saves the Add/Edit modal (new item gets its asset code here).
         [HttpPost("admin/equipment/save")]
         [RequestSizeLimit(8 * 1024 * 1024)]
         public async Task<IActionResult> Save(
@@ -117,11 +127,13 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/admin/equipment");
         }
 
+        // Save failed: send the errors back to the modal (JSON) or re-show the page.
         private async Task<IActionResult> InvalidAsync(EquipmentEditModel input, CancellationToken ct)
         {
             return Request.IsFetch() ? ModalForms.Rejected(ModelState) : View("Equipment", await PageAsync(input, null, 1, ct));
         }
 
+        // POST /admin/categories: quick "add category" from the equipment page.
         [HttpPost("admin/categories")]
         public async Task<IActionResult> AddCategory(string? name, CancellationToken cancellationToken)
         {
@@ -130,6 +142,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/admin/equipment");
         }
 
+        // Builds everything the Equipment page and its modal need (items, categories, locations, lock state).
         private async Task<InventoryPageModel> PageAsync(EquipmentEditModel input, string? query, int page, CancellationToken ct)
         {
             var result = await _inventory.GetPageAsync(query, page, ct);

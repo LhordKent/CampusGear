@@ -8,6 +8,12 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// RESERVATION REQUEST SERVICE  -  the student's booking form, before ReservationService.
+// Checks the form (dates, purpose, quantity, fair-use limits), finds free units, then asks
+// ReservationService.CreateAsync to book each unit. "Quantity 3" = 3 separate Pending bookings.
+// If one unit fails halfway, the ones already booked are cancelled again (WithdrawAsync).
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class ReservationRequestService : ServiceBase, IReservationRequestService
@@ -33,18 +39,21 @@ namespace ASI.Basecode.Services.Services
             _catalog = catalog;
         }
 
+        // The booking form was submitted. Returns the page again with errors, or "submitted" with the new booking ids.
         public async Task<OperationResult<ReservationPageViewModel>> CreateReservationAsync(
             RequestContext actor,
             ReservationRequestModel input,
             CancellationToken cancellationToken
         )
         {
+            // Step 1: the student must have a borrower profile.
             var profile = await OwnProfileAsync(actor, cancellationToken);
             if (profile is null)
             {
                 return new(OperationOutcome.Forbidden);
             }
 
+            // Step 2: check every form field and collect all errors at once (shown next to each field).
             var errors = new List<FieldError>();
             var model = await _catalog.GetRequestPageAsync(profile.IsEligible, input, cancellationToken);
             model.OpenDialog = true;
@@ -118,6 +127,7 @@ namespace ASI.Basecode.Services.Services
             }
 
             // A resubmitted form (double click, refresh, back button) shows the reservations it already created.
+            // Step 3: same form submitted twice? Show the bookings it already made instead of booking again.
             var requestIds = RequestIdsFor(input.RequestId, input.Quantity);
             var earlier = await FindRequestsAsync(profile.Id, requestIds, cancellationToken);
             if (earlier.Count > 0)
@@ -132,6 +142,7 @@ namespace ASI.Basecode.Services.Services
                 return new(OperationOutcome.Invalid, model, Errors: errors);
             }
 
+            // Step 4: find enough free units of this equipment for the chosen time.
             var now = _timeProvider.GetUtcNow().UtcDateTime;
             var candidates = new Queue<Guid>(
                 await _availability.FindFreeUnitsAsync(
@@ -156,6 +167,7 @@ namespace ASI.Basecode.Services.Services
 
             // Each unit is its own reservation, so every unit goes through the same locking, conflict checks,
             // pending hold and staff approval as before. A batch is not abandoned halfway if the browser disconnects.
+            // Step 5: book each unit through ReservationService (locks, conflict checks, Pending status).
             var created = new List<ReservationResult>();
             try
             {
@@ -231,6 +243,7 @@ namespace ASI.Basecode.Services.Services
             return Submitted(model, created.Select(x => x.Id));
         }
 
+        // Loads the signed-in student's borrower profile.
         private Task<BorrowerProfile?> OwnProfileAsync(RequestContext actor, CancellationToken ct)
         {
             return _reads.FindProfileAsync(actor.UserId, ct);
@@ -290,6 +303,7 @@ namespace ASI.Basecode.Services.Services
             return ids;
         }
 
+        // Reads a date/time typed in Manila time and converts it to UTC for the database.
         private DateTime? ParseManilaInput(string? value, string field, List<FieldError> errors)
         {
             if (!ManilaTime.TryParseInput(value, out var utc))

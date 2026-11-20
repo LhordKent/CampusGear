@@ -3,6 +3,9 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// =====================================================================
+// EQUIPMENT REPOSITORY  -  database queries for equipment items (used by InventoryService and others).
+// =====================================================================
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class EquipmentRepository : BaseRepository, IEquipmentRepository
@@ -15,17 +18,20 @@ namespace ASI.Basecode.Data.Repositories
             return Context.EquipmentItems.SingleOrDefaultAsync(x => x.Id == id, ct);
         }
 
+        // Has this item ever been booked or repaired? (If yes, delete only makes it inactive.)
         public async Task<bool> HasHistoryAsync(Guid id, CancellationToken ct)
         {
             return await Context.Reservations.AnyAsync(x => x.EquipmentItemId == id, ct)
                 || await Context.MaintenanceCases.AnyAsync(x => x.EquipmentItemId == id, ct);
         }
 
+        // Is the item out on loan right now?
         public Task<bool> HasOutstandingLoanAsync(Guid id, CancellationToken ct)
         {
             return Context.Loans.AnyAsync(x => x.Reservation.EquipmentItemId == id && x.ReturnedAtUtc == null, ct);
         }
 
+        // Does the item have Approved bookings or live Pending requests?
         public Task<bool> HasLiveReservationsAsync(Guid id, DateTime now, CancellationToken ct)
         {
             return Context.Reservations.AnyAsync(
@@ -36,6 +42,7 @@ namespace ASI.Basecode.Data.Repositories
             );
         }
 
+        // The Equipment page: items (15 per page, newest first), categories, and known storage locations.
         public async Task<InventoryData> InventoryAsync(string? search, int page, CancellationToken ct)
         {
             var query = Context.EquipmentItems.AsNoTracking();
@@ -71,6 +78,7 @@ namespace ASI.Basecode.Data.Repositories
             return new(items.Select(EquipmentRecord.From).ToList(), categories, page, pages, total, locations);
         }
 
+        // For the Edit modal: open loan due date, and number of upcoming bookings.
         public async Task<EquipmentEditState> EditStateAsync(Guid id, DateTime now, CancellationToken ct)
         {
             var due = await Context
@@ -93,6 +101,7 @@ namespace ASI.Basecode.Data.Repositories
 
         public void Remove(EquipmentItem item) => Context.EquipmentItems.Remove(item);
 
+        // Marks the item as changed so its row version moves on (detects edits made at the same time).
         public void MarkUpdated(EquipmentItem item)
         {
             Context.Entry(item).Property(x => x.UpdatedAtUtc).IsModified = true;

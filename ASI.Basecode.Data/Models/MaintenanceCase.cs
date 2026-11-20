@@ -1,5 +1,6 @@
 using ASI.Basecode.Resources.Constants;
 
+// MAINTENANCE CASE (table: MaintenanceCases)  -  one repair job for an item. While Open, the item is on hold.
 namespace ASI.Basecode.Data.Models
 {
     public sealed class MaintenanceCase
@@ -8,6 +9,7 @@ namespace ASI.Basecode.Data.Models
 
         public Guid EquipmentItemId { get; set; }
 
+        // Set when the case was opened by a Damaged return (links to that loan).
         public Guid? LoanId { get; set; }
 
         public MaintenanceStatus Status { get; set; } = MaintenanceStatus.Open;

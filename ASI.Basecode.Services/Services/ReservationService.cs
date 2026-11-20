@@ -8,6 +8,24 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Identity;
 
+// =====================================================================
+// RESERVATION SERVICE  -  the heart of borrowing. Every booking status change happens here.
+//
+//   Pending --Approve--> Approved --Release--> Released (on loan) --Return--> Completed
+//
+//   Ways a booking ends early:
+//     Pending  --Reject-->  Rejected
+//     Pending  --Cancel-->  Cancelled        Approved --Cancel--> Cancelled
+//     Pending  --hold runs out / start time passes-->  Expired
+//     Approved --end time passes, never picked up-->   Expired ("not picked up")
+//
+// Every method follows the same pattern:
+//   1. check WHO is asking (borrower or custodian)
+//   2. open a database transaction and LOCK the equipment item, so two people can't change it at once
+//   3. load the booking and check it is in the right status
+//   4. change it, write an audit log entry, save, commit
+// Errors are thrown as ReservationWorkflowException; the controller turns them into messages.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     /// <summary>
@@ -58,6 +76,7 @@ namespace ASI.Basecode.Services.Services
         private static readonly TimeSpan PendingHold = TimeSpan.FromHours(24);
         private const int ItemLockTimeoutMilliseconds = 10_000;
 
+        // CREATE: a student books one item for START..END. The new booking is Pending (waiting for a custodian).
         public async Task<ReservationResult> CreateAsync(
             ReservationActor actor,
             CreateReservationCommand command,
@@ -80,6 +99,7 @@ namespace ASI.Basecode.Services.Services
             }
 
             // Only a borrower may reserve, and only for themselves. Staff never take part in creating reservations.
+            // Step 1: the person asking must be an active, verified student booking for themselves.
             var actorUser = await RequireActiveVerifiedUserAsync(actor, cancellationToken);
             if (actorUser.Id != command.BorrowerUserId || !await _userManager.IsInRoleAsync(actorUser, RoleNames.Borrower))
             {
@@ -92,12 +112,14 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.IneligibleBorrower, Errors.IneligibleBorrower);
             }
 
+            // Step 2: same request sent twice (double click)? Return the first one instead of making a duplicate.
             var existing = await _records.FindByRequestIdAsync(command.RequestId, cancellationToken);
             if (existing is not null)
             {
                 return ExistingRequestResult(existing, borrower.Id, command, purpose, notes);
             }
 
+            // Step 3: lock the item. From here until commit, nobody else can book or change this item.
             await using var transaction = await BeginItemTransactionAsync(command.EquipmentItemId, cancellationToken);
             now = UtcNow();
             if (command.StartAtUtc <= now)
@@ -118,6 +140,7 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.IneligibleBorrower, Errors.BorrowerProfileRequired);
             }
 
+            // Step 4: lock the student too, then check they may still borrow (not paused or deactivated).
             await AcquireBorrowerLockAsync(profileId.Value, cancellationToken);
             var profile = await RequireEligibleBorrowerAsync(profileId.Value, cancellationToken);
             now = UtcNow();
@@ -130,6 +153,7 @@ namespace ASI.Basecode.Services.Services
             // cannot both slip under the active-booking limit.
             await EnsureWithinBorrowingLimitsAsync(profile.Id, command.StartAtUtc, command.EndAtUtc, now, cancellationToken);
 
+            // Step 5: the item must be usable (active, not damaged, not in maintenance) and free for that time.
             var item = await _equipmentRepository.FindAsync(command.EquipmentItemId, cancellationToken);
             EnsureUsable(item);
             if (await HasConflictAsync(command.EquipmentItemId, command.StartAtUtc, command.EndAtUtc, now, null, cancellationToken))
@@ -138,6 +162,7 @@ namespace ASI.Basecode.Services.Services
             }
 
             TouchItem(item!, now);
+            // Step 6: create the Pending booking. It is held for 24 hours (or until the start time) for a custodian to decide.
             var reservation = new Reservation
             {
                 RequestId = command.RequestId,
@@ -167,32 +192,38 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
+        // APPROVE (custodian): Pending -> Approved. The time slot is now firmly reserved for the student.
         public async Task<ReservationResult> ApproveAsync(
             ReservationActor actor,
             Guid reservationId,
             CancellationToken cancellationToken = default
         )
         {
+            // Step 1: only a custodian may approve. Then lock the item and load the booking.
             await RequireCustodianAsync(actor, cancellationToken);
             var itemId = await GetItemIdAsync(reservationId, cancellationToken);
             await using var transaction = await BeginItemTransactionAsync(itemId, cancellationToken);
             var reservation = await GetLockedReservationAsync(reservationId, cancellationToken);
             var now = UtcNow();
+            // Already approved (e.g. double click)? Nothing to do.
             if (reservation.Status == ReservationStatus.Approved)
             {
                 return ToResult(reservation);
             }
 
+            // Too late? If the hold or start time has passed, the request expires instead.
             if (await ExpireIfDueAsync(reservation, actor, now, transaction, cancellationToken))
             {
                 return ToResult(reservation);
             }
 
+            // Step 2: only a Pending request can be approved.
             if (reservation.Status != ReservationStatus.Pending)
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.PendingApprovalRequired);
             }
 
+            // Step 3: lock the student and check they may still borrow, the item is usable, and the slot is still free.
             await AcquireBorrowerLockAsync(reservation.BorrowerProfileId, cancellationToken);
             now = UtcNow();
             if (await ExpireIfDueAsync(reservation, actor, now, transaction, cancellationToken))
@@ -208,6 +239,7 @@ namespace ASI.Basecode.Services.Services
             }
 
             TouchItem(reservation.EquipmentItem, now);
+            // Step 4: mark it Approved and remember who decided.
             var before = reservation.Status;
             reservation.Status = ReservationStatus.Approved;
             reservation.HoldExpiresAtUtc = null;
@@ -220,6 +252,7 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
+        // REJECT (custodian): Pending -> Rejected. A reason is required; the slot becomes free again.
         public async Task<ReservationResult> RejectAsync(
             ReservationActor actor,
             Guid reservationId,
@@ -227,6 +260,7 @@ namespace ASI.Basecode.Services.Services
             CancellationToken cancellationToken = default
         )
         {
+            // Step 1: only a custodian; the reason must not be empty. Lock the item and load the booking.
             await RequireCustodianAsync(actor, cancellationToken);
             var decisionReason = RequiredText(reason, 1000, Errors.RejectionReasonRequired);
             var itemId = await GetItemIdAsync(reservationId, cancellationToken);
@@ -243,11 +277,13 @@ namespace ASI.Basecode.Services.Services
                 return ToResult(reservation);
             }
 
+            // Step 2: only a Pending request can be rejected.
             if (reservation.Status != ReservationStatus.Pending)
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.PendingRejectionRequired);
             }
 
+            // Step 3: mark it Rejected with the reason.
             var before = reservation.Status;
             reservation.Status = ReservationStatus.Rejected;
             reservation.HoldExpiresAtUtc = null;
@@ -261,6 +297,8 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
+        // CANCEL (the student): Pending or Approved -> Cancelled. (Admins pausing/deactivating a student
+        // cancel bookings in UserService instead.)
         public async Task<ReservationResult> CancelAsync(
             ReservationActor actor,
             Guid reservationId,
@@ -274,6 +312,7 @@ namespace ASI.Basecode.Services.Services
             var reservation = await GetLockedReservationAsync(reservationId, cancellationToken);
             var now = UtcNow();
             // Only the borrower who made a request may cancel it; the automatic batch withdrawal also runs as that borrower.
+            // Only the student who made the booking may cancel it.
             if (reservation.BorrowerProfile.UserId != actorUser.Id)
             {
                 throw Error(ReservationErrorCode.Forbidden, Errors.CancellationForbidden);
@@ -289,6 +328,7 @@ namespace ASI.Basecode.Services.Services
                 return ToResult(reservation);
             }
 
+            // Only Pending or Approved bookings can be cancelled (not ones already on loan).
             if (reservation.Status is not (ReservationStatus.Pending or ReservationStatus.Approved))
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.CancellationUnavailable);
@@ -306,6 +346,8 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
+        // RELEASE (custodian): the item is handed over at the desk. Approved -> Released, and a Loan record is created.
+        // Allowed from 30 minutes before the start time until the end time (see ReleaseWindow).
         public async Task<ReservationResult> ReleaseAsync(
             ReservationActor actor,
             Guid reservationId,
@@ -314,6 +356,7 @@ namespace ASI.Basecode.Services.Services
             CancellationToken cancellationToken = default
         )
         {
+            // Step 1: only a custodian; the item can't be handed over as Damaged.
             await RequireCustodianAsync(actor, cancellationToken);
             if (!Enum.IsDefined(conditionAtRelease) || conditionAtRelease is EquipmentCondition.Damaged)
             {
@@ -321,15 +364,18 @@ namespace ASI.Basecode.Services.Services
             }
 
             var releaseNotes = OptionalText(notes, 2000);
+            // Step 2: lock the item and load the booking.
             var itemId = await GetItemIdAsync(reservationId, cancellationToken);
             await using var transaction = await BeginItemTransactionAsync(itemId, cancellationToken);
             var reservation = await GetLockedReservationAsync(reservationId, cancellationToken);
             var now = UtcNow();
+            // Already released (double click)? Nothing to do.
             if (reservation.Status == ReservationStatus.Released && reservation.Loan is { ReturnedAtUtc: null })
             {
                 return ToResult(reservation);
             }
 
+            // Step 3: must be Approved, and now must be inside the pickup window.
             if (reservation.Status != ReservationStatus.Approved)
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.ApprovalRequired);
@@ -340,6 +386,7 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.InvalidState, Errors.ReleaseOutsideBooking);
             }
 
+            // Step 4: lock the student, check they may still borrow and the item is usable.
             await AcquireBorrowerLockAsync(reservation.BorrowerProfileId, cancellationToken);
             now = UtcNow();
             if (!ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now))
@@ -360,6 +407,7 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.ScheduleConflict, Errors.ReservationEquipmentUnavailable);
             }
 
+            // Step 5: create the Loan (due back at the booking's end time) and mark the booking Released.
             var loan = new Loan
             {
                 ReservationId = reservation.Id,
@@ -384,6 +432,8 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
+        // RETURN (custodian): the item comes back. Released -> Completed, and the loan gets its return time.
+        // If it comes back Damaged, the item goes on maintenance hold and a repair case is opened.
         public async Task<ReservationResult> ReturnAsync(
             ReservationActor actor,
             Guid reservationId,
@@ -392,6 +442,7 @@ namespace ASI.Basecode.Services.Services
             CancellationToken cancellationToken = default
         )
         {
+            // Step 1: only a custodian; the condition must be valid.
             await RequireCustodianAsync(actor, cancellationToken);
             if (!Enum.IsDefined(conditionAtReturn))
             {
@@ -399,15 +450,18 @@ namespace ASI.Basecode.Services.Services
             }
 
             var returnNotes = OptionalText(notes, 2000);
+            // Step 2: lock the item and load the booking (with its loan).
             var itemId = await GetItemIdAsync(reservationId, cancellationToken);
             await using var transaction = await BeginItemTransactionAsync(itemId, cancellationToken);
             var reservation = await GetLockedReservationAsync(reservationId, cancellationToken);
             var now = UtcNow();
+            // Already returned (double click)? Nothing to do.
             if (reservation.Status == ReservationStatus.Completed && reservation.Loan?.ReturnedAtUtc is not null)
             {
                 return ToResult(reservation);
             }
 
+            // Step 3: there must be an open loan to return.
             if (reservation.Status != ReservationStatus.Released || reservation.Loan is null || reservation.Loan.ReturnedAtUtc is not null)
             {
                 throw Error(ReservationErrorCode.InvalidState, Errors.ActiveLoanRequired);
@@ -419,6 +473,7 @@ namespace ASI.Basecode.Services.Services
                 throw Error(ReservationErrorCode.InvalidState, Errors.ReturnBeforeRelease);
             }
 
+            // Step 4: record the return on the loan and copy the condition onto the item.
             loan.ReturnedAtUtc = now;
             loan.ReceivedByUserId = actor.UserId;
             loan.ConditionAtReturn = conditionAtReturn;
@@ -427,6 +482,7 @@ namespace ASI.Basecode.Services.Services
             var item = reservation.EquipmentItem;
             item.Condition = conditionAtReturn;
             TouchItem(item, now);
+            // Step 5: Damaged -> put the item on hold and open a maintenance case.
             if (conditionAtReturn is EquipmentCondition.Damaged)
             {
                 item.IsMaintenanceHold = true;
@@ -443,6 +499,7 @@ namespace ASI.Basecode.Services.Services
                 );
             }
 
+            // Step 6: the booking is finished.
             var before = reservation.Status;
             reservation.Status = ReservationStatus.Completed;
             reservation.UpdatedAtUtc = now;
@@ -452,6 +509,8 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
+        // EXPIRY (runs automatically every minute, see ReservationExpiryWorker):
+        // closes Pending requests whose hold ran out, and Approved bookings that were never picked up.
         public async Task<int> ExpireDueAsync(int batchSize = 100, CancellationToken cancellationToken = default)
         {
             if (batchSize is < 1 or > 1000)
@@ -480,6 +539,7 @@ namespace ASI.Basecode.Services.Services
             return expired;
         }
 
+        // Used inside Approve/Reject/Cancel: if the request is already too late, expire it and stop.
         private async Task<bool> ExpireIfDueAsync(
             Reservation reservation,
             ReservationActor actor,
@@ -499,6 +559,7 @@ namespace ASI.Basecode.Services.Services
             return true;
         }
 
+        // Marks a booking Expired and writes "expired" or "not picked up" to the audit log.
         private void Expire(Reservation reservation, ReservationActor? actor, DateTime now)
         {
             var before = reservation.Status;
@@ -510,6 +571,7 @@ namespace ASI.Basecode.Services.Services
             AddAudit(actor, before == ReservationStatus.Approved ? "reservation.not_picked_up" : "reservation.expired", reservation, before, now);
         }
 
+        // Fair-use rules: max booking length, how far ahead you can book, and max active bookings per student.
         private async Task EnsureWithinBorrowingLimitsAsync(
             Guid profileId,
             DateTime startAtUtc,
@@ -537,6 +599,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // A Pending request is too late once its hold ran out or its start time arrived.
         private static bool IsDueToExpire(Reservation reservation, DateTime now)
         {
             return reservation.Status == ReservationStatus.Pending
@@ -552,6 +615,7 @@ namespace ASI.Basecode.Services.Services
             return reservation.Status == ReservationStatus.Approved && reservation.Loan is null && reservation.EndAtUtc <= now;
         }
 
+        // Is the item already booked (or on loan) for any part of START..END?
         private Task<bool> HasConflictAsync(
             Guid itemId,
             DateTime startAtUtc,
@@ -564,6 +628,7 @@ namespace ASI.Basecode.Services.Services
             return _records.HasConflictAsync(itemId, startAtUtc, endAtUtc, now, excludingReservationId, cancellationToken);
         }
 
+        // Opens a transaction and takes the per-item lock (a SQL Server "application lock").
         private async Task<IDataTransaction> BeginItemTransactionAsync(Guid itemId, CancellationToken cancellationToken)
         {
             var transaction = await _unitOfWork.BeginAsync(IsolationLevel.ReadCommitted, cancellationToken);
@@ -596,6 +661,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // Re-reads the student AFTER taking the lock: must be active, verified, a borrower, and not paused.
         private async Task<BorrowerProfile> RequireEligibleBorrowerAsync(Guid profileId, CancellationToken cancellationToken)
         {
             // UserManager may already track a user from before the lock wait. This query must
@@ -650,6 +716,7 @@ namespace ASI.Basecode.Services.Services
         }
 
         /// <summary>Approval, rejection, release and return belong to the custodian alone; administrators do not take part in the borrowing flow.</summary>
+        // Only custodians may approve, reject, release and return.
         private async Task RequireCustodianAsync(ReservationActor actor, CancellationToken cancellationToken)
         {
             var user = await RequireActiveVerifiedUserAsync(actor, cancellationToken);
@@ -671,6 +738,7 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
+        // Writes one audit log entry (who, what, before -> after status).
         private void AddAudit(ReservationActor? actor, string action, Reservation reservation, ReservationStatus? before, DateTime now)
         {
             _auditRepository.Add(
@@ -745,6 +813,7 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
+        // An item can be booked only if it is active, not on maintenance hold, and not Damaged.
         private static void EnsureUsable(EquipmentItem? item)
         {
             if (

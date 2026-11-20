@@ -2,6 +2,7 @@ using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
+// BORROWER PROFILE REPOSITORY  -  a student's extra details: student number, department, "can reserve" flag.
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class BorrowerProfileRepository : BaseRepository, IBorrowerProfileRepository

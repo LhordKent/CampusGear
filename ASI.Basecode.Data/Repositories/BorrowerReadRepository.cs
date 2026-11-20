@@ -3,6 +3,7 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// BORROWER READ REPOSITORY  -  read-only queries for the student pages (catalog, history, calendar).
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class BorrowerReadRepository : BaseRepository, IBorrowerReadRepository

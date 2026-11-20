@@ -3,6 +3,7 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// DASHBOARD READ REPOSITORY  -  read-only counts and lists for the dashboards.
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class DashboardReadRepository : BaseRepository, IDashboardReadRepository

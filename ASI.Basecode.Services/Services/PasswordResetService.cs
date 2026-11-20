@@ -7,6 +7,11 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Identity;
 
+// =====================================================================
+// PASSWORD RESET SERVICE  -  "forgot password" in 3 steps:
+//   1) email -> a code is sent   2) enter the code   3) choose a new password.
+// Progress between steps is kept in IAccountFlowStore, so step 3 only works after a correct code.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class PasswordResetService : ServiceBase, IPasswordResetService
@@ -35,6 +40,7 @@ namespace ASI.Basecode.Services.Services
             _audit = audit;
         }
 
+        // Step 1: send a reset code. The answer is the same whether or not the email exists (privacy).
         public async Task<OperationResult<PasswordResetResult>> PasswordResetRequestAsync(
             RequestContext actor,
             string emailInput,
@@ -59,6 +65,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new PasswordResetResult(PasswordResetStatus.CodeRequired, feedback.Notice));
         }
 
+        // Step 2 page: only reachable after step 1.
         public Task<OperationResult<PasswordResetResult>> GetPasswordResetCodeAsync(RequestContext actor, CancellationToken ct = default)
         {
             var feedback = new AccountFeedback();
@@ -70,6 +77,7 @@ namespace ASI.Basecode.Services.Services
             return Task.FromResult(feedback.Result(new PasswordResetResult(PasswordResetStatus.CodeRequired, feedback.Notice)));
         }
 
+        // Step 2: check the code; correct -> step 3 is unlocked.
         public async Task<OperationResult<PasswordResetResult>> PasswordResetCodeAsync(
             RequestContext actor,
             string? code,
@@ -130,6 +138,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new PasswordResetResult(PasswordResetStatus.PasswordRequired, feedback.Notice));
         }
 
+        // Sends a new code.
         public async Task<OperationResult<PasswordResetResult>> ResendPasswordResetCodeAsync(
             RequestContext actor,
             CancellationToken ct = default
@@ -158,6 +167,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new PasswordResetResult(PasswordResetStatus.CodeRequired, feedback.Notice));
         }
 
+        // Step 3 page: only reachable after a correct code.
         public async Task<OperationResult<PasswordResetResult>> GetPasswordResetNewAsync(
             RequestContext actor,
             CancellationToken ct = default
@@ -172,6 +182,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new PasswordResetResult(PasswordResetStatus.PasswordRequired, feedback.Notice));
         }
 
+        // Step 3: save the new password.
         public async Task<OperationResult<PasswordResetResult>> PasswordResetNewAsync(
             RequestContext actor,
             string? password,

@@ -3,6 +3,13 @@ using ASI.Basecode.Data.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
+// =====================================================================
+// WORKFLOW LOCK MANAGER  -  named locks inside SQL Server (sp_getapplock).
+// Example: "CampusGear:EquipmentItem:{id}" - while one request holds it, any other request
+// that asks for the same name WAITS (up to 10 seconds, then "Busy").
+// The lock is released automatically when the transaction commits or rolls back.
+// This is what stops two custodians approving / two students booking the same item at the same moment.
+// =====================================================================
 namespace ASI.Basecode.Data.Repositories
 {
     /// <summary>Locks belong to the current transaction, shared by all repositories and Identity stores.</summary>

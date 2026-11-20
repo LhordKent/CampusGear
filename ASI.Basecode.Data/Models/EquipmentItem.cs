@@ -1,5 +1,6 @@
 using ASI.Basecode.Resources.Constants;
 
+// EQUIPMENT ITEM (table: EquipmentItems)  -  ONE physical unit with its own label, e.g. "CAM-004 Canon EOS R50".
 namespace ASI.Basecode.Data.Models
 {
     public sealed class EquipmentItem
@@ -8,6 +9,7 @@ namespace ASI.Basecode.Data.Models
 
         public Guid CategoryId { get; set; }
 
+        // The label code, e.g. CAM-004. Given once when the item is added; never changes.
         public string AssetCode { get; set; } = string.Empty;
 
         public string Name { get; set; } = string.Empty;
@@ -23,8 +25,10 @@ namespace ASI.Basecode.Data.Models
 
         public EquipmentCondition Condition { get; set; } = EquipmentCondition.Good;
 
+        // false = "inactive": hidden from students, history kept. (Delete does this for items with history.)
         public bool IsActive { get; set; } = true;
 
+        // true = in maintenance (repair case open or Damaged): it can't be booked.
         public bool IsMaintenanceHold { get; set; }
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;

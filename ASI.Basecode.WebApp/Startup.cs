@@ -3,6 +3,12 @@ using ASI.Basecode.Data;
 using ASI.Basecode.WebApp.Configuration;
 using Microsoft.EntityFrameworkCore;
 
+// =====================================================================
+// STARTUP  -  configures the app.
+// ConfigureServices: what the app can use (database, sign-in, MVC, rate limits, ...).
+// ConfigureApp: the order every request goes through:
+//   error pages -> HTTPS -> static files -> routing -> rate limits -> session -> sign-in -> role checks -> controller.
+// =====================================================================
 namespace ASI.Basecode.WebApp
 {
     // Application configuration (services and HTTP request pipeline)

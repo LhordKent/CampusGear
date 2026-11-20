@@ -6,6 +6,10 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// AVAILABILITY CALENDAR SERVICE  -  the month calendars (read-only).
+// Students see when equipment is free; staff see every booking.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class AvailabilityCalendarService : ServiceBase, IAvailabilityCalendarService
@@ -28,6 +32,7 @@ namespace ASI.Basecode.Services.Services
             _timeProvider = clock;
         }
 
+        // The student's calendar: which days an item (or all items) is booked.
         public async Task<OperationResult<CalendarPageViewModel>> CalendarAsync(
             RequestContext actor,
             int? year,
@@ -137,6 +142,7 @@ namespace ASI.Basecode.Services.Services
             return _reads.FindProfileAsync(actor.UserId, ct);
         }
 
+        // The custodian/admin calendar: every booking in the month, with details for the chosen day.
         public async Task<CustodianCalendarViewModel> GetStaffCalendarAsync(
             int? year,
             int? month,

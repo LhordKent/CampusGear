@@ -3,6 +3,9 @@ using ASI.Basecode.Resources.Constants;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// DIRECTORY SERVICE  -  the custodian's lookup pages (read-only): categories with their units, and borrowers.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class DirectoryService : ServiceBase, IDirectoryService
@@ -18,6 +21,7 @@ namespace ASI.Basecode.Services.Services
             _timeProvider = clock;
         }
 
+        // Every category with its units and each unit's current state.
         public async Task<IReadOnlyList<DirectoryCategory>> GetCategoriesAsync(CancellationToken ct)
         {
             var statuses = await _availability.GetStatesAsync(_timeProvider.GetUtcNow().UtcDateTime, ct);
@@ -38,6 +42,7 @@ namespace ASI.Basecode.Services.Services
                 .ToList();
         }
 
+        // The student list with status and paging.
         public async Task<DirectoryBorrowersPage> GetBorrowersAsync(string? query, string? eligibility, int page, CancellationToken ct)
         {
             query = query?.Trim() ?? "";

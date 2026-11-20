@@ -4,6 +4,11 @@ using ASI.Basecode.Resources.Constants;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
+// =====================================================================
+// EQUIPMENT AVAILABILITY SERVICE  -  "what state is each item in right now?"
+// Each item gets ONE state: Inactive, Borrowed (on loan), ForRepair (damaged / maintenance hold),
+// Reserved (approved booking now), or Available.
+// =====================================================================
 namespace ASI.Basecode.Services.Services
 {
     public sealed class EquipmentAvailabilityService : ServiceBase, IEquipmentAvailabilityService
@@ -15,6 +20,7 @@ namespace ASI.Basecode.Services.Services
             _reads = reads;
         }
 
+        // Works out the current state of every item (see the list above).
         public async Task<Dictionary<Guid, ItemStatus>> GetStatesAsync(DateTime nowUtc, CancellationToken ct)
         {
             var items = await _reads.EquipmentStatesAsync(nowUtc, ct);
@@ -41,6 +47,7 @@ namespace ASI.Basecode.Services.Services
             return item.Reserved ? ItemStatus.Reserved : ItemStatus.Available;
         }
 
+        // The list of items for staff pickers, each with its current state.
         public async Task<IReadOnlyList<EquipmentPickerItem>> GetPickerAsync(DateTime nowUtc, CancellationToken ct)
         {
             var states = await GetStatesAsync(nowUtc, ct);
@@ -56,6 +63,7 @@ namespace ASI.Basecode.Services.Services
                 .ToList();
         }
 
+        // Finds units of a product that are free for START..END (used when a student books).
         public async Task<List<Guid>> FindFreeUnitsAsync(
             IReadOnlyList<Guid> unitIds,
             DateTime startUtc,
@@ -74,6 +82,7 @@ namespace ASI.Basecode.Services.Services
             return unitIds.Where(id => !blocked.Contains(id)).OrderByDescending(id => id == preferredUnitId).ToList();
         }
 
+        // Busy time ranges for items (used by the booking date picker).
         public async Task<IReadOnlyList<BusyIntervalData>> BusyIntervalsAsync(
             IReadOnlyList<Guid> unitIds,
             DateTime fromUtc,

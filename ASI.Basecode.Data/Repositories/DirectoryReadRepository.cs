@@ -3,6 +3,7 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.EntityFrameworkCore;
 
+// DIRECTORY READ REPOSITORY  -  read-only queries for the custodian's category and borrower lookups.
 namespace ASI.Basecode.Data.Repositories
 {
     public sealed class DirectoryReadRepository : BaseRepository, IDirectoryReadRepository
