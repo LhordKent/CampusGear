@@ -480,6 +480,22 @@
     font-size: 13.5px;
 }
 
+.equip-photo-formats {
+    margin-top: 2px;
+    color: var(--ws-faint, var(--ws-muted));
+    font-size: 11px;
+}
+
+/* The frame is the photo button, so it shows keyboard focus like one. */
+.equip-photo-frame:focus-visible {
+    outline: 3px solid var(--ws-focus);
+    outline-offset: -3px;
+}
+
+.equip-photo-frame[aria-disabled="true"] {
+    cursor: progress;
+}
+
 .equip-photo-glyph {
     width: 30px;
     height: 30px;
@@ -658,16 +674,11 @@
     white-space: nowrap;
 }
 
-.equip-photo-meta,
-.equip-photo-tips {
+.equip-photo-meta {
     margin: 0;
     color: var(--ws-muted);
     font-size: 12.5px;
     line-height: 1.5;
-}
-
-.equip-photo-tips {
-    font-size: 12px;
 }
 
 .equip-photo-actions {
@@ -677,8 +688,14 @@
     gap: 8px;
 }
 
+/* Only Remove or Undo live here now (the frame itself adds and replaces the photo), so they stay compact,
+   and the row takes no space when neither applies. */
 .equip-photo-actions .live-button {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
+}
+
+.equip-photo-actions:not(:has(> :not([hidden]))) {
+    display: none;
 }
 
 .equip-photo-actions .live-button.equip-photo-remove {

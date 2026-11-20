@@ -1,6 +1,6 @@
 // Add/Edit equipment dialog (Views/AdminInventory/_EquipmentEditor.cshtml): the live catalog preview, the description
 // counter, and the photo picker.
-// Photo: drop, click, choose or paste; it is previewed in the catalog's 4:3 crop. A photo the server would refuse
+// Photo: drop, click (or Enter/Space on the frame) or paste; it is previewed in the catalog's 4:3 crop. A photo the server would refuse
 // (over 5 MB, larger than needed, or HEIC/AVIF/BMP that the browser can still open) is resized and saved as JPEG here,
 // then put back into the file input, so the normal form post uploads the smaller file. The server still checks it.
 // The dialog is loaded on demand, so everything is delegated from the document.
@@ -15,7 +15,7 @@
             const q = name => root.querySelector(`[data-photo-${name}]`);
             root._parts = {
                 frame: q('frame'), img: q('img'), empty: q('empty'), emptyTitle: q('empty-title'), emptyText: q('empty-text'),
-                busy: q('busy'), name: q('name'), meta: q('meta'), choose: q('choose'), chooseLabel: q('choose-label'),
+                busy: q('busy'), name: q('name'), meta: q('meta'),
                 remove: q('remove'), undo: q('undo'), error: q('error'), input: q('input'), flag: q('remove-flag')
             };
             root._photo = {
@@ -38,7 +38,7 @@
         p.frame.classList.toggle('has-photo', !!src);
         p.frame.classList.toggle('is-removed', showing === 'removed');
         p.flag.value = showing === 'removed' ? 'true' : 'false';
-        p.chooseLabel.textContent = src ? 'Replace' : 'Upload photo';
+        p.frame.setAttribute('aria-label', src ? 'Replace photo' : 'Add a photo');
         p.remove.hidden = !src;
         p.undo.hidden = showing !== 'removed';
         p.emptyTitle.textContent = showing === 'removed' ? 'Photo will be removed' : 'Add a photo';
@@ -65,7 +65,7 @@
     const busy = (root, on) => {
         const p = parts(root);
         p.busy.hidden = !on;
-        p.choose.disabled = on;
+        p.frame.setAttribute('aria-disabled', on ? 'true' : 'false');
         root.classList.toggle('is-busy', on);
     };
 
@@ -153,19 +153,29 @@
         const root = rootOf(event.target);
         if (!root || root.classList.contains('is-busy')) return;
         const p = parts(root), s = root._photo;
-        if (event.target.closest('[data-photo-choose]') || event.target.closest('[data-photo-frame]')) {
+        if (event.target.closest('[data-photo-frame]')) {
             p.input.click();
         } else if (event.target.closest('[data-photo-remove]')) {
             setError(root, '');
             if (s.file) { s.file = null; p.input.value = ''; }      // drop the new photo; back to the saved one, if any
             else if (s.hadPhoto) s.removed = true;
             render(root);
-            p.choose.focus();
+            p.frame.focus();
         } else if (event.target.closest('[data-photo-undo]')) {
             s.removed = false;
             render(root);
             p.remove.focus();
         }
+    });
+
+    // The frame has role="button", so Enter and Space open the file picker like a click.
+    document.addEventListener('keydown', event => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        const frame = event.target.closest?.('[data-photo-frame]');
+        const root = frame && rootOf(frame);
+        if (!root || event.target !== frame) return;
+        event.preventDefault();
+        if (!root.classList.contains('is-busy')) parts(root).input.click();
     });
 
     document.addEventListener('change', event => {

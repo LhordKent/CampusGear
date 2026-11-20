@@ -131,12 +131,14 @@
                     <h3 class="equip-section-title" id="equip-preview-title">Catalog preview</h3>
                     <div class="equip-photo" data-photo data-max-bytes="5242880" data-has-photo="@(hasPhoto ? "true" : "false")">
                         <div class="equip-preview-card">
-                            <div class="equip-photo-frame @(hasPhoto ? "has-photo" : "")" data-photo-frame>
+                            @* The frame is the photo control: click, Enter/Space, drop or paste. *@
+                            <div class="equip-photo-frame @(hasPhoto ? "has-photo" : "")" data-photo-frame role="button" tabindex="@(locked ? "-1" : "0")" aria-label="@(hasPhoto ? "Replace photo" : "Add a photo")" aria-describedby="equip-photo-formats">
                                 <img class="equip-photo-img" src="@Model.ImagePath" alt="" hidden="@(!hasPhoto)" data-photo-img />
                                 <div class="equip-photo-empty" data-photo-empty hidden="@hasPhoto">
                                     <svg class="equip-photo-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2.5" /><circle cx="9" cy="10" r="1.8" /><path d="m21 15.5-4.5-4.5L7 20.5" /></svg>
                                     <strong data-photo-empty-title>Add a photo</strong>
                                     <span data-photo-empty-text>Drop it here, click to browse, or paste.</span>
+                                    <small class="equip-photo-formats" id="equip-photo-formats">JPEG, PNG, WebP or GIF · large photos are resized</small>
                                 </div>
                                 <span class="equip-photo-status" data-preview="active">@(Model.Input.IsActive ? "Active" : "Inactive")</span>
                                 <span class="equip-photo-hint" aria-hidden="true">Click or drop to replace</span>
@@ -154,14 +156,10 @@
                             <p class="equip-photo-meta" data-photo-meta aria-live="polite">@(hasPhoto ? "Borrowers see it cropped like this." : "Without one, borrowers see an icon for this type of equipment.")</p>
                         </div>
                         <div class="equip-photo-actions">
-                            <button class="live-button secondary" type="button" data-photo-choose>
-                                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" /><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" /></svg><span data-photo-choose-label>@(hasPhoto ? "Replace" : "Upload photo")</span>
-                            </button>
                             <button class="live-button secondary equip-photo-remove" type="button" data-photo-remove hidden="@(!hasPhoto)">Remove</button>
                             <button class="live-link" type="button" data-photo-undo hidden>Undo</button>
                         </div>
                         <p class="equip-photo-error" role="alert" data-photo-error hidden></p>
-                        <p class="equip-photo-tips">JPEG, PNG, WebP or GIF. Large phone photos are resized for you. Use a plain background with the item centred.</p>
                         <input id="imageFile" name="imageFile" type="file" class="equip-photo-input" accept="image/*" tabindex="-1" aria-label="Equipment photo" data-photo-input />
                         <input type="hidden" name="Input.RemoveImage" value="false" data-photo-remove-flag />
                     </div>
