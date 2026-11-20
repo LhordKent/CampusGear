@@ -133,6 +133,16 @@ namespace ASI.Basecode.Data.Repositories
                 .ToListAsync(ct);
         }
 
+        public Task<int> CountOpenBookingsAsync(string userId, CancellationToken ct)
+        {
+            return Context.Reservations.CountAsync(
+                x =>
+                    x.BorrowerProfile.UserId == userId
+                    && (x.Status == ReservationStatus.Pending || x.Status == ReservationStatus.Approved),
+                ct
+            );
+        }
+
         public async Task PrepareDeletionAsync(User user, CancellationToken ct)
         {
             await Context

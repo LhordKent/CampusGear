@@ -1,5 +1,6 @@
 // In-site confirmation for destructive forms, replacing the browser's confirm() box.
 // <form data-confirm="Message" data-confirm-title="Title" data-confirm-ok="Delete" data-confirm-cancel="Keep">
+// or, to ask only when a switch is turned off: <input type="checkbox" data-confirm-on-uncheck="Message">
 // Submitting the form opens the dialog; confirming submits it for real (so data-modal-form forms still post with
 // fetch). Cancel, Escape, or a click on the backdrop leaves everything as it was. Without JavaScript the form submits
 // directly, as it always could.
@@ -55,16 +56,24 @@
     };
 
     // Capture phase, so the question comes before any other submit handler (such as modal-forms.js).
+    // A checkbox with data-confirm-on-uncheck="Message" asks only when it is submitted switched off (the first such
+    // message wins); the form's data-confirm-title/-ok/-cancel still label the dialog.
+    const questionFor = form => {
+        const switched = [...form.querySelectorAll('[data-confirm-on-uncheck]')].find(x => !x.checked && !x.disabled);
+        return switched?.dataset.confirmOnUncheck || form.dataset.confirm;
+    };
+
     document.addEventListener('submit', event => {
-        const form = event.target.closest('form[data-confirm]');
-        if (!form) return;
+        const form = event.target.closest('form');
+        const question = form && questionFor(form);
+        if (!question) return;
         if (form._confirmed) { form._confirmed = false; return; }
         event.preventDefault();
         event.stopImmediatePropagation();
         if (!dialog) build();
         pending = { form, submitter: event.submitter };
         title.textContent = form.dataset.confirmTitle || 'Are you sure?';
-        message.textContent = form.dataset.confirm;
+        message.textContent = question;
         ok.textContent = form.dataset.confirmOk || 'Confirm';
         cancel.textContent = form.dataset.confirmCancel || 'Cancel';
         dialog.showModal();

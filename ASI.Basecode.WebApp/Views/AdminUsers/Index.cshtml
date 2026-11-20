@@ -85,7 +85,7 @@
                                     <a class="live-button" href="/admin/users/@row.Id/review" data-modal-load aria-label="Review @row.FullName's registration">Review</a>
                                 }
                                 <a class="live-button secondary" href="/admin/users/@row.Id/edit" data-modal-load>Edit</a>
-                                <form method="post" action="/admin/users/@row.Id/delete" data-confirm-title="Delete @row.FullName's account?" data-confirm="Accounts with borrowing history are deactivated instead of deleted." data-confirm-ok="Delete account" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button secondary" type="submit" aria-label="Delete @row.FullName">Delete</button></form>
+                                <form method="post" action="/admin/users/@row.Id/delete" data-confirm-title="Delete @row.FullName's account?" data-confirm="Accounts with borrowing history are deactivated instead of deleted, and their pending or approved bookings are cancelled." data-confirm-ok="Delete account" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button secondary" type="submit" aria-label="Delete @row.FullName">Delete</button></form>
                             </div></td>
                         </tr>
                     }

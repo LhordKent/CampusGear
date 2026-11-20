@@ -17,6 +17,11 @@
         _ => Model.Input.IsActive ? "Active" : "Inactive"
     };
     var fullName = $"{Model.Input.FirstName} {Model.Input.LastName}".Trim();
+    string? CancelWarning(int count, string action) => count == 0
+        ? null
+        : $"{action} cancels this student's {count} pending or approved {(count == 1 ? "booking" : "bookings")}. Turning it back on later does not restore {(count == 1 ? "it" : "them")}.";
+    var deactivateWarning = CancelWarning(Model.CancelledByDeactivation, "Deactivating the account");
+    var pauseWarning = CancelWarning(Model.CancelledByPause, "Pausing borrowing access");
     var initials = string.Concat(new[] { Model.Input.FirstName, Model.Input.LastName }
         .Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => char.ToUpperInvariant(x.Trim()[0])));
     var errors = ViewData.ModelState.TryGetValue("", out var summary) ? summary.Errors.Select(x => x.ErrorMessage).Distinct().ToList() : [];
@@ -41,7 +46,8 @@
         </div>
     </section>
 
-    <form id="account-editor-form" class="account-editor-form" method="post" action="/admin/users/@Model.Id/edit" data-modal-form novalidate>
+    <form id="account-editor-form" class="account-editor-form" method="post" action="/admin/users/@Model.Id/edit" data-modal-form novalidate
+          data-confirm-title="Cancel this student's bookings?" data-confirm-ok="Save and cancel bookings" data-confirm-cancel="Go back">
         @Html.AntiForgeryToken()
         <input type="hidden" name="ConcurrencyStamp" value="@Model.Input.ConcurrencyStamp" />
         <input type="hidden" name="ProfileRowVersion" value="@Model.Input.ProfileRowVersion" />
@@ -88,7 +94,7 @@
         <fieldset class="account-section">
             <legend>Access</legend>
             <label class="account-switch" for="IsActive">
-                <input id="IsActive" name="IsActive" type="checkbox" role="switch" value="true" checked="@Model.Input.IsActive" disabled="@Model.IsSelf" />
+                <input id="IsActive" name="IsActive" type="checkbox" role="switch" value="true" checked="@Model.Input.IsActive" disabled="@Model.IsSelf" data-confirm-on-uncheck="@deactivateWarning" />
                 <span class="account-switch-copy"><strong>Account is active</strong><small>Inactive accounts can't sign in. Their reservations and history are kept.</small></span>
             </label>
             <input type="hidden" name="IsActive" value="@(Model.IsSelf ? "true" : "false")" />
@@ -112,7 +118,7 @@
                 </label>
             </div>
             <label class="account-switch" for="IsEligible">
-                <input id="IsEligible" name="IsEligible" type="checkbox" role="switch" value="true" checked="@Model.Input.IsEligible" />
+                <input id="IsEligible" name="IsEligible" type="checkbox" role="switch" value="true" checked="@Model.Input.IsEligible" data-confirm-on-uncheck="@pauseWarning" />
                 <span class="account-switch-copy"><strong>Can reserve equipment</strong><small>Turn off to pause this student's borrowing without deactivating the account.</small></span>
             </label>
             <input type="hidden" name="IsEligible" value="false" />

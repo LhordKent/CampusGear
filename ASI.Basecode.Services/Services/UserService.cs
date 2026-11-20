@@ -618,6 +618,9 @@ namespace ASI.Basecode.Services.Services
                     ? string.Empty
                     : Convert.ToBase64String(target.BorrowerProfile.RowVersion),
             };
+            var openBookings = target.BorrowerProfile is null
+                ? 0
+                : await _accountRepository.CountOpenBookingsAsync(target.Id, cancellationToken);
             return new UserEditPage(
                 id,
                 target.Email ?? string.Empty,
@@ -627,7 +630,9 @@ namespace ASI.Basecode.Services.Services
                 target.BorrowerProfile is not null,
                 target.Id == actor.UserId,
                 input,
-                ManilaTime.Format(target.CreatedAtUtc)
+                ManilaTime.Format(target.CreatedAtUtc),
+                target.IsActive ? openBookings : 0,
+                target.BorrowerProfile?.IsEligible == true ? openBookings : 0
             );
         }
 

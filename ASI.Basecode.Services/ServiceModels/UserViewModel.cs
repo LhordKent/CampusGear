@@ -228,6 +228,9 @@ namespace ASI.Basecode.Services.ServiceModels
         bool HasBorrowerProfile,
         bool IsSelf,
         UserEditModel Input,
-        string RegisteredManila
+        string RegisteredManila,
+        // Pending/approved bookings that saving would cancel: deactivating an active account, or pausing an eligible one.
+        int CancelledByDeactivation = 0,
+        int CancelledByPause = 0
     );
 }
