@@ -56,7 +56,10 @@
         else
         {
             <div class="live-table-wrap" tabindex="0" aria-label="User accounts table">
-                <table class="live-table">
+                @* Review adds a third button, so the Action column widens only on pages that show one. *@
+                <table class="live-table admin-users-table@(Model.Rows.Any(x => x.ApprovalStatus == AccountApprovalStatus.PendingApproval) ? " has-review" : "")">
+                    @* Fixed widths, so a status note or a long email on one page never reshapes the columns. *@
+                    <colgroup><col /><col class="col-id" /><col /><col /><col class="col-status" /><col class="col-registered" /><col class="col-action" /></colgroup>
                     <thead><tr><th scope="col">@Table.Name</th><th scope="col">@Table.StudentIdNumber</th><th scope="col">@Table.Email</th><th scope="col">@Table.Role</th><th scope="col">@Table.Status</th><th scope="col">@Table.Registered</th><th scope="col">@Table.Action</th></tr></thead>
                     <tbody>
                     @foreach (var row in Model.Rows)

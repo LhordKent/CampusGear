@@ -63,6 +63,7 @@ body{margin:0;background:var(--cg-canvas);color:var(--cg-text);font-family:Inter
 .workspace-borrower .live-metric{padding-left:20px}
 .admin-user-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .admin-user-actions form{margin:0}
+.admin-users-table{table-layout:fixed;min-width:1040px}.admin-users-table .col-id{width:160px}.admin-users-table .col-status{width:170px}.admin-users-table .col-registered{width:180px}.admin-users-table .col-action{width:170px}.admin-users-table.has-review .col-action{width:240px}.admin-users-table .admin-user-actions{flex-wrap:nowrap}
 @media(max-width:1000px){.live-heading,.live-metrics{margin-left:0;margin-right:0}}
 /* Denser desktop sizing so pages fit comfortably at 100% browser zoom. */
 .live-heading{justify-content:flex-start}
