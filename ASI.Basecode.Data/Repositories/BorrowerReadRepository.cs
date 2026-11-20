@@ -32,7 +32,7 @@ namespace ASI.Basecode.Data.Repositories
                     x.Location,
                     x.Condition,
                     x.CreatedAtUtc,
-                    !x.IsMaintenanceHold && x.Condition != EquipmentCondition.Damaged && x.Condition != EquipmentCondition.Unserviceable,
+                    !x.IsMaintenanceHold && x.Condition != EquipmentCondition.Damaged,
                     x.AssetCode
                 ))
                 .ToListAsync(ct);

@@ -15,9 +15,9 @@ namespace ASI.Basecode.WebApp.Models
         string? ImagePath
     )
     {
-        /// <summary>Damaged or unserviceable but not yet in a case: listed first under "Needs attention".</summary>
+        /// <summary>Damaged but not yet in a case: listed first under "Needs attention".</summary>
         public bool NeedsAttention =>
-            Blocked is null && Condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable;
+            Blocked is null && Condition is EquipmentCondition.Damaged;
     }
 
     public sealed record MaintenancePageModel(

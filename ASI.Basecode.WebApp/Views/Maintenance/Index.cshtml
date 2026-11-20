@@ -144,7 +144,7 @@
         string ConditionState(MaintenanceItemOption item) => item.Blocked is not null ? "blocked"
             : item.Condition switch
             {
-                EquipmentCondition.Damaged or EquipmentCondition.Unserviceable => "bad",
+                EquipmentCondition.Damaged => "bad",
                 EquipmentCondition.Fair => "fair",
                 _ => "good"
             };

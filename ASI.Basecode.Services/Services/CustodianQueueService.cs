@@ -54,7 +54,7 @@ namespace ASI.Basecode.Services.Services
             var usable =
                 item.IsActive
                 && !item.IsMaintenanceHold
-                && item.Condition is not (EquipmentCondition.Damaged or EquipmentCondition.Unserviceable);
+                && item.Condition is not EquipmentCondition.Damaged;
             var releaseOpen =
                 reservation.Status == ReservationStatus.Approved && usable && ReleaseWindow.IsOpen(reservation.StartAtUtc, reservation.EndAtUtc, now);
             return (pending && usable, pending, releaseOpen, GetAvailabilityNote(reservation, usable, pending, now));

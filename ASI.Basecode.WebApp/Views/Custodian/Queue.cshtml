@@ -5,7 +5,7 @@
     var returns = Model.Queue == "active";
     var staffPath = ViewData["WorkspaceRole"] as string == "Administrator" ? "/admin" : "/custodian";
     var basePath = staffPath + (returns ? "/returns" : history ? "/history" : "/approvals");
-    var returnOptions = new ConditionOptionsModel("Condition at return", ConditionOptionsModel.ReturnConditions, ASI.Basecode.Resources.Constants.EquipmentCondition.Good, "Damaged or Unserviceable puts the item on a maintenance hold.");
+    var returnOptions = new ConditionOptionsModel("Condition at return", ConditionOptionsModel.ReturnConditions, ASI.Basecode.Resources.Constants.EquipmentCondition.Good, "Damaged puts the item on a maintenance hold.");
     var releaseTab = !history && !returns && Model.Status == "approved";
     var source =history ? "695:4595" : returns ? staffPath == "/admin" ? "695:3957" : "695:2032" : staffPath == "/admin" ? "695:3278" : "695:1499";
 }

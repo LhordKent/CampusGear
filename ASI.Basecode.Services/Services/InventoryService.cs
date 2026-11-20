@@ -227,7 +227,7 @@ namespace ASI.Basecode.Services.Services
                     _equipmentRepository.Add(item);
                 }
 
-                if (input.Condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
+                if (input.Condition is EquipmentCondition.Damaged)
                 {
                     item.IsMaintenanceHold = true;
                     if (!await _maintenanceRepository.HasOpenAsync(itemId, cancellationToken))

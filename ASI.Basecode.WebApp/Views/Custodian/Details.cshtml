@@ -165,7 +165,7 @@
                         <small>Record the equipment's condition when it is returned.</small>
                     }
                 </div>
-                @if (loan.ConditionAtReturn is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
+                @if (loan.ConditionAtReturn is EquipmentCondition.Damaged)
                 {
                     <div class="reservation-condition-alert">
                         <span>Condition assessment</span>

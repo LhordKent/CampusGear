@@ -151,7 +151,7 @@ namespace ASI.Basecode.Services.Services
 
             if (
                 input.Status == MaintenanceStatus.Closed
-                && input.Condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable
+                && input.Condition is EquipmentCondition.Damaged
             )
             {
                 return Outcome(false, Errors.InvalidClosingCondition, "Condition");

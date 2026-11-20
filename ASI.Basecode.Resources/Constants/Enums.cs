@@ -6,7 +6,6 @@ namespace ASI.Basecode.Resources.Constants
         Good,
         Fair,
         Damaged,
-        Unserviceable,
     }
 
     public enum ReservationStatus

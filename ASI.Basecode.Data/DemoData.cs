@@ -159,7 +159,7 @@ namespace ASI.Basecode.Data
                 "ViewSonic Portable Mini Projector",
                 "Projectors & Displays",
                 "Equipment Room B, Shelf 2",
-                EquipmentCondition.Unserviceable,
+                EquipmentCondition.Damaged,
                 "Pocket LED projector. Will not power on; awaiting replacement board.",
                 95
             ),
@@ -423,7 +423,7 @@ namespace ASI.Basecode.Data
                     CreatedAtUtc = added,
                     UpdatedAtUtc = added,
                     ImagePath = ImageFor(spec.Code),
-                    IsMaintenanceHold = spec.Condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable,
+                    IsMaintenanceHold = spec.Condition is EquipmentCondition.Damaged,
                 };
                 items[spec.Code] = item;
                 db.EquipmentItems.Add(item);

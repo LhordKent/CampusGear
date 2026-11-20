@@ -315,7 +315,7 @@ namespace ASI.Basecode.Services.Services
         )
         {
             await RequireCustodianAsync(actor, cancellationToken);
-            if (!Enum.IsDefined(conditionAtRelease) || conditionAtRelease is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
+            if (!Enum.IsDefined(conditionAtRelease) || conditionAtRelease is EquipmentCondition.Damaged)
             {
                 throw Error(ReservationErrorCode.UnavailableEquipment, Errors.DamagedReleaseForbidden);
             }
@@ -427,7 +427,7 @@ namespace ASI.Basecode.Services.Services
             var item = reservation.EquipmentItem;
             item.Condition = conditionAtReturn;
             TouchItem(item, now);
-            if (conditionAtReturn is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
+            if (conditionAtReturn is EquipmentCondition.Damaged)
             {
                 item.IsMaintenanceHold = true;
                 _maintenanceRepository.Add(
@@ -751,7 +751,7 @@ namespace ASI.Basecode.Services.Services
                 item is null
                 || !item.IsActive
                 || item.IsMaintenanceHold
-                || item.Condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable
+                || item.Condition is EquipmentCondition.Damaged
             )
             {
                 throw Error(ReservationErrorCode.UnavailableEquipment, Errors.ItemNotBookable);

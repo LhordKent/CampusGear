@@ -141,7 +141,7 @@ namespace ASI.Basecode.WebApp.Controllers
             CancellationToken cancellationToken
         )
         {
-            if (!ValidCondition(condition, out var parsed) || parsed is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable)
+            if (!ValidCondition(condition, out var parsed) || parsed is EquipmentCondition.Damaged)
             {
                 return InvalidFormAsync(id, "Choose Excellent, Good, or Fair for an equipment release.");
             }
@@ -255,7 +255,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 var message =
                     result.Status == ReservationStatus.Expired
                         ? "The pending hold expired before this action. Its equipment slot was released."
-                    : returnTransition && result.ConditionAtReturn is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable
+                    : returnTransition && result.ConditionAtReturn is EquipmentCondition.Damaged
                         ? "Return recorded. A maintenance hold was created for this equipment."
                     : success;
 

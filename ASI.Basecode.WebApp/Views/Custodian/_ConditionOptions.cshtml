@@ -1,12 +1,12 @@
 @using ASI.Basecode.Resources.Constants
 @model ConditionOptionsModel
-@* Condition picker as option buttons (radio inputs posted as "Condition"). Damaged and Unserviceable are marked as holds. *@
+@* Condition picker as option buttons (radio inputs posted as "Condition"). Damaged is marked as a hold. *@
 <fieldset class="live-field wide condition-options" disabled="@Model.Disabled">
     <legend>@Model.Legend</legend>
     <div class="condition-option-list">
         @foreach (var condition in Model.Options)
         {
-            var hold = condition is EquipmentCondition.Damaged or EquipmentCondition.Unserviceable;
+            var hold = condition is EquipmentCondition.Damaged;
             <label class="condition-option @(hold ? "is-hold" : "")">
                 <input type="radio" name="Condition" value="@condition" required checked="@(condition == Model.Selected)" />
                 <span>@condition</span>

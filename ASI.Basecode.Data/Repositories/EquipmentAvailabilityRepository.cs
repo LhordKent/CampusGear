@@ -66,7 +66,7 @@ namespace ASI.Basecode.Data.Repositories
                     x.Id,
                     x.Name,
                     x.AssetCode,
-                    x.IsMaintenanceHold || x.Condition == EquipmentCondition.Damaged || x.Condition == EquipmentCondition.Unserviceable,
+                    x.IsMaintenanceHold || x.Condition == EquipmentCondition.Damaged,
                     x.CategoryId,
                     x.Category.Name,
                     x.ImagePath
@@ -110,7 +110,7 @@ namespace ASI.Basecode.Data.Repositories
                 .Select(x => new EquipmentStateData(
                     x.Id,
                     x.IsActive,
-                    x.IsMaintenanceHold || x.Condition == EquipmentCondition.Damaged || x.Condition == EquipmentCondition.Unserviceable,
+                    x.IsMaintenanceHold || x.Condition == EquipmentCondition.Damaged,
                     Context.Loans.Any(l => l.Reservation.EquipmentItemId == x.Id && l.ReturnedAtUtc == null),
                     Context.Reservations.Any(r =>
                         r.EquipmentItemId == x.Id && r.Status == ReservationStatus.Approved && r.StartAtUtc <= now && r.EndAtUtc > now
