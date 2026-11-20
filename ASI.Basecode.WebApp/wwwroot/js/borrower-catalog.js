@@ -168,6 +168,7 @@
             showAvailability('checking', 'Checking availability for this time…');
             const query = new URLSearchParams({ equipmentItemId: current.dataset.id, start: start.value, end: end.value });
             try {
+                // WBS 25.00 | Preview free units for the chosen times; the reservation POST rechecks before saving.
                 const response = await fetch(`/borrower/reservation/availability?${query}`, {
                     headers: { Accept: 'application/json' }, signal: availabilityRequest.signal
                 });

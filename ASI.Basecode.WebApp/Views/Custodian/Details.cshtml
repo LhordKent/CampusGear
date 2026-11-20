@@ -177,7 +177,7 @@
         </section>
     }
 
-    @* The workflow card only exists to hold actions. A read-only record (cancelled, rejected, expired, or any record seen by an
+    @* WBS 28.00 / WBS 45.00 | The workflow card only exists to hold actions. A read-only record (cancelled, rejected, expired, or any record seen by an
        administrator) has none, and the page header already links back to the borrowing history, so the card is left out. *@
     @if (Model.CanApprove || Model.CanReject || (record.Status == ReservationStatus.Approved && !admin) || Model.CanReturn)
     {

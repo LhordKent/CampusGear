@@ -3,6 +3,7 @@
     // One dashboard page for staff: the administrator and custodian sections are partials in this folder.
     var administrator = Model is AdminDashboardViewModel;
     ViewData["Title"] = TitleText.Dashboard;
+    // WBS 45.00 | The chosen staff dashboard model tells the shared layout which menu to render.
     ViewData["WorkspaceRole"] = administrator ? "Administrator" : "Custodian";
 }
 @if (administrator)

@@ -156,6 +156,7 @@ namespace ASI.Basecode.Services.Services
             // Step 5: the item must be usable (active, not damaged, not in maintenance) and free for that time.
             var item = await _equipmentRepository.FindAsync(command.EquipmentItemId, cancellationToken);
             EnsureUsable(item);
+            // WBS 25.00 | Recheck under the item lock so concurrent submissions cannot both claim an overlapping slot.
             if (await HasConflictAsync(command.EquipmentItemId, command.StartAtUtc, command.EndAtUtc, now, null, cancellationToken))
             {
                 throw Error(ReservationErrorCode.ScheduleConflict, Errors.ScheduleUnavailable);
@@ -192,7 +193,7 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
-        // APPROVE (custodian): Pending -> Approved. The time slot is now firmly reserved for the student.
+        // WBS 28.00 | Reload the request under the item lock before changing a pending hold to an approved booking.
         public async Task<ReservationResult> ApproveAsync(
             ReservationActor actor,
             Guid reservationId,
@@ -233,6 +234,7 @@ namespace ASI.Basecode.Services.Services
 
             await RequireEligibleBorrowerAsync(reservation.BorrowerProfileId, cancellationToken);
             EnsureUsable(reservation.EquipmentItem);
+            // WBS 25.00 / WBS 28.00 | Exclude this request so its own pending hold does not block approval.
             if (await HasConflictAsync(itemId, reservation.StartAtUtc, reservation.EndAtUtc, now, reservation.Id, cancellationToken))
             {
                 throw Error(ReservationErrorCode.ScheduleConflict, Errors.ScheduleConflict);
@@ -252,7 +254,7 @@ namespace ASI.Basecode.Services.Services
             return ToResult(reservation);
         }
 
-        // REJECT (custodian): Pending -> Rejected. A reason is required; the slot becomes free again.
+        // WBS 28.00 | Record why the pending request was rejected so its hold can be released and the decision can be reviewed.
         public async Task<ReservationResult> RejectAsync(
             ReservationActor actor,
             Guid reservationId,
@@ -628,7 +630,8 @@ namespace ASI.Basecode.Services.Services
             return _records.HasConflictAsync(itemId, startAtUtc, endAtUtc, now, excludingReservationId, cancellationToken);
         }
 
-        // Opens a transaction and takes the per-item lock (a SQL Server "application lock").
+        // WBS 25.00 / WBS 28.00 | Serialize reads and writes for the same unit within a transaction.
+        // SQL Server holds the application lock for the lifetime of this transaction.
         private async Task<IDataTransaction> BeginItemTransactionAsync(Guid itemId, CancellationToken cancellationToken)
         {
             var transaction = await _unitOfWork.BeginAsync(IsolationLevel.ReadCommitted, cancellationToken);
@@ -715,8 +718,7 @@ namespace ASI.Basecode.Services.Services
             return user;
         }
 
-        /// <summary>Approval, rejection, release and return belong to the custodian alone; administrators do not take part in the borrowing flow.</summary>
-        // Only custodians may approve, reject, release and return.
+        /// <summary>WBS 28.00 / WBS 45.00 | The service rechecks Custodian membership for approval, rejection, release and return.</summary>
         private async Task RequireCustodianAsync(ReservationActor actor, CancellationToken cancellationToken)
         {
             var user = await RequireActiveVerifiedUserAsync(actor, cancellationToken);

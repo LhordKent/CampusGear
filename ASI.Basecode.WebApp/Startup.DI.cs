@@ -62,10 +62,12 @@ namespace ASI.Basecode.WebApp
             this._services.AddScoped<ICustodianQueueService, CustodianQueueService>();
             this._services.AddScoped<IDashboardService, DashboardService>();
             this._services.AddScoped<IUserService, UserService>();
+            // WBS 4.00 / WBS 5.00 | Route account actions to the Identity-backed authentication service.
             this._services.AddScoped<IAuthenticationService, AuthenticationService>();
             this._services.AddScoped<IRegistrationService, RegistrationService>();
             this._services.AddScoped<IPasswordResetService, PasswordResetService>();
             this._services.AddScoped<ICurrentAccountService, CurrentAccountService>();
+            // WBS 25.00 / WBS 28.00 | Borrower submissions and custodian decisions share the reservation workflow.
             this._services.AddScoped<IReservationService, ReservationService>();
             this._services.AddScoped<EmailChallengeService>();
             this._services.AddSingleton<IEquipmentImageStore, EquipmentImageStore>();

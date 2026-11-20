@@ -115,6 +115,7 @@
                                             }
                                             else
                                             {
+                                            @* WBS 28.00 | Reject sends Reason with the request ID in the URL; Approve overrides the form route. *@
                                             <form method="post" action="/custodian/reservations/@row.Id/reject" class="live-form" data-modal-form novalidate>
                                                 @Html.AntiForgeryToken()
                                                 <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>

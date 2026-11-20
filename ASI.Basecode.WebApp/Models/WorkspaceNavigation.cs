@@ -7,6 +7,7 @@ namespace ASI.Basecode.WebApp.Models
 
     public static class WorkspaceNavigation
     {
+        // WBS 45.00 | Keep each workspace's links here; controller role attributes protect the linked actions.
         public static IReadOnlyList<WorkspaceNavigationItem> ForRole(string role)
         {
             return role switch

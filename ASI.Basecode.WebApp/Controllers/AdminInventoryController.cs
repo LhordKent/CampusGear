@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 // =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
+    // WBS 45.00 | The administrator inventory menu leads to routes protected by the Administrator role.
     [Authorize(Roles = RoleNames.Administrator)]
     [AutoValidateAntiforgeryToken]
     public sealed class AdminInventoryController : Mvc.ControllerBase<AdminInventoryController>

@@ -171,6 +171,7 @@
             <dialog class="reserve-dialog" id="reserve-dialog" aria-labelledby="reserve-title"
                     open="@Model.OpenDialog" data-reserve-dialog data-open-on-load="@(Model.OpenDialog ? "true" : "false")"
                     data-eligible="@(Model.IsEligible ? "true" : "false")">
+                @* WBS 25.00 | Send the selected equipment and Manila times to CreateReservation for the final overlap check. *@
                 <form method="post" action="/borrower/reservation" class="reserve-form" id="reservation-form" novalidate data-reserve-form>
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="RequestId" value="@Model.Input.RequestId" />

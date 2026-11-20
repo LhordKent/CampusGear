@@ -45,7 +45,7 @@ namespace ASI.Basecode.Services.Services
             _protector = dataProtectionProvider.CreateProtector("CampusGear.EmailChallenge.v1");
         }
 
-        // Creates a new code for this user and purpose, and emails it.
+        // WBS 4.00 | Administrator sign-in uses its own challenge purpose, separate from password reset.
         public async Task<ChallengeIssueResult> IssueAsync(
             User user,
             EmailChallengePurpose purpose,
@@ -127,7 +127,8 @@ namespace ASI.Basecode.Services.Services
             }
         }
 
-        // Checks a code the user typed. Correct codes are marked used so they can't be used again.
+        // WBS 4.00 | Check the newest usable challenge for the account and purpose before sign-in can finish.
+        // A matching code is consumed so the same challenge cannot be reused.
         public async Task<ChallengeVerifyStatus> VerifyAsync(
             string userId,
             EmailChallengePurpose purpose,

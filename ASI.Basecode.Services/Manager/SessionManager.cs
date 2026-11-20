@@ -19,6 +19,7 @@ namespace ASI.Basecode.Services.Manager
         private ISession Session =>
             _accessor.HttpContext?.Session ?? throw new InvalidOperationException("An account flow requires an HTTP session.");
 
+        // WBS 4.00 / WBS 5.00 | Carry the account ID and stamp between the password and code requests.
         public AccountChallengeState? PendingAdministrator
         {
             get { return ReadChallenge("CampusGear.PendingAdministratorUserId", "CampusGear.PendingAdministratorStamp"); }
@@ -89,6 +90,7 @@ namespace ASI.Basecode.Services.Manager
             Session.SetString(stampKey, value.SecurityStamp);
         }
 
+        // WBS 4.00 / WBS 5.00 | Logout discards pending sign-in and reset state.
         public void Clear() => Session.Clear();
     }
 }

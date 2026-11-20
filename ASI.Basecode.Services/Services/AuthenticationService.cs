@@ -69,7 +69,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
         }
 
-        // LOGIN step 1: check the email and password.
+        // WBS 4.00 | Resolve the account by email, then check its state before issuing a cookie or requesting a code.
         public async Task<OperationResult<AuthenticationResult>> LoginAsync(
             RequestContext actor,
             LoginInput input,
@@ -117,7 +117,7 @@ namespace ASI.Basecode.Services.Services
                 return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
             }
 
-            // Check the password (wrong tries count toward lockout).
+            // WBS 5.00 | Identity counts failed passwords for approved accounts and reports when the account locks.
             var passwordResult = await _signInManager.CheckPasswordSignInAsync(user, input.Password, lockoutOnFailure: true);
             if (!passwordResult.Succeeded)
             {
@@ -131,7 +131,7 @@ namespace ASI.Basecode.Services.Services
             // Administrators need a second step: email them a code.
             if (await _userManager.IsInRoleAsync(user, RoleNames.Administrator) && !SkipAdministratorCode())
             {
-                // CheckPasswordSignInAsync validates the password without creating an auth cookie.
+                // WBS 4.00 / WBS 5.00 | The password check leaves cookie issuance to the verified code step.
                 _flow.PendingAdministrator = new(user.Id, user.SecurityStamp ?? string.Empty);
                 var issued = await _emailChallengeService.IssueAsync(user, EmailChallengePurpose.AdministratorLogin, ct);
                 if (issued.Status == ChallengeIssueStatus.DeliveryUnavailable)
@@ -169,7 +169,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.VerificationRequired, Notice: feedback.Notice));
         }
 
-        // LOGIN step 2 (administrators): check the emailed code, then sign in.
+        // WBS 4.00 | Bind verification to the pending account and recheck that account before signing in.
         public async Task<OperationResult<AuthenticationResult>> TwoFactorAsync(
             RequestContext actor,
             string? code,
@@ -226,7 +226,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.VerificationRequired, Notice: feedback.Notice));
         }
 
-        // Sign out.
+        // WBS 4.00 / WBS 5.00 | End the Identity sign-in and clear any unfinished account flows for this browser.
         public async Task<OperationResult<AuthenticationResult>> LogoutAsync(RequestContext actor, CancellationToken ct = default)
         {
             var feedback = new AccountFeedback();
@@ -236,7 +236,7 @@ namespace ASI.Basecode.Services.Services
             return feedback.Result(new AuthenticationResult(AuthenticationStatus.CredentialsRequired, Notice: feedback.Notice));
         }
 
-        // Which workspace the user belongs to (Administrator, Custodian or Borrower).
+        // WBS 4.00 / WBS 45.00 | Resolve the landing-page role from Identity membership.
         private async Task<string> GetWorkspaceRoleAsync(User user)
         {
             if (await _userManager.IsInRoleAsync(user, RoleNames.Administrator))
@@ -301,6 +301,7 @@ namespace ASI.Basecode.Services.Services
             return null;
         }
 
+        // WBS 4.00 / WBS 5.00 | A changed security stamp invalidates a pending administrator sign-in.
         private async Task<bool> MatchesPendingAdministratorAsync(User user)
         {
             var stamp = _flow.PendingAdministrator?.SecurityStamp;

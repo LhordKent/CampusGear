@@ -133,7 +133,7 @@ namespace ASI.Basecode.Services.Services
             return OperationResult<ReservationPageViewModel>.Ok(model);
         }
 
-        // "Is it free?" check used by the booking form while the student picks dates.
+        // WBS 25.00 | Count available units in the selected equipment group for the preview.
         public async Task<OperationResult<AvailabilityResult>> AvailabilityAsync(
             RequestContext actor,
             Guid equipmentItemId,
@@ -202,7 +202,7 @@ namespace ASI.Basecode.Services.Services
                 return new(OperationOutcome.NotFound);
             }
 
-            // Grouped exactly like AvailabilityAsync, so the picker and the booking check count the same units.
+            // WBS 25.00 | Use the same equipment grouping for the picker and availability preview.
             var bookable = units
                 .Where(x => x.CategoryId == unit.CategoryId && x.Name == unit.Name && x.IsBookable)
                 .OrderBy(x => x.AssetCode)

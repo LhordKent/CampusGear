@@ -1,6 +1,7 @@
 @model BorrowerHomeViewModel
 @{
     ViewData["Title"] = TitleText.Home;
+    // WBS 45.00 | The borrower home uses the borrower menu in the shared layout.
     ViewData["WorkspaceRole"] = "Borrower";
     var active = Model.PendingCount + Model.ApprovedCount + Model.BorrowedCount;
 }

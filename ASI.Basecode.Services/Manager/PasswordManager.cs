@@ -9,6 +9,7 @@ namespace ASI.Basecode.Services.Manager
     public static class PasswordManager
     {
         public const int RequiredLength = 8;
+        // WBS 5.00 | These settings apply to Identity's per-account failed-password counter.
         public const int MaxFailedAccessAttempts = 5;
         public static readonly TimeSpan LockoutTimeSpan = TimeSpan.FromMinutes(15);
 

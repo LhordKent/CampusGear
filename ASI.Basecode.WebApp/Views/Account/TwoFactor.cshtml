@@ -15,6 +15,7 @@
     })
     <section class="auth-card" aria-labelledby="auth-title">
         @await Html.PartialAsync("_AccountFeedback")
+        @* WBS 4.00 | The Code field completes the pending administrator sign-in through AccountController.TwoFactor. *@
         <form class="auth-form" action="/auth/two-factor" method="post">
             @Html.AntiForgeryToken()
             <label class="auth-field" for="Code"><span class="auth-field-label">6-digit verification code</span>

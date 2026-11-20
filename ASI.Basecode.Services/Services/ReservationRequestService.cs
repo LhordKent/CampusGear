@@ -98,6 +98,7 @@ namespace ASI.Basecode.Services.Services
                 errors.Add(new(nameof(input.Notes), Errors.NotesTooLong));
             }
 
+            // WBS 25.00 | Interpret form dates as Manila time before comparing them with stored UTC bookings.
             var startUtc = ParseManilaInput(input.StartLocal, nameof(input.StartLocal), errors);
             var endUtc = ParseManilaInput(input.EndLocal, nameof(input.EndLocal), errors);
             if (startUtc is not null && endUtc is not null && startUtc >= endUtc)
@@ -205,7 +206,7 @@ namespace ASI.Basecode.Services.Services
                         catch (ReservationWorkflowException exception)
                             when (exception.Code is ReservationErrorCode.ScheduleConflict or ReservationErrorCode.UnavailableEquipment)
                         {
-                            // This unit was taken after the availability check; try the next free unit.
+                            // WBS 25.00 | Availability can change after the candidate search; try the next free unit.
                         }
                     }
                 }

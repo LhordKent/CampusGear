@@ -14,6 +14,7 @@
     })
     <section class="auth-card" aria-labelledby="auth-title">
         @await Html.PartialAsync("_AccountFeedback")
+        @* WBS 4.00 | Email and Password bind to LoginViewModel in AccountController.Login. *@
         <form class="auth-form" action="/auth/login" method="post">
             @Html.AntiForgeryToken()
             <label class="auth-field" for="Email">

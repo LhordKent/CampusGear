@@ -39,7 +39,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _registrationService = registrationService;
         }
 
-        // GET /auth/login: shows the sign-in page. Already signed in? Go straight to your dashboard.
+        // WBS 4.00 | A signed-in visitor resumes their workspace when opening the login page.
         [AllowAnonymous, HttpGet("login")]
         public async Task<IActionResult> Login(CancellationToken cancellationToken)
         {
@@ -54,8 +54,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/Login.cshtml");
         }
 
-        // POST /auth/login: checks email + password.
-        // Result: signed in -> dashboard, administrator -> two-factor page (code emailed), wrong -> error again.
+        // WBS 4.00 / WBS 5.00 | Bind the sign-in form here; Identity checks credentials and lockout in AuthenticationService.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("login")]
         public async Task<IActionResult> Login([FromForm] LoginViewModel model, CancellationToken cancellationToken)
         {
@@ -83,7 +82,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/Login.cshtml");
         }
 
-        // GET /auth/two-factor: shows the "enter the code we emailed you" page (administrators only).
+        // WBS 4.00 | Render the code form only while the pending sign-in is valid.
         [AllowAnonymous, HttpGet("two-factor")]
         public async Task<IActionResult> TwoFactor(CancellationToken cancellationToken)
         {
@@ -99,7 +98,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/TwoFactor.cshtml");
         }
 
-        // POST /auth/two-factor: checks the emailed code. Correct -> signed in and sent to the admin dashboard.
+        // WBS 4.00 | Bind Code from TwoFactor.cshtml; the service can finish sign-in after verification.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("two-factor")]
         public async Task<IActionResult> TwoFactor([FromForm] CodeInput input, CancellationToken cancellationToken)
         {
@@ -123,7 +122,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/TwoFactor.cshtml");
         }
 
-        // POST /auth/resend-two-factor: emails a new code.
+        // WBS 4.00 | Resend uses the pending account in the flow session rather than a posted account ID.
         [AllowAnonymous, EnableRateLimiting("auth-post"), HttpPost("resend-two-factor")]
         public async Task<IActionResult> ResendTwoFactor(CancellationToken cancellationToken)
         {
@@ -134,7 +133,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 : RedirectToAction(nameof(TwoFactor));
         }
 
-        // POST /auth/logout: signs the user out and goes back to the login page.
+        // WBS 4.00 | Resolve the account from the authenticated request; both workspace forms use this action.
         [Authorize, EnableRateLimiting("auth-post"), HttpPost("logout")]
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
@@ -186,7 +185,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("~/Views/Account/RegistrationSubmitted.cshtml");
         }
 
-        // Which dashboard each role lands on after signing in.
+        // WBS 4.00 / WBS 45.00 | The signed-in role determines the landing page.
         private static string WorkspaceUrl(string? role)
         {
             return role switch
