@@ -6,6 +6,7 @@
     var adding = Model.Input.Id is null;
     var errors = ViewData.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).Distinct().ToList();
     var hasPhoto = Model.ImagePath is not null;
+    var assetCode = adding ? "Assigned when saved" : Model.AssetCode;
     var categoryName = Model.Categories.FirstOrDefault(x => x.Id == Model.Input.CategoryId)?.Name ?? Model.Categories.FirstOrDefault()?.Name ?? "";
 }
 @* Add and Edit share this dialog. Left: the form in three short sections. Right: a live preview of the borrower
@@ -17,7 +18,7 @@
             <h2 id="equipment-editor-title">@(adding ? "Add equipment" : "Edit equipment")</h2>
             <p class="equip-editor-sub" id="equipment-editor-sub">
                 @if (adding) { <text>One physical unit with its own asset code.</text> }
-                else { <span class="equip-editor-code">@Model.Input.AssetCode</span><text> · @Model.Input.Name</text> }
+                else { <span class="equip-editor-code">@Model.AssetCode</span><text> · @Model.Input.Name</text> }
             </p>
         </div>
         <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
@@ -46,11 +47,10 @@
                             <select asp-for="Input.Condition" asp-items="Html.GetEnumSelectList<EquipmentCondition>()" aria-describedby="equip-condition-hint"></select>
                             <small class="equip-hint" id="equip-condition-hint">Damaged or Unserviceable sends the item to maintenance.</small>
                         </label>
-                        <label class="live-field">
+                        <div class="live-field">
                             <span>Asset code</span>
-                            <input asp-for="Input.AssetCode" required maxlength="64" placeholder="EQ-000" autocomplete="off" spellcheck="false" aria-describedby="equip-code-hint" data-preview-source="code" />
-                            <small class="equip-hint" id="equip-code-hint">Unique to this unit.</small>
-                        </label>
+                            <strong class="equip-editor-code">@assetCode</strong>
+                        </div>
                         <label class="live-field">
                             <span>Serial number <small>Optional</small></span>
                             <input asp-for="Input.SerialNumber" maxlength="120" autocomplete="off" spellcheck="false" />
@@ -107,7 +107,7 @@
                         <div class="equip-preview-body" aria-hidden="true">
                             <p class="equip-preview-category" data-preview="category">@categoryName</p>
                             <p class="equip-preview-name" data-preview="name" data-empty="Equipment name">@(string.IsNullOrWhiteSpace(Model.Input.Name) ? "Equipment name" : Model.Input.Name)</p>
-                            <p class="equip-preview-code" data-preview="code" data-empty="Asset code">@(string.IsNullOrWhiteSpace(Model.Input.AssetCode) ? "Asset code" : Model.Input.AssetCode)</p>
+                            <p class="equip-preview-code">@assetCode</p>
                         </div>
                     </div>
                     <div class="equip-photo-info">

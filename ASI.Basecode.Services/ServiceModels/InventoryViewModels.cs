@@ -10,9 +10,6 @@ namespace ASI.Basecode.Services.ServiceModels
 
         public Guid CategoryId { get; set; }
 
-        [Required, StringLength(64)]
-        public string AssetCode { get; set; } = "";
-
         [Required, StringLength(160)]
         public string Name { get; set; } = "";
 

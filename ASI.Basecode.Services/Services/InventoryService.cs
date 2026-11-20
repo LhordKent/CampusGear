@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
@@ -13,6 +14,7 @@ namespace ASI.Basecode.Services.Services
     {
         private readonly IEquipmentRepository _equipmentRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IAssetCodeRepository _assetCodes;
         private readonly IMaintenanceRepository _maintenanceRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -23,6 +25,7 @@ namespace ASI.Basecode.Services.Services
         public InventoryService(
             IEquipmentRepository equipment,
             ICategoryRepository categories,
+            IAssetCodeRepository assetCodes,
             IMaintenanceRepository maintenance,
             IAuditRepository audits,
             IUnitOfWork work,
@@ -33,6 +36,7 @@ namespace ASI.Basecode.Services.Services
         {
             _equipmentRepository = equipment;
             _categoryRepository = categories;
+            _assetCodes = assetCodes;
             _maintenanceRepository = maintenance;
             _auditRepository = audits;
             _unitOfWork = work;
@@ -114,7 +118,6 @@ namespace ASI.Basecode.Services.Services
         )
         {
             var errors = new List<FieldError>();
-            input.AssetCode = input.AssetCode?.Trim() ?? "";
             input.Name = input.Name?.Trim() ?? "";
             if (!Enum.IsDefined(input.Condition))
             {
@@ -153,6 +156,7 @@ namespace ASI.Basecode.Services.Services
             }
 
             string? replacedImagePath = null;
+            string? assignedCode = null;
             IDataTransaction? transaction = null;
             var committed = false;
             try
@@ -203,7 +207,6 @@ namespace ASI.Basecode.Services.Services
                         }
                     );
                 item.CategoryId = input.CategoryId;
-                item.AssetCode = input.AssetCode;
                 item.Name = input.Name;
                 item.SerialNumber = Clean(input.SerialNumber);
                 item.Location = Clean(input.Location);
@@ -219,6 +222,8 @@ namespace ASI.Basecode.Services.Services
                 item.UpdatedAtUtc = now;
                 if (input.Id is null)
                 {
+                    assignedCode = await _assetCodes.AllocateAsync(input.CategoryId, cancellationToken);
+                    item.AssetCode = assignedCode;
                     _equipmentRepository.Add(item);
                 }
 
@@ -302,7 +307,9 @@ namespace ASI.Basecode.Services.Services
             _images.Delete(replacedImagePath);
             return OperationResult<Guid>.Ok(
                 itemId,
-                input.Id is null ? Common.EquipmentAdded : Common.EquipmentUpdated
+                assignedCode is null
+                    ? Common.EquipmentUpdated
+                    : string.Format(CultureInfo.CurrentCulture, Common.EquipmentAdded, assignedCode)
             );
         }
 

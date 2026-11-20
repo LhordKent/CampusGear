@@ -120,6 +120,30 @@ namespace ASI.Basecode.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("ASI.Basecode.Data.Models.AssetCodeSeries", b =>
+                {
+                    b.Property<string>("Prefix")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("NextNumber")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Prefix");
+
+                    b.HasIndex("CategoryId")
+                        .IsUnique()
+                        .HasFilter("[CategoryId] IS NOT NULL");
+
+                    b.ToTable("AssetCodeSeries", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AssetCodeSeries_NextNumber", "[NextNumber] > 0");
+                        });
+                });
+
             modelBuilder.Entity("ASI.Basecode.Data.Models.AuditEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -749,6 +773,14 @@ namespace ASI.Basecode.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ASI.Basecode.Data.Models.AssetCodeSeries", b =>
+                {
+                    b.HasOne("ASI.Basecode.Data.Models.EquipmentCategory", null)
+                        .WithOne("AssetCodeSeries")
+                        .HasForeignKey("ASI.Basecode.Data.Models.AssetCodeSeries", "CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
             modelBuilder.Entity("ASI.Basecode.Data.Models.AuditEvent", b =>
                 {
                     b.HasOne("ASI.Basecode.Data.Models.User", "ActorUser")
@@ -928,13 +960,6 @@ namespace ASI.Basecode.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ASI.Basecode.Data.Models.User", b =>
-                {
-                    b.Navigation("BorrowerProfile");
-
-                    b.Navigation("EmailChallenges");
-                });
-
             modelBuilder.Entity("ASI.Basecode.Data.Models.BorrowerProfile", b =>
                 {
                     b.Navigation("Reservations");
@@ -942,6 +967,8 @@ namespace ASI.Basecode.Data.Migrations
 
             modelBuilder.Entity("ASI.Basecode.Data.Models.EquipmentCategory", b =>
                 {
+                    b.Navigation("AssetCodeSeries");
+
                     b.Navigation("Items");
                 });
 
@@ -960,6 +987,13 @@ namespace ASI.Basecode.Data.Migrations
             modelBuilder.Entity("ASI.Basecode.Data.Models.Reservation", b =>
                 {
                     b.Navigation("Loan");
+                });
+
+            modelBuilder.Entity("ASI.Basecode.Data.Models.User", b =>
+                {
+                    b.Navigation("BorrowerProfile");
+
+                    b.Navigation("EmailChallenges");
                 });
 #pragma warning restore 612, 618
         }

@@ -27,6 +27,7 @@ namespace ASI.Basecode.WebApp
             this._services.AddScoped<IWorkflowLockManager, WorkflowLockManager>();
             this._services.AddScoped<IAuditRepository, AuditRepository>();
             this._services.AddScoped<ICategoryRepository, CategoryRepository>();
+            this._services.AddScoped<IAssetCodeRepository, AssetCodeRepository>();
             this._services.AddScoped<IEquipmentRepository, EquipmentRepository>();
             this._services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
             this._services.AddScoped<IReservationRepository, ReservationRepository>();

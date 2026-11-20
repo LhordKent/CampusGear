@@ -16,6 +16,8 @@ namespace ASI.Basecode.Data.Models
 
         public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 
+        public AssetCodeSeries? AssetCodeSeries { get; set; }
+
         public ICollection<EquipmentItem> Items { get; set; } = new List<EquipmentItem>();
     }
 }

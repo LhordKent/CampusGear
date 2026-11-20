@@ -1,3 +1,4 @@
+using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Resources.Constants;
 using Microsoft.AspNetCore.Identity;
@@ -112,6 +113,17 @@ namespace ASI.Basecode.Data
                 );
             }
 
+            await transaction.CommitAsync();
+        }
+
+        public static async Task InitializeAssetCodeSeriesAsync(IServiceProvider services)
+        {
+            await using var scope = services.CreateAsyncScope();
+            var work = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var codes = scope.ServiceProvider.GetRequiredService<IAssetCodeRepository>();
+            await using var transaction = await work.BeginAsync();
+            await codes.InitializeMissingAsync(CancellationToken.None);
+            await work.SaveAsync();
             await transaction.CommitAsync();
         }
 

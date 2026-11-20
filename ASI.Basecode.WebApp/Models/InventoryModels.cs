@@ -12,6 +12,7 @@ namespace ASI.Basecode.WebApp.Models
         int Pages,
         int Total,
         string? Feedback,
-        string? ImagePath = null
+        string? ImagePath,
+        string? AssetCode
     );
 }

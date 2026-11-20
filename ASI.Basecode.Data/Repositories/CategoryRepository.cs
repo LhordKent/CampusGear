@@ -27,7 +27,7 @@ namespace ASI.Basecode.Data.Repositories
                 await query
                     .OrderByDescending(x => x.CreatedAtUtc)
                     .ThenBy(x => x.Name)
-                    .Select(x => new CategoryListRecord(x.Id, x.Name, x.Description, x.IsActive, x.Items.Count))
+                    .Select(x => new CategoryListRecord(x.Id, x.Name, x.Description, x.IsActive, x.Items.Count, x.AssetCodeSeries!.Prefix))
                     .ToListAsync(ct),
                 total
             );

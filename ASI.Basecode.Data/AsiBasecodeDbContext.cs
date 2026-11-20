@@ -14,6 +14,7 @@ namespace ASI.Basecode.Data
         public DbSet<EquipmentCategory> EquipmentCategories => Set<EquipmentCategory>();
 
         public DbSet<EquipmentItem> EquipmentItems => Set<EquipmentItem>();
+        public DbSet<AssetCodeSeries> AssetCodeSeries => Set<AssetCodeSeries>();
 
         public DbSet<Reservation> Reservations => Set<Reservation>();
 
@@ -64,6 +65,15 @@ namespace ASI.Basecode.Data
                 entity.Property(x => x.Description).HasMaxLength(1000);
                 entity.Property(x => x.RowVersion).IsRowVersion();
                 entity.HasIndex(x => x.Name).IsUnique();
+            });
+            modelBuilder.Entity<AssetCodeSeries>(entity =>
+            {
+                entity.ToTable("AssetCodeSeries", table => table.HasCheckConstraint("CK_AssetCodeSeries_NextNumber", "[NextNumber] > 0"));
+                entity.HasKey(x => x.Prefix);
+                entity.Property(x => x.Prefix).HasMaxLength(16);
+                // A deleted category releases its association but its prefix stays reserved.
+                entity.HasOne<EquipmentCategory>().WithOne(x => x.AssetCodeSeries)
+                    .HasForeignKey<AssetCodeSeries>(x => x.CategoryId).OnDelete(DeleteBehavior.SetNull);
             });
             modelBuilder.Entity<EquipmentItem>(entity =>
             {

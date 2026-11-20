@@ -33,11 +33,11 @@
             {
                 <div class="live-table-wrap" tabindex="0" role="region" aria-label="Equipment categories">
                     <table class="live-table">
-                        <thead><tr><th scope="col">Name</th><th scope="col">Description</th><th scope="col">Items</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+                        <thead><tr><th scope="col">Name</th><th scope="col">Asset code prefix</th><th scope="col">Description</th><th scope="col">Items</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
                         <tbody>
                         @foreach (var category in Model.Categories)
                         {
-                            <tr><td><strong>@category.Name</strong></td><td>@(category.Description ?? "—")</td><td>@category.Items</td><td><span class="live-badge">@(category.IsActive ? "Active" : "Inactive")</span></td>
+                            <tr><td><strong>@category.Name</strong></td><td>@category.AssetCodePrefix</td><td>@(category.Description ?? "—")</td><td>@category.Items</td><td><span class="live-badge">@(category.IsActive ? "Active" : "Inactive")</span></td>
                                 <td><div class="admin-user-actions"><a class="live-button secondary" href="/admin/categories?id=@category.Id" data-modal-load>Edit</a><form method="post" action="/admin/categories/@category.Id/delete" data-confirm-title="Delete @category.Name?" data-confirm="A category that still holds equipment is deactivated instead of deleted." data-confirm-ok="Delete category" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<button class="live-button secondary" type="submit" aria-label="Delete @category.Name">Delete</button></form></div></td></tr>
                         }
                         </tbody>

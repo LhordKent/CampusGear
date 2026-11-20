@@ -46,7 +46,6 @@ namespace ASI.Basecode.WebApp.Controllers
                 {
                     Id = item.Id,
                     CategoryId = item.CategoryId,
-                    AssetCode = item.AssetCode,
                     Name = item.Name,
                     SerialNumber = item.SerialNumber,
                     Location = item.Location,
@@ -139,7 +138,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 input.CategoryId = result.Data.Categories.FirstOrDefault()?.Id ?? Guid.Empty;
             }
 
-            var imagePath = input.Id is { } id ? (await _inventory.GetEditAsync(id, ct))?.ImagePath : null;
+            var item = input.Id is { } id ? await _inventory.GetEditAsync(id, ct) : null;
             return new(
                 input,
                 result.Data.Items,
@@ -149,7 +148,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 result.Data.Pages,
                 result.Data.Total,
                 TempData["InventoryFeedback"] as string,
-                imagePath
+                item?.ImagePath,
+                item?.AssetCode
             );
         }
     }

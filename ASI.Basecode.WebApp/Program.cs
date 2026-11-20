@@ -46,6 +46,8 @@ if (app.Configuration.GetValue<bool>("DemoMode:Enabled"))
     }
 }
 
+await DbInitializer.InitializeAssetCodeSeriesAsync(app.Services);
+
 if (args.Contains("--initialize-only", StringComparer.OrdinalIgnoreCase))
 {
     return;

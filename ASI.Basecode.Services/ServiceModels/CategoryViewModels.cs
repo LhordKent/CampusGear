@@ -17,7 +17,7 @@ namespace ASI.Basecode.Services.ServiceModels
         public string? RowVersion { get; set; }
     }
 
-    public sealed record CategoryListItem(Guid Id, string Name, string? Description, bool IsActive, int Items);
+    public sealed record CategoryListItem(Guid Id, string Name, string? Description, bool IsActive, int Items, string? AssetCodePrefix);
 
     public sealed record CategoryPage(IReadOnlyList<CategoryListItem> Categories, string Query, int Total);
 }

@@ -21,7 +21,7 @@
     <value>A new code was sent to your email address.</value>
   </data>
   <data name="EquipmentAdded" xml:space="preserve">
-    <value>Equipment added.</value>
+    <value>Equipment added as {0}.</value>
   </data>
   <data name="EquipmentUpdated" xml:space="preserve">
     <value>Equipment updated.</value>

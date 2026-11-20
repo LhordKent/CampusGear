@@ -13,6 +13,7 @@ namespace ASI.Basecode.Services.Services
     public sealed class CategoryService : ServiceBase, ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IAssetCodeRepository _assetCodes;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWorkflowLockManager _lockManager;
         private readonly IAuditRepository _auditRepository;
@@ -21,6 +22,7 @@ namespace ASI.Basecode.Services.Services
 
         public CategoryService(
             ICategoryRepository categories,
+            IAssetCodeRepository assetCodes,
             IUnitOfWork work,
             IWorkflowLockManager locks,
             IAuditRepository audits,
@@ -29,6 +31,7 @@ namespace ASI.Basecode.Services.Services
         )
         {
             _categoryRepository = categories;
+            _assetCodes = assetCodes;
             _unitOfWork = work;
             _lockManager = locks;
             _auditRepository = audits;
@@ -119,6 +122,7 @@ namespace ASI.Basecode.Services.Services
                 if (input.Id is null)
                 {
                     _categoryRepository.Add(category);
+                    await _assetCodes.CreateSeriesAsync(category, ct);
                 }
 
                 _auditRepository.Add(
@@ -156,6 +160,8 @@ namespace ASI.Basecode.Services.Services
 
         public async Task<OperationResult<Guid>> DeleteAsync(RequestContext actor, Guid id, CancellationToken ct)
         {
+            await using var transaction = await _unitOfWork.BeginAsync(ct);
+            await _lockManager.AcquireAsync($"CampusGear:EquipmentCategory:{id:N}", ct);
             var category = await _categoryRepository.FindAsync(id, ct);
             if (category is null)
             {
@@ -192,6 +198,7 @@ namespace ASI.Basecode.Services.Services
                 )
             );
             await _unitOfWork.SaveAsync(ct);
+            await transaction.CommitAsync(ct);
             return OperationResult<Guid>.Ok(
                 id,
                 inUse
@@ -208,28 +215,8 @@ namespace ASI.Basecode.Services.Services
                 return OperationResult<Guid>.Invalid(Errors.InvalidNameLength);
             }
 
-            var category = new EquipmentCategory { Name = name };
-            _categoryRepository.Add(category);
-            _auditRepository.Add(
-                WorkflowRecords.Audit(
-                    actor,
-                    "category.created",
-                    nameof(EquipmentCategory),
-                    category.Id.ToString(),
-                    _timeProvider.GetUtcNow().UtcDateTime,
-                    null,
-                    JsonSerializer.Serialize(new { name })
-                )
-            );
-            try
-            {
-                await _unitOfWork.SaveAsync(ct);
-                return OperationResult<Guid>.Ok(category.Id, Common.CategoryAdded);
-            }
-            catch (PersistenceException e) when (e.Failure == PersistenceFailure.Duplicate)
-            {
-                return OperationResult<Guid>.Invalid(Errors.DuplicateCategory);
-            }
+            var result = await SaveAsync(actor, new CategoryEditModel { Name = name }, ct);
+            return result.Succeeded ? result with { Message = Common.CategoryAdded } : result;
         }
     }
 }
