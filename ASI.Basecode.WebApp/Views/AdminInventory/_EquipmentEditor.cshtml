@@ -1,13 +1,23 @@
 @using ASI.Basecode.WebApp.Models
 @using ASI.Basecode.Resources.Constants
+@using ASI.Basecode.Services.Manager
 @using ASI.Basecode.Services.ServiceModels
 @model InventoryPageModel
 @{
     var adding = Model.Input.Id is null;
     var errors = ViewData.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).Distinct().ToList();
     var hasPhoto = Model.ImagePath is not null;
-    var assetCode = adding ? "Assigned when saved" : Model.AssetCode;
-    var categoryName = Model.Categories.FirstOrDefault(x => x.Id == Model.Input.CategoryId)?.Name ?? Model.Categories.FirstOrDefault()?.Name ?? "";
+    var selectedCategory = Model.Categories.FirstOrDefault(x => x.Id == Model.Input.CategoryId) ?? Model.Categories.FirstOrDefault();
+    var categoryName = selectedCategory?.Name ?? "";
+    string Pattern(string? prefix) => prefix is null ? "Assigned when saved" : $"{prefix}-###";
+    // A new item gets its code from the chosen category; the preview shows the pattern until it is saved.
+    var assetCode = adding ? Pattern(selectedCategory?.AssetCodePrefix) : Model.AssetCode;
+    var state = Model.EditState;
+    // The server refuses any edit during a loan, and refuses making the item inactive while bookings are live.
+    // Saying so here, before the admin types anything, saves a round trip that would only end in an error.
+    var locked = state is { OnLoan: true };
+    var keepActive = !locked && state is { UpcomingBookings: > 0 } && Model.Input.IsActive;
+    var damaged = Model.Input.Condition == EquipmentCondition.Damaged;
 }
 @* Add and Edit share this dialog. Left: the form in three short sections. Right: a live preview of the borrower
    catalog card, which is also where the photo is added (wwwroot/js/equipment-editor.js). *@
@@ -23,114 +33,144 @@
         </div>
         <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
     </div>
-    <form id="equipment-editor-form" method="post" action="/admin/equipment/save" enctype="multipart/form-data" class="equip-editor-form" data-modal-form data-equipment-editor novalidate>
+    <form id="equipment-editor-form" method="post" action="/admin/equipment/save" enctype="multipart/form-data" class="equip-editor-form" data-modal-form data-equipment-editor novalidate
+          data-confirm-discard="Your changes to this equipment haven't been saved.">
         @Html.AntiForgeryToken()
         <input asp-for="Input.Id" type="hidden" /><input asp-for="Input.RowVersion" type="hidden" />
         <div class="equip-editor-body">
             <div class="live-modal-alert equip-editor-alert" role="alert" data-modal-alert hidden="@(errors.Count == 0)">@string.Join(" ", errors)</div>
-
-            <div class="equip-editor-main">
-                <section class="equip-section" aria-labelledby="equip-section-details">
-                    <h3 class="equip-section-title" id="equip-section-details">Details</h3>
-                    <div class="equip-grid">
-                        <label class="live-field equip-span-all">
-                            <span>Equipment name</span>
-                            <input asp-for="Input.Name" required maxlength="160" placeholder="e.g. Canon EOS R50 Camera" autocomplete="off" aria-describedby="equip-name-hint" data-preview-source="name" />
-                            <small class="equip-hint" id="equip-name-hint">Units with the same name and category are listed together for borrowers.</small>
-                        </label>
-                        <label class="live-field">
-                            <span>Category</span>
-                            <select asp-for="Input.CategoryId" data-preview-source="category">@foreach (var category in Model.Categories) { <option value="@category.Id">@category.Name@(category.IsActive ? "" : " (deleted, choose another)")</option> }</select>
-                        </label>
-                        <label class="live-field">
-                            <span>Condition</span>
-                            <select asp-for="Input.Condition" asp-items="Html.GetEnumSelectList<EquipmentCondition>()" aria-describedby="equip-condition-hint"></select>
-                            <small class="equip-hint" id="equip-condition-hint">Damaged sends the item to maintenance.</small>
-                        </label>
-                        <div class="live-field">
-                            <span>Asset code</span>
-                            <strong class="equip-editor-code">@assetCode</strong>
-                        </div>
-                        <label class="live-field">
-                            <span>Serial number <small>Optional</small></span>
-                            <input asp-for="Input.SerialNumber" maxlength="120" autocomplete="off" spellcheck="false" />
-                        </label>
+            @if (locked)
+            {
+                <div class="equip-lock-notice" role="note">
+                    <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#lock"></use></svg>
+                    <div>
+                        <strong>On loan until @ManilaTime.Format(state!.LoanDueAtUtc!.Value)</strong>
+                        <span>Record its return at the custodian desk before editing. Everything below is read-only until then.</span>
                     </div>
-                </section>
-
-                <section class="equip-section" aria-labelledby="equip-section-storage">
-                    <h3 class="equip-section-title" id="equip-section-storage">Storage and description</h3>
-                    <div class="equip-grid">
-                        <label class="live-field equip-span-all">
-                            <span>Storage location <small>Optional</small></span>
-                            <input asp-for="Input.Location" maxlength="160" placeholder="e.g. Equipment Room A, Shelf 2" />
-                        </label>
-                        <label class="live-field equip-span-all">
-                            <span class="equip-label-row">Description <small>Optional</small><span class="equip-counter" aria-hidden="true" data-counter-for="Input_Description">@(Model.Input.Description?.Length ?? 0) / 2000</span></span>
-                            <textarea asp-for="Input.Description" maxlength="2000" rows="4" placeholder="What's included, accessories, and anything borrowers should know."></textarea>
-                        </label>
-                    </div>
-                </section>
-
-                <section class="equip-section" aria-labelledby="equip-section-availability">
-                    <h3 class="equip-section-title" id="equip-section-availability">Availability</h3>
-                    <label class="account-switch" for="Input_IsActive">
-                        <input asp-for="Input.IsActive" role="switch" data-preview-source="active" />
-                        <span class="account-switch-copy">
-                            <strong>Active inventory item</strong>
-                            <small>Active items appear in the borrower catalog. Turn this off to retire an item; its history is kept.</small>
-                        </span>
-                    </label>
-                    @if (!adding)
-                    {
-                        <p class="equip-note">Equipment with an active loan can’t be edited until it’s returned.</p>
-                    }
-                </section>
-            </div>
-
-            <aside class="equip-editor-aside" aria-labelledby="equip-preview-title">
-                <h3 class="equip-section-title" id="equip-preview-title">Catalog preview</h3>
-                <div class="equip-photo" data-photo data-max-bytes="5242880" data-has-photo="@(hasPhoto ? "true" : "false")">
-                    <div class="equip-preview-card">
-                        <div class="equip-photo-frame @(hasPhoto ? "has-photo" : "")" data-photo-frame>
-                            <img class="equip-photo-img" src="@Model.ImagePath" alt="" hidden="@(!hasPhoto)" data-photo-img />
-                            <div class="equip-photo-empty" data-photo-empty hidden="@hasPhoto">
-                                <svg class="equip-photo-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2.5" /><circle cx="9" cy="10" r="1.8" /><path d="m21 15.5-4.5-4.5L7 20.5" /></svg>
-                                <strong data-photo-empty-title>Add a photo</strong>
-                                <span data-photo-empty-text>Drop it here, click to browse, or paste.</span>
-                            </div>
-                            <span class="equip-photo-status" data-preview="active">@(Model.Input.IsActive ? "Active" : "Inactive")</span>
-                            <span class="equip-photo-hint" aria-hidden="true">Click or drop to replace</span>
-                            <span class="equip-photo-drop" aria-hidden="true">Drop to use this photo</span>
-                            <span class="equip-photo-busy" data-photo-busy hidden><span class="equip-photo-spinner" aria-hidden="true"></span>Preparing photo…</span>
-                        </div>
-                        <div class="equip-preview-body" aria-hidden="true">
-                            <p class="equip-preview-category" data-preview="category">@categoryName</p>
-                            <p class="equip-preview-name" data-preview="name" data-empty="Equipment name">@(string.IsNullOrWhiteSpace(Model.Input.Name) ? "Equipment name" : Model.Input.Name)</p>
-                            <p class="equip-preview-code">@assetCode</p>
-                        </div>
-                    </div>
-                    <div class="equip-photo-info">
-                        <p class="equip-photo-name" data-photo-name>@(hasPhoto ? "Current photo" : "No photo yet")</p>
-                        <p class="equip-photo-meta" data-photo-meta aria-live="polite">@(hasPhoto ? "Borrowers see it cropped like this." : "Without one, borrowers see an icon for this type of equipment.")</p>
-                    </div>
-                    <div class="equip-photo-actions">
-                        <button class="live-button secondary" type="button" data-photo-choose>
-                            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" /><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" /></svg><span data-photo-choose-label>@(hasPhoto ? "Replace" : "Upload photo")</span>
-                        </button>
-                        <button class="live-button secondary equip-photo-remove" type="button" data-photo-remove hidden="@(!hasPhoto)">Remove</button>
-                        <button class="live-link" type="button" data-photo-undo hidden>Undo</button>
-                    </div>
-                    <p class="equip-photo-error" role="alert" data-photo-error hidden></p>
-                    <p class="equip-photo-tips">JPEG, PNG, WebP or GIF. Large phone photos are resized for you. Use a plain background with the item centred.</p>
-                    <input id="imageFile" name="imageFile" type="file" class="equip-photo-input" accept="image/*" tabindex="-1" aria-label="Equipment photo" data-photo-input />
-                    <input type="hidden" name="Input.RemoveImage" value="false" data-photo-remove-flag />
                 </div>
-            </aside>
+            }
+
+            @* display: contents, so the fieldset only carries the disabled state and the two-column layout is untouched. *@
+            <fieldset class="equip-editor-fields" disabled="@locked">
+                <legend class="visually-hidden">Equipment details</legend>
+                <div class="equip-editor-main">
+                    <section class="equip-section" aria-labelledby="equip-section-details">
+                        <h3 class="equip-section-title" id="equip-section-details">Details</h3>
+                        <div class="equip-grid">
+                            <label class="live-field equip-span-all">
+                                <span>Equipment name</span>
+                                <input asp-for="Input.Name" required maxlength="160" placeholder="e.g. Canon EOS R50 Camera" autocomplete="off" aria-describedby="equip-name-hint" data-preview-source="name" />
+                                <small class="equip-hint" id="equip-name-hint">Units with the same name and category are listed together for borrowers.</small>
+                            </label>
+                            <label class="live-field">
+                                <span>Category</span>
+                                <select asp-for="Input.CategoryId" data-preview-source="category" data-asset-source="@(adding ? "pattern" : null)" aria-describedby="equip-category-hint">
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <option value="@category.Id" data-prefix="@category.AssetCodePrefix">@category.Name@(category.IsActive ? "" : " (deleted, choose another)")</option>
+                                    }
+                                </select>
+                                <small class="equip-hint" id="equip-category-hint">
+                                    @if (adding) { <text>Asset code </text><code class="equip-code-chip" data-preview="code">@assetCode</code><text>, numbered when you save.</text> }
+                                    else { <text>Keeps asset code </text><code class="equip-code-chip">@Model.AssetCode</code><text> if moved.</text> }
+                                </small>
+                            </label>
+                            <label class="live-field">
+                                <span>Condition</span>
+                                <select asp-for="Input.Condition" asp-items="Html.GetEnumSelectList<EquipmentCondition>()" aria-describedby="equip-condition-hint" data-condition-select></select>
+                                <small class="equip-hint @(damaged ? "is-warning" : "")" id="equip-condition-hint" data-condition-hint
+                                       data-ok="Excellent, Good and Fair can be borrowed."
+                                       data-damaged="Saving opens a maintenance case and hides it from borrowers until it's repaired.">@(damaged ? "Saving opens a maintenance case and hides it from borrowers until it's repaired." : "Excellent, Good and Fair can be borrowed.")</small>
+                            </label>
+                            <label class="live-field equip-span-all">
+                                <span class="equip-label-row">Description <small>Optional</small><span class="equip-counter" aria-hidden="true" data-counter-for="Input_Description">@(Model.Input.Description?.Length ?? 0) / 2000</span></span>
+                                <textarea asp-for="Input.Description" maxlength="2000" rows="3" placeholder="What's included, accessories, and anything borrowers should know."></textarea>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="equip-section" aria-labelledby="equip-section-tracking">
+                        <h3 class="equip-section-title" id="equip-section-tracking">Tracking</h3>
+                        <div class="equip-grid">
+                            <label class="live-field">
+                                <span>Serial number <small>Optional</small></span>
+                                <input asp-for="Input.SerialNumber" maxlength="120" autocomplete="off" spellcheck="false" placeholder="From the label on the unit" />
+                            </label>
+                            <label class="live-field">
+                                <span>Storage location <small>Optional</small></span>
+                                <input asp-for="Input.Location" maxlength="160" placeholder="e.g. Equipment Room A, Shelf 2" list="equip-locations" autocomplete="off" />
+                                @if (Model.Locations is { Count: > 0 })
+                                {
+                                    <datalist id="equip-locations">@foreach (var location in Model.Locations) { <option value="@location"></option> }</datalist>
+                                }
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="equip-section" aria-labelledby="equip-section-availability">
+                        <h3 class="equip-section-title" id="equip-section-availability">Availability</h3>
+                        @* Written out instead of asp-for so the switch can be disabled; a disabled checkbox is not posted,
+                           so the hidden "true" keeps the value (the first posted value wins over the "false" fallback). *@
+                        <label class="account-switch" for="Input_IsActive">
+                            @if (keepActive) { <input type="hidden" name="Input.IsActive" value="true" /> }
+                            <input id="Input_IsActive" name="Input.IsActive" type="checkbox" role="switch" value="true" checked="@Model.Input.IsActive" disabled="@keepActive" data-preview-source="active" aria-describedby="@(keepActive ? "equip-active-note" : null)" />
+                            <span class="account-switch-copy">
+                                <strong>Active</strong>
+                                <small>Active items appear in the borrower catalog. Inactive items are hidden but keep their borrowing history.</small>
+                            </span>
+                        </label>
+                        <input type="hidden" name="Input.IsActive" value="false" />
+                        @if (keepActive)
+                        {
+                            <p class="equip-note" id="equip-active-note">It has @state!.UpcomingBookings upcoming @(state.UpcomingBookings == 1 ? "booking" : "bookings"), so it stays active. Reject or cancel @(state.UpcomingBookings == 1 ? "it" : "them") from the approval queue to make it inactive.</p>
+                        }
+                    </section>
+                </div>
+
+                <aside class="equip-editor-aside" aria-labelledby="equip-preview-title">
+                    <h3 class="equip-section-title" id="equip-preview-title">Catalog preview</h3>
+                    <div class="equip-photo" data-photo data-max-bytes="5242880" data-has-photo="@(hasPhoto ? "true" : "false")">
+                        <div class="equip-preview-card">
+                            <div class="equip-photo-frame @(hasPhoto ? "has-photo" : "")" data-photo-frame>
+                                <img class="equip-photo-img" src="@Model.ImagePath" alt="" hidden="@(!hasPhoto)" data-photo-img />
+                                <div class="equip-photo-empty" data-photo-empty hidden="@hasPhoto">
+                                    <svg class="equip-photo-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2.5" /><circle cx="9" cy="10" r="1.8" /><path d="m21 15.5-4.5-4.5L7 20.5" /></svg>
+                                    <strong data-photo-empty-title>Add a photo</strong>
+                                    <span data-photo-empty-text>Drop it here, click to browse, or paste.</span>
+                                </div>
+                                <span class="equip-photo-status" data-preview="active">@(Model.Input.IsActive ? "Active" : "Inactive")</span>
+                                <span class="equip-photo-hint" aria-hidden="true">Click or drop to replace</span>
+                                <span class="equip-photo-drop" aria-hidden="true">Drop to use this photo</span>
+                                <span class="equip-photo-busy" data-photo-busy hidden><span class="equip-photo-spinner" aria-hidden="true"></span>Preparing photo…</span>
+                            </div>
+                            <div class="equip-preview-body" aria-hidden="true">
+                                <p class="equip-preview-category" data-preview="category">@categoryName</p>
+                                <p class="equip-preview-name" data-preview="name" data-empty="Equipment name">@(string.IsNullOrWhiteSpace(Model.Input.Name) ? "Equipment name" : Model.Input.Name)</p>
+                                <p class="equip-preview-code" data-preview="@(adding ? "code" : null)">@assetCode</p>
+                            </div>
+                        </div>
+                        <div class="equip-photo-info">
+                            <p class="equip-photo-name" data-photo-name>@(hasPhoto ? "Current photo" : "No photo yet")</p>
+                            <p class="equip-photo-meta" data-photo-meta aria-live="polite">@(hasPhoto ? "Borrowers see it cropped like this." : "Without one, borrowers see an icon for this type of equipment.")</p>
+                        </div>
+                        <div class="equip-photo-actions">
+                            <button class="live-button secondary" type="button" data-photo-choose>
+                                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" /><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" /></svg><span data-photo-choose-label>@(hasPhoto ? "Replace" : "Upload photo")</span>
+                            </button>
+                            <button class="live-button secondary equip-photo-remove" type="button" data-photo-remove hidden="@(!hasPhoto)">Remove</button>
+                            <button class="live-link" type="button" data-photo-undo hidden>Undo</button>
+                        </div>
+                        <p class="equip-photo-error" role="alert" data-photo-error hidden></p>
+                        <p class="equip-photo-tips">JPEG, PNG, WebP or GIF. Large phone photos are resized for you. Use a plain background with the item centred.</p>
+                        <input id="imageFile" name="imageFile" type="file" class="equip-photo-input" accept="image/*" tabindex="-1" aria-label="Equipment photo" data-photo-input />
+                        <input type="hidden" name="Input.RemoveImage" value="false" data-photo-remove-flag />
+                    </div>
+                </aside>
+            </fieldset>
         </div>
         <div class="live-modal-actions equip-editor-actions">
-            <button class="live-button secondary" type="button" data-modal-close>Cancel</button>
-            <button class="live-button" type="submit">@(adding ? "Add equipment" : "Save changes")</button>
+            <button class="live-button secondary" type="button" data-modal-close>@(locked ? "Close" : "Cancel")</button>
+            <button class="live-button" type="submit" disabled="@locked">@(adding ? "Add equipment" : "Save changes")</button>
         </div>
     </form>
 </dialog>

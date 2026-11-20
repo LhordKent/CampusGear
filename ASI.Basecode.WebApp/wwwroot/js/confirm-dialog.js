@@ -4,8 +4,17 @@
 // Submitting the form opens the dialog; confirming submits it for real (so data-modal-form forms still post with
 // fetch). Cancel, Escape, or a click on the backdrop leaves everything as it was. Without JavaScript the form submits
 // directly, as it always could.
+// Scripts can ask the same question: `await CampusGear.confirm({ title, message, ok, cancel })` resolves true or false.
 (() => {
     let dialog, title, message, ok, cancel, pending;
+
+    const settle = answer => {
+        const current = pending;
+        pending = null;
+        current?.resolve(answer);
+        // Cancelled: put focus back where the question came from. Confirmed: the caller decides what happens next.
+        if (!answer && current?.returnFocus?.isConnected) current.returnFocus.focus();
+    };
 
     const build = () => {
         dialog = document.createElement('dialog');
@@ -32,13 +41,10 @@
 
         cancel.addEventListener('click', () => dialog.close());
         ok.addEventListener('click', () => {
-            const { form, submitter } = pending ?? {};
+            const current = pending;
             pending = null;
             dialog.close();
-            if (!form?.isConnected) return;
-            form._confirmed = true;
-            if (form.requestSubmit) form.requestSubmit(submitter?.form === form ? submitter : undefined);
-            else form.submit();
+            current?.resolve(true);
         });
         // A click on the dimmed backdrop (outside the dialog box) cancels.
         dialog.addEventListener('click', event => {
@@ -47,15 +53,29 @@
             const inside = event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom;
             if (!inside) dialog.close();
         });
-        dialog.addEventListener('close', () => {
-            // Cancelled (not confirmed): put focus back on the button that asked.
-            if (pending?.submitter?.isConnected) pending.submitter.focus();
-            pending = null;
-        });
+        // Closing any other way (Cancel, Escape, backdrop) is a "no".
+        dialog.addEventListener('close', () => { if (pending) settle(false); });
         document.body.append(dialog);
     };
 
-    // Capture phase, so the question comes before any other submit handler (such as modal-forms.js).
+    const ask = ({ title: heading, message: text, ok: okLabel, cancel: cancelLabel, returnFocus } = {}) => {
+        if (!dialog) build();
+        if (pending) settle(false);
+        title.textContent = heading || 'Are you sure?';
+        message.textContent = text || '';
+        ok.textContent = okLabel || 'Confirm';
+        cancel.textContent = cancelLabel || 'Cancel';
+        return new Promise(resolve => {
+            pending = { resolve, returnFocus: returnFocus ?? document.activeElement };
+            dialog.showModal();
+            // The safe choice has focus, so Enter never confirms by accident.
+            cancel.focus();
+        });
+    };
+
+    window.CampusGear = window.CampusGear || {};
+    window.CampusGear.confirm = ask;
+
     // A checkbox with data-confirm-on-uncheck="Message" asks only when it is submitted switched off (the first such
     // message wins); the form's data-confirm-title/-ok/-cancel still label the dialog.
     const questionFor = form => {
@@ -63,21 +83,25 @@
         return switched?.dataset.confirmOnUncheck || form.dataset.confirm;
     };
 
-    document.addEventListener('submit', event => {
+    // Capture phase, so the question comes before any other submit handler (such as modal-forms.js).
+    document.addEventListener('submit', async event => {
         const form = event.target.closest('form');
         const question = form && questionFor(form);
         if (!question) return;
         if (form._confirmed) { form._confirmed = false; return; }
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (!dialog) build();
-        pending = { form, submitter: event.submitter };
-        title.textContent = form.dataset.confirmTitle || 'Are you sure?';
-        message.textContent = question;
-        ok.textContent = form.dataset.confirmOk || 'Confirm';
-        cancel.textContent = form.dataset.confirmCancel || 'Cancel';
-        dialog.showModal();
-        // The safe choice has focus, so Enter never confirms by accident.
-        cancel.focus();
+        const submitter = event.submitter;
+        const confirmed = await ask({
+            title: form.dataset.confirmTitle,
+            message: question,
+            ok: form.dataset.confirmOk,
+            cancel: form.dataset.confirmCancel,
+            returnFocus: submitter,
+        });
+        if (!confirmed || !form.isConnected) return;
+        form._confirmed = true;
+        if (form.requestSubmit) form.requestSubmit(submitter?.form === form ? submitter : undefined);
+        else form.submit();
     }, true);
 })();

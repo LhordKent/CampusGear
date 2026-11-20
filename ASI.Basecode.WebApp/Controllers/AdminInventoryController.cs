@@ -155,7 +155,9 @@ namespace ASI.Basecode.WebApp.Controllers
                 result.Data.Total,
                 TempData["InventoryFeedback"] as string,
                 item?.ImagePath,
-                item?.AssetCode
+                item?.AssetCode,
+                result.Data.Locations,
+                item is null ? null : await _inventory.GetEditStateAsync(item.Id, ct)
             );
         }
     }

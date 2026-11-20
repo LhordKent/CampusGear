@@ -10,11 +10,43 @@
     const parser = new DOMParser();
     const toast = (message, type) => window.CampusGear?.toast?.(message, type);
 
+    // A form marked data-confirm-discard="Message" asks before its dialog closes with unsaved edits (close button,
+    // backdrop or Escape); a successful save closes it without asking. "Unsaved" compares the posted values with how
+    // the form opened, so typing something and deleting it again does not count. A chosen photo counts by name and size.
+    const snapshot = form => JSON.stringify([...new FormData(form)]
+        .filter(([name]) => name !== '__RequestVerificationToken')
+        .map(([name, value]) => [name, value instanceof File ? (value.size ? `${value.name}:${value.size}` : '') : value]));
+    const unsaved = dialog => [...dialog.querySelectorAll('form[data-confirm-discard]')].find(form => form._opened !== undefined && snapshot(form) !== form._opened);
+
+    async function requestClose(dialog) {
+        const form = unsaved(dialog);
+        const confirm = window.CampusGear?.confirm;
+        if (form && confirm) {
+            const discard = await confirm({
+                title: 'Discard changes?',
+                message: form.dataset.confirmDiscard,
+                ok: 'Discard changes',
+                cancel: 'Keep editing',
+            });
+            if (!discard) return;
+        }
+        if (dialog.open) dialog.close();
+    }
+
     const openDialog = (dialog, opener) => {
         dialog._opener = opener;
         dialog.showModal();
-        dialog.querySelector('select, textarea, input:not([type="hidden"])')?.focus();
+        dialog.querySelectorAll('form[data-confirm-discard]').forEach(form => { form._opened = snapshot(form); });
+        dialog.querySelector('select:enabled, textarea:enabled, input:not([type="hidden"]):enabled')?.focus();
     };
+
+    // Escape fires "cancel" on the dialog (it does not bubble, hence the capture listener).
+    document.addEventListener('cancel', event => {
+        const dialog = event.target;
+        if (!(dialog instanceof HTMLDialogElement) || !unsaved(dialog)) return;
+        event.preventDefault();
+        requestClose(dialog);
+    }, true);
 
     async function loadDialog(link) {
         if (link._loading) return;
@@ -67,12 +99,12 @@
             return;
         }
         const closer = event.target.closest('[data-modal-close]');
-        if (closer) { closer.closest('dialog')?.close(); return; }
+        if (closer) { const dialog = closer.closest('dialog'); if (dialog) requestClose(dialog); return; }
         // A click on the dimmed backdrop (the dialog element itself, outside its content box) closes it.
         if (event.target instanceof HTMLDialogElement && event.target.open) {
             const box = event.target.getBoundingClientRect();
             const inside = event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom;
-            if (!inside) event.target.close();
+            if (!inside) requestClose(event.target);
         }
     });
 

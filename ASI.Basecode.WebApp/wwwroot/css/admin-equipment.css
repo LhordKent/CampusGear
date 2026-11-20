@@ -317,6 +317,74 @@
     line-height: 1.5;
 }
 
+/* The fieldset only carries the disabled state for a locked item; display: contents keeps the two-column grid. */
+.equip-editor-fields {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.equip-editor-fields:disabled .equip-editor-main,
+.equip-editor-fields:disabled .equip-editor-aside {
+    opacity: .6;
+}
+
+.equip-editor-fields:disabled .equip-photo-frame {
+    cursor: not-allowed;
+}
+
+/* On loan: why nothing can be changed, above the fields it locks. */
+.equip-lock-notice {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid var(--ws-pending-border);
+    border-radius: 12px;
+    background: var(--ws-pending-bg);
+    color: var(--ws-pending-text);
+}
+
+.equip-lock-notice .icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+}
+
+.equip-lock-notice div {
+    display: grid;
+    gap: 2px;
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.equip-lock-notice strong {
+    font-size: 13px;
+}
+
+/* Asset code shown inline in a hint: the pattern for a new item, the real code when editing. */
+.equip-code-chip {
+    display: inline-block;
+    padding: 0 6px;
+    border: 1px solid var(--ws-border);
+    border-radius: 5px;
+    background: var(--ws-inset);
+    color: var(--ws-text);
+    font: 600 11.5px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: nowrap;
+}
+
+/* Choosing Damaged has a consequence on save, so the condition hint reads as a warning. */
+.equip-hint.is-warning {
+    color: var(--ws-warn-text);
+    font-weight: 500;
+}
+
 /* The shared footer has -22px side margins for padded forms; this form's footer sits flush, so they would overflow. */
 .live-modal.equip-editor .equip-editor-actions {
     margin: 0;

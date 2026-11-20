@@ -143,7 +143,11 @@
         }
     };
 
-    const rootOf = target => target?.closest?.('[data-photo]');
+    // A locked editor (the item is on loan) sits in a disabled fieldset; its photo can't be changed either.
+    const rootOf = target => {
+        const root = target?.closest?.('[data-photo]');
+        return root && !root.closest('fieldset:disabled') ? root : null;
+    };
 
     document.addEventListener('click', event => {
         const root = rootOf(event.target);
@@ -198,7 +202,7 @@
     document.addEventListener('paste', event => {
         const root = document.querySelector('dialog[open] [data-photo]');
         const image = [...(event.clipboardData?.files || [])].find(file => file.type.startsWith('image/'));
-        if (!root || !image || root.classList.contains('is-busy')) return;
+        if (!root || !image || root.classList.contains('is-busy') || root.closest('fieldset:disabled')) return;
         const typing = event.target.closest?.('input:not([type="file"]), textarea, [contenteditable]');
         if (typing && event.clipboardData.getData('text/plain')) return;
         event.preventDefault();
@@ -222,6 +226,22 @@
                 target.classList.toggle('is-placeholder', !value);
                 if (key === 'active') target.classList.toggle('is-inactive', !field.checked);
             });
+        }
+        // Adding: the asset code pattern follows the chosen category's prefix (each <option> carries data-prefix).
+        if (form && field.dataset.assetSource === 'pattern') {
+            const prefix = field.selectedOptions[0]?.dataset.prefix;
+            form.querySelectorAll('[data-preview="code"]').forEach(target => {
+                target.textContent = prefix ? `${prefix}-###` : 'Assigned when saved';
+            });
+        }
+        // Damaged is the one condition with a consequence on save, so its hint turns into a warning.
+        if (form && field.matches('[data-condition-select]')) {
+            const hint = form.querySelector('[data-condition-hint]');
+            const damaged = field.selectedOptions[0]?.textContent.trim() === 'Damaged';
+            if (hint) {
+                hint.textContent = damaged ? hint.dataset.damaged : hint.dataset.ok;
+                hint.classList.toggle('is-warning', damaged);
+            }
         }
         if (field.id) {
             const counter = form?.querySelector(`[data-counter-for="${field.id}"]`);

@@ -3,7 +3,13 @@ using ASI.Basecode.Resources.Constants;
 
 namespace ASI.Basecode.Data.Models
 {
-    public sealed record CategoryRecord(Guid Id, string Name, string? Description, bool IsActive);
+    public sealed record CategoryRecord(Guid Id, string Name, string? Description, bool IsActive, string? AssetCodePrefix = null);
+
+    /// <summary>What stops an item from being edited or made inactive right now; shown in the editor before saving.</summary>
+    public sealed record EquipmentEditState(DateTime? LoanDueAtUtc, int UpcomingBookings)
+    {
+        public bool OnLoan => LoanDueAtUtc is not null;
+    }
 
     public sealed record EquipmentRecord(
         Guid Id,
@@ -50,6 +56,8 @@ namespace ASI.Basecode.Data.Models
         IReadOnlyList<CategoryRecord> Categories,
         int Page,
         int Pages,
-        int Total
+        int Total,
+        // Storage locations already in use, suggested in the editor so the same room is spelled the same way.
+        IReadOnlyList<string>? Locations = null
     );
 }

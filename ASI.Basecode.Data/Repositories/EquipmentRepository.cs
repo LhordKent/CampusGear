@@ -58,9 +58,35 @@ namespace ASI.Basecode.Data.Repositories
                 .EquipmentCategories.AsNoTracking()
                 .Where(x => x.IsActive)
                 .OrderBy(x => x.Name)
-                .Select(x => new CategoryRecord(x.Id, x.Name, x.Description, x.IsActive))
+                .Select(x => new CategoryRecord(x.Id, x.Name, x.Description, x.IsActive, x.AssetCodeSeries!.Prefix))
                 .ToListAsync(ct);
-            return new(items.Select(EquipmentRecord.From).ToList(), categories, page, pages, total);
+            var locations = await Context
+                .EquipmentItems.AsNoTracking()
+                .Where(x => x.Location != null && x.Location != "")
+                .Select(x => x.Location!)
+                .Distinct()
+                .OrderBy(x => x)
+                .Take(200)
+                .ToListAsync(ct);
+            return new(items.Select(EquipmentRecord.From).ToList(), categories, page, pages, total, locations);
+        }
+
+        public async Task<EquipmentEditState> EditStateAsync(Guid id, DateTime now, CancellationToken ct)
+        {
+            var due = await Context
+                .Loans.AsNoTracking()
+                .Where(x => x.Reservation.EquipmentItemId == id && x.ReturnedAtUtc == null)
+                .Select(x => (DateTime?)x.DueAtUtc)
+                .FirstOrDefaultAsync(ct);
+            // Same rule as HasLiveReservationsAsync, which blocks making the item inactive.
+            var upcoming = await Context.Reservations.CountAsync(
+                x =>
+                    x.EquipmentItemId == id
+                    && (x.Status == ReservationStatus.Approved || x.Status == ReservationStatus.Pending && x.HoldExpiresAtUtc > now),
+                ct
+            );
+            // datetime2 comes back with Kind=Unspecified; the column contract is UTC.
+            return new(due is { } value ? DateTime.SpecifyKind(value, DateTimeKind.Utc) : null, upcoming);
         }
 
         public void Add(EquipmentItem item) => Context.EquipmentItems.Add(item);

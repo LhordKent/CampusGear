@@ -9,6 +9,7 @@ namespace ASI.Basecode.Data.Interfaces
         Task<bool> HasHistoryAsync(Guid id, CancellationToken ct);
         Task<bool> HasOutstandingLoanAsync(Guid id, CancellationToken ct);
         Task<bool> HasLiveReservationsAsync(Guid id, DateTime now, CancellationToken ct);
+        Task<EquipmentEditState> EditStateAsync(Guid id, DateTime now, CancellationToken ct);
         Task<InventoryData> InventoryAsync(string? query, int page, CancellationToken ct);
         void Add(EquipmentItem item);
         void Remove(EquipmentItem item);

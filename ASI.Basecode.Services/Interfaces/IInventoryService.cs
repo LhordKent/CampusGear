@@ -7,6 +7,7 @@ namespace ASI.Basecode.Services.Interfaces
     public interface IInventoryService
     {
         Task<EquipmentRecord?> GetEditAsync(Guid id, CancellationToken ct);
+        Task<EquipmentEditState> GetEditStateAsync(Guid id, CancellationToken ct);
         Task<InventoryPage> GetPageAsync(string? query, int page, CancellationToken ct);
         Task<OperationResult<Guid>> SaveAsync(
             RequestContext actor,

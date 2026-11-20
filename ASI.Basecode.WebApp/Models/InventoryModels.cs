@@ -13,6 +13,9 @@ namespace ASI.Basecode.WebApp.Models
         int Total,
         string? Feedback,
         string? ImagePath,
-        string? AssetCode
+        string? AssetCode,
+        IReadOnlyList<string>? Locations = null,
+        // Only when editing: an open loan or upcoming bookings, so the editor can say what is locked before saving.
+        EquipmentEditState? EditState = null
     );
 }

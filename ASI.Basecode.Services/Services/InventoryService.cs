@@ -51,6 +51,11 @@ namespace ASI.Basecode.Services.Services
             return item is null ? null : EquipmentRecord.From(item);
         }
 
+        public Task<EquipmentEditState> GetEditStateAsync(Guid id, CancellationToken ct)
+        {
+            return _equipmentRepository.EditStateAsync(id, _timeProvider.GetUtcNow().UtcDateTime, ct);
+        }
+
         public async Task<InventoryPage> GetPageAsync(string? query, int page, CancellationToken ct)
         {
             query = query?.Trim();
