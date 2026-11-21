@@ -1,3 +1,6 @@
+@* STUDENT HOME PAGE  (/borrower/home)  -  shown by BorrowerController.Home (EquipmentCatalogService.HomeAsync).
+   Sections: search, "My reservations", a notice if borrowing is paused, browse by category,
+   "Ready to borrow now", and "How borrowing works". *@
 @model BorrowerHomeViewModel
 @{
     ViewData["Title"] = TitleText.Home;
@@ -15,6 +18,7 @@
                 <p class="home-kicker">Welcome, @Model.FirstName</p>
                 <h1 id="home-title">Borrow the gear your class needs, without the paperwork.</h1>
                 <p class="home-lede">CampusGear lists the equipment the campus lends out, from cameras and laptops to projectors and audio kits. Find what you need, pick a time, and the equipment desk confirms your request.</p>
+                @* Search: opens the booking page with the search text. *@
                 <form class="home-search" method="get" action="/borrower/reservation" role="search">
                     <label class="visually-hidden" for="home-search">Search equipment</label>
                     <svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg>

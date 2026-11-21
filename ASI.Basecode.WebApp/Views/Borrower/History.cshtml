@@ -1,3 +1,5 @@
+@* MY BORROWING HISTORY  (/borrower/history)  -  the student's bookings, with filters.
+   Shown by BorrowerController.History (BorrowingHistoryService). *@
 @model HistoryPageViewModel
 @{
     ViewData["Title"] = TitleText.MyReservations;
@@ -22,6 +24,7 @@
     {
         <section class="borrower-feedback borrower-success" role="status" data-toast="success"><p>@Model.Feedback</p></section>
     }
+    @* Filters (status, dates, search). *@
     <form method="get" action="/borrower/history" class="borrower-card borrower-filter" role="search" aria-label="Filter borrowing history" data-live-search data-live-target="#history-results">
         <label class="borrower-field borrower-field-search" for="history-q"><span>Search</span><span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="history-q" name="q" type="search" value="@Model.Query" maxlength="100" placeholder="Equipment, asset code, or purpose" autocomplete="off" /></span></label>
         <label class="borrower-field" for="from"><span>From date</span><input id="from" name="from" type="date" value="@Model.From" /></label>
@@ -65,6 +68,7 @@
                                 <td>
                                     @if (row.CanCancel)
                                     {
+                                        @* Cancel -> BorrowerController.Cancel -> ReservationService.CancelAsync (only Pending or Approved bookings). *@
                                         <form method="post" action="/borrower/reservation/@row.Id/cancel" data-confirm-title="Cancel this request?" data-confirm="Your request for @row.EquipmentName (@row.StartManila) will be withdrawn and the time slot released. This can't be undone." data-confirm-ok="Cancel request" data-confirm-cancel="Keep request">
                                             @Html.AntiForgeryToken()
                                             <button class="borrower-button borrower-button-danger" type="submit">Cancel request</button>

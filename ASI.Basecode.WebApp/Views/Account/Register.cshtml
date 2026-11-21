@@ -1,3 +1,5 @@
+@* STUDENT SIGN-UP PAGE  (/auth/signup)  -  shown by AccountController.Register (GET).
+   The new account waits for an administrator's approval before it can sign in. *@
 @{
     Layout = "_AccountLayout";
     ViewData["Title"] = TitleText.CreateAccount;
@@ -15,6 +17,7 @@
     })
     <section class="auth-card auth-signup" aria-labelledby="auth-title">
         @await Html.PartialAsync("_AccountFeedback")
+        @* Creates the account -> AccountController.Register (POST) -> RegistrationService.SignUpAsync. *@
         <form class="auth-form" action="/auth/signup" method="post">
             @Html.AntiForgeryToken()
             <div class="auth-row">

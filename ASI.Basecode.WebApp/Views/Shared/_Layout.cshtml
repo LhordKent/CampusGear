@@ -1,3 +1,6 @@
+@* MAIN LAYOUT  -  the frame around every signed-in page. @RenderBody() is where each page's own view goes.
+   Students get a top menu bar; staff (custodian/admin) get a side menu + top bar (_Header).
+   All shared scripts (toasts, live search, confirm dialog, ...) are loaded at the bottom. *@
 @using ASI.Basecode.WebApp.Models
 @using ASI.Basecode.Resources.Constants
 @using ASI.Basecode.Services.ServiceModels
@@ -53,6 +56,7 @@
 </head>
 <body class="workspace-@slug @(dashboard ? "is-dashboard" : "")" data-figma-source="@FigmaReference.Frame(path)">
     <a class="live-skip" href="#workspace-content">Skip to content</a>
+    @* STUDENT layout: top navigation bar. *@
     @if (borrower)
     {
         @* Borrowers get a website-style header instead of the staff sidebar. *@
@@ -89,6 +93,7 @@
             </footer>
         </div>
     }
+    @* STAFF layout: side navigation + top bar. *@
     else
     {
         <div class="live-shell">

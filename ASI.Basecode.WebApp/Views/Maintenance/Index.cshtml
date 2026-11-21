@@ -1,3 +1,5 @@
+@* MAINTENANCE PAGE  (/admin/maintenance)  -  repair cases. Shown by MaintenanceController.Index.
+   While a case is open, its item is on hold and can't be booked. *@
 @using ASI.Basecode.Services.Manager
 @using ASI.Basecode.WebApp.Models
 @using ASI.Basecode.Resources.Constants
@@ -36,6 +38,7 @@
                 <a class="@(closed ? "is-selected" : "")" href="/admin/maintenance?status=closed" aria-current="@(closed ? "page" : null)">Closed <span class="live-count">@Model.ClosedTotal</span></a>
             </nav>
         </div>
+        @* Status filter + search. *@
         <form class="live-filters" method="get" action="/admin/maintenance" role="search" aria-label="Find maintenance cases" data-live-search data-live-target="#maintenance-results">
             @if (closed) { <input type="hidden" name="status" value="closed" /> }
             <label for="maintenance-q" class="live-filter-search">Search cases<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="maintenance-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Equipment, asset code, issue, or repair notes" autocomplete="off" /></span></label>
@@ -90,6 +93,7 @@
                                         }
                                         else
                                         {
+                                            @* UPDATE a case (status, notes; closing needs the repair details) -> MaintenanceController.Update. *@
                                             <form method="post" action="/admin/maintenance/@item.Id/update" class="live-form" data-modal-form novalidate>
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="RowVersion" value="@Convert.ToBase64String(item.RowVersion)" />
@@ -158,6 +162,7 @@
             </div>
             <button class="live-modal-close" type="button" data-modal-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
         </div>
+        @* OPEN a new case for an item -> MaintenanceController.Open (the item list is filtered by wwwroot/js/maintenance-open.js). *@
         <form method="post" action="/admin/maintenance/open" class="maint-open-form" data-modal-form data-maint-open novalidate>
             @Html.AntiForgeryToken()
             <div class="maint-open-body">

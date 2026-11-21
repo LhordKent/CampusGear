@@ -1,3 +1,5 @@
+@* EQUIPMENT PAGE  (/admin/equipment)  -  shown by AdminInventoryController.Equipment.
+   One card per item. "Add equipment" / "Edit item" open _EquipmentEditor.cshtml as a modal. *@
 @using ASI.Basecode.WebApp.Models
 @using ASI.Basecode.Resources.Constants
 @using ASI.Basecode.Services.ServiceModels
@@ -25,6 +27,7 @@
     @if (Model.Feedback is not null) { <div class="live-feedback" role="status" data-toast="success">@Model.Feedback</div> }
     <section class="live-panel" aria-labelledby="inventory-title">
         <h2 id="inventory-title">Equipment inventory</h2>
+        @* Search box: filters the cards as you type (wwwroot/js/live-search.js). *@
         <form class="live-filters" method="get" action="/admin/equipment" role="search" aria-label="Find equipment" data-live-search data-live-target="#inventory-results">
             <label for="inventory-q" class="live-filter-search">Search inventory<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="inventory-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name, asset code, or category" autocomplete="off" /></span></label>
             <a class="live-button secondary live-filter-reset" href="/admin/equipment" data-live-reset>Clear</a>
@@ -65,6 +68,7 @@
                         </dl>
                     </div>
                     <footer class="equipment-card-footer">
+                        @* Delete -> AdminInventoryController.Delete (items with history are made inactive instead). *@
                         <form method="post" action="/admin/equipment/@item.Id/delete" data-confirm-title="Delete @item.Name (@item.AssetCode)?" data-confirm="Items with borrowing or repair history are deactivated instead of deleted." data-confirm-ok="Delete item" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<button class="live-link equipment-card-delete" type="submit" aria-label="Delete @item.AssetCode">Delete</button></form>
                         <a class="live-link" href="/admin/equipment?id=@item.Id" data-modal-load>Edit item</a>
                     </footer>

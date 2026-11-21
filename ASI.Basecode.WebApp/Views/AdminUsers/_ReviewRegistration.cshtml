@@ -1,3 +1,4 @@
+@* REVIEW REGISTRATION MODAL  -  an administrator checks a new student's details, then approves or rejects. *@
 @using ASI.Basecode.Resources.Constants
 @using ASI.Basecode.Services.ServiceModels
 @model UserEditPage
@@ -60,6 +61,7 @@
         </footer>
     </article>
 
+    @* Approve -> AdminUsersController.Approve. The Reject button posts the same form to /reject. *@
     <form id="registration-review-form" class="live-form" method="post" action="/admin/users/@Model.Id/approve" data-modal-form novalidate>
         @Html.AntiForgeryToken()
         <input type="hidden" name="returnUrl" value="/admin/users?status=pending" />

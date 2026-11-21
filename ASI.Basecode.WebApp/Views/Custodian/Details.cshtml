@@ -1,3 +1,5 @@
+@* BOOKING DETAILS  (/custodian/reservations/{id})  -  everything about one booking, plus its action buttons.
+   Shown by CustodianController.Details. Administrators see it read-only (no buttons). *@
 @using ASI.Basecode.Services.Manager
 @model CustodianDetailViewModel
 @using ASI.Basecode.WebApp.Models
@@ -182,6 +184,7 @@
     @if (Model.CanApprove || Model.CanReject || (record.Status == ReservationStatus.Approved && !admin) || Model.CanReturn)
     {
     <section class="reservation-workflow" aria-label="@(returning ? "Return & condition assessment" : record.Status == ReservationStatus.Approved ? "Equipment release" : "Reservation decision")">
+        @* Approve / Reject buttons (only while the request is Pending). *@
         @if (Model.CanApprove || Model.CanReject)
         {
             <div class="live-decision-actions">
@@ -204,6 +207,7 @@
         @if (record.Status == ReservationStatus.Approved && !admin)
         {
             <p class="reservation-workflow-intro">Verify the borrower and item at handoff, then record the equipment's condition at release.</p>
+            @* RELEASE form -> CustodianController.Release (only for Approved bookings). *@
             <form class="live-form live-release-form reservation-action-form" method="post" action="@route/release">
                 @Html.AntiForgeryToken()
                 <label class="live-field span-2" for="ReleaseCondition">
@@ -230,6 +234,7 @@
             {
                 <p class="live-feedback" role="note">Early return: this loan is due @ManilaTime.Format(dueAt). It can be returned now; the item becomes available for the rest of the booking.</p>
             }
+            @* RETURN form -> CustodianController.RecordReturn (only while the item is on loan). *@
             <form class="live-form live-release-form reservation-action-form" method="post" action="@route/return">
                 @Html.AntiForgeryToken()
                 <label class="live-field span-2" for="ReturnCondition">

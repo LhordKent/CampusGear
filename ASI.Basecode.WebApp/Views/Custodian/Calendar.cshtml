@@ -1,3 +1,4 @@
+@* STAFF CALENDAR  (/custodian/calendar and /admin/calendar)  -  every booking in the month. *@
 @model CustodianCalendarViewModel
 @using System.Globalization
 @{
@@ -23,6 +24,7 @@
         <partial name="_EquipmentPicker" model='new ASI.Basecode.WebApp.Models.EquipmentPickerModel(Model.Picker, Model.SelectedItem?.Id, staffPath + "/calendar", Model.Month.Year, Model.Month.Month)' />
         <div class="calendar-main">
         <section class="live-panel">
+            @* Pick a month / an item. *@
             <form class="calendar-selection" method="get" action="@staffPath/calendar" data-calendar-form>
                 <input type="hidden" name="year" value="@Model.Month.Year" /><input type="hidden" name="month" value="@Model.Month.Month" />
                 <input type="hidden" name="equipmentItemId" value="@Model.SelectedItem?.Id" />

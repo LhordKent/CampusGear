@@ -1,3 +1,6 @@
+@* BOOKING PAGE  (/borrower/reservation)  -  the equipment catalog + the "request" dialog.
+   Shown by BorrowerController.Reservation. Picking an item opens the dialog; the date picker is
+   wwwroot/js/reservation-picker.js and the catalog filters are wwwroot/js/borrower-catalog.js. *@
 @model ReservationPageViewModel
 @{
     ViewData["Title"] = TitleText.BrowseEquipment;
@@ -171,6 +174,8 @@
             <dialog class="reserve-dialog" id="reserve-dialog" aria-labelledby="reserve-title"
                     open="@Model.OpenDialog" data-reserve-dialog data-open-on-load="@(Model.OpenDialog ? "true" : "false")"
                     data-eligible="@(Model.IsEligible ? "true" : "false")">
+                @* THE BOOKING FORM -> BorrowerController.CreateReservation -> ReservationRequestService
+                   -> ReservationService.CreateAsync. Each unit requested becomes one Pending booking. *@
                 <form method="post" action="/borrower/reservation" class="reserve-form" id="reservation-form" novalidate data-reserve-form>
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="RequestId" value="@Model.Input.RequestId" />

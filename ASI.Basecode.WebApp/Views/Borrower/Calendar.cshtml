@@ -1,3 +1,4 @@
+@* STUDENT CALENDAR  (/borrower/calendar)  -  month view of when equipment is booked (AvailabilityCalendarService). *@
 @model CalendarPageViewModel
 @{
     ViewData["Title"] = TitleText.AvailabilityCalendar;
@@ -31,6 +32,7 @@
             <div class="calendar-main">
             <section class="borrower-card borrower-calendar" aria-labelledby="calendar-title">
                 <div class="borrower-calendar-toolbar">
+                    @* Pick a month / an item. *@
                     <form method="get" action="/borrower/calendar" class="calendar-selection" data-calendar-form>
                         <input type="hidden" name="year" value="@Model.Year" /><input type="hidden" name="month" value="@Model.Month" />
                         <input type="hidden" name="equipmentItemId" value="@itemId" />

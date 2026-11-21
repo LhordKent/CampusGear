@@ -1,3 +1,5 @@
+@* TWO-FACTOR PAGE  (/auth/two-factor)  -  administrators type the code that was emailed to them.
+   Shown by AccountController.TwoFactor (GET). *@
 @{
     Layout = "_AccountLayout";
     ViewData["Title"] = TitleText.AdministratorVerification;
@@ -15,6 +17,7 @@
     })
     <section class="auth-card" aria-labelledby="auth-title">
         @await Html.PartialAsync("_AccountFeedback")
+        @* Checks the code -> AccountController.TwoFactor (POST). *@
         <form class="auth-form" action="/auth/two-factor" method="post">
             @Html.AntiForgeryToken()
             <label class="auth-field" for="Code"><span class="auth-field-label">6-digit verification code</span>
@@ -24,6 +27,7 @@
             <button class="auth-action" type="submit">VERIFY AND CONTINUE</button>
         </form>
         <div class="auth-links">
+            @* "Send a new code" -> AccountController.ResendTwoFactor. *@
             <form class="auth-inline-form" action="/auth/resend-two-factor" method="post">@Html.AntiForgeryToken()<button type="submit">Resend verification code</button></form>
             <a class="auth-link" href="/auth/login">Back to sign in</a>
         </div>

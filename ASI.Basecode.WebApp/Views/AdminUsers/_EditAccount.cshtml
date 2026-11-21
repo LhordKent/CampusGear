@@ -1,3 +1,6 @@
+@* EDIT ACCOUNT MODAL  -  saving -> AdminUsersController.Edit (POST) -> UserService.EditAsync.
+   Turning off "Account is active" or "Can reserve equipment" cancels the student's open bookings;
+   a warning asks first (data-confirm-on-uncheck, handled in wwwroot/js/confirm-dialog.js). *@
 @using ASI.Basecode.WebApp.Models
 @using ASI.Basecode.Resources.Constants
 @using ASI.Basecode.Services.ServiceModels
@@ -46,6 +49,7 @@
         </div>
     </section>
 
+    @* The whole account form (name, role, access switches, borrower details). *@
     <form id="account-editor-form" class="account-editor-form" method="post" action="/admin/users/@Model.Id/edit" data-modal-form novalidate
           data-confirm-title="Cancel this student's bookings?" data-confirm-ok="Save and cancel bookings" data-confirm-cancel="Go back">
         @Html.AntiForgeryToken()

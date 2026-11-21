@@ -1,3 +1,4 @@
+@* CUSTODIAN DIRECTORY - BORROWERS  (/custodian/borrowers)  -  the student list with status (read-only). *@
 @model DirectoryBorrowersPage
 @{
     ViewData["Title"] = TitleText.BorrowerProfiles;
@@ -11,6 +12,7 @@
         </div>
     </header>
     <section class="live-panel" aria-label="Borrower profiles">
+        @* Search + "borrowing paused" filter. *@
         <form class="live-filters" method="get" action="/custodian/borrowers" role="search" aria-label="Find borrowers" data-live-search data-live-target="#borrower-results">
             <label for="q" class="live-filter-search">Search borrowers<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name, email, Student ID, or department" autocomplete="off" /></span></label>
             <label for="eligibility">Eligibility<select id="eligibility" name="eligibility">

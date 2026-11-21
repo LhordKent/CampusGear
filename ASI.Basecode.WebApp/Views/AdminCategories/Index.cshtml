@@ -1,3 +1,5 @@
+@* EQUIPMENT CATEGORIES PAGE  (/admin/categories)  -  shown by AdminCategoriesController.Index.
+   "Add category" / "Edit" open _CategoryEditor.cshtml as a modal. *@
 @model CategoriesPageModel
 @{ ViewData["Title"] = TitleText.EquipmentCategories; ViewData["WorkspaceRole"] = "Administrator";
    var editor = Model.Input.Id is not null || Context.Request.Query["form"] == "add" || !ViewData.ModelState.IsValid;
@@ -18,6 +20,7 @@
     @if (Model.Error is not null) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
     <section class="live-panel" aria-labelledby="categories-title">
         <h2 id="categories-title" class="visually-hidden">Categories</h2>
+        @* Search box: filters the table as you type (wwwroot/js/live-search.js). *@
         <form class="live-filters" method="get" action="/admin/categories" role="search" aria-label="Find categories" data-live-search data-live-target="#category-results">
             <label for="category-q" class="live-filter-search">Search categories<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="category-q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name or description" autocomplete="off" /></span></label>
             <a class="live-button secondary live-filter-reset" href="/admin/categories" data-live-reset>Clear</a>
@@ -75,6 +78,7 @@
                                         }
                                         else
                                         {
+                                            @* Delete -> AdminCategoriesController.Delete. (The button is disabled while the category has active items.) *@
                                             <form method="post" action="/admin/categories/@category.Id/delete" data-confirm-title="Delete @category.Name?" data-confirm="@(category.InactiveItems > 0 ? $"{(category.InactiveItems == 1 ? "Its inactive item keeps its" : $"Its {category.InactiveItems} inactive items keep their")} borrowing history. Adding a category with this name later brings it back." : "This can't be undone.")" data-confirm-ok="Delete category" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<button class="live-button secondary category-delete" type="submit" aria-label="Delete @category.Name">Delete</button></form>
                                         }
                                     </div>

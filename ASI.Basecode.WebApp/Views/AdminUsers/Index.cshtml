@@ -1,3 +1,5 @@
+@* USERS & ROLES PAGE  (/admin/users)  -  shown by AdminUsersController.Index.
+   The account table. "Edit", "Review" and "Create account" open modals (_EditAccount, _ReviewRegistration, _CreateAccount). *@
 @using ASI.Basecode.WebApp.Models
 @using ASI.Basecode.Resources.Constants
 @using ASI.Basecode.Services.ServiceModels
@@ -33,6 +35,7 @@
         <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div>
     }
     <section class="live-panel" aria-label="Accounts">
+        @* Search + role + status filters (update the table as you type, wwwroot/js/live-search.js). *@
         <form class="live-filters" method="get" action="@basePath" role="search" aria-label="Find user accounts" data-live-search data-live-target="#user-results">
             <label for="q" class="live-filter-search">Search accounts<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="q" name="q" type="search" value="@Model.Query" maxlength="120" placeholder="Name, email, Student ID, or department" autocomplete="off" /></span></label>
             <label for="role">Role<select id="role" name="role"><option value="all" selected="@(Model.Role == "all")">All roles</option>
@@ -88,6 +91,7 @@
                                     <a class="live-button" href="/admin/users/@row.Id/review" data-modal-load aria-label="Review @row.FullName's registration">Review</a>
                                 }
                                 <a class="live-button secondary" href="/admin/users/@row.Id/edit" data-modal-load>Edit</a>
+                                @* Delete -> AdminUsersController.Delete (accounts with history are deactivated instead). *@
                                 <form method="post" action="/admin/users/@row.Id/delete" data-confirm-title="Delete @row.FullName's account?" data-confirm="Accounts with borrowing history are deactivated instead of deleted, and their pending or approved bookings are cancelled." data-confirm-ok="Delete account" data-confirm-cancel="Keep">@Html.AntiForgeryToken()<input type="hidden" name="returnUrl" value="@returnUrl" /><button class="live-button secondary" type="submit" aria-label="Delete @row.FullName">Delete</button></form>
                             </div></td>
                         </tr>
