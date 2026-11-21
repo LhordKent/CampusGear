@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 // =====================================================================
 namespace ASI.Basecode.WebApp.Controllers
 {
+    // WBS 45.00 | Protect the borrower actions even when a request comes directly to a route.
     [Authorize(Roles = RoleNames.Borrower)]
     public sealed class BorrowerController : Mvc.ControllerBase<BorrowerController>
     {
@@ -71,7 +72,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Page(await _catalog.ReservationAsync(RequestActor, equipmentItemId, state, id, cancellationToken), "Reservation");
         }
 
-        // GET /borrower/reservation/availability: "is this item free from START to END?" - answered as JSON for the booking form.
+        // WBS 25.00 | Return a free-unit estimate for the selected time range; the save checks again under the item lock.
         [HttpGet("borrower/reservation/availability")]
         public async Task<IActionResult> Availability(Guid equipmentItemId, string? start, string? end, CancellationToken cancellationToken)
         {
@@ -101,7 +102,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
-        // Busy times for the request dialog's date picker. No borrower details are included, only numbered units.
+        // WBS 25.00 | The date picker gets busy times by numbered unit without borrower details.
         [HttpGet("borrower/reservation/schedule")]
         public async Task<IActionResult> Schedule(Guid equipmentItemId, string? from, CancellationToken cancellationToken)
         {
@@ -133,7 +134,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
-        // POST /borrower/reservation: submits a booking request (it becomes Pending).
+        // WBS 25.00 | Bind the posted dates and selected equipment before resolving candidate units.
         [HttpPost("borrower/reservation")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReservation(ReservationRequestModel input, CancellationToken cancellationToken)

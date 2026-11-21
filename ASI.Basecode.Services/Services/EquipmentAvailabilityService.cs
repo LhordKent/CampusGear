@@ -63,7 +63,7 @@ namespace ASI.Basecode.Services.Services
                 .ToList();
         }
 
-        // Finds units of a product that are free for START..END (used when a student books).
+        // WBS 25.00 | Filter out blocked physical units and try the selected unit first if it is free.
         public async Task<List<Guid>> FindFreeUnitsAsync(
             IReadOnlyList<Guid> unitIds,
             DateTime startUtc,

@@ -36,7 +36,7 @@ namespace ASI.Basecode.Data.Repositories
                 .ToListAsync(ct);
         }
 
-        // The one rule for "this unit is taken": the booking check and the borrower's date picker both use it.
+        // WBS 25.00 | Shared blocking query for the date picker and candidate lookup. ReservationRepository rechecks on save.
         private IQueryable<Reservation> Blocking(IReadOnlyList<Guid> ids, DateTime start, DateTime end, DateTime now)
         {
             return Context

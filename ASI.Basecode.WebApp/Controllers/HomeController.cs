@@ -42,7 +42,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return Redirect("/auth/login");
         }
 
-        // GET /custodian/dashboard: the custodian's home page (today's pickups, returns due, pending requests).
+        // WBS 45.00 | Each staff dashboard route selects a model for the matching workspace and role.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpGet("custodian/dashboard")]
         public async Task<IActionResult> Custodian(CancellationToken cancellationToken)

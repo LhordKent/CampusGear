@@ -68,6 +68,7 @@ window.createReservationPicker = ({ form, start, end, quantity }) => {
         return e;
     };
 
+    // WBS 25.00 | Request the busy intervals used to disable times in the picker.
     const fetchWindow = async (id, fromDay) => {
         const query = new URLSearchParams({ equipmentItemId: id });
         if (fromDay !== undefined) query.set('from', toInput(fromDay).slice(0, 10));

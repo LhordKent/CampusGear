@@ -165,7 +165,7 @@
             showError(form, invalid?.validationMessage ? `${invalid.closest('label')?.querySelector('span')?.firstChild?.textContent.trim() ?? 'A field'}: ${invalid.validationMessage}` : 'Check the highlighted field.', invalid?.name);
             return;
         }
-        // The clicked button decides where the form posts (formaction), so one dialog can offer two actions.
+        // WBS 28.00 | The clicked button can override the form route, as Approve does in the reservation queue.
         // button.formAction returns the page's own URL when the attribute is absent, so only use it when it is set.
         const submit = event.submitter ?? form.querySelector('[type="submit"]');
         const target = submit.hasAttribute('formaction') ? submit.formAction : form.action;

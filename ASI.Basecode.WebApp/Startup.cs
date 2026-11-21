@@ -52,7 +52,7 @@ namespace ASI.Basecode.WebApp
                 options.UseSqlServer(this.Configuration.GetCampusGearConnectionString())
             );
 
-            // Session (account flows: administrator code, password reset)
+            // WBS 5.00 | The flow session holds unfinished administrator sign-in and password reset steps.
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
@@ -119,6 +119,7 @@ namespace ASI.Basecode.WebApp
             this._app.UseRateLimiter();
             this._app.UseSession();
 
+            // WBS 5.00 / WBS 45.00 | Establish the account from its cookie before checking endpoint permissions.
             this._app.UseAuthentication();
             this._app.UseAuthorization();
         }

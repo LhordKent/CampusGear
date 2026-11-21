@@ -25,7 +25,7 @@ namespace ASI.Basecode.WebApp.Authentication
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation) { }
 
         /// <summary>
-        /// Runs for the sign-in cookie on every request (validation interval is zero in Startup.Auth.cs).
+        /// WBS 5.00 | Runs for the sign-in cookie on every request (validation interval is zero in Startup.Auth.cs).
         /// Returning null rejects the cookie and signs the user out, so a deleted, deactivated or
         /// unapproved account is signed out on its next request.
         /// </summary>

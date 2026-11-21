@@ -28,7 +28,8 @@ namespace ASI.Basecode.Data.Repositories
             return Context.Reservations.SingleOrDefaultAsync(x => x.Id == id, ct);
         }
 
-        // Loads a booking with its loan, item and student - everything a status change needs.
+        // WBS 28.00 | Load the tracked request and related records the service needs for the decision.
+        // The workflow load includes the loan, equipment item and borrower profile.
         public Task<Reservation?> FindWorkflowAsync(Guid id, CancellationToken ct)
         {
             return Context
@@ -48,9 +49,8 @@ namespace ASI.Basecode.Data.Repositories
                 .SingleOrDefaultAsync(ct);
         }
 
-        // THE CONFLICT CHECK: does any booking overlap START..END for this item?
-        // Counts: Approved, Released (on loan), and Pending requests whose hold is still running.
-        // Overlap rule: other.Start < END and other.End > START.
+        // WBS 25.00 | Strict time comparisons allow adjacent bookings; the optional ID excludes the request being approved.
+        // Approved, released and still-held pending bookings can block the time range.
         public Task<bool> HasConflictAsync(Guid itemId, DateTime start, DateTime end, DateTime now, Guid? excluding, CancellationToken ct)
         {
             return Context.Reservations.AnyAsync(

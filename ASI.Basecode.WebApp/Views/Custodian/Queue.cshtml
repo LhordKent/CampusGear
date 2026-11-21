@@ -1,8 +1,3 @@
-@* CUSTODIAN QUEUE  -  one view for three tabs, chosen by CustodianController:
-     /custodian/approvals  -> Pending requests (approve/reject) and Approved bookings (release)
-     /custodian/returns    -> items on loan (record the return)
-     /custodian/history    -> all bookings (read-only)
-   Every action is a small form inside a modal; each posts to CustodianController -> ReservationService. *@
 @model CustodianListViewModel
 @{
     ViewData["Title"] = Model.Queue == "history" ? TitleText.BorrowingHistory : Model.Queue == "active" ? TitleText.ReturnDesk : TitleText.ReservationApprovals;
@@ -47,7 +42,6 @@
     @if (!string.IsNullOrWhiteSpace(Model.Error)) { <div class="live-feedback error" role="alert" data-toast="error">@Model.Error</div> }
     <section class="live-panel" aria-labelledby="queue-title">
         <div class="custodian-panel-heading"><h2 id="queue-title">@(returns ? "Active loans awaiting return" : history ? "Reservation and loan records" : releaseTab ? "Approved bookings awaiting handoff" : "Requests awaiting a decision")</h2><span class="live-muted">Times in Manila (UTC+8)</span></div>
-        @* Search + filters for the list. *@
         <form class="live-filters" method="get" action="@basePath" role="search" aria-label="Filter records" data-live-search data-live-target="#queue-results">
             <label for="queue-search" class="live-filter-search">Search borrower or equipment<span class="live-search-input"><svg class="icon" aria-hidden="true"><use href="/img/icons.svg#search"></use></svg><input id="queue-search" name="q" type="search" value="@Model.Search" maxlength="100" placeholder="Name, email, or asset code" autocomplete="off" /></span></label>
             @if (history)
@@ -98,7 +92,6 @@
                                         @if (returns)
                                         {
                                             @if (early) { <p class="live-feedback" role="note">Returning before the due time. The item becomes available for the rest of the booking.</p> }
-                                            @* RETURN form -> CustodianController.RecordReturn -> ReservationService.ReturnAsync. *@
                                             <form method="post" action="/custodian/reservations/@row.Id/return" class="live-form" data-modal-form novalidate>
                                                 @Html.AntiForgeryToken()
                                                 <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
@@ -122,8 +115,7 @@
                                             }
                                             else
                                             {
-                                            @* REJECT form -> CustodianController.Reject (needs a reason).
-                                               Its "Approve" button posts the same form to /approve (formaction) -> ReservationService.ApproveAsync. *@
+                                            @* WBS 28.00 | Reject sends Reason with the request ID in the URL; Approve overrides the form route. *@
                                             <form method="post" action="/custodian/reservations/@row.Id/reject" class="live-form" data-modal-form novalidate>
                                                 @Html.AntiForgeryToken()
                                                 <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>
@@ -150,7 +142,6 @@
                                             }
                                             else
                                             {
-                                            @* RELEASE form (hand the item over) -> CustodianController.Release -> ReservationService.ReleaseAsync. *@
                                             <form method="post" action="/custodian/reservations/@row.Id/release" class="live-form" data-modal-form novalidate>
                                                 @Html.AntiForgeryToken()
                                                 <div class="live-modal-alert wide" role="alert" data-modal-alert hidden></div>

@@ -51,7 +51,7 @@ namespace ASI.Basecode.Services.Services
             );
         }
 
-        /// <summary>Which desk actions a reservation allows right now. Shared by the details page and the queue dialogs.</summary>
+        /// <summary>WBS 28.00 | Keep the decision controls consistent between the details page and the queue dialogs.</summary>
         private static (bool CanApprove, bool CanReject, bool CanRelease, string? Note) Actions(Reservation reservation, DateTime now)
         {
             var pending =

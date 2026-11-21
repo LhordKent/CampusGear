@@ -19,6 +19,7 @@ namespace ASI.Basecode.Data.Repositories
                 .ToListAsync(ct);
         }
 
+        // WBS 4.00 | Select the newest unconsumed, non-invalidated code; the service checks expiry and attempts.
         public Task<EmailChallenge?> LatestValidAsync(string userId, EmailChallengePurpose purpose, CancellationToken ct)
         {
             return Context

@@ -101,7 +101,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View("Queue", Feedback(await _desk.GetHistoryAsync(new(q, status, from, to, page), cancellationToken)));
         }
 
-        // GET /custodian/reservations/{id}: full details of one booking.
+        // WBS 45.00 | Both staff roles can read details. The decision endpoints below require Custodian.
         [Authorize(Roles = RoleNames.CustodianOrAdministrator)]
         [HttpGet("custodian/reservations/{id:guid}")]
         public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
@@ -116,7 +116,7 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(model with { Feedback = TempData["CustodianFeedback"] as string, Error = TempData["CustodianError"] as string });
         }
 
-        // POST .../approve: Pending -> Approved.
+        // WBS 28.00 / WBS 45.00 | The custodian's Approve action gets the reservation ID from the route.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpPost("custodian/reservations/{id:guid}/approve")]
         public Task<IActionResult> Approve(Guid id, CancellationToken cancellationToken)
@@ -129,7 +129,7 @@ namespace ASI.Basecode.WebApp.Controllers
             );
         }
 
-        // POST .../reject: Pending -> Rejected (a reason is required).
+        // WBS 28.00 / WBS 45.00 | Reject binds the ID from the route and validates the reason from the form.
         [Authorize(Roles = RoleNames.Custodian)]
         [HttpPost("custodian/reservations/{id:guid}/reject")]
         public Task<IActionResult> Reject(Guid id, [FromForm] string? reason, CancellationToken cancellationToken)
@@ -254,8 +254,7 @@ namespace ASI.Basecode.WebApp.Controllers
             };
         }
 
-        // Runs one booking action (approve/reject/release/return) and turns the result or error into
-        // a toast (modal form) or a message + redirect (normal form).
+        // WBS 28.00 | Pass the signed-in actor to the service and translate the result for the queue modal or details page.
         private async Task<IActionResult> TransitionAsync(
             Guid id,
             Func<ReservationActor, Task<ReservationResult>> operation,

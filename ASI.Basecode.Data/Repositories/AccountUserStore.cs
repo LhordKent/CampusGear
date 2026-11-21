@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 // and turns database errors (e.g. duplicate email) into friendly results.
 namespace ASI.Basecode.Data.Repositories
 {
-    // Retains Identity's EF implementation; only translates relational constraint failures at the boundary.
+    // WBS 4.00 / WBS 5.00 | Identity's EF user store owns account lookup and lockout state; this class translates write errors.
     public sealed class AccountUserStore : UserStore<User, IdentityRole, AsiBasecodeDBContext>
     {
         private readonly AsiBasecodeDBContext _db;

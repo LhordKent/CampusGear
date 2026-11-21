@@ -16,7 +16,6 @@
     })
     <section class="auth-card" aria-labelledby="auth-title">
         @await Html.PartialAsync("_AccountFeedback")
-        @* Email + password. Administrators are sent to the two-factor page next; everyone else goes to their dashboard. *@
         <form class="auth-form" action="/auth/login" method="post">
             @Html.AntiForgeryToken()
             <label class="auth-field" for="Email">

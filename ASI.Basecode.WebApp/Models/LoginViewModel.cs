@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ASI.Basecode.WebApp.Models
 {
-    /// <summary>The sign-in form posted from Views/Account/Login.cshtml.</summary>
+    /// <summary>WBS 4.00 | The Email and Password field names in Login.cshtml bind to these properties.</summary>
     public class LoginViewModel
     {
         [Required, EmailAddress, StringLength(256)]

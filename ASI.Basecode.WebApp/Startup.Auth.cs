@@ -23,6 +23,7 @@ namespace ASI.Basecode.WebApp
                 .AddSignInManager<SignInManager>()
                 .AddDefaultTokenProviders();
 
+            // WBS 4.00 / WBS 5.00 | Configure the Identity cookie issued on sign-in and removed on sign-out.
             this._services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = "/auth/login";
@@ -32,7 +33,7 @@ namespace ASI.Basecode.WebApp
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.Cookie.SecurePolicy = this._environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
                 options.ExpireTimeSpan = TimeSpan.FromHours(8);
-                // Not signed in: a browser page visit goes to the login page; fetch calls and form posts get 401.
+                // WBS 45.00 | Anonymous page visits go to sign-in; anonymous fetch calls and form posts get 401.
                 // Signed in with the wrong role: always 403 (HomeController renders the access-denied page for browsers).
                 options.Events.OnRedirectToLogin = context =>
                 {
@@ -54,7 +55,7 @@ namespace ASI.Basecode.WebApp
                 };
             });
 
-            // The sign-in cookie is re-checked on every request (see Authentication/SignInManager.cs), so a
+            // WBS 5.00 | The sign-in cookie is re-checked on every request (see Authentication/SignInManager.cs), so a
             // deactivated or unapproved account loses its open session immediately.
             this._services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
         }
